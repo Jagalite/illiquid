@@ -23,9 +23,20 @@ import time
 ROOT = Path(__file__).resolve().parents[2]
 HERE = Path(__file__).resolve().parent
 SOURCE = "Sources/CFFmpeg/include/ffmpeg_shim.h"
-BASELINE_REVISION = "68274d1b09dcc866296321a5a8858efc297c4f19"
-BASELINE_SOURCE_BLOB = "10a3f9d1a2c5604a2eaaa8299a727ce5d2552bcc"
-BASELINE_FUNCTION_SHA256 = "4f4e115e23be67dbdbbaf3390af4862969c13c2fdff628f5e364b808e35c81b0"
+BASELINES = {
+    "scalar": {
+        "file": "Baseline.h",
+        "revision": "68274d1b09dcc866296321a5a8858efc297c4f19",
+        "source_blob": "10a3f9d1a2c5604a2eaaa8299a727ce5d2552bcc",
+        "sha256": "4f4e115e23be67dbdbbaf3390af4862969c13c2fdff628f5e364b808e35c81b0",
+    },
+    "checked-palette": {
+        "file": "CheckedPaletteBaseline.h",
+        "revision": "ea2ff568237e2667f7b1aeee67b11a44ebe95b72",
+        "source_blob": "7f980fcf6a8ba1612259d555fb71994da5148d27",
+        "sha256": "312c80c905a5cdd6d9f2a262821221e83dc8564360b7e78a26916429c51c9775",
+    },
+}
 FUNCTION = "illiquid_subtitle_rect_copy_bgra"
 COMMON_FLAGS = ["-std=c11", "-Wall", "-Wextra", "-Werror", "-fno-lto"]
 MAX_ITERATIONS = 99_999_992  # Complete eight-fixture cycles, below the harness cap.
@@ -75,6 +86,7 @@ def paired_count(text: str) -> int:
 class Experiment:
     def __init__(self, args: argparse.Namespace) -> None:
         self.args = args
+        self.baseline = BASELINES[args.baseline]
         self.output = args.output.resolve()
         self.output.mkdir(parents=True, exist_ok=False)
         compiler = shutil.which(args.cc)
@@ -91,8 +103,9 @@ class Experiment:
             "platform": platform.platform(),
             "architecture": platform.machine(),
             "compiler": self.command([self.cc, "--version"]).strip(),
-            "baseline_revision": BASELINE_REVISION,
-            "baseline_source_blob": BASELINE_SOURCE_BLOB,
+            "baseline": args.baseline,
+            "baseline_revision": self.baseline["revision"],
+            "baseline_source_blob": self.baseline["source_blob"],
             "candidate_source_kind": "working_tree",
             "candidate_route": "complete_shim" if platform.system() == "Darwin" else "verbatim_helper",
             "common_compiler_flags": COMMON_FLAGS,
@@ -127,14 +140,14 @@ class Experiment:
         return process.stdout
 
     def prepare_sources(self) -> None:
-        baseline = (HERE / "Baseline.h").read_bytes()
-        if digest(baseline) != BASELINE_FUNCTION_SHA256:
+        baseline = (HERE / self.baseline["file"]).read_bytes()
+        if digest(baseline) != self.baseline["sha256"]:
             raise ValueError("The frozen baseline helper has changed")
         candidate = (ROOT / SOURCE).read_bytes()
         helper = extract_function(candidate.decode()).encode()
         inputs = {
             SOURCE: candidate,
-            "Benchmarks/BitmapSubtitlePalette/Baseline.h": baseline,
+            f"Benchmarks/BitmapSubtitlePalette/{self.baseline['file']}": baseline,
             "Benchmarks/BitmapSubtitlePalette/Harness.c": (HERE / "Harness.c").read_bytes(),
             "Benchmarks/BitmapSubtitlePalette/run.py": Path(__file__).read_bytes(),
         }
@@ -165,38 +178,56 @@ class Experiment:
 
         metadata_path = ROOT / "BuildInputs/native-sdk.json"
         metadata = json.loads(metadata_path.read_text())
-        archive_path = ROOT / "BuildInputs" / metadata["archive"]
-        archive_sha = file_digest(archive_path)
-        if archive_sha != metadata["sha256"]:
-            raise ValueError("Pinned native SDK archive hash mismatch")
         prefix = metadata["kegs"]["ffmpeg"] + "/include/"
         expected = {entry["path"]: entry["sha256"] for entry in metadata["files"]
                     if entry["path"].startswith(prefix) and "sha256" in entry}
         self.include = self.output / "include"
         extracted: dict[str, str] = {}
-        with tarfile.open(archive_path) as archive:
-            for member in archive:
-                if not member.name.startswith(prefix) or member.isdir():
-                    continue
-                relative = PurePosixPath(member.name[len(prefix):])
-                if relative.is_absolute() or ".." in relative.parts or not member.isfile():
-                    raise ValueError(f"Unexpected SDK header member: {member.name}")
-                if member.name not in expected or member.name in extracted:
-                    raise ValueError(f"Unexpected or duplicate SDK header: {member.name}")
-                stream = archive.extractfile(member)
-                if stream is None:
-                    raise ValueError(f"Missing SDK header data: {member.name}")
-                data = stream.read()
-                if digest(data) != expected[member.name]:
-                    raise ValueError(f"SDK header hash mismatch: {member.name}")
-                target = self.include.joinpath(*relative.parts)
-                target.parent.mkdir(parents=True, exist_ok=True)
-                target.write_bytes(data)
-                extracted[member.name] = digest(data)
+
+        def relative_header(name: str) -> PurePosixPath:
+            relative = PurePosixPath(name[len(prefix):])
+            if relative.is_absolute() or ".." in relative.parts:
+                raise ValueError(f"Unexpected SDK header path: {name}")
+            return relative
+
+        def copy_header(name: str, data: bytes) -> None:
+            if name not in expected or name in extracted:
+                raise ValueError(f"Unexpected or duplicate SDK header: {name}")
+            if digest(data) != expected[name]:
+                raise ValueError(f"SDK header hash mismatch: {name}")
+            target = self.include.joinpath(*relative_header(name).parts)
+            target.parent.mkdir(parents=True, exist_ok=True)
+            target.write_bytes(data)
+            extracted[name] = digest(data)
+
+        archive_sha = None
+        if self.args.sdk_headers is not None:
+            # Copy only manifest-listed, hash-verified headers into the isolated
+            # include directory; unverified extra input files cannot affect builds.
+            for name in expected:
+                path = self.args.sdk_headers.joinpath(*relative_header(name).parts)
+                copy_header(name, path.read_bytes())
+        else:
+            archive_path = ROOT / "BuildInputs" / metadata["archive"]
+            archive_sha = file_digest(archive_path)
+            if archive_sha != metadata["sha256"]:
+                raise ValueError("Pinned native SDK archive hash mismatch")
+            with tarfile.open(archive_path) as archive:
+                for member in archive:
+                    if not member.name.startswith(prefix) or member.isdir():
+                        continue
+                    if not member.isfile():
+                        raise ValueError(f"Unexpected SDK header member: {member.name}")
+                    stream = archive.extractfile(member)
+                    if stream is None:
+                        raise ValueError(f"Missing SDK header data: {member.name}")
+                    copy_header(member.name, stream.read())
         if extracted != expected:
             raise ValueError("Pinned FFmpeg header inventory mismatch")
         self.report["sdk"] = {
+            "header_source": "preextracted" if self.args.sdk_headers is not None else "archive",
             "archive_sha256": archive_sha,
+            "expected_archive_sha256": metadata["sha256"],
             "manifest_sha256": file_digest(metadata_path),
             "header_count": len(extracted),
             "header_inventory_sha256": digest(json.dumps(extracted, sort_keys=True).encode()),
@@ -338,6 +369,10 @@ def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--output", type=Path, required=True, help="new directory for immutable run evidence")
     parser.add_argument("--cc", default="cc")
+    parser.add_argument("--baseline", choices=BASELINES, default="scalar",
+                        help="frozen implementation to compare with the working tree")
+    parser.add_argument("--sdk-headers", type=Path,
+                        help="pre-extracted FFmpeg include directory; all pinned hashes are checked")
     parser.add_argument("--pairs", type=paired_count, default=8)
     parser.add_argument("--target-ms", type=positive_float, default=80)
     parser.add_argument("--verify-only", action="store_true")

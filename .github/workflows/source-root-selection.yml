@@ -1,0 +1,137 @@
+name: Source root selection performance
+
+on:
+  push:
+    branches: ['perf/source-root-selection-20261028']
+    paths:
+      - 'Sources/IlliquidApp/UI/SourceBrowserFilter.swift'
+      - 'Sources/IlliquidApp/UI/SourceTreeProjectionInput.swift'
+      - 'Sources/IlliquidApp/App/AppModel.swift'
+      - 'Sources/IlliquidCore/MediaLibrary/**'
+      - 'Sources/IlliquidCore/Utilities/NormalizedFileURL.swift'
+      - 'Sources/IlliquidCore/Utilities/MediaFileSupport.swift'
+      - 'Sources/IlliquidCore/Utilities/SourcePreparationExecutor.swift'
+      - 'Benchmarks/SourceTreeVisibility/run.py'
+      - 'Tests/IlliquidAppTests/SourceBrowserFilterTests.swift'
+      - 'Tests/IlliquidAppTests/SourceTreeVisibilityCacheTests.swift'
+      - 'Tests/IlliquidAppTests/SourceBrowserSearchTests.swift'
+      - 'Tests/IlliquidAppTests/SourceVisibilityStorageTests.swift'
+      - 'Sources/IlliquidApp/UI/SourcesSidebar.swift'
+      - 'Tests/IlliquidAppTests/SourceRootSelectionTests.swift'
+      - 'Benchmarks/SourceRootSelection/**'
+      - '.github/workflows/source-root-selection.yml'
+      - '!Benchmarks/SourceRootSelection/**/*.md'
+      - '!Benchmarks/SourceRootSelection/evidence/**'
+  pull_request:
+    paths:
+      - 'Sources/IlliquidCore/MediaLibrary/**'
+      - 'Sources/IlliquidCore/Utilities/NormalizedFileURL.swift'
+      - 'Sources/IlliquidCore/Utilities/MediaFileSupport.swift'
+      - 'Sources/IlliquidCore/Utilities/SourcePreparationExecutor.swift'
+      - 'Tests/IlliquidAppTests/SourceBrowserFilterTests.swift'
+      - 'Tests/IlliquidAppTests/SourceTreeVisibilityCacheTests.swift'
+      - 'Tests/IlliquidAppTests/SourceBrowserSearchTests.swift'
+      - 'Tests/IlliquidAppTests/SourceVisibilityStorageTests.swift'
+      - 'Sources/IlliquidApp/UI/SourcesSidebar.swift'
+      - 'Sources/IlliquidApp/UI/SourceBrowserFilter.swift'
+      - 'Sources/IlliquidApp/UI/SourceTreeProjectionInput.swift'
+      - 'Sources/IlliquidApp/App/AppModel.swift'
+      - 'Tests/IlliquidAppTests/SourceRootSelectionTests.swift'
+      - 'Benchmarks/SourceRootSelection/**'
+      - 'Benchmarks/SourceTreeVisibility/run.py'
+      - '.github/workflows/source-root-selection.yml'
+      - '!Benchmarks/SourceRootSelection/**/*.md'
+      - '!Benchmarks/SourceRootSelection/evidence/**'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: source-root-selection-${{ github.head_ref || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  native-component:
+    runs-on: macos-26
+    timeout-minutes: 25
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Run current-source regressions or a dispatched historical study
+        run: |
+          echo "Kyoto is unavailable on this isolated hosted runner; builds use private, serialized scratch paths."
+          mode=()
+          if test "$GITHUB_EVENT_NAME" != 'workflow_dispatch'; then
+            mode+=(--tests-only)
+          fi
+          python3 Benchmarks/SourceRootSelection/run.py \
+            --pairs 8 --target-ms 120 \
+            --output "$RUNNER_TEMP/source-root-selection" "${mode[@]}"
+      - name: Emit evidence even after a failed study
+        if: always()
+        run: |
+          python3 - <<'PY'
+          import json, os
+          from pathlib import Path
+          root = Path(os.environ['RUNNER_TEMP']) / 'source-root-selection'
+          for name in ['manifest.json', 'tests.json', 'verification.json', 'summary.json']:
+              path = root / name
+              if path.is_file():
+                  print('ROOT_SELECTION_FILE ' + json.dumps({'name': name, 'content': path.read_text()}, separators=(',', ':')))
+          PY
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: source-root-selection-macos
+          path: |
+            ${{ runner.temp }}/source-root-selection/*.json
+            ${{ runner.temp }}/source-root-selection/*.jsonl
+            ${{ runner.temp }}/source-root-selection/*.log
+            ${{ runner.temp }}/source-root-selection/packages/**/*.swift
+          retention-days: 30
+
+  portable-component:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Run current-source regressions or a dispatched historical study
+        run: |
+          echo "Kyoto is unavailable on this isolated hosted runner; builds use private, serialized scratch paths."
+          mode=()
+          if test "$GITHUB_EVENT_NAME" != 'workflow_dispatch'; then
+            mode+=(--tests-only)
+          fi
+          python3 Benchmarks/SourceRootSelection/run.py \
+            --pairs 8 --target-ms 120 \
+            --output "$RUNNER_TEMP/source-root-selection" "${mode[@]}"
+      - name: Emit portable evidence
+        if: always()
+        run: |
+          python3 - <<'PY'
+          import json, os
+          from pathlib import Path
+          root = Path(os.environ['RUNNER_TEMP']) / 'source-root-selection'
+          for name in ['manifest.json', 'tests.json', 'verification.json', 'summary.json']:
+              path = root / name
+              if path.is_file():
+                  print('ROOT_SELECTION_FILE ' + json.dumps({'name': name, 'content': path.read_text()}, separators=(',', ':')))
+          PY
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: source-root-selection-linux
+          path: |
+            ${{ runner.temp }}/source-root-selection/*.json
+            ${{ runner.temp }}/source-root-selection/*.jsonl
+            ${{ runner.temp }}/source-root-selection/*.log
+            ${{ runner.temp }}/source-root-selection/packages/**/*.swift
+          retention-days: 30

@@ -10,6 +10,7 @@ import json
 import os
 from pathlib import Path
 import platform
+import re
 import shutil
 import statistics
 import subprocess
@@ -37,6 +38,8 @@ def write_json(path, value):
 class Runner:
     def __init__(self, args):
         self.args = args
+        self.baseline_commit = args.baseline_ref or PIN
+        self.baseline_blob = args.baseline_blob or BLOB
         self.output = Path(args.output).resolve() if args.output else Path(
             tempfile.mkdtemp(prefix="illiquid-planar-ownership-")
         )
@@ -51,7 +54,7 @@ class Runner:
         self.swiftc = str(Path(self.swiftc).absolute())
         self.native = platform.system() == "Darwin"
         self.manifest = {
-            "baseline_commit": PIN, "baseline_blob_sha1": BLOB,
+            "baseline_commit": self.baseline_commit, "baseline_blob_sha1": self.baseline_blob,
             "source_path": SOURCE, "platform": platform.platform(),
             "machine": platform.machine(), "python": platform.python_version(),
             "clock": "DispatchTime.now().uptimeNanoseconds",
@@ -94,9 +97,9 @@ class Runner:
         return result.stdout
 
     def prepare(self):
-        baseline = self.run(["git", "show", f"{PIN}:{SOURCE}"])
-        actual_blob = self.run(["git", "rev-parse", f"{PIN}:{SOURCE}"]).decode().strip()
-        if actual_blob != BLOB:
+        baseline = self.run(["git", "show", f"{self.baseline_commit}:{SOURCE}"])
+        actual_blob = self.run(["git", "rev-parse", f"{self.baseline_commit}:{SOURCE}"]).decode().strip()
+        if actual_blob != self.baseline_blob:
             raise RuntimeError(f"Pinned baseline blob mismatch: {actual_blob}")
         candidate = (ROOT / SOURCE).read_bytes()
         self.manifest["compiler"] = self.run([self.swiftc, "--version"]).decode().strip()
@@ -275,6 +278,8 @@ let package = Package(name: "PlanarOwnershipNativeTests", platforms: [.macOS(.v1
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--baseline-ref", help="Pinned full commit SHA; requires --baseline-blob")
+    parser.add_argument("--baseline-blob", help="Expected production source Git blob SHA")
     parser.add_argument("--swiftc")
     parser.add_argument("--output")
     parser.add_argument("--build-only", action="store_true")
@@ -288,6 +293,11 @@ def main():
     parser.add_argument("--seeds", type=lambda value: [int(x) for x in value.split(",")], default=[1, 7, 42, 2026, 65537])
     parser.add_argument("--steps", type=int, default=2000)
     args = parser.parse_args()
+    if bool(args.baseline_ref) != bool(args.baseline_blob):
+        parser.error("--baseline-ref and --baseline-blob must be supplied together")
+    for value in (args.baseline_ref, args.baseline_blob):
+        if value is not None and not re.fullmatch(r"[0-9a-f]{40}", value):
+            parser.error("Baseline overrides must be full lowercase 40-character Git SHAs")
     if args.rounds < 1 or args.iterations < 1 or args.warmup < 0 or args.steps < 0:
         parser.error("Invalid round/iteration/warmup/step count")
     runner = Runner(args)

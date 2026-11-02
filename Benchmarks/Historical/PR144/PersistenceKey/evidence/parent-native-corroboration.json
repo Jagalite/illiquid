@@ -1,0 +1,249 @@
+{
+  "schema_version": 1,
+  "passed": true,
+  "scope": "Independent reconstruction of existing PR #144 native evidence; not execution of the companion's expanded native suite.",
+  "source_ref": "630530f27be150823d4dd4737b15cec947bfd8c9",
+  "measured_commit": "6b0b45aa1c5d3efece3bed7defa6245a79ac617b",
+  "source_directory": "https://github.com/Jagalite/illiquid/tree/630530f27be150823d4dd4737b15cec947bfd8c9/Benchmarks/FileIdentity/evidence/native-initial",
+  "source_files": [
+    "observations.json",
+    "summary.json",
+    "manifest.json",
+    "provenance.json"
+  ],
+  "workflow_run": {
+    "id": 40635089020,
+    "url": "https://github.com/Jagalite/illiquid/actions/runs/40635089020",
+    "conclusion": "success"
+  },
+  "job": {
+    "id": 122640099089,
+    "url": "https://github.com/Jagalite/illiquid/actions/runs/40635089020/job/122640099089",
+    "conclusion": "success"
+  },
+  "environment": {
+    "cpu": "Apple M1 (Virtual)",
+    "machine": "arm64",
+    "macos": "ProductName:\t\tmacOS\nProductVersion:\t\t26.6.2\nBuildVersion:\t\t25G83",
+    "swift": "swift-driver version: 1.148.6 Apple Swift version 6.3.3 (swiftlang-6.3.3.1.3 clang-2100.1.1.101)\nTarget: arm64-apple-macosx26.0"
+  },
+  "production_helper": {
+    "git_blob_sha1": "4e6867e927aaef29d9746244570e338f17884182",
+    "sha256": "bb34064bfa3c15ab0ce9ddebd59920c17ab252ea48069ca9d4f66dff424c92aa"
+  },
+  "observation_count": 208,
+  "case_count": 13,
+  "pairs_per_case": 8,
+  "method": "Reconstructed lossless column-table rows; checked pair completeness, exact receipts and operation counts; recomputed per-pair wall/CPU reductions and reproduced every stored paired wall reduction minimum, median, maximum and faster-pair count.",
+  "statistic": "Median of paired reductions, 100 * (1 - candidate / baseline). These percentages are not the ratio of separate variant medians used for the companion Linux table.",
+  "cases": [
+    {
+      "case": "key-ascii",
+      "pairs": 8,
+      "paired_wall_reduction_percent": {
+        "median": 8.962552118761302,
+        "min": -3.139352474022994,
+        "max": 29.91430100046323
+      },
+      "paired_cpu_reduction_percent": {
+        "median": 2.9021209287135474,
+        "min": -3.1749214088663713,
+        "max": 29.847934790054108
+      },
+      "candidate_faster_wall_pairs": 7,
+      "candidate_faster_cpu_pairs": 6
+    },
+    {
+      "case": "key-unicode",
+      "pairs": 8,
+      "paired_wall_reduction_percent": {
+        "median": -2.712101092758834,
+        "min": -21.91100334713545,
+        "max": 12.913632287600208
+      },
+      "paired_cpu_reduction_percent": {
+        "median": -2.7700039489714,
+        "min": -21.846541367951943,
+        "max": 13.114872099405261
+      },
+      "candidate_faster_wall_pairs": 3,
+      "candidate_faster_cpu_pairs": 3
+    },
+    {
+      "case": "key-relative",
+      "pairs": 8,
+      "paired_wall_reduction_percent": {
+        "median": 6.668640587804681,
+        "min": -2.7648540007197298,
+        "max": 22.299230928220272
+      },
+      "paired_cpu_reduction_percent": {
+        "median": 6.645944078001353,
+        "min": -2.8109742395456605,
+        "max": 22.161656045407696
+      },
+      "candidate_faster_wall_pairs": 7,
+      "candidate_faster_cpu_pairs": 7
+    },
+    {
+      "case": "key-escaped",
+      "pairs": 8,
+      "paired_wall_reduction_percent": {
+        "median": 25.269897274784565,
+        "min": 1.0269524576761335,
+        "max": 32.03033764575007
+      },
+      "paired_cpu_reduction_percent": {
+        "median": 24.667512972616578,
+        "min": 0.7965355501973304,
+        "max": 32.085115152764175
+      },
+      "candidate_faster_wall_pairs": 8,
+      "candidate_faster_cpu_pairs": 8
+    },
+    {
+      "case": "key-long",
+      "pairs": 8,
+      "paired_wall_reduction_percent": {
+        "median": 5.082807981424059,
+        "min": -101.1601819790204,
+        "max": 45.47788204488805
+      },
+      "paired_cpu_reduction_percent": {
+        "median": 0.26587234235303514,
+        "min": -17.294528149443767,
+        "max": 17.504027523687306
+      },
+      "candidate_faster_wall_pairs": 5,
+      "candidate_faster_cpu_pairs": 5
+    },
+    {
+      "case": "key-rejected",
+      "pairs": 8,
+      "paired_wall_reduction_percent": {
+        "median": 2.8149937761796973,
+        "min": -24.342654625474047,
+        "max": 17.766455311478456
+      },
+      "paired_cpu_reduction_percent": {
+        "median": 2.296136875558391,
+        "min": -24.738994526607105,
+        "max": 17.717089022904098
+      },
+      "candidate_faster_wall_pairs": 4,
+      "candidate_faster_cpu_pairs": 4
+    },
+    {
+      "case": "same-file",
+      "pairs": 8,
+      "paired_wall_reduction_percent": {
+        "median": 2.186077316732854,
+        "min": -14.495597583606434,
+        "max": 15.618182730934894
+      },
+      "paired_cpu_reduction_percent": {
+        "median": 4.402989343425645,
+        "min": -14.24345152867852,
+        "max": 30.731422624739835
+      },
+      "candidate_faster_wall_pairs": 5,
+      "candidate_faster_cpu_pairs": 6
+    },
+    {
+      "case": "lookup-100",
+      "pairs": 8,
+      "paired_wall_reduction_percent": {
+        "median": 1.3306057903044566,
+        "min": -21.950227966615255,
+        "max": 9.808077261799287
+      },
+      "paired_cpu_reduction_percent": {
+        "median": 0.1742717473833144,
+        "min": -22.501625596986475,
+        "max": 9.84477951745627
+      },
+      "candidate_faster_wall_pairs": 5,
+      "candidate_faster_cpu_pairs": 4
+    },
+    {
+      "case": "lookup-1000",
+      "pairs": 8,
+      "paired_wall_reduction_percent": {
+        "median": 1.829467653206207,
+        "min": -19.04098658868394,
+        "max": 17.898101794494327
+      },
+      "paired_cpu_reduction_percent": {
+        "median": 3.2756555136334353,
+        "min": -19.65987505263429,
+        "max": 18.201938430688102
+      },
+      "candidate_faster_wall_pairs": 5,
+      "candidate_faster_cpu_pairs": 5
+    },
+    {
+      "case": "lookup-10000",
+      "pairs": 8,
+      "paired_wall_reduction_percent": {
+        "median": 15.756158689149002,
+        "min": -10.136301347651443,
+        "max": 23.98849803737395
+      },
+      "paired_cpu_reduction_percent": {
+        "median": 13.602909503486133,
+        "min": -6.310450691483727,
+        "max": 18.78732817190709
+      },
+      "candidate_faster_wall_pairs": 6,
+      "candidate_faster_cpu_pairs": 6
+    },
+    {
+      "case": "deduplicate-1000",
+      "pairs": 8,
+      "paired_wall_reduction_percent": {
+        "median": 12.954561032015949,
+        "min": 1.596382379080119,
+        "max": 22.5624473743835
+      },
+      "paired_cpu_reduction_percent": {
+        "median": 10.817560994366914,
+        "min": -0.6815307944064264,
+        "max": 21.241810864008936
+      },
+      "candidate_faster_wall_pairs": 8,
+      "candidate_faster_cpu_pairs": 7
+    },
+    {
+      "case": "deduplicate-10000",
+      "pairs": 8,
+      "paired_wall_reduction_percent": {
+        "median": 7.158275525732733,
+        "min": -83.94260869149437,
+        "max": 14.713448075437585
+      },
+      "paired_cpu_reduction_percent": {
+        "median": 7.229425750836232,
+        "min": -41.934404792677185,
+        "max": 14.887334117013895
+      },
+      "candidate_faster_wall_pairs": 5,
+      "candidate_faster_cpu_pairs": 6
+    },
+    {
+      "case": "normalize-control",
+      "pairs": 8,
+      "paired_wall_reduction_percent": {
+        "median": 5.606737865129668,
+        "min": -22.14337740409025,
+        "max": 13.751324765478623
+      },
+      "paired_cpu_reduction_percent": {
+        "median": 1.3857037959807306,
+        "min": -24.868910169616697,
+        "max": 11.461417099501869
+      },
+      "candidate_faster_wall_pairs": 5,
+      "candidate_faster_cpu_pairs": 4
+    }
+  ]
+}

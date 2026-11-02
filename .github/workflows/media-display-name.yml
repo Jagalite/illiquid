@@ -1,0 +1,179 @@
+name: Media display name performance
+
+on:
+  pull_request:
+    paths:
+      - 'Sources/IlliquidCore/MediaLibrary/MediaNameRecognition.swift'
+      - 'Sources/IlliquidCore/MediaLibrary/MediaMetadataHints.swift'
+      - 'Tests/IlliquidCoreTests/MediaDisplayNameTests.swift'
+      - 'Tests/IlliquidCoreTests/EpisodeDisplayNameTests.swift'
+      - 'Tests/IlliquidCoreTests/MediaNameRecognition*Tests.swift'
+      - 'Sources/IlliquidCore/Utilities/NormalizedFileURL.swift'
+      - 'Sources/IlliquidCore/Utilities/MediaFileSupport.swift'
+      - 'Sources/IlliquidCore/Utilities/SourcePreparationExecutor.swift'
+      - 'Sources/IlliquidCore/MediaLibrary/NFOMetadataHints.swift'
+      - 'Sources/IlliquidCore/MediaLibrary/PlexMatchHints.swift'
+      - 'Sources/IlliquidCore/MediaLibrary/MediaSidecarReader.swift'
+      - 'Sources/IlliquidApp/UI/SourceBrowserFilter.swift'
+      - 'Sources/IlliquidApp/UI/SourceTreeProjectionInput.swift'
+      - 'Sources/IlliquidApp/UI/SourcesSidebar.swift'
+      - 'Sources/IlliquidApp/App/AppModel.swift'
+      - 'Benchmarks/SourceTreeVisibility/run.py'
+      - 'Benchmarks/MediaDisplayName/**'
+      - 'Benchmarks/MediaDisplayNameProjection/**'
+      - 'Benchmarks/MediaNameRecognition/**'
+      - '.github/workflows/media-display-name.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: media-display-name-${{ github.head_ref && format('refs/heads/{0}', github.head_ref) || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  portable-correctness:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Prepare verified Swift 6.3.3 toolchain
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libncurses6
+          archive="$RUNNER_TEMP/swift-6.3.3.tar.gz"
+          swift_root="$RUNNER_TEMP/swift-6.3.3"
+          curl --fail --location --retry 3 \
+            https://download.swift.org/swift-6.3.3-release/ubuntu2404/swift-6.3.3-RELEASE/swift-6.3.3-RELEASE-ubuntu24.04.tar.gz \
+            --output "$archive"
+          printf '%s  %s\n' da8272a5fddccd65b1529ed0e52e04526e2eadd4237d58d6220efeb973c6cd19 "$archive" | sha256sum --check
+          mkdir -p "$swift_root"
+          tar -xzf "$archive" -C "$swift_root" --strip-components=1
+          echo "$swift_root/usr/bin" >> "$GITHUB_PATH"
+      - name: Check build coordination
+        run: |
+          if test -f /Volumes/seed1/Projects/kyoto/kyoto.py; then
+            echo 'Kyoto is available; submit this qualification through its shared queue.'
+            exit 1
+          fi
+          echo 'Kyoto is unavailable on this ephemeral runner; building serially in this isolated checkout.'
+      # Keep the intact historical bare-dot path corpus in the native job;
+      # Linux Foundation traps before formatting (see the research report).
+      - name: Check comparison guards without compiling
+        run: python3 Benchmarks/MediaDisplayName/test_regression.py
+      - name: Test labels and compare complete production outputs
+        run: |
+          regression=()
+          if [ "${{ github.event_name }}" != "workflow_dispatch" ]; then
+            regression=(--current-source-regression)
+          fi
+          python3 Benchmarks/MediaDisplayName/run.py --correctness-only "${regression[@]}" \
+            --output "$RUNNER_TEMP/media-display-name-portable/component"
+          python3 Benchmarks/MediaDisplayNameProjection/run.py --verify-only "${regression[@]}" \
+            --output "$RUNNER_TEMP/media-display-name-portable/projection"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: media-display-name-portable
+          path: |
+            ${{ runner.temp }}/media-display-name-portable/
+            !${{ runner.temp }}/media-display-name-portable/**/build/**
+            !${{ runner.temp }}/media-display-name-portable/**/test-build/**
+            !${{ runner.temp }}/media-display-name-portable/**/cache/**
+            !${{ runner.temp }}/media-display-name-portable/**/module-cache/**
+            !${{ runner.temp }}/media-display-name-portable/**/.build/**
+          retention-days: 14
+
+  native-component:
+    runs-on: macos-26
+    timeout-minutes: 30
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Check build coordination
+        run: |
+          if test -f /Volumes/seed1/Projects/kyoto/kyoto.py; then
+            echo 'Kyoto is available; submit this qualification through its shared queue.'
+            exit 1
+          fi
+          echo 'Kyoto is unavailable on this ephemeral runner; building serially in this isolated checkout.'
+      - name: Check comparison guards without compiling
+        run: python3 Benchmarks/MediaDisplayName/test_regression.py
+      - name: Verify current-source component and projection regressions
+        if: github.event_name != 'workflow_dispatch'
+        run: |
+          python3 Benchmarks/MediaDisplayName/run.py --correctness-only --current-source-regression \
+            --output "$RUNNER_TEMP/media-display-name/component"
+          python3 Benchmarks/MediaDisplayNameProjection/run.py --verify-only --current-source-regression \
+            --output "$RUNNER_TEMP/media-display-name/projection"
+      - name: Test exact formatting and measure production labels
+        if: github.event_name == 'workflow_dispatch'
+        run: |
+          python3 Benchmarks/MediaDisplayName/run.py --pairs 10 --target-ms 100 \
+            --output "$RUNNER_TEMP/media-display-name/component"
+      - name: Compare complete media row construction
+        if: github.event_name == 'workflow_dispatch'
+        run: |
+          python3 Benchmarks/MediaDisplayNameProjection/run.py --pairs 10 --target-ms 100 \
+            --output "$RUNNER_TEMP/media-display-name/projection"
+      - name: Verify the historical recognition oracle
+        run: |
+          python3 Benchmarks/MediaNameRecognition/run.py --verify-only \
+            --output "$RUNNER_TEMP/media-display-name/historical-oracle"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: media-display-name-native
+          path: |
+            ${{ runner.temp }}/media-display-name/
+            !${{ runner.temp }}/media-display-name/**/build/**
+            !${{ runner.temp }}/media-display-name/**/test-build/**
+            !${{ runner.temp }}/media-display-name/**/cache/**
+            !${{ runner.temp }}/media-display-name/**/module-cache/**
+            !${{ runner.temp }}/media-display-name/**/.build/**
+          retention-days: 14
+
+  native-app:
+    runs-on: macos-26
+    timeout-minutes: 40
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - name: Check build coordination
+        run: |
+          if test -f /Volumes/seed1/Projects/kyoto/kyoto.py; then
+            echo 'Kyoto is available; submit this qualification through its shared queue.'
+            exit 1
+          fi
+          echo 'Kyoto is unavailable on this ephemeral runner; building serially in this isolated checkout.'
+      - name: Prepare pinned native dependencies
+        run: |
+          if ! xcrun -sdk macosx metal --version; then
+            xcodebuild -downloadComponent MetalToolchain
+          fi
+          python3 Scripts/verify-corresponding-source.py DependencySources
+          python3 Scripts/install-ci-native-sdk.py
+      - name: Build app graph and test affected media behavior
+        run: |
+          mkdir -p "$RUNNER_TEMP/media-display-name-app"
+          set -o pipefail
+          swift test --force-resolved-versions -c release --jobs 2 --no-parallel \
+            --filter 'MediaDisplayNameTests|EpisodeDisplayNameTests|MediaNameRecognition|MediaSidecarTests|SourceMediaOrganizationTests|SourceMediaGroupingTests' \
+            2>&1 | tee "$RUNNER_TEMP/media-display-name-app/tests.log"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: media-display-name-native-app
+          path: ${{ runner.temp }}/media-display-name-app/
+          retention-days: 14

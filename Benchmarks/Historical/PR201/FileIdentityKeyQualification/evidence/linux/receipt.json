@@ -1,0 +1,162 @@
+{
+  "schema_version": 1,
+  "purpose": "Independent qualification of PR #144; no production changes relative to the parent PR",
+  "parent_pull_request": 144,
+  "parent_branch": "perf/file-identity-path-20261028",
+  "parent_commit": "630530f27be150823d4dd4737b15cec947bfd8c9",
+  "baseline_commit": "ea2ff568237e2667f7b1aeee67b11a44ebe95b72",
+  "baseline_helper_blob": "d90e4fc199eabfa4e554c3c8d01a1ed48277ae20",
+  "candidate_helper_blob": "4e6867e927aaef29d9746244570e338f17884182",
+  "measured_commit": "1e0d10bcb234a888c0aae5e4d37316480760ca15",
+  "run_id": 40641068341,
+  "job_id": 122659089259,
+  "run_url": "https://github.com/Jagalite/illiquid/actions/runs/40641068341",
+  "job_url": "https://github.com/Jagalite/illiquid/actions/runs/40641068341/job/122659089259",
+  "observed_conclusion": "success",
+  "scope": "Linux component tests and warm wall-clock measurements; no native or app performance claim",
+  "artifact": {
+    "id": 12796011712,
+    "name": "file-identity-qualification-portable",
+    "size_in_bytes": 211469,
+    "url": "https://api.github.com/repos/Jagalite/illiquid/actions/artifacts/12796011712",
+    "archive_download_url": "https://api.github.com/repos/Jagalite/illiquid/actions/artifacts/12796011712/zip",
+    "expired": false,
+    "created_at": "2026-10-28T06:02:29Z",
+    "expires_at": "2026-11-11T06:02:28Z",
+    "updated_at": "2026-10-28T06:02:29Z",
+    "digest": "sha256:50cb30442f4cf2f1c12e3aa5c8ff953a9d7232495501dc9e838fdc9abae58fc7",
+    "workflow_run": {
+      "id": 40641068341,
+      "repository_id": 1402467213,
+      "head_repository_id": 1402467213,
+      "head_branch": "perf/file-identity-qualification-20261028",
+      "head_sha": "1e0d10bcb234a888c0aae5e4d37316480760ca15"
+    }
+  },
+  "tests": [
+    {
+      "variant": "baseline",
+      "configuration": "debug",
+      "passed": true,
+      "log": "logs/tests-baseline-debug.log",
+      "result": "◇ Test \"Relative references validate the resolved authority and retain path bytes\" started.\n✔ Test \"Relative references validate the resolved authority and retain path bytes\" passed after 0.001 seconds.\n◇ Test \"Invalid local authorities and unsupported schemes remain rejected\" started.\n✔ Test \"Invalid local authorities and unsupported schemes remain rejected\" passed after 0.001 seconds.\n◇ Test \"Paths exposed as Darwin file references retain constructor behavior\" started.\n✔ Test \"Paths exposed as Darwin file references retain constructor behavior\" passed after 0.001 seconds.\n✔ Suite \"Normalized persistence key reconstruction\" passed after 0.052 seconds.\n✔ Test run with 31 tests in 4 suites passed after 0.269 seconds."
+    },
+    {
+      "variant": "baseline",
+      "configuration": "release",
+      "passed": true,
+      "log": "logs/tests-baseline-release.log",
+      "result": "◇ Test \"Relative references validate the resolved authority and retain path bytes\" started.\n✔ Test \"Relative references validate the resolved authority and retain path bytes\" passed after 0.001 seconds.\n◇ Test \"Invalid local authorities and unsupported schemes remain rejected\" started.\n✔ Test \"Invalid local authorities and unsupported schemes remain rejected\" passed after 0.001 seconds.\n◇ Test \"Paths exposed as Darwin file references retain constructor behavior\" started.\n✔ Test \"Paths exposed as Darwin file references retain constructor behavior\" passed after 0.001 seconds.\n✔ Suite \"Normalized persistence key reconstruction\" passed after 0.012 seconds.\n✔ Test run with 31 tests in 4 suites passed after 0.064 seconds."
+    },
+    {
+      "variant": "candidate",
+      "configuration": "debug",
+      "passed": true,
+      "log": "logs/tests-candidate-debug.log",
+      "result": "◇ Test \"Relative references validate the resolved authority and retain path bytes\" started.\n✔ Test \"Relative references validate the resolved authority and retain path bytes\" passed after 0.001 seconds.\n◇ Test \"Invalid local authorities and unsupported schemes remain rejected\" started.\n✔ Test \"Invalid local authorities and unsupported schemes remain rejected\" passed after 0.001 seconds.\n◇ Test \"Paths exposed as Darwin file references retain constructor behavior\" started.\n✔ Test \"Paths exposed as Darwin file references retain constructor behavior\" passed after 0.001 seconds.\n✔ Suite \"Normalized persistence key reconstruction\" passed after 0.014 seconds.\n✔ Test run with 31 tests in 4 suites passed after 0.069 seconds."
+    },
+    {
+      "variant": "candidate",
+      "configuration": "release",
+      "passed": true,
+      "log": "logs/tests-candidate-release.log",
+      "result": "◇ Test \"Relative references validate the resolved authority and retain path bytes\" started.\n✔ Test \"Relative references validate the resolved authority and retain path bytes\" passed after 0.001 seconds.\n◇ Test \"Invalid local authorities and unsupported schemes remain rejected\" started.\n✔ Test \"Invalid local authorities and unsupported schemes remain rejected\" passed after 0.001 seconds.\n◇ Test \"Paths exposed as Darwin file references retain constructor behavior\" started.\n✔ Test \"Paths exposed as Darwin file references retain constructor behavior\" passed after 0.001 seconds.\n✔ Suite \"Normalized persistence key reconstruction\" passed after 0.011 seconds.\n✔ Test run with 31 tests in 4 suites passed after 0.053 seconds."
+    }
+  ],
+  "new_test_input_configurations": 1293,
+  "timed_observations": 400,
+  "calibration_observations": 81,
+  "workload_count": 20,
+  "observed_timed_batch_ms": {
+    "min": 93.193558,
+    "max": 279.559009
+  },
+  "primary_portable_thresholds": [
+    {
+      "id": "key-ascii64",
+      "required_reduction_percent": 15,
+      "observed_reduction_percent": 55.37009630579757,
+      "required_faster_pairs": 8,
+      "observed_faster_pairs": 10,
+      "passed": true
+    },
+    {
+      "id": "folder-last512",
+      "required_reduction_percent": 15,
+      "observed_reduction_percent": 53.24977792179635,
+      "required_faster_pairs": 8,
+      "observed_faster_pairs": 10,
+      "passed": true
+    },
+    {
+      "id": "folder-miss512",
+      "required_reduction_percent": 15,
+      "observed_reduction_percent": 53.29403829942252,
+      "required_faster_pairs": 8,
+      "observed_faster_pairs": 10,
+      "passed": true
+    }
+  ],
+  "regressions": [
+    {
+      "id": "key-unicode-nfc64",
+      "increase_ns": 117.87896386430702,
+      "increase_percent": 5.121950389117735,
+      "candidate_faster_pairs": 1
+    },
+    {
+      "id": "key-unicode-nfd64",
+      "increase_ns": 126.09676289237723,
+      "increase_percent": 5.412633640007147,
+      "candidate_faster_pairs": 0
+    }
+  ],
+  "native_qualification": {
+    "run_id": 40641068250,
+    "url": "https://github.com/Jagalite/illiquid/actions/runs/40641068250",
+    "commit": "1e0d10bcb234a888c0aae5e4d37316480760ca15",
+    "status": "queued",
+    "qualified": false
+  },
+  "parent_native_evidence": {
+    "run_id": 40635089020,
+    "url": "https://github.com/Jagalite/illiquid/actions/runs/40635089020",
+    "commit": "6b0b45aa1c5d3efece3bed7defa6245a79ac617b",
+    "candidate_helper_blob": "4e6867e927aaef29d9746244570e338f17884182",
+    "observed_conclusion": "success",
+    "qualification_scope": "The parent PR's independent initial cohort, not this suite"
+  },
+  "excluded_exploration": {
+    "run_id": 40639554616,
+    "commit": "e0f1af0f1990914e22cd50cfde9a2cc5cc1d507c",
+    "reason": "Different prototype helper and no explicit -disable-cmo; not final candidate qualification"
+  },
+  "limitations": [
+    "MacOS parity/performance pending for this suite",
+    "Fixture creation/sorting/warmup excluded",
+    "Loop and result-consumption overhead included",
+    "No full app/playback/UI/CPU utilization/energy measurement"
+  ],
+  "independent_audit": {
+    "passed": true,
+    "protocol_discrepancies": 0,
+    "statistical_discrepancies": 0,
+    "summaries_recomputed": 20,
+    "calibration_observations": 81,
+    "measured_observations": 400,
+    "pairs": 200,
+    "order_balance": {
+      "AB": 100,
+      "BA": 100
+    },
+    "source_hash_entries_independently_verified": 11,
+    "candidate_helper_sha256": "bb34064bfa3c15ab0ce9ddebd59920c17ab252ea48069ca9d4f66dff424c92aa",
+    "verified": [
+      "Shared iteration counts and calibration stopping rules",
+      "Five AB and five BA pairs for each workload",
+      "Fixture/result signatures and checksum scaling",
+      "All medians, ranges, deltas, paired ratios and faster-pair counts",
+      "Baseline/candidate helper, driver, runner, regression suite and supporting source hashes"
+    ]
+  }
+}

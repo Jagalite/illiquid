@@ -1,0 +1,73 @@
+Shared Kyoto queue is unavailable; compiling and testing the isolated filesystem components directly.
+Building for production...
+[0/9] Write sources
+[2/9] Write swift-version--1D53F1F8B6B247D8.txt
+[4/10] Compiling IlliquidApp SourceFilesystemEventDelivery.swift
+[5/11] Compiling IlliquidAppTests SourceFilesystemEventDeliveryTests.swift
+[5/11] /workspace/scratch/193764fb3b70/swift-test-tmp/illiquid-source-volume.U68o0b/.build/x86_64-unknown-linux-gnu/release/IlliquidSourceVolumeRegressionsPackageDiscoveredTests.derived/all-discovered-tests.swift
+[6/11] Write sources
+[8/12] Compiling IlliquidSourceVolumeRegressionsPackageDiscoveredTests IlliquidAppTests.swift
+[8/12] /workspace/scratch/193764fb3b70/swift-test-tmp/illiquid-source-volume.U68o0b/.build/x86_64-unknown-linux-gnu/release/IlliquidSourceVolumeRegressionsPackageTests.derived/runner.swift
+[9/12] Write sources
+[11/13] Compiling IlliquidSourceVolumeRegressionsPackageTests runner.swift
+[11/13] Write Objects.LinkFileList
+[12/13] Linking IlliquidSourceVolumeRegressionsPackageTests.xctest
+Build complete! (18.14s)
+Test Suite 'All tests' started at 2026-10-28 00:44:11.147
+Test Suite 'release.xctest' started at 2026-10-28 00:44:11.155
+Test Suite 'release.xctest' passed at 2026-10-28 00:44:11.155
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.0 (0.0) seconds
+Test Suite 'All tests' passed at 2026-10-28 00:44:11.155
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.0 (0.0) seconds
+◇ Test run started.
+↳ Testing Library Version: 6.3.2 (70eff261d7f462c)
+↳ Target Platform: x86_64-unknown-linux-gnu
+◇ Suite "Source volume notification boundaries" started.
+◇ Suite "Bounded source filesystem delivery" started.
+◇ Test siblingPrefixesRemainUnrelated() started.
+◇ Test unicodeAndSpacePathsKeepComponentBoundaries() started.
+◇ Test affectedRootsPreserveOriginalOrder() started.
+◇ Test filesystemRootSourceContainsMountPoint() started.
+◇ Test nonexistentPathsAndDotSegmentsNeedNoFilesystemResolution() started.
+◇ Test normalizedPathMatrixMatchesComponentAncestry() started.
+◇ Test emptyWatchListRemainsEmpty() started.
+◇ Test rootVolumeChangeIncludesEverySource() started.
+◇ Test exactAndDescendantSourcesRemainAffected() started.
+◇ Test pendingCallbacksCoalesceWithoutChangingEventsOrOrder(_:) started.
+◇ Test filteringDoesNotRewriteOrDeduplicateRootURLs() started.
+◇ Test closeDiscardsQueuedInputAndNeverAffectsReplacementSession() started.
+◇ Test concurrentProducersAndDrainsNeitherLoseNorDuplicateEvents() started.
+◇ Test nativeLossMarkerSupersedesPendingDetailAndDrainRearmsDelivery() started.
+◇ Test ordinaryDeliveryPreservesEveryFlagIncludingUnknownBits() started.
+◇ Test queuedTaskDoesNotKeepReleasedDeliveryAlive() started.
+◇ Test handlerCanSendAgainWithoutDeadlockOrStrandingEvents() started.
+◇ Test overflowWhileMainActorIsBusyRetainsOneRecoveryObligation(_:) started.
+◇ Test sourceContainingMountPointIsAffected() started.
+◇ Test case passing 1 argument batchSize → 1 to pendingCallbacksCoalesceWithoutChangingEventsOrOrder(_:) started.
+◇ Test case passing 1 argument batchSize → 4096 to pendingCallbacksCoalesceWithoutChangingEventsOrOrder(_:) started.
+◇ Test case passing 1 argument batchSize → 1 to overflowWhileMainActorIsBusyRetainsOneRecoveryObligation(_:) started.
+◇ Test case passing 1 argument batchSize → 128 to overflowWhileMainActorIsBusyRetainsOneRecoveryObligation(_:) started.
+✔ Test siblingPrefixesRemainUnrelated() passed after 0.001 seconds.
+✔ Test filesystemRootSourceContainsMountPoint() passed after 0.001 seconds.
+✔ Test exactAndDescendantSourcesRemainAffected() passed after 0.001 seconds.
+✔ Test affectedRootsPreserveOriginalOrder() passed after 0.001 seconds.
+✔ Test filteringDoesNotRewriteOrDeduplicateRootURLs() passed after 0.001 seconds.
+✔ Test sourceContainingMountPointIsAffected() passed after 0.001 seconds.
+✔ Test unicodeAndSpacePathsKeepComponentBoundaries() passed after 0.001 seconds.
+✔ Test emptyWatchListRemainsEmpty() passed after 0.001 seconds.
+✔ Test rootVolumeChangeIncludesEverySource() passed after 0.001 seconds.
+◇ Test case passing 1 argument batchSize → 4097 to overflowWhileMainActorIsBusyRetainsOneRecoveryObligation(_:) started.
+✔ Test nonexistentPathsAndDotSegmentsNeedNoFilesystemResolution() passed after 0.001 seconds.
+◇ Test case passing 1 argument batchSize → 128 to pendingCallbacksCoalesceWithoutChangingEventsOrOrder(_:) started.
+✔ Test normalizedPathMatrixMatchesComponentAncestry() passed after 0.004 seconds.
+✔ Suite "Source volume notification boundaries" passed after 0.005 seconds.
+✔ Test concurrentProducersAndDrainsNeitherLoseNorDuplicateEvents() passed after 0.018 seconds.
+✔ Test closeDiscardsQueuedInputAndNeverAffectsReplacementSession() passed after 0.020 seconds.
+✔ Test ordinaryDeliveryPreservesEveryFlagIncludingUnknownBits() passed after 0.020 seconds.
+✔ Test queuedTaskDoesNotKeepReleasedDeliveryAlive() passed after 0.019 seconds.
+✔ Test overflowWhileMainActorIsBusyRetainsOneRecoveryObligation(_:) with 3 test cases passed after 0.024 seconds.
+✔ Test pendingCallbacksCoalesceWithoutChangingEventsOrOrder(_:) with 3 test cases passed after 0.026 seconds.
+✔ Test nativeLossMarkerSupersedesPendingDetailAndDrainRearmsDelivery() passed after 0.026 seconds.
+✔ Test handlerCanSendAgainWithoutDeadlockOrStrandingEvents() passed after 0.026 seconds.
+✔ Suite "Bounded source filesystem delivery" passed after 0.027 seconds.
+✔ Test run with 19 tests in 2 suites passed after 0.028 seconds.

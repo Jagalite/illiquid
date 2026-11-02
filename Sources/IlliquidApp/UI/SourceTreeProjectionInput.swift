@@ -87,38 +87,47 @@ struct SourceTreeProjectionInput: Equatable, Sendable {
             })
         }
 
+        let sortedIndices = SourceTreeSorting.sortedIndicesIfNeeded(
+            entries, using: sortConfiguration
+        )
         var seenPaths: Set<String> = []
-        return SourceTreeSorting.sorted(entries, using: sortConfiguration)
-            .compactMap { entry -> SourceTreeDisplayRow? in
-                guard !Task.isCancelled, let path = entry.visibilityPath
-                    ?? SourceVisibilityPath.normalized(entry.url),
-                      seenPaths.insert(path).inserted
-                else {
-                    return nil
-                }
-                let relativePath = matcher.relativePath(
-                    normalizedPath: path
-                )
-                let parent = (relativePath as NSString).deletingLastPathComponent
-                let recognition: RecognizedMediaName? = visibility.viewMode == .media
-                    ? entry.recognizedMedia ?? MediaNameRecognition.recognize(relativePath: entry.url.path)
-                    : nil
-                let context = recognition.map { media in
-                    [media.variant, media.metadataSources.isEmpty ? nil : media.metadataSources.joined(separator: ", "), parent.isEmpty ? nil : parent].compactMap { $0 }.joined(separator: " · ")
-                } ?? parent
-                return SourceTreeDisplayRow(
-                    id: "media:\(SourceTreeIdentity.fileID(for: entry.url))",
-                    folderID: entry.url.deletingLastPathComponent().path,
-                    url: entry.url,
-                    displayName: recognition?.displayName ?? entry.url.deletingPathExtension().lastPathComponent,
-                    contextLabel: context.isEmpty ? nil : context,
-                    recognizedMedia: recognition,
-                    visibilityPath: path,
-                    depth: 0,
-                    ancestorIDs: [],
-                    kind: .media(dateAdded: entry.dateAdded)
-                )
+        func makeRow(_ entry: SourceTreeEntry) -> SourceTreeDisplayRow? {
+            guard !Task.isCancelled, let path = entry.visibilityPath
+                ?? SourceVisibilityPath.normalized(entry.url),
+                  seenPaths.insert(path).inserted
+            else {
+                return nil
             }
+            let relativePath = matcher.relativePath(
+                normalizedPath: path
+            )
+            let parent = (relativePath as NSString).deletingLastPathComponent
+            let recognition: RecognizedMediaName? = visibility.viewMode == .media
+                ? entry.recognizedMedia ?? MediaNameRecognition.recognize(relativePath: entry.url.path)
+                : nil
+            let context = recognition.map { media in
+                [media.variant, media.metadataSources.isEmpty ? nil : media.metadataSources.joined(separator: ", "), parent.isEmpty ? nil : parent].compactMap { $0 }.joined(separator: " · ")
+            } ?? parent
+            return SourceTreeDisplayRow(
+                id: "media:\(SourceTreeIdentity.fileID(for: entry.url))",
+                folderID: entry.url.deletingLastPathComponent().path,
+                url: entry.url,
+                displayName: recognition?.displayName ?? entry.url.deletingPathExtension().lastPathComponent,
+                contextLabel: context.isEmpty ? nil : context,
+                recognizedMedia: recognition,
+                visibilityPath: path,
+                depth: 0,
+                ancestorIDs: [],
+                kind: .media(dateAdded: entry.dateAdded)
+            )
+        }
+
+        // The sorter already produced positions. Build the final rows directly,
+        // without materializing a second array of complete entry values.
+        if let sortedIndices {
+            return sortedIndices.compactMap { makeRow(entries[$0]) }
+        }
+        return entries.compactMap(makeRow)
     }
 
     private func appendActiveFolderContents(

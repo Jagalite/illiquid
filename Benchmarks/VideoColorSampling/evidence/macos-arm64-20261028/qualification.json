@@ -1,0 +1,195 @@
+{
+  "schema_version": 1,
+  "recorded_date_utc": "2026-10-28",
+  "repository": "Jagalite/illiquid",
+  "baseline_commit": "ea2ff568237e2667f7b1aeee67b11a44ebe95b72",
+  "qualified_candidate_commit": "c60321fc2418bbb9bb801e85388bd95fcc4dccb5",
+  "workflow_run": {
+    "id": 40635423170,
+    "url": "https://github.com/Jagalite/illiquid/actions/runs/40635423170",
+    "conclusion": "success",
+    "job_id": 122641178913,
+    "job_url": "https://github.com/Jagalite/illiquid/actions/runs/40635423170/job/122641178913"
+  },
+  "artifact": {
+    "id": 12793522961,
+    "name": "video-color-sampling-native",
+    "url": "https://github.com/Jagalite/illiquid/actions/runs/40635423170/artifacts/12793522961",
+    "digest": "sha256:0334bedee97fb8c379a0aba855f9b49f2febf351236cf38df4999512f6a8e92a",
+    "size_in_bytes": 455849,
+    "expires_at": "2026-11-11T05:07:53Z"
+  },
+  "evidence_provenance": "Exact JSON records emitted by the successful native benchmark job; observations rendered one JSON record per line. Summary values independently recomputed from all 240 observations.",
+  "test_runs": [
+    {
+      "configuration": "debug",
+      "exit": 0,
+      "log": "test-baseline-debug.log",
+      "passed_tests": 10,
+      "variant": "baseline"
+    },
+    {
+      "configuration": "release",
+      "exit": 0,
+      "log": "test-baseline-release.log",
+      "passed_tests": 10,
+      "variant": "baseline"
+    },
+    {
+      "configuration": "debug",
+      "exit": 0,
+      "log": "test-candidate-debug.log",
+      "passed_tests": 10,
+      "variant": "candidate"
+    },
+    {
+      "configuration": "release",
+      "exit": 0,
+      "log": "test-candidate-release.log",
+      "passed_tests": 10,
+      "variant": "candidate"
+    }
+  ],
+  "verification": {
+    "artifact": "verification.json",
+    "exact_baseline_candidate_parity": true,
+    "sha256": "8b6fd17b568b3748a8e36f94b3c4532c1ad0755b69632fea5911892086acd7a9"
+  },
+  "verification_coverage": {
+    "grid_matrix_cases": 90,
+    "grid_points_per_case": 96,
+    "components_per_point": 3,
+    "temporal_events": 10
+  },
+  "audit": {
+    "observations": 240,
+    "caseCount": 15,
+    "pairs": 120,
+    "fasterPairs": 120,
+    "matchingChecksums": true,
+    "matchingSummaries": true,
+    "matchingIterations": true,
+    "sourceCommitMatches": true,
+    "testsPassed": true,
+    "parity": true,
+    "minimumMeasuredBatchMs": 15.713458,
+    "cases": [
+      {
+        "case": "bgra-48x32",
+        "baseline": 6609.753229047073,
+        "candidate": 3714.3295063145806,
+        "reduction": 44.18966997413991,
+        "saved": 2751.0434845005743
+      },
+      {
+        "case": "bgra-1920x1080",
+        "baseline": 6434.722445661475,
+        "candidate": 3456.5915625534826,
+        "reduction": 45.30972198241976,
+        "saved": 2740.510354270067
+      },
+      {
+        "case": "bgra-3840x2160",
+        "baseline": 6433.786199499464,
+        "candidate": 3850.9950661422954,
+        "reduction": 40.95336134231299,
+        "saved": 2591.5326063639613
+      },
+      {
+        "case": "yuv8-video-48x32",
+        "baseline": 10905.46968161473,
+        "candidate": 3853.7549615741914,
+        "reduction": 62.524495919687425,
+        "saved": 6659.5445486023145
+      },
+      {
+        "case": "yuv8-video-1920x1080",
+        "baseline": 10789.496650757766,
+        "candidate": 4367.401406681738,
+        "reduction": 61.451922738217135,
+        "saved": 6555.318345474337
+      },
+      {
+        "case": "yuv8-video-3840x2160",
+        "baseline": 10936.708973593913,
+        "candidate": 4405.493174697896,
+        "reduction": 61.81464724086663,
+        "saved": 6531.215798896017
+      },
+      {
+        "case": "yuv8-full-48x32",
+        "baseline": 11726.941512605043,
+        "candidate": 3838.7272268907564,
+        "reduction": 65.8748046212174,
+        "saved": 7798.149453781512
+      },
+      {
+        "case": "yuv8-full-1920x1080",
+        "baseline": 11130.251583189407,
+        "candidate": 4008.1403898346903,
+        "reduction": 64.89739706546865,
+        "saved": 7404.979439098611
+      },
+      {
+        "case": "yuv8-full-3840x2160",
+        "baseline": 10613.222174490355,
+        "candidate": 4463.680426462548,
+        "reduction": 58.38314683597521,
+        "saved": 6067.3703038350395
+      },
+      {
+        "case": "yuv10-video-48x32",
+        "baseline": 10952.142802915274,
+        "candidate": 3794.8156696021865,
+        "reduction": 65.22825923784889,
+        "saved": 7365.799612815063
+      },
+      {
+        "case": "yuv10-video-1920x1080",
+        "baseline": 11261.395518849284,
+        "candidate": 3945.2534181617007,
+        "reduction": 65.00905932179417,
+        "saved": 7098.817157986248
+      },
+      {
+        "case": "yuv10-video-3840x2160",
+        "baseline": 10865.132676325658,
+        "candidate": 4071.451128925498,
+        "reduction": 60.735144467339154,
+        "saved": 5900.483636096196
+      },
+      {
+        "case": "yuv10-full-48x32",
+        "baseline": 10717.809341841657,
+        "candidate": 4434.43307115827,
+        "reduction": 63.66986933821863,
+        "saved": 7184.722119165986
+      },
+      {
+        "case": "yuv10-full-1920x1080",
+        "baseline": 12332.762842272008,
+        "candidate": 4487.143471373614,
+        "reduction": 60.81814532468275,
+        "saved": 7831.966168816474
+      },
+      {
+        "case": "yuv10-full-3840x2160",
+        "baseline": 10686.447337794587,
+        "candidate": 3730.035496072156,
+        "reduction": 63.81588024951672,
+        "saved": 6935.04112113277
+      }
+    ]
+  },
+  "measured_scope": "Elapsed wall time for synchronous sample(), including lock, metadata, 96-point sampling, allocation and checksum; fixture setup excluded.",
+  "limitations": [
+    "One Apple M1 virtual macOS host; no physical-device or cross-toolchain coverage.",
+    "Warm reused synthetic IOSurface-backed buffers; allocation and fixture filling excluded.",
+    "Elapsed component time includes an identical output checksum cost.",
+    "30 ms calibration target; some subsequent batches were shorter due to host variability.",
+    "Production sampling defaults to a 0.25-second interval, so total playback impact is modest.",
+    "No full-application build, live UI playback, decoder, renderer, GPU, energy or dropped-frame qualification.",
+    "The complete verification vectors and full test logs are in the expiring CI artifact; permanent records retain their digest, results and run linkage."
+  ],
+  "evidence_commit_scope": "Documentation and recorded evidence only; the qualified production, test, harness, driver and workflow source files are unchanged."
+}

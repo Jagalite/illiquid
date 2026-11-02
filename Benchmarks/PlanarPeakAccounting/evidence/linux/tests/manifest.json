@@ -1,0 +1,71 @@
+{
+  "allocation_scope": "cumulative successful malloc/calloc/realloc requested bytes; not RSS",
+  "arguments": {
+    "allocations": false,
+    "baseline_blob": "e110a666400aa680a2d7b86ed4852c4fe05f08cc",
+    "baseline_ref": "ea2ff568237e2667f7b1aeee67b11a44ebe95b72",
+    "build_only": false,
+    "iterations": 100000,
+    "occupancies": [
+      1,
+      7,
+      11,
+      16,
+      32
+    ],
+    "output": "/home/runner/work/_temp/planar-peak/tests",
+    "rounds": 8,
+    "seeds": [
+      1,
+      7,
+      42,
+      2026,
+      65537
+    ],
+    "steps": 2000,
+    "swiftc": null,
+    "tests_only": true,
+    "warmup": 10000,
+    "workloads": [
+      "pipeline",
+      "lifecycle-mixed"
+    ]
+  },
+  "baseline_blob_sha1": "e110a666400aa680a2d7b86ed4852c4fe05f08cc",
+  "baseline_commit": "ea2ff568237e2667f7b1aeee67b11a44ebe95b72",
+  "binary_sha256": {
+    "baseline-debug": "5e29355108612c5e21221d5563be885b84cf41cb8260b3affa62d30cc9d23a75",
+    "baseline-release": "d4761aa0ee86b0b86ebc29b39f356a078b04f5a314a6b6ca3f475105459973d5",
+    "candidate-debug": "68741c9d60db72a0a008de756ba7f58e3dffecc8f7e1ecd992a91f7c2620420c",
+    "candidate-release": "8419a11282128d74c2214fb6beea7dc923c005eea0f39e3cc3e6885bce2377fa"
+  },
+  "checkout_head": "823296f978a8bcc9e8fdab98137aeebcf610ee53",
+  "clock": "DispatchTime.now().uptimeNanoseconds",
+  "compiler": "Swift version 6.4 (swift-6.4-RELEASE)\nTarget: x86_64-unknown-linux-gnu",
+  "cpu_affinity": [
+    0,
+    1,
+    2,
+    3
+  ],
+  "cpu_model": "AMD EPYC 7763 64-Core Processor",
+  "execution_started_utc": "2026-10-28T05:10:48Z",
+  "framework_boundary": "Linux identity objects; real ledger, Foundation, locks, ARC; inert signposts",
+  "harness_sha256": {
+    "Harness.swift": "237c0fc1418c9661ed22ac009cfa3b107cddc8dc0638d1330724791a9333371b",
+    "Platform.swift": "206dd3bc95bc0a21c7d361ea54fa01899f8834c42a421dd6b4aecdd756b72ba6",
+    "run.py": "3cb4bc0f415f9b48f998f7ce06d2b4134912e379bf8266b31cd33519807405ed"
+  },
+  "machine": "x86_64",
+  "native_source_sha256": {
+    "Sources/IlliquidNativePlayback/Diagnostics/NativePlaybackSignposts.swift": "f0a218021dfa5917b8c08f2a56d096daecb5e9a6a4e93c43af5a0e7f9c83fc4f",
+    "Tests/IlliquidNativePlaybackTests/PlanarOwnershipTransitionTests.swift": "3a1da00f1ea501434a277ec955a12efdb21b11b13f5d758af89425249920614f"
+  },
+  "platform": "Linux-6.17.0-1022-azure-x86_64-with-glibc2.39",
+  "python": "3.12.3",
+  "source_path": "Sources/IlliquidNativePlayback/Diagnostics/PlanarBufferOwnershipDiagnostics.swift",
+  "source_sha256": {
+    "baseline": "0378f477c1d4069b4678f44bfc3920ca07aa5ad64fe476fda3b2e9aef99ecb8c",
+    "candidate": "268eadaf73b02b054ba4a67119041317b096c36e146b177ef4b5722cf06a1ddb"
+  }
+}

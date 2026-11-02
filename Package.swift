@@ -2,6 +2,17 @@
 
 import PackageDescription
 
+#if canImport(Darwin)
+let nativeFixtureTargets: [Target] = [
+    .target(name: "PR199NativeFixtures", path: "Tests/Support/PR199NativeFixtures",
+            publicHeadersPath: "include", cSettings: [.unsafeFlags(["-fobjc-arc"])])
+]
+let nativeFixtureDependencies: [Target.Dependency] = ["PR199NativeFixtures"]
+#else
+let nativeFixtureTargets: [Target] = []
+let nativeFixtureDependencies: [Target.Dependency] = []
+#endif
+
 let package = Package(
     name: "Illiquid",
     platforms: [
@@ -195,7 +206,7 @@ let package = Package(
             dependencies: [
                 "IlliquidCore",
                 .product(name: "Testing", package: "swift-testing"),
-            ],
+            ] + nativeFixtureDependencies,
             path: "Tests/IlliquidCoreTests"
         ),
         .testTarget(
@@ -243,5 +254,5 @@ let package = Package(
                 ]),
             ]
         ),
-    ]
+    ] + nativeFixtureTargets
 )

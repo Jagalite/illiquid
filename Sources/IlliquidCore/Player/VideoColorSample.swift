@@ -119,8 +119,9 @@ public struct VideoColorSample: Equatable, Sendable {
         var count = 0
 
         for row in minimumRow...maximumRow {
+            let rowOffset = row * columns
             for column in minimumColumn...maximumColumn {
-                let color = color(column: column, row: row)
+                let color = colors[rowOffset + column]
                 red += color.red
                 green += color.green
                 blue += color.blue

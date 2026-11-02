@@ -1,0 +1,540 @@
+{
+  "adverse_cases_with_entire_nominal_cpu_interval_below_zero": [],
+  "adverse_controls": [
+    {
+      "baseline_cpu_ns_per_label": 163.77821881583566,
+      "batch_size": 128,
+      "candidate_cpu_ns_per_label": 167.21510915006144,
+      "case": "labels-unknown-control",
+      "control": true,
+      "cpu_reduction_percent": {
+        "bootstrap_95_ci": [
+          -9.706145482939077,
+          6.138431050272975
+        ],
+        "faster_pairs": 4,
+        "paired_median": -3.2091926190824016,
+        "ratio_of_medians": -2.0985026941161555
+      },
+      "wall_reduction_percent": {
+        "bootstrap_95_ci": [
+          -9.786654547312034,
+          6.044996914471823
+        ],
+        "faster_pairs": 4,
+        "paired_median": -3.261303905968427,
+        "ratio_of_medians": -2.152252046562486
+      }
+    }
+  ],
+  "artifact_sha256": {
+    "binaries.json": "5f7fba2a05ece6025161c80969645c0763cfa2cad00f07b408480b45c4ede3ce",
+    "calibration.jsonl": "12cb7487f40016730899e36db568ea2015f88d79b597c054d8c621f25ea77e28",
+    "cases.json": "b7dbe5d5ace41d801ccbe79f691e0f226d144d9b55eeae30d84cb1921fee5aa1",
+    "commands.jsonl": "0f46741a1b50540fac5ae7ea08dabe4d405f77b57232f6285d11559ee6c1402e",
+    "iterations.json": "9b1aef03a7cc72fe9cb712079b011e4b63841ededeb53ec5ed0950bbefb803ed",
+    "manifest.json": "36759d5b7abd2a1995b8b0ff77959480f0f7b5e0cbaa7a0d3e35a93a6896ee28",
+    "observations.jsonl": "fa9502d3a21d237599107043eb58f24566bbcd66338d751b535b63698770f0df",
+    "original-verification.json": "e822725a525e024f42f1a899849b00d60e1c04b8467a41fd83dc8ed9cff2a002",
+    "parity.json": "52a1231a5f4da910eb9c3eb295274e8a5aa8c8b696fbbb149bb99240d5507bee",
+    "references.json": "40a7c2d56a794e4fc030dc795bc638bdef12ae0decf26077f91e2be4fb34368c",
+    "runtime-manifest.json": "053f4b0c6f4b54c142aba2b9393662f831cca9d5b253b1ec66161a8e1d8447e2",
+    "summary.json": "034e3eb5f23664d19625f23ef11e5350d37eee34cabd64a8cf2053dfe0f85dfc",
+    "tests.json": "6e1977b77cc8053515cfbe8494a4b9f249772a31368cdeca50e0625de3b4b25f",
+    "verification-receipts.json.gz": "0cc66354a93fac67d9cad18ebe4451b863e3a8eac0c6c3b1240c3de26264edfd"
+  },
+  "audit_script_sha256": "3a0a322b2f38b79f0f6f4bb2b164668f3545452ce77973fb926fa3c9c14ee234",
+  "audited_utc": "2026-10-28T05:18:28Z",
+  "binary_sha256": {
+    "baseline": "bd2b67ef14d1cbc225d3d58ae18a131bad1c71a97599452e63041bea9883dea0",
+    "candidate": "058267a203cf5a2805e6a3274ba85f9e1ebef426069f6060c02b475b73ca4fee"
+  },
+  "calibration_observations": 48,
+  "checks": {
+    "360_fresh_valid_observations_balanced_equal_work_and_positive_times": true,
+    "all_archived_current_and_frozen_source_hashes": true,
+    "all_reported_medians_ranges_paired_values_and_bootstrap_intervals_recomputed": true,
+    "interrupted_attempts_retained_separately_and_excluded_from_statistics": true,
+    "unchanged_executables_and_separate_compilation_boundaries": true
+  },
+  "evidence": "/workspace/scratch/355e15c67b63/episode-display-name-linux-recovered",
+  "headlines": [
+    {
+      "baseline_cpu_ns_per_label": 1843.7017657520325,
+      "batch_size": 128,
+      "candidate_cpu_ns_per_label": 197.61484374999998,
+      "case": "labels-episodes",
+      "control": false,
+      "cpu_reduction_percent": {
+        "bootstrap_95_ci": [
+          87.5997425150994,
+          89.57603831417285
+        ],
+        "faster_pairs": 12,
+        "paired_median": 88.87310934184845,
+        "ratio_of_medians": 89.28162637684548
+      },
+      "wall_reduction_percent": {
+        "bootstrap_95_ci": [
+          87.6053341415822,
+          89.63269941080128
+        ],
+        "faster_pairs": 12,
+        "paired_median": 88.89591436654575,
+        "ratio_of_medians": 89.28496097070483
+      }
+    },
+    {
+      "baseline_cpu_ns_per_label": 3455.3234532600864,
+      "batch_size": 128,
+      "candidate_cpu_ns_per_label": 219.97031475144092,
+      "case": "labels-ranges",
+      "control": false,
+      "cpu_reduction_percent": {
+        "bootstrap_95_ci": [
+          92.46292250122258,
+          94.23118379213359
+        ],
+        "faster_pairs": 12,
+        "paired_median": 93.13035203363088,
+        "ratio_of_medians": 93.63387197386977
+      },
+      "wall_reduction_percent": {
+        "bootstrap_95_ci": [
+          92.50789643616949,
+          94.2346557027349
+        ],
+        "faster_pairs": 12,
+        "paired_median": 93.14046419310975,
+        "ratio_of_medians": 93.63793248452825
+      }
+    },
+    {
+      "baseline_cpu_ns_per_label": 1971.4797028186274,
+      "batch_size": 128,
+      "candidate_cpu_ns_per_label": 317.2881551659125,
+      "case": "labels-titles",
+      "control": false,
+      "cpu_reduction_percent": {
+        "bootstrap_95_ci": [
+          79.46377364225296,
+          86.47197407252125
+        ],
+        "faster_pairs": 12,
+        "paired_median": 83.53349455371657,
+        "ratio_of_medians": 83.9060907037346
+      },
+      "wall_reduction_percent": {
+        "bootstrap_95_ci": [
+          79.46055382581139,
+          86.47957172265427
+        ],
+        "faster_pairs": 12,
+        "paired_median": 83.53698426072421,
+        "ratio_of_medians": 83.86045503761159
+      }
+    },
+    {
+      "baseline_cpu_ns_per_label": 2722.276971726191,
+      "batch_size": 128,
+      "candidate_cpu_ns_per_label": 353.28234375,
+      "case": "labels-unicode",
+      "control": false,
+      "cpu_reduction_percent": {
+        "bootstrap_95_ci": [
+          84.11503042683219,
+          87.82942426960498
+        ],
+        "faster_pairs": 12,
+        "paired_median": 86.30564822033935,
+        "ratio_of_medians": 87.02254225344366
+      },
+      "wall_reduction_percent": {
+        "bootstrap_95_ci": [
+          84.11848823875007,
+          87.84135058611302
+        ],
+        "faster_pairs": 12,
+        "paired_median": 86.3090198580779,
+        "ratio_of_medians": 87.03207305840081
+      }
+    },
+    {
+      "baseline_cpu_ns_per_label": 1392.4572418811274,
+      "batch_size": 128,
+      "candidate_cpu_ns_per_label": 200.20256491268384,
+      "case": "labels-mixed",
+      "control": false,
+      "cpu_reduction_percent": {
+        "bootstrap_95_ci": [
+          82.19562756460209,
+          88.27146980023163
+        ],
+        "faster_pairs": 12,
+        "paired_median": 84.6175765705222,
+        "ratio_of_medians": 85.62235457641614
+      },
+      "wall_reduction_percent": {
+        "bootstrap_95_ci": [
+          82.20629228447018,
+          88.2669098037392
+        ],
+        "faster_pairs": 12,
+        "paired_median": 84.6428059313008,
+        "ratio_of_medians": 85.63150013142908
+      }
+    },
+    {
+      "baseline_cpu_ns_per_label": 1481.457251915565,
+      "batch_size": 1024,
+      "candidate_cpu_ns_per_label": 200.87007493239184,
+      "case": "labels-mixed-1024",
+      "control": false,
+      "cpu_reduction_percent": {
+        "bootstrap_95_ci": [
+          83.9361426772747,
+          87.5447841738767
+        ],
+        "faster_pairs": 12,
+        "paired_median": 84.58531286923636,
+        "ratio_of_medians": 86.44104818598976
+      },
+      "wall_reduction_percent": {
+        "bootstrap_95_ci": [
+          83.93715426330117,
+          87.54977507483889
+        ],
+        "faster_pairs": 12,
+        "paired_median": 84.59105685525809,
+        "ratio_of_medians": 86.44657983231252
+      }
+    },
+    {
+      "baseline_cpu_ns_per_label": 170.46565451801575,
+      "batch_size": 128,
+      "candidate_cpu_ns_per_label": 165.14421261181658,
+      "case": "labels-movies-control",
+      "control": true,
+      "cpu_reduction_percent": {
+        "bootstrap_95_ci": [
+          -0.596428501614521,
+          12.005648143485342
+        ],
+        "faster_pairs": 9,
+        "paired_median": 5.442472784697616,
+        "ratio_of_medians": 3.1217091332827795
+      },
+      "wall_reduction_percent": {
+        "bootstrap_95_ci": [
+          -0.655085900909419,
+          11.993046796171985
+        ],
+        "faster_pairs": 9,
+        "paired_median": 5.727553075505426,
+        "ratio_of_medians": 2.971715063357616
+      }
+    },
+    {
+      "baseline_cpu_ns_per_label": 138.83961194861234,
+      "batch_size": 128,
+      "candidate_cpu_ns_per_label": 126.22574502552459,
+      "case": "labels-dates-control",
+      "control": true,
+      "cpu_reduction_percent": {
+        "bootstrap_95_ci": [
+          -0.9373149385904334,
+          16.062369810321936
+        ],
+        "faster_pairs": 9,
+        "paired_median": 7.150816839759511,
+        "ratio_of_medians": 9.085207561482111
+      },
+      "wall_reduction_percent": {
+        "bootstrap_95_ci": [
+          -0.9807255749815613,
+          16.026616666018846
+        ],
+        "faster_pairs": 9,
+        "paired_median": 7.166888539560789,
+        "ratio_of_medians": 9.104541831162305
+      }
+    },
+    {
+      "baseline_cpu_ns_per_label": 163.77821881583566,
+      "batch_size": 128,
+      "candidate_cpu_ns_per_label": 167.21510915006144,
+      "case": "labels-unknown-control",
+      "control": true,
+      "cpu_reduction_percent": {
+        "bootstrap_95_ci": [
+          -9.706145482939077,
+          6.138431050272975
+        ],
+        "faster_pairs": 4,
+        "paired_median": -3.2091926190824016,
+        "ratio_of_medians": -2.0985026941161555
+      },
+      "wall_reduction_percent": {
+        "bootstrap_95_ci": [
+          -9.786654547312034,
+          6.044996914471823
+        ],
+        "faster_pairs": 4,
+        "paired_median": -3.261303905968427,
+        "ratio_of_medians": -2.152252046562486
+      }
+    },
+    {
+      "baseline_cpu_ns_per_label": 2566.4629415760874,
+      "batch_size": 128,
+      "candidate_cpu_ns_per_label": 2403.8891728940216,
+      "case": "labels-negative-control",
+      "control": true,
+      "cpu_reduction_percent": {
+        "bootstrap_95_ci": [
+          -10.305948155474331,
+          10.974710746289645
+        ],
+        "faster_pairs": 7,
+        "paired_median": 2.002067671338603,
+        "ratio_of_medians": 6.334545730172425
+      },
+      "wall_reduction_percent": {
+        "bootstrap_95_ci": [
+          -10.30336614763159,
+          11.052291968959064
+        ],
+        "faster_pairs": 7,
+        "paired_median": 2.1742269737771047,
+        "ratio_of_medians": 5.791154640323404
+      }
+    },
+    {
+      "baseline_cpu_ns_per_label": 2617.960979959239,
+      "batch_size": 128,
+      "candidate_cpu_ns_per_label": 2445.6948985224185,
+      "case": "labels-overflow-control",
+      "control": true,
+      "cpu_reduction_percent": {
+        "bootstrap_95_ci": [
+          -3.2501356151094063,
+          14.135436690174867
+        ],
+        "faster_pairs": 8,
+        "paired_median": 4.7688739527430695,
+        "ratio_of_medians": 6.580162300184577
+      },
+      "wall_reduction_percent": {
+        "bootstrap_95_ci": [
+          -3.1711072953780617,
+          14.050120741888279
+        ],
+        "faster_pairs": 8,
+        "paired_median": 4.779572639342416,
+        "ratio_of_medians": 6.424946398648979
+      }
+    },
+    {
+      "baseline_cpu_ns_per_label": 3572.8427105686696,
+      "batch_size": 128,
+      "candidate_cpu_ns_per_label": 482.2996747585837,
+      "case": "labels-positive-int32",
+      "control": false,
+      "cpu_reduction_percent": {
+        "bootstrap_95_ci": [
+          82.98598524709541,
+          89.59189652702284
+        ],
+        "faster_pairs": 12,
+        "paired_median": 86.89170044838158,
+        "ratio_of_medians": 86.50095417489513
+      },
+      "wall_reduction_percent": {
+        "bootstrap_95_ci": [
+          83.01053738495,
+          89.59869258410575
+        ],
+        "faster_pairs": 12,
+        "paired_median": 86.89665032098827,
+        "ratio_of_medians": 86.51197846526557
+      }
+    },
+    {
+      "baseline_cpu_ns_per_label": 36567.206580528844,
+      "batch_size": 128,
+      "candidate_cpu_ns_per_label": 34583.029597355766,
+      "case": "recognize-episodes",
+      "control": false,
+      "cpu_reduction_percent": {
+        "bootstrap_95_ci": [
+          -17.30738943756642,
+          16.692916986804086
+        ],
+        "faster_pairs": 7,
+        "paired_median": 4.935046713907177,
+        "ratio_of_medians": 5.426110356019387
+      },
+      "wall_reduction_percent": {
+        "bootstrap_95_ci": [
+          -23.458701818544636,
+          16.68437314434479
+        ],
+        "faster_pairs": 7,
+        "paired_median": 4.934802819967649,
+        "ratio_of_medians": 4.565901159764307
+      }
+    },
+    {
+      "baseline_cpu_ns_per_label": 29124.279058689026,
+      "batch_size": 128,
+      "candidate_cpu_ns_per_label": 30865.499428353658,
+      "case": "recognize-mixed",
+      "control": false,
+      "cpu_reduction_percent": {
+        "bootstrap_95_ci": [
+          -20.8175303285007,
+          14.797667421732257
+        ],
+        "faster_pairs": 6,
+        "paired_median": -4.881645709265674,
+        "ratio_of_medians": -5.978587027530735
+      },
+      "wall_reduction_percent": {
+        "bootstrap_95_ci": [
+          -20.96887466627857,
+          14.770458177833396
+        ],
+        "faster_pairs": 6,
+        "paired_median": -4.885770938108508,
+        "ratio_of_medians": -5.73623257800413
+      }
+    },
+    {
+      "baseline_cpu_ns_per_label": 17267.0654296875,
+      "batch_size": 128,
+      "candidate_cpu_ns_per_label": 16372.1123046875,
+      "case": "recognize-movies-control",
+      "control": true,
+      "cpu_reduction_percent": {
+        "bootstrap_95_ci": [
+          0.9812638285683295,
+          18.907363948588632
+        ],
+        "faster_pairs": 9,
+        "paired_median": 10.18787590524735,
+        "ratio_of_medians": 5.183006508223997
+      },
+      "wall_reduction_percent": {
+        "bootstrap_95_ci": [
+          0.9849440416741351,
+          18.90791804366051
+        ],
+        "faster_pairs": 9,
+        "paired_median": 10.071772365360316,
+        "ratio_of_medians": 5.026449587549564
+      }
+    }
+  ],
+  "interrupted_attempts": [
+    {
+      "included_in_statistics": false,
+      "path": "/workspace/scratch/355e15c67b63/episode-display-name-linux-12pair",
+      "recorded_disposition": {
+        "included_in_final_statistics": false,
+        "next_action": "Reclaim this task\u2019s disposable build caches and rerun complete study into a fresh output directory",
+        "reason": "OSError [Errno 28] No space left on device while writing a measurement log; error reporting also ran out of space",
+        "recorded_utc": "2026-10-28T05:08:50Z",
+        "retained_observations": 29,
+        "status": "aborted_infrastructure"
+      }
+    },
+    {
+      "included_in_statistics": false,
+      "path": "/workspace/scratch/355e15c67b63/episode-display-name-linux-12pair-rerun",
+      "recorded_disposition": null
+    }
+  ],
+  "method": "Independent standard-library calculations; no import or execution of benchmark runner functions",
+  "minimum_measured_cpu_ms": {
+    "baseline": 93.856828,
+    "candidate": 9.319936
+  },
+  "new_output_verification": {
+    "exact_utf8_equal": true,
+    "independent_checksums_equal": true,
+    "labels": 4139,
+    "receipts": 16,
+    "rerun_for_both_variants": true,
+    "sha256": "94a7075d4c5579548b6ab82fc4e22ffa8b39e734b28bcbb604c1a78c6e71146e"
+  },
+  "observations": 360,
+  "passed": true,
+  "runtime": {
+    "all_loaded_dependency_count": 19,
+    "copied_from_verified_surviving_runtime": true,
+    "directory": "/workspace/scratch/355e15c67b63/tools/episode-swift-runtime",
+    "required_libraries": {
+      "libBlocksRuntime.so": "bc1c428c7bce19a4ccf7c60ee917a63e31189776e97c7a9404eafbbdb1458ba5",
+      "libFoundation.so": "6383cb3a1c03c9772132d85e0dc9a724349de0bc80de1df34b7916d292e3f274",
+      "libFoundationEssentials.so": "2ba83babbb640fcb17128a15a1e8405e5831d8b201d27c85dd1e4910f2d6bf60",
+      "libFoundationInternationalization.so": "4c5ad5fdf708414c0c6c15a8327500fe4360af16aa1109e24feb24da0a649faf",
+      "lib_FoundationICU.so": "c9787cbc71160bda0fd935e180b700e94d7171c9838644bddce0098efbcf0835",
+      "libdispatch.so": "8a32f60d801a84a8d9a8cf66e8ae17f75d21df8caa19847722f36e789b170eb1",
+      "libswiftCore.so": "cbf8375af0dd28f368ed9f8ed55d351543078337091408e901c44078d230fb6b",
+      "libswiftDispatch.so": "9e165d6514a6d5ce89d850296d1bed932d06947680e1afc8f806044fbf2fbcfc",
+      "libswiftGlibc.so": "16d293cbeaa11f5efe1b87fd2bf16be6a11fd124ecf21e16683214e48865a5d8",
+      "libswiftSynchronization.so": "27a76d71f5f53417bd5bea5618c50ccc10be8559ec218fbfbe64529c367ee592",
+      "libswift_Builtin_float.so": "9ccd1afb5047c6bc418705d070cbd85d8962bed458441655270e4b5cf88e42a2",
+      "libswift_Concurrency.so": "dfb7b853562f8d33b3435b7e227178101e7613070f30a90e63c5b4f12a2cd371",
+      "libswift_RegexParser.so": "0836d892f5d28acf73e16b50bff3f658230138a9e4d8944103d9d9cf71e87b67",
+      "libswift_StringProcessing.so": "31b2744bd285d89f8def117c04ef0debe200b3142bf22a58f597ba90468f3663"
+    }
+  },
+  "schema": 1,
+  "source_sha256": {
+    "Driver.swift": "65008a6eb2c14d1db731d0fb4634a340040f2a50c06b9faa7786d3d369de2bd3",
+    "Package.swift": "5739f05aa7f3f60e46eecc20620ed41f658db88df000b543b54725f756fd64b6",
+    "Tests/IlliquidCoreTests/EpisodeDisplayNameTests.swift": "cb25e29526f13bbbbca9bd9cd9868ffdd009a9c63547f83abe6e3f7f2163cbc3",
+    "Tests/IlliquidCoreTests/MediaNameRecognitionFastPathTests.swift": "9dafb54dc4924bd0db562cb8fdd90ded17b2f1c85b5a4c768728bc17f5cb00cd",
+    "Tests/IlliquidCoreTests/MediaNameRecognitionPerformanceRegressionTests.swift": "64c993fc9537e20a7df900f003b3768c6bd8014ecfe8e3cc52d21106175a5a2b",
+    "Tests/IlliquidCoreTests/MediaNameRecognitionTests.swift": "6850282f759af9c10c2a41db95d2450a49a56c4b453b82b18defce512d254acf",
+    "baseline/MediaNameRecognition.swift": "546229819194a5844bc052e3837a21296921f4b11e6191ebdc82c0c7c5e64910",
+    "baseline/manifest.json": "8a8421578ff13b6143590353b5f30c3214100bdfedb89c7208826c4f48e0a92c",
+    "candidate/MediaNameRecognition.swift": "cc3c1ac628498798384c3e93973ffa0dcd6f21036b1f1de779cd54c82cc944d1",
+    "recover.py": "b5c6a0743dce8d14dea64d64ea3105acf08a7385f54961e3f8892c21617046d2",
+    "run.py": "d622906e8b93176efa924aafe732feeb444741c605c685d4b0ba68ef47358326"
+  },
+  "test_qualification": {
+    "executions": 160,
+    "inherited": true,
+    "matrix": [
+      {
+        "configuration": "debug",
+        "count": 40,
+        "passed": true,
+        "variant": "baseline"
+      },
+      {
+        "configuration": "debug",
+        "count": 40,
+        "passed": true,
+        "variant": "candidate"
+      },
+      {
+        "configuration": "release",
+        "count": 40,
+        "passed": true,
+        "variant": "baseline"
+      },
+      {
+        "configuration": "release",
+        "count": 40,
+        "passed": true,
+        "variant": "candidate"
+      }
+    ],
+    "origin": "/workspace/scratch/355e15c67b63/episode-display-name-linux-12pair",
+    "qualification_note": "Tests ran successfully before original environment failures; recovered runtime receives new full-output verification and timings below",
+    "rerun_during_recovery": false
+  }
+}

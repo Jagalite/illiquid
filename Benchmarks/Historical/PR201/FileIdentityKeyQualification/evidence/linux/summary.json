@@ -1,0 +1,435 @@
+{
+  "status": "passed",
+  "tests": [
+    {
+      "variant": "baseline",
+      "configuration": "debug",
+      "passed": true,
+      "log": "logs/tests-baseline-debug.log",
+      "result": "◇ Test \"Relative references validate the resolved authority and retain path bytes\" started.\n✔ Test \"Relative references validate the resolved authority and retain path bytes\" passed after 0.001 seconds.\n◇ Test \"Invalid local authorities and unsupported schemes remain rejected\" started.\n✔ Test \"Invalid local authorities and unsupported schemes remain rejected\" passed after 0.001 seconds.\n◇ Test \"Paths exposed as Darwin file references retain constructor behavior\" started.\n✔ Test \"Paths exposed as Darwin file references retain constructor behavior\" passed after 0.001 seconds.\n✔ Suite \"Normalized persistence key reconstruction\" passed after 0.052 seconds.\n✔ Test run with 31 tests in 4 suites passed after 0.269 seconds."
+    },
+    {
+      "variant": "baseline",
+      "configuration": "release",
+      "passed": true,
+      "log": "logs/tests-baseline-release.log",
+      "result": "◇ Test \"Relative references validate the resolved authority and retain path bytes\" started.\n✔ Test \"Relative references validate the resolved authority and retain path bytes\" passed after 0.001 seconds.\n◇ Test \"Invalid local authorities and unsupported schemes remain rejected\" started.\n✔ Test \"Invalid local authorities and unsupported schemes remain rejected\" passed after 0.001 seconds.\n◇ Test \"Paths exposed as Darwin file references retain constructor behavior\" started.\n✔ Test \"Paths exposed as Darwin file references retain constructor behavior\" passed after 0.001 seconds.\n✔ Suite \"Normalized persistence key reconstruction\" passed after 0.012 seconds.\n✔ Test run with 31 tests in 4 suites passed after 0.064 seconds."
+    },
+    {
+      "variant": "candidate",
+      "configuration": "debug",
+      "passed": true,
+      "log": "logs/tests-candidate-debug.log",
+      "result": "◇ Test \"Relative references validate the resolved authority and retain path bytes\" started.\n✔ Test \"Relative references validate the resolved authority and retain path bytes\" passed after 0.001 seconds.\n◇ Test \"Invalid local authorities and unsupported schemes remain rejected\" started.\n✔ Test \"Invalid local authorities and unsupported schemes remain rejected\" passed after 0.001 seconds.\n◇ Test \"Paths exposed as Darwin file references retain constructor behavior\" started.\n✔ Test \"Paths exposed as Darwin file references retain constructor behavior\" passed after 0.001 seconds.\n✔ Suite \"Normalized persistence key reconstruction\" passed after 0.014 seconds.\n✔ Test run with 31 tests in 4 suites passed after 0.069 seconds."
+    },
+    {
+      "variant": "candidate",
+      "configuration": "release",
+      "passed": true,
+      "log": "logs/tests-candidate-release.log",
+      "result": "◇ Test \"Relative references validate the resolved authority and retain path bytes\" started.\n✔ Test \"Relative references validate the resolved authority and retain path bytes\" passed after 0.001 seconds.\n◇ Test \"Invalid local authorities and unsupported schemes remain rejected\" started.\n✔ Test \"Invalid local authorities and unsupported schemes remain rejected\" passed after 0.001 seconds.\n◇ Test \"Paths exposed as Darwin file references retain constructor behavior\" started.\n✔ Test \"Paths exposed as Darwin file references retain constructor behavior\" passed after 0.001 seconds.\n✔ Suite \"Normalized persistence key reconstruction\" passed after 0.011 seconds.\n✔ Test run with 31 tests in 4 suites passed after 0.053 seconds."
+    }
+  ],
+  "summaries": [
+    {
+      "id": "key-short",
+      "operationsPerIteration": 64,
+      "iterations": 1977,
+      "pairs": 10,
+      "baseline_median_ns": 1296.622206151998,
+      "candidate_median_ns": 799.2973017830045,
+      "delta_ns": -497.32490436899343,
+      "reduction_percent": 38.35542087813772,
+      "median_paired_reduction_percent": 38.441901634925735,
+      "candidate_faster_pairs": 10,
+      "baseline_range_ns": [
+        1289.7050376201314,
+        1373.9830472306526
+      ],
+      "candidate_range_ns": [
+        788.0217264162873,
+        820.2339403136065
+      ]
+    },
+    {
+      "id": "key-root",
+      "operationsPerIteration": 64,
+      "iterations": 2184,
+      "pairs": 10,
+      "baseline_median_ns": 1237.3793247767858,
+      "candidate_median_ns": 710.7657358917124,
+      "delta_ns": -526.6135888850733,
+      "reduction_percent": 42.558783579164015,
+      "median_paired_reduction_percent": 42.53976209074884,
+      "candidate_faster_pairs": 10,
+      "baseline_range_ns": [
+        1211.031715029762,
+        1254.0729595924909
+      ],
+      "candidate_range_ns": [
+        696.1116643772893,
+        763.9258456387363
+      ]
+    },
+    {
+      "id": "key-ascii64",
+      "operationsPerIteration": 64,
+      "iterations": 877,
+      "pairs": 10,
+      "baseline_median_ns": 3989.541628064424,
+      "candidate_median_ns": 1780.528586445268,
+      "delta_ns": -2209.013041619156,
+      "reduction_percent": 55.37009630579757,
+      "median_paired_reduction_percent": 55.51591508433648,
+      "candidate_faster_pairs": 10,
+      "baseline_range_ns": [
+        3967.692185718358,
+        4109.035668472064
+      ],
+      "candidate_range_ns": [
+        1764.6135618586088,
+        1815.0132554161917
+      ]
+    },
+    {
+      "id": "key-long-ascii64",
+      "operationsPerIteration": 64,
+      "iterations": 198,
+      "pairs": 10,
+      "baseline_median_ns": 21913.306739267675,
+      "candidate_median_ns": 7807.120778093435,
+      "delta_ns": -14106.18596117424,
+      "reduction_percent": 64.37269431316169,
+      "median_paired_reduction_percent": 64.35251937741799,
+      "candidate_faster_pairs": 10,
+      "baseline_range_ns": [
+        21826.209517045456,
+        22061.159169823233
+      ],
+      "candidate_range_ns": [
+        7781.649068813132,
+        7877.880445075758
+      ]
+    },
+    {
+      "id": "key-percent64",
+      "operationsPerIteration": 64,
+      "iterations": 1045,
+      "pairs": 10,
+      "baseline_median_ns": 3211.960870215311,
+      "candidate_median_ns": 1486.7668286483254,
+      "delta_ns": -1725.1940415669856,
+      "reduction_percent": 53.71155226593214,
+      "median_paired_reduction_percent": 53.47186864286246,
+      "candidate_faster_pairs": 10,
+      "baseline_range_ns": [
+        3159.0095843301438,
+        3273.8081190191388
+      ],
+      "candidate_range_ns": [
+        1474.6463965311004,
+        1520.5460077751195
+      ]
+    },
+    {
+      "id": "key-raw-localhost64",
+      "operationsPerIteration": 64,
+      "iterations": 1024,
+      "pairs": 10,
+      "baseline_median_ns": 3008.563102722168,
+      "candidate_median_ns": 1518.5310592651367,
+      "delta_ns": -1490.0320434570312,
+      "reduction_percent": 49.526368322101675,
+      "median_paired_reduction_percent": 49.259890329967874,
+      "candidate_faster_pairs": 10,
+      "baseline_range_ns": [
+        2956.166778564453,
+        3169.9896545410156
+      ],
+      "candidate_range_ns": [
+        1499.5927734375,
+        1568.321517944336
+      ]
+    },
+    {
+      "id": "key-unicode-nfc64",
+      "operationsPerIteration": 64,
+      "iterations": 678,
+      "pairs": 10,
+      "baseline_median_ns": 2301.4468104719763,
+      "candidate_median_ns": 2419.3257743362833,
+      "delta_ns": 117.87896386430702,
+      "reduction_percent": -5.121950389117735,
+      "median_paired_reduction_percent": -4.947692742381626,
+      "candidate_faster_pairs": 1,
+      "baseline_range_ns": [
+        2282.8022216076697,
+        2407.5682614306784
+      ],
+      "candidate_range_ns": [
+        2383.1321211283184,
+        2522.5991196533923
+      ]
+    },
+    {
+      "id": "key-unicode-nfd64",
+      "operationsPerIteration": 64,
+      "iterations": 669,
+      "pairs": 10,
+      "baseline_median_ns": 2329.674817825112,
+      "candidate_median_ns": 2455.771580717489,
+      "delta_ns": 126.09676289237723,
+      "reduction_percent": -5.412633640007147,
+      "median_paired_reduction_percent": -5.047450864478709,
+      "candidate_faster_pairs": 0,
+      "baseline_range_ns": [
+        2318.94403961136,
+        2349.3893404334826
+      ],
+      "candidate_range_ns": [
+        2419.3638593049327,
+        2556.7852671898354
+      ]
+    },
+    {
+      "id": "key-invalid-authority64",
+      "operationsPerIteration": 64,
+      "iterations": 10810,
+      "pairs": 10,
+      "baseline_median_ns": 148.53751589962997,
+      "candidate_median_ns": 146.50887777520813,
+      "delta_ns": -2.028638124421832,
+      "reduction_percent": 1.365741248690755,
+      "median_paired_reduction_percent": 1.4236985278695213,
+      "candidate_faster_pairs": 7,
+      "baseline_range_ns": [
+        147.12048016882517,
+        150.6874768732655
+      ],
+      "candidate_range_ns": [
+        143.85033389222943,
+        150.01994680851064
+      ]
+    },
+    {
+      "id": "same-file64",
+      "operationsPerIteration": 64,
+      "iterations": 537,
+      "pairs": 10,
+      "baseline_median_ns": 5834.924231843575,
+      "candidate_median_ns": 2865.9856261638733,
+      "delta_ns": -2968.938605679702,
+      "reduction_percent": 50.88221350805184,
+      "median_paired_reduction_percent": 50.93252506455437,
+      "candidate_faster_pairs": 10,
+      "baseline_range_ns": [
+        5781.618074953445,
+        6041.253637104283
+      ],
+      "candidate_range_ns": [
+        2846.281337290503,
+        2889.1962290502793
+      ]
+    },
+    {
+      "id": "item-id512",
+      "operationsPerIteration": 512,
+      "iterations": 149,
+      "pairs": 10,
+      "baseline_median_ns": 2798.2741912227348,
+      "candidate_median_ns": 1314.2686661073826,
+      "delta_ns": -1484.0055251153522,
+      "reduction_percent": 53.032884689076894,
+      "median_paired_reduction_percent": 53.04396071700658,
+      "candidate_faster_pairs": 10,
+      "baseline_range_ns": [
+        2759.64408557047,
+        3144.9307754823826
+      ],
+      "candidate_range_ns": [
+        1296.647860738255,
+        1331.9714371854027
+      ]
+    },
+    {
+      "id": "item-id-invalid64",
+      "operationsPerIteration": 64,
+      "iterations": 9551,
+      "pairs": 10,
+      "baseline_median_ns": 166.3111887825882,
+      "candidate_median_ns": 163.81596822322268,
+      "delta_ns": -2.495220559365521,
+      "reduction_percent": 1.5003323454247042,
+      "median_paired_reduction_percent": 1.2697269953572787,
+      "candidate_faster_pairs": 10,
+      "baseline_range_ns": [
+        164.5382191655324,
+        169.95582432467805
+      ],
+      "candidate_range_ns": [
+        162.19601187048477,
+        165.59480519055597
+      ]
+    },
+    {
+      "id": "folder-last32",
+      "operationsPerIteration": 32,
+      "iterations": 74,
+      "pairs": 10,
+      "baseline_median_ns": 92150.64294763513,
+      "candidate_median_ns": 43030.24113175676,
+      "delta_ns": -49120.40181587837,
+      "reduction_percent": 53.30445913849042,
+      "median_paired_reduction_percent": 53.32413616256031,
+      "candidate_faster_pairs": 10,
+      "baseline_range_ns": [
+        91517.2339527027,
+        93367.09755067568
+      ],
+      "candidate_range_ns": [
+        42742.71410472973,
+        43864.47761824324
+      ]
+    },
+    {
+      "id": "folder-miss32",
+      "operationsPerIteration": 32,
+      "iterations": 74,
+      "pairs": 10,
+      "baseline_median_ns": 92154.45270270269,
+      "candidate_median_ns": 42711.87394425676,
+      "delta_ns": -49442.57875844593,
+      "reduction_percent": 53.65186087963809,
+      "median_paired_reduction_percent": 53.80504652609224,
+      "candidate_faster_pairs": 10,
+      "baseline_range_ns": [
+        90904.92398648648,
+        94322.24366554055
+      ],
+      "candidate_range_ns": [
+        42209.21790540541,
+        43273.19552364865
+      ]
+    },
+    {
+      "id": "folder-last512",
+      "operationsPerIteration": 32,
+      "iterations": 5,
+      "pairs": 10,
+      "baseline_median_ns": 1420804.3937499998,
+      "candidate_median_ns": 664229.209375,
+      "delta_ns": -756575.1843749998,
+      "reduction_percent": 53.24977792179635,
+      "median_paired_reduction_percent": 53.28386825954858,
+      "candidate_faster_pairs": 10,
+      "baseline_range_ns": [
+        1412679.05625,
+        1439429.91875
+      ],
+      "candidate_range_ns": [
+        660787.5875,
+        671209.5625
+      ]
+    },
+    {
+      "id": "folder-miss512",
+      "operationsPerIteration": 32,
+      "iterations": 5,
+      "pairs": 10,
+      "baseline_median_ns": 1427263.6875,
+      "candidate_median_ns": 666617.23125,
+      "delta_ns": -760646.45625,
+      "reduction_percent": 53.29403829942252,
+      "median_paired_reduction_percent": 53.29929409401206,
+      "candidate_faster_pairs": 10,
+      "baseline_range_ns": [
+        1410418.08125,
+        1534709.35
+      ],
+      "candidate_range_ns": [
+        660217.76875,
+        678734.5
+      ]
+    },
+    {
+      "id": "folder-first512",
+      "operationsPerIteration": 32,
+      "iterations": 1211,
+      "pairs": 10,
+      "baseline_median_ns": 5586.953370148638,
+      "candidate_median_ns": 2613.9472414327,
+      "delta_ns": -2973.006128715938,
+      "reduction_percent": 53.21336928639593,
+      "median_paired_reduction_percent": 52.88935381148906,
+      "candidate_faster_pairs": 10,
+      "baseline_range_ns": [
+        5532.780733897605,
+        6013.340240503716
+      ],
+      "candidate_range_ns": [
+        2580.888470272502,
+        2701.307313170933
+      ]
+    },
+    {
+      "id": "folder-singleton-hit",
+      "operationsPerIteration": 32,
+      "iterations": 1193,
+      "pairs": 10,
+      "baseline_median_ns": 5556.194153394803,
+      "candidate_median_ns": 2617.17014616513,
+      "delta_ns": -2939.024007229673,
+      "reduction_percent": 52.89635182085828,
+      "median_paired_reduction_percent": 53.021755437148144,
+      "candidate_faster_pairs": 10,
+      "baseline_range_ns": [
+        5511.270091156748,
+        5644.593697611064
+      ],
+      "candidate_range_ns": [
+        2597.82022736798,
+        2644.594038139145
+      ]
+    },
+    {
+      "id": "folder-singleton-miss",
+      "operationsPerIteration": 32,
+      "iterations": 1219,
+      "pairs": 10,
+      "baseline_median_ns": 5353.993834598032,
+      "candidate_median_ns": 2563.4887971698113,
+      "delta_ns": -2790.5050374282205,
+      "reduction_percent": 52.12006445348712,
+      "median_paired_reduction_percent": 52.16635917419165,
+      "candidate_faster_pairs": 10,
+      "baseline_range_ns": [
+        5306.586213084495,
+        5401.112746103364
+      ],
+      "candidate_range_ns": [
+        2546.914299630845,
+        2623.8857157506154
+      ]
+    },
+    {
+      "id": "folder-empty",
+      "operationsPerIteration": 32,
+      "iterations": 684871,
+      "pairs": 10,
+      "baseline_median_ns": 5.168372036485703,
+      "candidate_median_ns": 4.561741394547294,
+      "delta_ns": -0.6066306419384091,
+      "reduction_percent": 11.737364060790313,
+      "median_paired_reduction_percent": 11.831527565377309,
+      "candidate_faster_pairs": 10,
+      "baseline_range_ns": [
+        4.899934668353603,
+        5.185037903123362
+      ],
+      "candidate_range_ns": [
+        4.252331734735447,
+        4.578335281388758
+      ]
+    }
+  ]
+}

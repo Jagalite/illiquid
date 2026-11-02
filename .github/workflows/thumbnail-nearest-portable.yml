@@ -1,0 +1,59 @@
+name: Thumbnail nearest portable planning
+
+on:
+  push:
+    branches:
+      - perf/thumbnail-nearest-buckets-987bdf6388c2
+    paths:
+      - Sources/IlliquidNativePlayback/Media/NativeThumbnailCache.swift
+      - Benchmarks/ThumbnailNearest/Portable.swift
+      - Benchmarks/ThumbnailNearest/portable.py
+      - .github/workflows/thumbnail-nearest-portable.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: thumbnail-nearest-portable-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  planning-probe:
+    runs-on: ubuntu-24.04
+    container: swift:6.3.2-jammy
+    timeout-minutes: 20
+    env:
+      PROBE_CONTAINER_IMAGE: swift:6.3.2-jammy
+    steps:
+      - name: Install runner prerequisites
+        run: |
+          apt-get update
+          apt-get install -y --no-install-recommends python3 git ca-certificates
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Allow this ephemeral checkout
+        run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
+      - name: Check hosted build coordination
+        shell: bash
+        run: |
+          if [ -f /Volumes/seed1/Projects/kyoto/kyoto.py ]; then
+            echo "Kyoto is available. Submit the complete portable runner through Kyoto before building."
+            exit 1
+          fi
+          echo "Kyoto is unavailable on this hosted Linux runner; running sequential builds in an isolated output/build directory."
+      - name: Validate runner syntax
+        run: python3 -c "import ast; from pathlib import Path; ast.parse(Path('Benchmarks/ThumbnailNearest/portable.py').read_text())"
+      - name: Run extracted planning comparison
+        run: python3 Benchmarks/ThumbnailNearest/portable.py --pairs 8 --target-ms 100 --output "$RUNNER_TEMP/thumbnail-nearest-portable"
+      - name: Preserve planning receipts
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: thumbnail-nearest-portable
+          retention-days: 14
+          path: |
+            ${{ runner.temp }}/thumbnail-nearest-portable
+            !${{ runner.temp }}/thumbnail-nearest-portable/build/**

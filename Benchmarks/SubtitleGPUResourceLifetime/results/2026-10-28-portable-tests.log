@@ -1,0 +1,89 @@
+2026-10-28T06:17:15.6809621Z Running debug pool ownership tests
+2026-10-28T06:17:26.9041576Z Building for debugging...
+2026-10-28T06:17:26.9042347Z [0/13] Write sources
+2026-10-28T06:17:26.9042882Z [2/13] Write swift-version-24593BA9C3E375BF.txt
+2026-10-28T06:17:26.9043758Z [4/15] Compiling IlliquidNativePlayback Pool.swift
+2026-10-28T06:17:26.9044447Z [5/15] Emitting module IlliquidNativePlayback
+2026-10-28T06:17:26.9045159Z [6/16] Wrapping AST for IlliquidNativePlayback for debugging
+2026-10-28T06:17:26.9046051Z [8/18] Emitting module IlliquidNativePlaybackTests
+2026-10-28T06:17:26.9046944Z [9/18] Compiling IlliquidNativePlaybackTests SubtitleGPUResourcePoolTests.swift
+2026-10-28T06:17:26.9048421Z [10/19] /__w/illiquid/illiquid/.qualification/subtitle-gpu-pool-portable/package/.build/x86_64-unknown-linux-gnu/debug/SubtitleGPUResourcePoolPortableCheckPackageDiscoveredTests.derived/all-discovered-tests.swift
+2026-10-28T06:17:26.9049499Z [11/19] Write sources
+2026-10-28T06:17:26.9049901Z [12/19] Wrapping AST for IlliquidNativePlaybackTests for debugging
+2026-10-28T06:17:26.9051164Z [14/21] Emitting module SubtitleGPUResourcePoolPortableCheckPackageDiscoveredTests
+2026-10-28T06:17:26.9052013Z [15/21] Compiling SubtitleGPUResourcePoolPortableCheckPackageDiscoveredTests IlliquidNativePlaybackTests.swift
+2026-10-28T06:17:26.9053000Z [16/22] Compiling SubtitleGPUResourcePoolPortableCheckPackageDiscoveredTests all-discovered-tests.swift
+2026-10-28T06:17:26.9054204Z [17/23] /__w/illiquid/illiquid/.qualification/subtitle-gpu-pool-portable/package/.build/x86_64-unknown-linux-gnu/debug/SubtitleGPUResourcePoolPortableCheckPackageTests.derived/runner.swift
+2026-10-28T06:17:26.9055123Z [18/23] Write sources
+2026-10-28T06:17:26.9055701Z [19/23] Wrapping AST for SubtitleGPUResourcePoolPortableCheckPackageDiscoveredTests for debugging
+2026-10-28T06:17:26.9056481Z [21/25] Compiling SubtitleGPUResourcePoolPortableCheckPackageTests runner.swift
+2026-10-28T06:17:26.9057177Z [22/25] Emitting module SubtitleGPUResourcePoolPortableCheckPackageTests
+2026-10-28T06:17:26.9057844Z [23/26] Wrapping AST for SubtitleGPUResourcePoolPortableCheckPackageTests for debugging
+2026-10-28T06:17:26.9058398Z [24/26] Write Objects.LinkFileList
+2026-10-28T06:17:26.9058914Z [25/26] Linking SubtitleGPUResourcePoolPortableCheckPackageTests.xctest
+2026-10-28T06:17:26.9059414Z Build complete! (10.19s)
+2026-10-28T06:17:26.9059806Z Test Suite 'All tests' started at 2026-10-28 06:17:26.882
+2026-10-28T06:17:26.9060423Z Test Suite 'debug.xctest' started at 2026-10-28 06:17:26.883
+2026-10-28T06:17:26.9061085Z Test Suite 'debug.xctest' passed at 2026-10-28 06:17:26.883
+2026-10-28T06:17:26.9061814Z 	 Executed 0 tests, with 0 failures (0 unexpected) in 0.0 (0.0) seconds
+2026-10-28T06:17:26.9062218Z Test Suite 'All tests' passed at 2026-10-28 06:17:26.883
+2026-10-28T06:17:26.9062788Z 	 Executed 0 tests, with 0 failures (0 unexpected) in 0.0 (0.0) seconds
+2026-10-28T06:17:26.9063359Z ◇ Test run started.
+2026-10-28T06:17:26.9063894Z ↳ Testing Library Version: 6.2.4 (5ee435b15ad40ec)
+2026-10-28T06:17:26.9064563Z ↳ Target Platform: x86_64-unknown-linux-gnu
+2026-10-28T06:17:26.9065196Z ◇ Suite "Subtitle GPU resource pool" started.
+2026-10-28T06:17:26.9065988Z ◇ Test returnedResourcesAreReusedWithinTheSameSource() started.
+2026-10-28T06:17:26.9067115Z ✔ Test returnedResourcesAreReusedWithinTheSameSource() passed after 0.001 seconds.
+2026-10-28T06:17:26.9068147Z ◇ Test retirementReleasesEveryIdleResource() started.
+2026-10-28T06:17:26.9069091Z ✔ Test retirementReleasesEveryIdleResource() passed after 0.001 seconds.
+2026-10-28T06:17:26.9070514Z ◇ Test retirementPreservesBorrowedLifetimeButRejectsItsReturn() started.
+2026-10-28T06:17:26.9071864Z ✔ Test retirementPreservesBorrowedLifetimeButRejectsItsReturn() passed after 0.001 seconds.
+2026-10-28T06:17:26.9072755Z ◇ Test delayedOldReturnCannotDisplaceCurrentSourceResources() started.
+2026-10-28T06:17:26.9073418Z ✔ Test delayedOldReturnCannotDisplaceCurrentSourceResources() passed after 0.001 seconds.
+2026-10-28T06:17:26.9074098Z ◇ Test interleavedReturnsRemainRetiredAcrossMultipleSourceChanges() started.
+2026-10-28T06:17:26.9074814Z ✔ Test interleavedReturnsRemainRetiredAcrossMultipleSourceChanges() passed after 0.001 seconds.
+2026-10-28T06:17:26.9075461Z ◇ Test concurrentReturnsCannotRepopulateARetiredSource() started.
+2026-10-28T06:17:26.9076060Z ✔ Test concurrentReturnsCannotRepopulateARetiredSource() passed after 0.001 seconds.
+2026-10-28T06:17:26.9076627Z ✔ Suite "Subtitle GPU resource pool" passed after 0.003 seconds.
+2026-10-28T06:17:26.9077086Z ✔ Test run with 6 tests in 1 suite passed after 0.003 seconds.
+2026-10-28T06:17:26.9077350Z 
+2026-10-28T06:17:26.9077458Z Running release pool ownership tests
+2026-10-28T06:17:38.5364682Z Building for production...
+2026-10-28T06:17:38.5365112Z [0/9] Write sources
+2026-10-28T06:17:38.5365414Z [2/9] Write swift-version-24593BA9C3E375BF.txt
+2026-10-28T06:17:38.5365765Z [4/10] Compiling IlliquidNativePlayback Pool.swift
+2026-10-28T06:17:38.5366233Z [5/11] Compiling IlliquidNativePlaybackTests SubtitleGPUResourcePoolTests.swift
+2026-10-28T06:17:38.5367361Z [5/11] /__w/illiquid/illiquid/.qualification/subtitle-gpu-pool-portable/package/.build/x86_64-unknown-linux-gnu/release/SubtitleGPUResourcePoolPortableCheckPackageDiscoveredTests.derived/all-discovered-tests.swift
+2026-10-28T06:17:38.5368310Z [6/11] Write sources
+2026-10-28T06:17:38.5368815Z [8/12] Compiling SubtitleGPUResourcePoolPortableCheckPackageDiscoveredTests IlliquidNativePlaybackTests.swift
+2026-10-28T06:17:38.5369934Z [8/12] /__w/illiquid/illiquid/.qualification/subtitle-gpu-pool-portable/package/.build/x86_64-unknown-linux-gnu/release/SubtitleGPUResourcePoolPortableCheckPackageTests.derived/runner.swift
+2026-10-28T06:17:38.5371124Z [9/12] Write sources
+2026-10-28T06:17:38.5371484Z [11/13] Compiling SubtitleGPUResourcePoolPortableCheckPackageTests runner.swift
+2026-10-28T06:17:38.5371918Z [11/13] Write Objects.LinkFileList
+2026-10-28T06:17:38.5372297Z [12/13] Linking SubtitleGPUResourcePoolPortableCheckPackageTests.xctest
+2026-10-28T06:17:38.5372688Z Build complete! (11.36s)
+2026-10-28T06:17:38.5372965Z Test Suite 'All tests' started at 2026-10-28 06:17:38.515
+2026-10-28T06:17:38.5373346Z Test Suite 'release.xctest' started at 2026-10-28 06:17:38.516
+2026-10-28T06:17:38.5373732Z Test Suite 'release.xctest' passed at 2026-10-28 06:17:38.516
+2026-10-28T06:17:38.5374138Z 	 Executed 0 tests, with 0 failures (0 unexpected) in 0.0 (0.0) seconds
+2026-10-28T06:17:38.5374527Z Test Suite 'All tests' passed at 2026-10-28 06:17:38.516
+2026-10-28T06:17:38.5374904Z 	 Executed 0 tests, with 0 failures (0 unexpected) in 0.0 (0.0) seconds
+2026-10-28T06:17:38.5375745Z ◇ Test run started.
+2026-10-28T06:17:38.5376056Z ↳ Testing Library Version: 6.2.4 (5ee435b15ad40ec)
+2026-10-28T06:17:38.5376428Z ↳ Target Platform: x86_64-unknown-linux-gnu
+2026-10-28T06:17:38.5377023Z ◇ Suite "Subtitle GPU resource pool" started.
+2026-10-28T06:17:38.5377470Z ◇ Test returnedResourcesAreReusedWithinTheSameSource() started.
+2026-10-28T06:17:38.5378069Z ✔ Test returnedResourcesAreReusedWithinTheSameSource() passed after 0.001 seconds.
+2026-10-28T06:17:38.5378624Z ◇ Test retirementReleasesEveryIdleResource() started.
+2026-10-28T06:17:38.5379114Z ✔ Test retirementReleasesEveryIdleResource() passed after 0.001 seconds.
+2026-10-28T06:17:38.5379685Z ◇ Test retirementPreservesBorrowedLifetimeButRejectsItsReturn() started.
+2026-10-28T06:17:38.5380674Z ✔ Test retirementPreservesBorrowedLifetimeButRejectsItsReturn() passed after 0.001 seconds.
+2026-10-28T06:17:38.5381338Z ◇ Test delayedOldReturnCannotDisplaceCurrentSourceResources() started.
+2026-10-28T06:17:38.5381991Z ✔ Test delayedOldReturnCannotDisplaceCurrentSourceResources() passed after 0.001 seconds.
+2026-10-28T06:17:38.5382665Z ◇ Test interleavedReturnsRemainRetiredAcrossMultipleSourceChanges() started.
+2026-10-28T06:17:38.5383394Z ✔ Test interleavedReturnsRemainRetiredAcrossMultipleSourceChanges() passed after 0.001 seconds.
+2026-10-28T06:17:38.5384042Z ◇ Test concurrentReturnsCannotRepopulateARetiredSource() started.
+2026-10-28T06:17:38.5384638Z ✔ Test concurrentReturnsCannotRepopulateARetiredSource() passed after 0.001 seconds.
+2026-10-28T06:17:38.5385201Z ✔ Suite "Subtitle GPU resource pool" passed after 0.003 seconds.
+2026-10-28T06:17:38.5385651Z ✔ Test run with 6 tests in 1 suite passed after 0.003 seconds.
+2026-10-28T06:17:38.5385896Z 

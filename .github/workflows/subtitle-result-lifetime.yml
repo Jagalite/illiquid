@@ -48,8 +48,12 @@ jobs:
           python3 Scripts/install-ci-native-sdk.py
       - name: Compare decoded output and retained native allocations
         run: |
+          mode=()
+          if [[ "${{ github.event_name }}" == "pull_request" ]]; then
+            mode+=(--current-source-regression)
+          fi
           python3 Benchmarks/SubtitleResultLifetime/run.py \
-            --output "$RUNNER_TEMP/subtitle-result-lifetime/component"
+            --output "$RUNNER_TEMP/subtitle-result-lifetime/component" "${mode[@]}"
       - name: Generate required bitmap subtitle fixtures
         run: |
           python3 Scripts/generate-bitmap-subtitle-fixtures.py \

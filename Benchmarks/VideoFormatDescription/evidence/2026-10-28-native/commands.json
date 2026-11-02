@@ -1,0 +1,1511 @@
+[
+  {
+    "argv": [
+      "xcrun",
+      "--sdk",
+      "macosx",
+      "--show-sdk-path"
+    ],
+    "elapsed_seconds": 2.2852909564971924,
+    "exit_code": 0,
+    "label": "sdk",
+    "log": "logs/sdk.log",
+    "log_sha256": "0f808f2e6b513e3677dcb3492d4b0577b7f2680ca95d988f4ea653b04edc4a89",
+    "started_unix_seconds": 1793185068.6809769
+  },
+  {
+    "argv": [
+      "git",
+      "rev-parse",
+      "HEAD"
+    ],
+    "elapsed_seconds": 0.010205984115600586,
+    "exit_code": 0,
+    "label": "head",
+    "log": "logs/head.log",
+    "log_sha256": "ae98e73fa7f4836a5ca58ba4ab814a35a3fd9d4a11d89490ef3b9ef79bb89966",
+    "started_unix_seconds": 1793185070.966601
+  },
+  {
+    "argv": [
+      "sw_vers"
+    ],
+    "elapsed_seconds": 0.012629032135009766,
+    "exit_code": 0,
+    "label": "os",
+    "log": "logs/os.log",
+    "log_sha256": "cd5d6399b3785b04ceaae75045a9ca9f80f0bbc3526eff9d0c36b170ed1ec348",
+    "started_unix_seconds": 1793185071.009841
+  },
+  {
+    "argv": [
+      "sysctl",
+      "-n",
+      "machdep.cpu.brand_string"
+    ],
+    "elapsed_seconds": 0.005921125411987305,
+    "exit_code": 0,
+    "label": "cpu",
+    "log": "logs/cpu.log",
+    "log_sha256": "ff76851c55aca2697f22e6534c9378088cae0334bbb5d13675e90a9097fc2713",
+    "started_unix_seconds": 1793185071.02282
+  },
+  {
+    "argv": [
+      "/usr/bin/swift",
+      "--version"
+    ],
+    "elapsed_seconds": 1.3868560791015625,
+    "exit_code": 0,
+    "label": "swift-version",
+    "log": "logs/swift-version.log",
+    "log_sha256": "5fa4b669e41b23b9ad0760253d062493487f93cf5d8ad8c44f0d4fd635137499",
+    "started_unix_seconds": 1793185071.029053
+  },
+  {
+    "argv": [
+      "git",
+      "diff",
+      "--check",
+      "ea2ff568237e2667f7b1aeee67b11a44ebe95b72",
+      "--",
+      "Sources/IlliquidNativePlayback/Presentation/SampleBufferVideoPresenter.swift",
+      "Sources/IlliquidNativePlayback/Presentation/VideoFormatDescriptionCache.swift",
+      "Sources/IlliquidNativePlayback/Diagnostics/NativePlaybackSignposts.swift",
+      "Tests/IlliquidNativePlaybackTests/VideoFormatDescriptionCacheTests.swift",
+      "Benchmarks/VideoFormatDescription/Driver.swift",
+      "Benchmarks/VideoFormatDescription/run.py"
+    ],
+    "elapsed_seconds": 0.022233963012695312,
+    "exit_code": 0,
+    "label": "diff-check",
+    "log": "logs/diff-check.log",
+    "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "started_unix_seconds": 1793185072.417221
+  },
+  {
+    "argv": [
+      "git",
+      "show",
+      "ea2ff568237e2667f7b1aeee67b11a44ebe95b72:Sources/IlliquidNativePlayback/Presentation/SampleBufferVideoPresenter.swift"
+    ],
+    "elapsed_seconds": 0.009093999862670898,
+    "exit_code": 0,
+    "label": "baseline-presenter",
+    "log": "logs/baseline-presenter.log",
+    "log_sha256": "3b1d16383cc338da440beac9441704ae4d808f16e70703ea5aede5ca2ff3f4d8",
+    "started_unix_seconds": 1793185072.439706
+  },
+  {
+    "argv": [
+      "git",
+      "show",
+      "ea2ff568237e2667f7b1aeee67b11a44ebe95b72:Sources/IlliquidNativePlayback/Diagnostics/NativePlaybackSignposts.swift"
+    ],
+    "elapsed_seconds": 0.009060859680175781,
+    "exit_code": 0,
+    "label": "baseline-signposts",
+    "log": "logs/baseline-signposts.log",
+    "log_sha256": "f0a218021dfa5917b8c08f2a56d096daecb5e9a6a4e93c43af5a0e7f9c83fc4f",
+    "started_unix_seconds": 1793185072.450926
+  },
+  {
+    "argv": [
+      "/usr/bin/swift",
+      "test",
+      "--package-path",
+      "/Users/runner/work/_temp/video-format-description/build/package",
+      "-c",
+      "debug",
+      "--jobs",
+      "2",
+      "--no-parallel",
+      "-Xswiftc",
+      "-warnings-as-errors"
+    ],
+    "elapsed_seconds": 34.13862490653992,
+    "exit_code": 0,
+    "label": "tests-debug",
+    "log": "logs/tests-debug.log",
+    "log_sha256": "448ed981cce50c15571042d28a507cf3ae5220e4548779e3fbc39119f86f9401",
+    "started_unix_seconds": 1793185072.463159
+  },
+  {
+    "argv": [
+      "/usr/bin/swift",
+      "test",
+      "--package-path",
+      "/Users/runner/work/_temp/video-format-description/build/package",
+      "-c",
+      "release",
+      "--jobs",
+      "2",
+      "--no-parallel",
+      "-Xswiftc",
+      "-warnings-as-errors"
+    ],
+    "elapsed_seconds": 26.235168933868408,
+    "exit_code": 0,
+    "label": "tests-release",
+    "log": "logs/tests-release.log",
+    "log_sha256": "7495b840bb9665f539e2a31d34d6e91a2579c3ccd40c12f6d10801ab745116d5",
+    "started_unix_seconds": 1793185106.604168
+  },
+  {
+    "argv": [
+      "/usr/bin/swiftc",
+      "-O",
+      "-whole-module-optimization",
+      "-parse-as-library",
+      "-swift-version",
+      "6",
+      "-warnings-as-errors",
+      "-sdk",
+      "/Applications/Xcode_26.6.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.5.sdk",
+      "-target",
+      "arm64-apple-macosx26.0",
+      "/Users/runner/work/_temp/video-format-description/sources/VideoFormatDescriptionCache.swift",
+      "/Users/runner/work/_temp/video-format-description/sources/BaselineFactory.swift",
+      "/Users/runner/work/_temp/video-format-description/sources/NativePlaybackSignposts.swift",
+      "/Users/runner/work/_temp/video-format-description/sources/Driver.swift",
+      "-o",
+      "/Users/runner/work/_temp/video-format-description/build/benchmark"
+    ],
+    "elapsed_seconds": 10.791671991348267,
+    "exit_code": 0,
+    "label": "compile-benchmark",
+    "log": "logs/compile-benchmark.log",
+    "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "started_unix_seconds": 1793185132.841117
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/video-format-description/build/benchmark",
+      "verify",
+      "stable-bgra",
+      "64"
+    ],
+    "elapsed_seconds": 0.014292001724243164,
+    "exit_code": 0,
+    "label": "verify-stable-bgra",
+    "log": "logs/verify-stable-bgra.log",
+    "log_sha256": "a97904f3896d0edc6e5d534b468d9b35957d049c9a96e53fe881799a7f987b11",
+    "started_unix_seconds": 1793185143.633874
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/video-format-description/build/benchmark",
+      "verify",
+      "stable-nv12",
+      "64"
+    ],
+    "elapsed_seconds": 0.014368057250976562,
+    "exit_code": 0,
+    "label": "verify-stable-nv12",
+    "log": "logs/verify-stable-nv12.log",
+    "log_sha256": "c5906e67ee5ea844a2c759e54e4776b931fe7c5822b7c3187cc4d9b8f47ca7c6",
+    "started_unix_seconds": 1793185143.6486468
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/video-format-description/build/benchmark",
+      "verify",
+      "stable-p010-hdr",
+      "64"
+    ],
+    "elapsed_seconds": 0.014139890670776367,
+    "exit_code": 0,
+    "label": "verify-stable-p010-hdr",
+    "log": "logs/verify-stable-p010-hdr.log",
+    "log_sha256": "6ebd9d26aa1f5a8d68a1f37dd39c4ef901f50d37750ac51802223c559fa919c1",
+    "started_unix_seconds": 1793185143.66347
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/video-format-description/build/benchmark",
+      "verify",
+      "alternating-size",
+      "64"
+    ],
+    "elapsed_seconds": 0.01295018196105957,
+    "exit_code": 0,
+    "label": "verify-alternating-size",
+    "log": "logs/verify-alternating-size.log",
+    "log_sha256": "b30a055910fe1eeab76fe41ce2ad7722b2dafee62206fad54d19e248338188f0",
+    "started_unix_seconds": 1793185143.678148
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/video-format-description/build/benchmark",
+      "verify",
+      "alternating-color",
+      "64"
+    ],
+    "elapsed_seconds": 0.013679981231689453,
+    "exit_code": 0,
+    "label": "verify-alternating-color",
+    "log": "logs/verify-alternating-color.log",
+    "log_sha256": "165a2df4eec3af274e06f2eeddaef4ef2d8f3898932d89db7a973b70cb363974",
+    "started_unix_seconds": 1793185143.691607
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/video-format-description/build/benchmark",
+      "baseline",
+      "stable-bgra",
+      "8192"
+    ],
+    "elapsed_seconds": 0.05005812644958496,
+    "exit_code": 0,
+    "label": "calibrate-stable-bgra-baseline",
+    "log": "logs/calibrate-stable-bgra-baseline.log",
+    "log_sha256": "edf7ccfe0d879b4203cb04d952731d49d17eb44598ddf54b8244d0283821b968",
+    "started_unix_seconds": 1793185143.705924
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/video-format-description/build/benchmark",
+      "cached",
+      "stable-bgra",
+      "8192"
+    ],
+    "elapsed_seconds": 0.04033994674682617,
+    "exit_code": 0,
+    "label": "calibrate-stable-bgra-cached",
+    "log": "logs/calibrate-stable-bgra-cached.log",
+    "log_sha256": "214c0da205ccf97d2ff5c8464e0b63fd4533741776f7b35e1e45785d676481d8",
+    "started_unix_seconds": 1793185143.756702
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/video-format-description/build/benchmark",
+      "baseline",
+      "stable-bgra",
+      "52480"
+    ],
+    "elapsed_seconds": 0.23548388481140137,
+    "exit_code": 0,
+    "label": "stable-bgra-pair-1-baseline",
+    "log": "logs/stable-bgra-pair-1-baseline.log",
+    "log_sha256": "7d07bea8f66d17c82f02c8ecc43ec22aa38630df4d234f9040f26663672a35ef",
+    "started_unix_seconds": 1793185143.797892
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/video-format-description/build/benchmark",
+      "cached",
+      "stable-bgra",
+      "52480"
+    ],
+    "elapsed_seconds": 0.15701603889465332,
+    "exit_code": 0,
+    "label": "stable-bgra-pair-1-cached",
+    "log": "logs/stable-bgra-pair-1-cached.log",
+    "log_sha256": "e057b9b0aa047ebf29c65653a7d11855fb97a3fa8e066fb4a400628e08d33ff2",
+    "started_unix_seconds": 1793185144.034005
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/video-format-description/build/benchmark",
+      "cached",
+      "stable-bgra",
+      "52480"
+    ],
+    "elapsed_seconds": 0.16204595565795898,
+    "exit_code": 0,
+    "label": "stable-bgra-pair-2-cached",
+    "log": "logs/stable-bgra-pair-2-cached.log",
+    "log_sha256": "b04578ea79c450aab59eb9be62b3f0dd10537f679dc814db5c431308e656bf02",
+    "started_unix_seconds": 1793185144.192223
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/video-format-description/build/benchmark",
+      "baseline",
+      "stable-bgra",
+      "52480"
+    ],
+    "elapsed_seconds": 0.22589707374572754,
+    "exit_code": 0,
+    "label": "stable-bgra-pair-2-baseline",
+    "log": "logs/stable-bgra-pair-2-baseline.log",
+    "log_sha256": "af6c6a3b3df0935e332dfb64fc5232e2176804910a4f0b317439f1f8d6f7e794",
+    "started_unix_seconds": 1793185144.355387
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/video-format-description/build/benchmark",
+      "baseline",
+      "stable-bgra",
+      "52480"
+    ],
+    "elapsed_seconds": 0.22428488731384277,
+    "exit_code": 0,
+    "label": "stable-bgra-pair-3-baseline",
+    "log": "logs/stable-bgra-pair-3-baseline.log",
+    "log_sha256": "cf4165083485196f2a3161db012e1caf2e9b6fe698e47bda9a2f250481ad648c",
+    "started_unix_seconds": 1793185144.581921
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/video-format-description/build/benchmark",
+      "cached",
+      "stable-bgra",
+      "52480"
+    ],
+    "elapsed_seconds": 0.15701818466186523,
+    "exit_code": 0,
+    "label": "stable-bgra-pair-3-cached",
+    "log": "logs/stable-bgra-pair-3-cached.log",
+    "log_sha256": "c0923369b31b8b3b76f3bd5571d06b8d26c2707c79ffac9b9cf7ddb6439e8291",
+    "started_unix_seconds": 1793185144.808668
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/video-format-description/build/benchmark",
+      "cached",
+      "stable-bgra",
+      "52480"
+    ],
+    "elapsed_seconds": 0.16976094245910645,
+    "exit_code": 0,
+    "label": "stable-bgra-pair-4-cached",
+    "log": "logs/stable-bgra-pair-4-cached.log",
+    "log_sha256": "30463c0117f895902a2d2a0f889aacbfbd28331f6e056b065428f4cc96cf905d",
+    "started_unix_seconds": 1793185144.967933
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/video-format-description/build/benchmark",
+      "baseline",
+      "stable-bgra",
+      "52480"
+    ],
+    "elapsed_seconds": 0.2606489658355713,
+    "exit_code": 0,
+    "label": "stable-bgra-pair-4-baseline",
+    "log": "logs/stable-bgra-pair-4-baseline.log",
+    "log_sha256": "5bce45297394f108b2af63368655a60138b619ec9f3635bb6e1156ca70a662b1",
+    "started_unix_seconds": 1793185145.139277
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/video-format-description/build/benchmark",
+      "baseline",
+      "stable-bgra",
+      "52480"
+    ],
+    "elapsed_seconds": 0.27524590492248535,
+    "exit_code": 0,
+    "label": "stable-bgra-pair-5-baseline",
+    "log": "logs/stable-bgra-pair-5-baseline.log",
+    "log_sha256": "2ec11849f01207bfa74c370df6f24baa50e4829331f57eb3208468b441a04f9e",
+    "started_unix_seconds": 1793185145.400857
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/video-format-description/build/benchmark",
+      "cached",
+      "stable-bgra",
+      "52480"
+    ],
+    "elapsed_seconds": 0.18665719032287598,
+    "exit_code": 0,
+    "label": "stable-bgra-pair-5-cached",
+    "log": "logs/stable-bgra-pair-5-cached.log",
+    "log_sha256": "ce4270c67383b32b2e0932218068d6d2a370111a7fcc39a3c845f5497a4c8a30",
+    "started_unix_seconds": 1793185145.6769989
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/video-format-description/build/benchmark",
+      "cached",
+      "stable-bgra",
+      "52480"
+    ],
+    "elapsed_seconds": 0.17981910705566406,
+    "exit_code": 0,
+    "label": "stable-bgra-pair-6-cached",
+    "log": "logs/stable-bgra-pair-6-cached.log",
+    "log_sha256": "678af8884d7e86245be8abb0e01119ce90bef1e4aabc43037ae8df38664e8c10",
+    "started_unix_seconds": 1793185145.8648279
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/video-format-description/build/benchmark",
+      "baseline",
+      "stable-bgra",
+      "52480"
+    ],
+    "elapsed_seconds": 0.28875112533569336,
+    "exit_code": 0,
+    "label": "stable-bgra-pair-6-baseline",
+    "log": "logs/stable-bgra-pair-6-baseline.log",
+    "log_sha256": "be0b273e5470898784e147de590f1884aa68491ae5413165841f477d0c5aeaa8",
+    "started_unix_seconds": 1793185146.0458848
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/video-format-description/build/benchmark",
+      "baseline",
+      "stable-bgra",
+      "52480"
+    ],
+    "elapsed_seconds": 0.28621912002563477,
+    "exit_code": 0,
+    "label": "stable-bgra-pair-7-baseline",
+    "log": "logs/stable-bgra-pair-7-baseline.log",
+    "log_sha256": "667fb1d63fb12d7dd149081a11f4c15ec438a66d85b520745e1d3e7534cd3d27",
+    "started_unix_seconds": 1793185146.336087
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/video-format-description/build/benchmark",
+      "cached",
+      "stable-bgra",
+      "52480"
+    ],
+    "elapsed_seconds": 0.18707013130187988,
+    "exit_code": 0,
+    "label": "stable-bgra-pair-7-cached",
+    "log": "logs/stable-bgra-pair-7-cached.log",
+    "log_sha256": "8a97c9345534c2008211b79a8931c9cabf7e494411c74f457d04896adbea36dc",
+    "started_unix_seconds": 1793185146.623281
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/video-format-description/build/benchmark",
+      "cached",
+      "stable-bgra",
+      "52480"
+    ],
+    "elapsed_seconds": 0.18789124488830566,
+    "exit_code": 0,
+    "label": "stable-bgra-pair-8-cached",
+    "log": "logs/stable-bgra-pair-8-cached.log",
+    "log_sha256": "e4221258dffabb271a593493b4a5b5dbf23771cd4f8c78096d787f93f58b4534",
+    "started_unix_seconds": 1793185146.811931
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/video-format-description/build/benchmark",
+      "baseline",
+      "stable-bgra",
+      "52480"
+    ],
+    "elapsed_seconds": 0.2955751419067383,
+    "exit_code": 0,
+    "label": "stable-bgra-pair-8-baseline",
+    "log": "logs/stable-bgra-pair-8-baseline.log",
+    "log_sha256": "10c1d127a0ba48407497e1db85f5ac1db5dde6e31fb4055ebe8728916fc17c3e",
+    "started_unix_seconds": 1793185147.000903
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/video-format-description/build/benchmark",
+      "baseline",
+      "stable-nv12",
+      "8192"
+    ],
+    "elapsed_seconds": 0.07506322860717773,
+    "exit_code": 0,
+    "label": "calibrate-stable-nv12-baseline",
+    "log": "logs/calibrate-stable-nv12-baseline.log",
+    "log_sha256": "731cdfa5faad533909d801fa016a83887118091708240728278a8beed8e5bddc",
+    "started_unix_seconds": 1793185147.2980459
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/video-format-description/build/benchmark",
+      "cached",
+      "stable-nv12",
+      "8192"
+    ],
+    "elapsed_seconds": 0.05991172790527344,
+    "exit_code": 0,
+    "label": "calibrate-stable-nv12-cached",
+    "log": "logs/calibrate-stable-nv12-cached.log",
+    "log_sha256": "8a97014d96d9ce1f523928cfb24dd2e608f0788794c82074cd68f3aac2a62d52",
+    "started_unix_seconds": 1793185147.3740952
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/video-format-description/build/benchmark",
+      "baseline",
+      "stable-nv12",
+      "36864"
+    ],
+    "elapsed_seconds": 0.3434109687805176,
+    "exit_code": 0,
+    "label": "stable-nv12-pair-1-baseline",
+    "log": "logs/stable-nv12-pair-1-baseline.log",
+    "log_sha256": "bec244df657c967dfa2b5225ad4915861785915b4af990c7c05c38ff29614283",
+    "started_unix_seconds": 1793185147.435432
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/video-format-description/build/benchmark",
+      "cached",
+      "stable-nv12",
+      "36864"
+    ],
+    "elapsed_seconds": 0.16402816772460938,
+    "exit_code": 0,
+    "label": "stable-nv12-pair-1-cached",
+    "log": "logs/stable-nv12-pair-1-cached.log",
+    "log_sha256": "a3070600139532629ff5d48b535f6851922bf0b69206bb8205c7b37a871faeaa",
+    "started_unix_seconds": 1793185147.7801049
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/video-format-description/build/benchmark",
+      "cached",
+      "stable-nv12",
+      "36864"
+    ],
+    "elapsed_seconds": 0.16262388229370117,
+    "exit_code": 0,
+    "label": "stable-nv12-pair-2-cached",
+    "log": "logs/stable-nv12-pair-2-cached.log",
+    "log_sha256": "add8b97d19898424c1a68625778624b2896931eecd8afe7b23612dc12219e383",
+    "started_unix_seconds": 1793185147.946023
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/video-format-description/build/benchmark",
+      "baseline",
+      "stable-nv12",
+      "36864"
+    ],
+    "elapsed_seconds": 0.20610833168029785,
+    "exit_code": 0,
+    "label": "stable-nv12-pair-2-baseline",
+    "log": "logs/stable-nv12-pair-2-baseline.log",
+    "log_sha256": "6b297fdf72110a4a35dbd4cb6fa50a6e323acf5713f8e9d8aad87c03077c11cb",
+    "started_unix_seconds": 1793185148.109779
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/video-format-description/build/benchmark",
+      "baseline",
+      "stable-nv12",
+      "36864"
+    ],
+    "elapsed_seconds": 0.19049692153930664,
+    "exit_code": 0,
+    "label": "stable-nv12-pair-3-baseline",
+    "log": "logs/stable-nv12-pair-3-baseline.log",
+    "log_sha256": "cf13c5467e281f00b24d1cc5ca5caf92e0bec21a526437308a385f8e2ca12859",
+    "started_unix_seconds": 1793185148.316606
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/video-format-description/build/benchmark",
+      "cached",
+      "stable-nv12",
+      "36864"
+    ],
+    "elapsed_seconds": 0.1669628620147705,
+    "exit_code": 0,
+    "label": "stable-nv12-pair-3-cached",
+    "log": "logs/stable-nv12-pair-3-cached.log",
+    "log_sha256": "d1d3efaff23280ecf046f595f175f006459b194a8573ae9b8cfbcec41b4196fc",
+    "started_unix_seconds": 1793185148.507852
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/video-format-description/build/benchmark",
+      "cached",
+      "stable-nv12",
+      "36864"
+    ],
+    "elapsed_seconds": 0.15989899635314941,
+    "exit_code": 0,
+    "label": "stable-nv12-pair-4-cached",
+    "log": "logs/stable-nv12-pair-4-cached.log",
+    "log_sha256": "db67a2b31bcce8779977d44dd32ce0dc683221052d4992c00ddf3bbc00fc984b",
+    "started_unix_seconds": 1793185148.67596
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/video-format-description/build/benchmark",
+      "baseline",
+      "stable-nv12",
+      "36864"
+    ],
+    "elapsed_seconds": 0.20827198028564453,
+    "exit_code": 0,
+    "label": "stable-nv12-pair-4-baseline",
+    "log": "logs/stable-nv12-pair-4-baseline.log",
+    "log_sha256": "ab2ebc9b963e00b46e17c927798459ae85fa3bd4dd3d527b7ed50d493426648e",
+    "started_unix_seconds": 1793185148.836991
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/video-format-description/build/benchmark",
+      "baseline",
+      "stable-nv12",
+      "36864"
+    ],
+    "elapsed_seconds": 0.21514177322387695,
+    "exit_code": 0,
+    "label": "stable-nv12-pair-5-baseline",
+    "log": "logs/stable-nv12-pair-5-baseline.log",
+    "log_sha256": "53c5dbfa1a5475d3e68b1d80e87c4006b16cd87ed90bfddf2b088c6990b97696",
+    "started_unix_seconds": 1793185149.046453
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/video-format-description/build/benchmark",
+      "cached",
+      "stable-nv12",
+      "36864"
+    ],
+    "elapsed_seconds": 0.12342500686645508,
+    "exit_code": 0,
+    "label": "stable-nv12-pair-5-cached",
+    "log": "logs/stable-nv12-pair-5-cached.log",
+    "log_sha256": "3cbefada7b83ffb7fa2d1c1b69ac9207f39280f535f22598111e6403a2a80e1f",
+    "started_unix_seconds": 1793185149.263118
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/video-format-description/build/benchmark",
+      "cached",
+      "stable-nv12",
+      "36864"
+    ],
+    "elapsed_seconds": 0.11555981636047363,
+    "exit_code": 0,
+    "label": "stable-nv12-pair-6-cached",
+    "log": "logs/stable-nv12-pair-6-cached.log",
+    "log_sha256": "cdd5cb6211a0c5ac9aebc420ead193a77a27cc20f730817d0d5ed6b28fe2fc0e",
+    "started_unix_seconds": 1793185149.3873742
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/video-format-description/build/benchmark",
+      "baseline",
+      "stable-nv12",
+      "36864"
+    ],
+    "elapsed_seconds": 0.1636500358581543,
+    "exit_code": 0,
+    "label": "stable-nv12-pair-6-baseline",
+    "log": "logs/stable-nv12-pair-6-baseline.log",
+    "log_sha256": "63679d73f37d0fd839a20e8e18d9dca845af815376682d129f2824eebfdcd4b7",
+    "started_unix_seconds": 1793185149.503814
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/video-format-description/build/benchmark",
+      "baseline",
+      "stable-nv12",
+      "36864"
+    ],
+    "elapsed_seconds": 0.16546106338500977,
+    "exit_code": 0,
+    "label": "stable-nv12-pair-7-baseline",
+    "log": "logs/stable-nv12-pair-7-baseline.log",
+    "log_sha256": "12a5d64699973c5cf58658aa96f47a04a87afff405b2f35e5c13b8397b23f66a",
+    "started_unix_seconds": 1793185149.6684659
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/video-format-description/build/benchmark",
+      "cached",
+      "stable-nv12",
+      "36864"
+    ],
+    "elapsed_seconds": 0.11556506156921387,
+    "exit_code": 0,
+    "label": "stable-nv12-pair-7-cached",
+    "log": "logs/stable-nv12-pair-7-cached.log",
+    "log_sha256": "5700aa0f567a5fd5bacc9595b1d293985606d9871d553c81e2cfec7d511fc5d8",
+    "started_unix_seconds": 1793185149.834636
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/video-format-description/build/benchmark",
+      "cached",
+      "stable-nv12",
+      "36864"
+    ],
+    "elapsed_seconds": 0.12370896339416504,
+    "exit_code": 0,
+    "label": "stable-nv12-pair-8-cached",
+    "log": "logs/stable-nv12-pair-8-cached.log",
+    "log_sha256": "2b7909ddfd5c04f382967b37750c8f14bdcd752b83c67edd851ce445621aee56",
+    "started_unix_seconds": 1793185149.951322
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/video-format-description/build/benchmark",
+      "baseline",
+      "stable-nv12",
+      "36864"
+    ],
+    "elapsed_seconds": 0.1843700408935547,
+    "exit_code": 0,
+    "label": "stable-nv12-pair-8-baseline",
+    "log": "logs/stable-nv12-pair-8-baseline.log",
+    "log_sha256": "6a20ca877e0688da25e1e9e6ecb711117aa9ff72e2fbc8afc761b3d7459c16a6",
+    "started_unix_seconds": 1793185150.075844
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/video-format-description/build/benchmark",
+      "baseline",
+      "stable-p010-hdr",
+      "8192"
+    ],
+    "elapsed_seconds": 0.061527252197265625,
+    "exit_code": 0,
+    "label": "calibrate-stable-p010-hdr-baseline",
+    "log": "logs/calibrate-stable-p010-hdr-baseline.log",
+    "log_sha256": "d31c87fac96831bab3e152d18ea7f7367f2fff658ce9f4da2a7f5ccaed4620ea",
+    "started_unix_seconds": 1793185150.2617338
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/video-format-description/build/benchmark",
+      "cached",
+      "stable-p010-hdr",
+      "8192"
+    ],
+    "elapsed_seconds": 0.0444490909576416,
+    "exit_code": 0,
+    "label": "calibrate-stable-p010-hdr-cached",
+    "log": "logs/calibrate-stable-p010-hdr-cached.log",
+    "log_sha256": "0535926c908876178eba0526f1455555016f0902b41f3a70139d576acfe55bcc",
+    "started_unix_seconds": 1793185150.323949
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/video-format-description/build/benchmark",
+      "baseline",
+      "stable-p010-hdr",
+      "48896"
+    ],
+    "elapsed_seconds": 0.25165414810180664,
+    "exit_code": 0,
+    "label": "stable-p010-hdr-pair-1-baseline",
+    "log": "logs/stable-p010-hdr-pair-1-baseline.log",
+    "log_sha256": "98d79ba8c017126ede3b88c785828f5f93996c3fc8c4f3f0bb728a8d8f9c7de8",
+    "started_unix_seconds": 1793185150.3693
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/video-format-description/build/benchmark",
+      "cached",
+      "stable-p010-hdr",
+      "48896"
+    ],
+    "elapsed_seconds": 0.16284704208374023,
+    "exit_code": 0,
+    "label": "stable-p010-hdr-pair-1-cached",
+    "log": "logs/stable-p010-hdr-pair-1-cached.log",
+    "log_sha256": "7adf619bdfaee5827dc58faa79764b8ca28f575340f0bf8b5cd40eb351ba84ed",
+    "started_unix_seconds": 1793185150.621856
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/video-format-description/build/benchmark",
+      "cached",
+      "stable-p010-hdr",
+      "48896"
+    ],
+    "elapsed_seconds": 0.16592693328857422,
+    "exit_code": 0,
+    "label": "stable-p010-hdr-pair-2-cached",
+    "log": "logs/stable-p010-hdr-pair-2-cached.log",
+    "log_sha256": "886aec60aa72e6b4ee23595665982aa16f7b3e21365f4abafe8c097cac647937",
+    "started_unix_seconds": 1793185150.785968
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/video-format-description/build/benchmark",
+      "baseline",
+      "stable-p010-hdr",
+      "48896"
+    ],
+    "elapsed_seconds": 0.246337890625,
+    "exit_code": 0,
+    "label": "stable-p010-hdr-pair-2-baseline",
+    "log": "logs/stable-p010-hdr-pair-2-baseline.log",
+    "log_sha256": "5d1047f29f1de64b6c88e4c5a893810d2de49e69a06f6d3f750725fac3f0c2a5",
+    "started_unix_seconds": 1793185150.952872
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/video-format-description/build/benchmark",
+      "baseline",
+      "stable-p010-hdr",
+      "48896"
+    ],
+    "elapsed_seconds": 0.24895691871643066,
+    "exit_code": 0,
+    "label": "stable-p010-hdr-pair-3-baseline",
+    "log": "logs/stable-p010-hdr-pair-3-baseline.log",
+    "log_sha256": "b9504fe45144c04f479d45154e64af4c81f96c79b05ae4ea6007c421f180157d",
+    "started_unix_seconds": 1793185151.2003672
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/video-format-description/build/benchmark",
+      "cached",
+      "stable-p010-hdr",
+      "48896"
+    ],
+    "elapsed_seconds": 0.18131709098815918,
+    "exit_code": 0,
+    "label": "stable-p010-hdr-pair-3-cached",
+    "log": "logs/stable-p010-hdr-pair-3-cached.log",
+    "log_sha256": "fb808126dde441c712aee6fc89c9c674e314e41d5230867086b947da22cc1a07",
+    "started_unix_seconds": 1793185151.45025
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/video-format-description/build/benchmark",
+      "cached",
+      "stable-p010-hdr",
+      "48896"
+    ],
+    "elapsed_seconds": 0.18837571144104004,
+    "exit_code": 0,
+    "label": "stable-p010-hdr-pair-4-cached",
+    "log": "logs/stable-p010-hdr-pair-4-cached.log",
+    "log_sha256": "939386573fede8b02bad540602d98e8fcfa13553b414f799379df75297bcb2b6",
+    "started_unix_seconds": 1793185151.6329432
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/video-format-description/build/benchmark",
+      "baseline",
+      "stable-p010-hdr",
+      "48896"
+    ],
+    "elapsed_seconds": 0.2733778953552246,
+    "exit_code": 0,
+    "label": "stable-p010-hdr-pair-4-baseline",
+    "log": "logs/stable-p010-hdr-pair-4-baseline.log",
+    "log_sha256": "46eabf5de8eef96287acaa9fe7c60d2aa838c9996ee2f010ad5cc1887e2e0348",
+    "started_unix_seconds": 1793185151.822415
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/video-format-description/build/benchmark",
+      "baseline",
+      "stable-p010-hdr",
+      "48896"
+    ],
+    "elapsed_seconds": 0.2761220932006836,
+    "exit_code": 0,
+    "label": "stable-p010-hdr-pair-5-baseline",
+    "log": "logs/stable-p010-hdr-pair-5-baseline.log",
+    "log_sha256": "0025fe17ee957051deed6d52cf2dcb99a809aa172098edce2ad2063dea087fe3",
+    "started_unix_seconds": 1793185152.0976388
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/video-format-description/build/benchmark",
+      "cached",
+      "stable-p010-hdr",
+      "48896"
+    ],
+    "elapsed_seconds": 0.16600322723388672,
+    "exit_code": 0,
+    "label": "stable-p010-hdr-pair-5-cached",
+    "log": "logs/stable-p010-hdr-pair-5-cached.log",
+    "log_sha256": "f4a3836aa71baef706e5a555a007c1e974362fcb7db3e135704c530eb32dc3b0",
+    "started_unix_seconds": 1793185152.375026
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/video-format-description/build/benchmark",
+      "cached",
+      "stable-p010-hdr",
+      "48896"
+    ],
+    "elapsed_seconds": 0.24008703231811523,
+    "exit_code": 0,
+    "label": "stable-p010-hdr-pair-6-cached",
+    "log": "logs/stable-p010-hdr-pair-6-cached.log",
+    "log_sha256": "8867441acbd6cff149093b5edbd67cfc798a6669cfb282e16b79c12b379820b0",
+    "started_unix_seconds": 1793185152.541831
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/video-format-description/build/benchmark",
+      "baseline",
+      "stable-p010-hdr",
+      "48896"
+    ],
+    "elapsed_seconds": 0.2758629322052002,
+    "exit_code": 0,
+    "label": "stable-p010-hdr-pair-6-baseline",
+    "log": "logs/stable-p010-hdr-pair-6-baseline.log",
+    "log_sha256": "e9a18ec72440a8098c710a73f9b8d2ecb603419bece6008932bcbc611bc8d678",
+    "started_unix_seconds": 1793185152.782969
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/video-format-description/build/benchmark",
+      "baseline",
+      "stable-p010-hdr",
+      "48896"
+    ],
+    "elapsed_seconds": 0.2586188316345215,
+    "exit_code": 0,
+    "label": "stable-p010-hdr-pair-7-baseline",
+    "log": "logs/stable-p010-hdr-pair-7-baseline.log",
+    "log_sha256": "28bd1e06ed9bd338f81b3d9ac4da56d435309e6427a295165649255dc04f28c1",
+    "started_unix_seconds": 1793185153.05967
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/video-format-description/build/benchmark",
+      "cached",
+      "stable-p010-hdr",
+      "48896"
+    ],
+    "elapsed_seconds": 0.15807008743286133,
+    "exit_code": 0,
+    "label": "stable-p010-hdr-pair-7-cached",
+    "log": "logs/stable-p010-hdr-pair-7-cached.log",
+    "log_sha256": "bd66ecb32cd1cb71f7ab30924ee7e1006bf8feb5f4b7fe80e872ebe49592ffbc",
+    "started_unix_seconds": 1793185153.319329
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/video-format-description/build/benchmark",
+      "cached",
+      "stable-p010-hdr",
+      "48896"
+    ],
+    "elapsed_seconds": 0.15608882904052734,
+    "exit_code": 0,
+    "label": "stable-p010-hdr-pair-8-cached",
+    "log": "logs/stable-p010-hdr-pair-8-cached.log",
+    "log_sha256": "11eb6b8c502de4f29f465ca2f71835ece9007334f6b1d1ff1c594c5cba8f1e83",
+    "started_unix_seconds": 1793185153.478231
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/video-format-description/build/benchmark",
+      "baseline",
+      "stable-p010-hdr",
+      "48896"
+    ],
+    "elapsed_seconds": 0.273270845413208,
+    "exit_code": 0,
+    "label": "stable-p010-hdr-pair-8-baseline",
+    "log": "logs/stable-p010-hdr-pair-8-baseline.log",
+    "log_sha256": "fd191d28a81bed4b774688c0c94a49234d6ec12c013f52dc0d78e206a3ae2535",
+    "started_unix_seconds": 1793185153.635657
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/video-format-description/build/benchmark",
+      "baseline",
+      "alternating-size",
+      "8192"
+    ],
+    "elapsed_seconds": 0.10550665855407715,
+    "exit_code": 0,
+    "label": "calibrate-alternating-size-baseline",
+    "log": "logs/calibrate-alternating-size-baseline.log",
+    "log_sha256": "e01d31e487b79415d054dc6fb378d5f81c9ee465b2a2d593cfd5aee5a74f8ab1",
+    "started_unix_seconds": 1793185153.9099672
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/video-format-description/build/benchmark",
+      "cached",
+      "alternating-size",
+      "8192"
+    ],
+    "elapsed_seconds": 0.0640408992767334,
+    "exit_code": 0,
+    "label": "calibrate-alternating-size-cached",
+    "log": "logs/calibrate-alternating-size-cached.log",
+    "log_sha256": "7804aef126efbab4896063a8f26f414af2f5a7b8eae947d564ccf3c828aa0374",
+    "started_unix_seconds": 1793185154.0321972
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/video-format-description/build/benchmark",
+      "baseline",
+      "alternating-size",
+      "35584"
+    ],
+    "elapsed_seconds": 0.18074321746826172,
+    "exit_code": 0,
+    "label": "alternating-size-pair-1-baseline",
+    "log": "logs/alternating-size-pair-1-baseline.log",
+    "log_sha256": "654d2a693559086aeb5c24b3d02b08627d991b8f49d671ceec09e3d90f7a7af3",
+    "started_unix_seconds": 1793185154.0972328
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/video-format-description/build/benchmark",
+      "cached",
+      "alternating-size",
+      "35584"
+    ],
+    "elapsed_seconds": 0.1715989112854004,
+    "exit_code": 0,
+    "label": "alternating-size-pair-1-cached",
+    "log": "logs/alternating-size-pair-1-cached.log",
+    "log_sha256": "eeec2e9a272a3879be0fe3ddd19fba639014ba593ffb23f254233951a9bcfd39",
+    "started_unix_seconds": 1793185154.27971
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/video-format-description/build/benchmark",
+      "cached",
+      "alternating-size",
+      "35584"
+    ],
+    "elapsed_seconds": 0.1639859676361084,
+    "exit_code": 0,
+    "label": "alternating-size-pair-2-cached",
+    "log": "logs/alternating-size-pair-2-cached.log",
+    "log_sha256": "3f6916475281d308956888e26c1aa0a7dc4011fe564501ff6cf93d5519b91867",
+    "started_unix_seconds": 1793185154.452137
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/video-format-description/build/benchmark",
+      "baseline",
+      "alternating-size",
+      "35584"
+    ],
+    "elapsed_seconds": 0.18986296653747559,
+    "exit_code": 0,
+    "label": "alternating-size-pair-2-baseline",
+    "log": "logs/alternating-size-pair-2-baseline.log",
+    "log_sha256": "1ef82fe189f7ea1a1cd7436f1669e3f7c4fbd35c8235f258ed1fd50bbca06ab4",
+    "started_unix_seconds": 1793185154.616985
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/video-format-description/build/benchmark",
+      "baseline",
+      "alternating-size",
+      "35584"
+    ],
+    "elapsed_seconds": 0.20432066917419434,
+    "exit_code": 0,
+    "label": "alternating-size-pair-3-baseline",
+    "log": "logs/alternating-size-pair-3-baseline.log",
+    "log_sha256": "356c5797ee09f3914627d0b7d7959bc324b201a95291a9971d8dcde22460c382",
+    "started_unix_seconds": 1793185154.8079832
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/video-format-description/build/benchmark",
+      "cached",
+      "alternating-size",
+      "35584"
+    ],
+    "elapsed_seconds": 0.19898605346679688,
+    "exit_code": 0,
+    "label": "alternating-size-pair-3-cached",
+    "log": "logs/alternating-size-pair-3-cached.log",
+    "log_sha256": "87596924703a0a2b731f832558f91fdfd773d36cd8db5bda5f438f0ae7ca03a2",
+    "started_unix_seconds": 1793185155.013258
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/video-format-description/build/benchmark",
+      "cached",
+      "alternating-size",
+      "35584"
+    ],
+    "elapsed_seconds": 0.19930100440979004,
+    "exit_code": 0,
+    "label": "alternating-size-pair-4-cached",
+    "log": "logs/alternating-size-pair-4-cached.log",
+    "log_sha256": "72ed9f3d992a39168c52804dbf5a5cf5acf75ff44a96131a376327b3955faa87",
+    "started_unix_seconds": 1793185155.213226
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/video-format-description/build/benchmark",
+      "baseline",
+      "alternating-size",
+      "35584"
+    ],
+    "elapsed_seconds": 0.2610611915588379,
+    "exit_code": 0,
+    "label": "alternating-size-pair-4-baseline",
+    "log": "logs/alternating-size-pair-4-baseline.log",
+    "log_sha256": "c59e0373ccfc9f6b63b109fbe57c157ddc0919e3d06d0f2385b5e5a5627fd0c9",
+    "started_unix_seconds": 1793185155.414955
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/video-format-description/build/benchmark",
+      "baseline",
+      "alternating-size",
+      "35584"
+    ],
+    "elapsed_seconds": 0.21472787857055664,
+    "exit_code": 0,
+    "label": "alternating-size-pair-5-baseline",
+    "log": "logs/alternating-size-pair-5-baseline.log",
+    "log_sha256": "7b7afd0e6b2bc660599dcb095678cca0655d99a9ca929c17f382654e3592d063",
+    "started_unix_seconds": 1793185155.678821
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/video-format-description/build/benchmark",
+      "cached",
+      "alternating-size",
+      "35584"
+    ],
+    "elapsed_seconds": 0.26276493072509766,
+    "exit_code": 0,
+    "label": "alternating-size-pair-5-cached",
+    "log": "logs/alternating-size-pair-5-cached.log",
+    "log_sha256": "93a183b90cb3efcfcd352a1ff4bbb1ca4a7c056c1bb71ded687a48f58a704cae",
+    "started_unix_seconds": 1793185155.895879
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/video-format-description/build/benchmark",
+      "cached",
+      "alternating-size",
+      "35584"
+    ],
+    "elapsed_seconds": 0.26980090141296387,
+    "exit_code": 0,
+    "label": "alternating-size-pair-6-cached",
+    "log": "logs/alternating-size-pair-6-cached.log",
+    "log_sha256": "542d6d6aa674986c157e42168043b6f7a47eae7b05361e150448e51c3114415b",
+    "started_unix_seconds": 1793185156.1605692
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/video-format-description/build/benchmark",
+      "baseline",
+      "alternating-size",
+      "35584"
+    ],
+    "elapsed_seconds": 0.22712230682373047,
+    "exit_code": 0,
+    "label": "alternating-size-pair-6-baseline",
+    "log": "logs/alternating-size-pair-6-baseline.log",
+    "log_sha256": "6d35225b1fcffc1538e296b682bdb7aa996738c8a9f4523bbc980f3f479418a2",
+    "started_unix_seconds": 1793185156.4317498
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/video-format-description/build/benchmark",
+      "baseline",
+      "alternating-size",
+      "35584"
+    ],
+    "elapsed_seconds": 0.20401906967163086,
+    "exit_code": 0,
+    "label": "alternating-size-pair-7-baseline",
+    "log": "logs/alternating-size-pair-7-baseline.log",
+    "log_sha256": "33523384c927133cc041ba4f63c61e8cc138d797178800158e0d06aa859c865c",
+    "started_unix_seconds": 1793185156.660189
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/video-format-description/build/benchmark",
+      "cached",
+      "alternating-size",
+      "35584"
+    ],
+    "elapsed_seconds": 0.19884419441223145,
+    "exit_code": 0,
+    "label": "alternating-size-pair-7-cached",
+    "log": "logs/alternating-size-pair-7-cached.log",
+    "log_sha256": "c11069dc285f4e4bf70708b7fbe25f20de65dc31ddd952a28e59aae46816a076",
+    "started_unix_seconds": 1793185156.865491
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/video-format-description/build/benchmark",
+      "cached",
+      "alternating-size",
+      "35584"
+    ],
+    "elapsed_seconds": 0.24021387100219727,
+    "exit_code": 0,
+    "label": "alternating-size-pair-8-cached",
+    "log": "logs/alternating-size-pair-8-cached.log",
+    "log_sha256": "c72d35d95ebbaea5822f95d188dd624b6a2dbfc8711ebc005e6c6c5dbbfd6517",
+    "started_unix_seconds": 1793185157.0656261
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/video-format-description/build/benchmark",
+      "baseline",
+      "alternating-size",
+      "35584"
+    ],
+    "elapsed_seconds": 0.18702387809753418,
+    "exit_code": 0,
+    "label": "alternating-size-pair-8-baseline",
+    "log": "logs/alternating-size-pair-8-baseline.log",
+    "log_sha256": "990fbd83922b2b4ada9a7df20ba2eed384f48ffb3ffc9c43f788787c533a099f",
+    "started_unix_seconds": 1793185157.317547
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/video-format-description/build/benchmark",
+      "baseline",
+      "alternating-color",
+      "8192"
+    ],
+    "elapsed_seconds": 0.06477475166320801,
+    "exit_code": 0,
+    "label": "calibrate-alternating-color-baseline",
+    "log": "logs/calibrate-alternating-color-baseline.log",
+    "log_sha256": "aeb336dae704a57110c44681b6385d62d74681cfb93390524ecc11ecd76c6a2a",
+    "started_unix_seconds": 1793185157.506102
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/video-format-description/build/benchmark",
+      "cached",
+      "alternating-color",
+      "8192"
+    ],
+    "elapsed_seconds": 0.07728409767150879,
+    "exit_code": 0,
+    "label": "calibrate-alternating-color-cached",
+    "log": "logs/calibrate-alternating-color-cached.log",
+    "log_sha256": "b99d487e9363e6f003fb0d230d44faa7f0d26dfba3aaa0e87164f23fe5e53922",
+    "started_unix_seconds": 1793185157.571902
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/video-format-description/build/benchmark",
+      "baseline",
+      "alternating-color",
+      "32256"
+    ],
+    "elapsed_seconds": 0.18323516845703125,
+    "exit_code": 0,
+    "label": "alternating-color-pair-1-baseline",
+    "log": "logs/alternating-color-pair-1-baseline.log",
+    "log_sha256": "f4d6330aa88891b7128968e0824a70075f92ee87fc858149b2eac261d2890374",
+    "started_unix_seconds": 1793185157.6501389
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/video-format-description/build/benchmark",
+      "cached",
+      "alternating-color",
+      "32256"
+    ],
+    "elapsed_seconds": 0.22591781616210938,
+    "exit_code": 0,
+    "label": "alternating-color-pair-1-cached",
+    "log": "logs/alternating-color-pair-1-cached.log",
+    "log_sha256": "af3659d013eb51f794276bb933a34f028c2452f2572fd804d758c1cb731287f7",
+    "started_unix_seconds": 1793185157.834422
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/video-format-description/build/benchmark",
+      "cached",
+      "alternating-color",
+      "32256"
+    ],
+    "elapsed_seconds": 0.21865391731262207,
+    "exit_code": 0,
+    "label": "alternating-color-pair-2-cached",
+    "log": "logs/alternating-color-pair-2-cached.log",
+    "log_sha256": "4380f758ad2e27e9b0fb05da68c32cc52ec1b9e04d06f64592e2ccab175a3200",
+    "started_unix_seconds": 1793185158.0615969
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/video-format-description/build/benchmark",
+      "baseline",
+      "alternating-color",
+      "32256"
+    ],
+    "elapsed_seconds": 0.15690279006958008,
+    "exit_code": 0,
+    "label": "alternating-color-pair-2-baseline",
+    "log": "logs/alternating-color-pair-2-baseline.log",
+    "log_sha256": "80d4b61411a852e34165e9412399804167aa895d4d69eb324437672cfb1a04c9",
+    "started_unix_seconds": 1793185158.2812312
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/video-format-description/build/benchmark",
+      "baseline",
+      "alternating-color",
+      "32256"
+    ],
+    "elapsed_seconds": 0.15769314765930176,
+    "exit_code": 0,
+    "label": "alternating-color-pair-3-baseline",
+    "log": "logs/alternating-color-pair-3-baseline.log",
+    "log_sha256": "6d19c3bd012a1c69d4e8168bb017c7a30fcae4d272a7fc79e6489f57c578087c",
+    "started_unix_seconds": 1793185158.4392378
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/video-format-description/build/benchmark",
+      "cached",
+      "alternating-color",
+      "32256"
+    ],
+    "elapsed_seconds": 0.19622206687927246,
+    "exit_code": 0,
+    "label": "alternating-color-pair-3-cached",
+    "log": "logs/alternating-color-pair-3-cached.log",
+    "log_sha256": "21eac54d0b7fdd0c22aedf8d9958bf7d243fd6c63b37556d62848f1aae82b1de",
+    "started_unix_seconds": 1793185158.598211
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/video-format-description/build/benchmark",
+      "cached",
+      "alternating-color",
+      "32256"
+    ],
+    "elapsed_seconds": 0.20615696907043457,
+    "exit_code": 0,
+    "label": "alternating-color-pair-4-cached",
+    "log": "logs/alternating-color-pair-4-cached.log",
+    "log_sha256": "4fe28b973b389d96d0fca0d058f48dd32bb841825e779d081a4e59e15b322f0e",
+    "started_unix_seconds": 1793185158.805641
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/video-format-description/build/benchmark",
+      "baseline",
+      "alternating-color",
+      "32256"
+    ],
+    "elapsed_seconds": 0.1759960651397705,
+    "exit_code": 0,
+    "label": "alternating-color-pair-4-baseline",
+    "log": "logs/alternating-color-pair-4-baseline.log",
+    "log_sha256": "745fefde245dfa2fa89fec37105f795864b4b59562a12922904bed419b4ee9e0",
+    "started_unix_seconds": 1793185159.012816
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/video-format-description/build/benchmark",
+      "baseline",
+      "alternating-color",
+      "32256"
+    ],
+    "elapsed_seconds": 0.15959715843200684,
+    "exit_code": 0,
+    "label": "alternating-color-pair-5-baseline",
+    "log": "logs/alternating-color-pair-5-baseline.log",
+    "log_sha256": "a52146acebe31f9791a886f6a3d335240b82b4c2ddb486dc00f95275ef59fbba",
+    "started_unix_seconds": 1793185159.189833
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/video-format-description/build/benchmark",
+      "cached",
+      "alternating-color",
+      "32256"
+    ],
+    "elapsed_seconds": 0.23933100700378418,
+    "exit_code": 0,
+    "label": "alternating-color-pair-5-cached",
+    "log": "logs/alternating-color-pair-5-cached.log",
+    "log_sha256": "cc36676724d1c6251b59b224ac46638a2961deb1eaa44388dcdf072e3072093b",
+    "started_unix_seconds": 1793185159.350409
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/video-format-description/build/benchmark",
+      "cached",
+      "alternating-color",
+      "32256"
+    ],
+    "elapsed_seconds": 0.3268420696258545,
+    "exit_code": 0,
+    "label": "alternating-color-pair-6-cached",
+    "log": "logs/alternating-color-pair-6-cached.log",
+    "log_sha256": "7b3337748951247dbb34587dbe12bb6ec67e989d6785260354bf5239903f1092",
+    "started_unix_seconds": 1793185159.591712
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/video-format-description/build/benchmark",
+      "baseline",
+      "alternating-color",
+      "32256"
+    ],
+    "elapsed_seconds": 0.259490966796875,
+    "exit_code": 0,
+    "label": "alternating-color-pair-6-baseline",
+    "log": "logs/alternating-color-pair-6-baseline.log",
+    "log_sha256": "47f3f13b41272a3692923dc62197847cd67a49b29187bdc18b311dd3c789341c",
+    "started_unix_seconds": 1793185159.9199061
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/video-format-description/build/benchmark",
+      "baseline",
+      "alternating-color",
+      "32256"
+    ],
+    "elapsed_seconds": 0.2769019603729248,
+    "exit_code": 0,
+    "label": "alternating-color-pair-7-baseline",
+    "log": "logs/alternating-color-pair-7-baseline.log",
+    "log_sha256": "f702ec7cded7b69765d3545470879cdc018a443a187e5a02c3f9dc9f3f70cf25",
+    "started_unix_seconds": 1793185160.183202
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/video-format-description/build/benchmark",
+      "cached",
+      "alternating-color",
+      "32256"
+    ],
+    "elapsed_seconds": 0.2862279415130615,
+    "exit_code": 0,
+    "label": "alternating-color-pair-7-cached",
+    "log": "logs/alternating-color-pair-7-cached.log",
+    "log_sha256": "82107516fa766748f5359ee9269e01d3edd43760adfa38b1a3e8d1428584c7eb",
+    "started_unix_seconds": 1793185160.462831
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/video-format-description/build/benchmark",
+      "cached",
+      "alternating-color",
+      "32256"
+    ],
+    "elapsed_seconds": 0.20695996284484863,
+    "exit_code": 0,
+    "label": "alternating-color-pair-8-cached",
+    "log": "logs/alternating-color-pair-8-cached.log",
+    "log_sha256": "3679caa7826b3997eebbeb88ebe9dd5b79f9ed7c2613534d8653f448d33ee01f",
+    "started_unix_seconds": 1793185160.750256
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/video-format-description/build/benchmark",
+      "baseline",
+      "alternating-color",
+      "32256"
+    ],
+    "elapsed_seconds": 0.17310094833374023,
+    "exit_code": 0,
+    "label": "alternating-color-pair-8-baseline",
+    "log": "logs/alternating-color-pair-8-baseline.log",
+    "log_sha256": "326c58baa9696c58fa2bf2cb97b5c38b5dfa932e71f8ec82acbb80af1e577b00",
+    "started_unix_seconds": 1793185160.95842
+  }
+]

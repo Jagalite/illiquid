@@ -1,0 +1,98 @@
+Building for debugging...
+[0/7] /Users/runner/work/_temp/bitmap-subtitle-lookup/tests/build/tests-baseline/.build/arm64-apple-macosx/debug/BitmapSubtitleLookupRegressionTestsPackageTests.derived/runner.swift
+[1/7] Write sources
+[4/7] Write swift-version-7974D3F7F03D5E95.txt
+[6/10] Emitting module IlliquidNativePlayback
+[7/10] Compiling IlliquidNativePlayback ASSRenderedRegion.swift
+[8/10] Compiling IlliquidNativePlayback BitmapSubtitleTimeline.swift
+[9/11] Compiling IlliquidNativePlayback SubtitleMemoryBudget.swift
+[10/13] Emitting module IlliquidNativePlaybackTests
+[11/13] Compiling IlliquidNativePlaybackTests BitmapSubtitleTimelineOrderingTests.swift
+[12/14] Compiling IlliquidNativePlaybackTests SubtitleMemoryBudgetAccountingTests.swift
+[13/16] Emitting module BitmapSubtitleLookupRegressionTestsPackageTests
+[14/16] Compiling BitmapSubtitleLookupRegressionTestsPackageTests runner.swift
+[14/16] Write Objects.LinkFileList
+[15/16] Linking BitmapSubtitleLookupRegressionTestsPackageTests
+Build complete! (24.70s)
+Test Suite 'All tests' started at 2026-10-28 04:55:48.334.
+Test Suite 'All tests' passed at 2026-10-28 04:55:48.340.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.006) seconds
+◇ Test run started.
+↳ Testing Library Version: 1902
+↳ Target Platform: arm64e-apple-macos14.0
+◇ Suite "Bitmap subtitle timeline ordering" started.
+◇ Test productionSizedWindowsPreserveEveryPosition(capacity:) started.
+◇ Test case passing 1 argument capacity → 127 to productionSizedWindowsPreserveEveryPosition(capacity:) started.
+◇ Test case passing 1 argument capacity → 128 to productionSizedWindowsPreserveEveryPosition(capacity:) started.
+✔ Test productionSizedWindowsPreserveEveryPosition(capacity:) with 2 test cases passed after 0.338 seconds.
+◇ Test lookupAndPruneBoundariesMatchIndependentOracle(count:) started.
+◇ Test case passing 1 argument count → 0 to lookupAndPruneBoundariesMatchIndependentOracle(count:) started.
+◇ Test case passing 1 argument count → 1 to lookupAndPruneBoundariesMatchIndependentOracle(count:) started.
+◇ Test case passing 1 argument count → 2 to lookupAndPruneBoundariesMatchIndependentOracle(count:) started.
+◇ Test case passing 1 argument count → 3 to lookupAndPruneBoundariesMatchIndependentOracle(count:) started.
+◇ Test case passing 1 argument count → 8 to lookupAndPruneBoundariesMatchIndependentOracle(count:) started.
+◇ Test case passing 1 argument count → 32 to lookupAndPruneBoundariesMatchIndependentOracle(count:) started.
+◇ Test case passing 1 argument count → 127 to lookupAndPruneBoundariesMatchIndependentOracle(count:) started.
+◇ Test case passing 1 argument count → 128 to lookupAndPruneBoundariesMatchIndependentOracle(count:) started.
+✔ Test lookupAndPruneBoundariesMatchIndependentOracle(count:) with 8 test cases passed after 2.364 seconds.
+◇ Test insertionPermutationsAndReplacementsMatchSortedArrayOracle() started.
+✔ Test insertionPermutationsAndReplacementsMatchSortedArrayOracle() passed after 0.076 seconds.
+◇ Test signedZeroReplacementUsesTheIncomingTimestampSign(negativeFirst:) started.
+◇ Test case passing 1 argument negativeFirst → false to signedZeroReplacementUsesTheIncomingTimestampSign(negativeFirst:) started.
+◇ Test case passing 1 argument negativeFirst → true to signedZeroReplacementUsesTheIncomingTimestampSign(negativeFirst:) started.
+✔ Test signedZeroReplacementUsesTheIncomingTimestampSign(negativeFirst:) with 2 test cases passed after 0.001 seconds.
+◇ Test byteAndEntryLimitsRejectAtomicallyAndAllowFullCapacityReplacement() started.
+✔ Test byteAndEntryLimitsRejectAtomicallyAndAllowFullCapacityReplacement() passed after 0.001 seconds.
+◇ Test invalidDeliveriesAreAtomicAndStaleMalformedDeliveriesAreHarmless() started.
+✔ Test invalidDeliveriesAreAtomicAndStaleMalformedDeliveriesAreHarmless() passed after 0.001 seconds.
+◇ Test durationAndClearEventsNeverResurrectEarlierDisplays() started.
+✔ Test durationAndClearEventsNeverResurrectEarlierDisplays() passed after 0.001 seconds.
+◇ Test resetPruneAndValueCopiesRemainIndependent() started.
+✔ Test resetPruneAndValueCopiesRemainIndependent() passed after 0.001 seconds.
+◇ Test mixedOperationsMatchIndependentSortedArrayOracle(seed:) started.
+◇ Test case passing 1 argument seed → 1 to mixedOperationsMatchIndependentSortedArrayOracle(seed:) started.
+◇ Test case passing 1 argument seed → 42 to mixedOperationsMatchIndependentSortedArrayOracle(seed:) started.
+◇ Test case passing 1 argument seed → 1311768467463790320 to mixedOperationsMatchIndependentSortedArrayOracle(seed:) started.
+◇ Test case passing 1 argument seed → 3735928559 to mixedOperationsMatchIndependentSortedArrayOracle(seed:) started.
+✔ Test mixedOperationsMatchIndependentSortedArrayOracle(seed:) with 4 test cases passed after 0.505 seconds.
+◇ Test queriedRenderedAndCopiedOwnersKeepRetiredLeaseAlive() started.
+✔ Test queriedRenderedAndCopiedOwnersKeepRetiredLeaseAlive() passed after 0.001 seconds.
+◇ Test pruneReleasesOnlyUnaliasedRemovedEntries() started.
+✔ Test pruneReleasesOnlyUnaliasedRemovedEntries() passed after 0.001 seconds.
+◇ Test rejectedAndStaleIncomingLeasesAreNotRetained() started.
+✔ Test rejectedAndStaleIncomingLeasesAreNotRetained() passed after 0.001 seconds.
+✔ Suite "Bitmap subtitle timeline ordering" passed after 3.288 seconds.
+◇ Suite "Subtitle memory budget accounting" started.
+◇ Test zeroByteReservationsKeepTheirOwnerUntilTheLastLeaseIsReleased() started.
+✔ Test zeroByteReservationsKeepTheirOwnerUntilTheLastLeaseIsReleased() passed after 0.001 seconds.
+◇ Test rejectedGrowthPreservesBothTheLeaseAndOtherReservations() started.
+✔ Test rejectedGrowthPreservesBothTheLeaseAndOtherReservations() passed after 0.001 seconds.
+◇ Test preflightCombinesDuplicateOwnersAndDoesNotReserveOrReject() started.
+✔ Test preflightCombinesDuplicateOwnersAndDoesNotReserveOrReject() passed after 0.001 seconds.
+◇ Test nonpositiveGlobalLimitsStillAllowOneByte(limit:) started.
+◇ Test case passing 1 argument limit → 0 to nonpositiveGlobalLimitsStillAllowOneByte(limit:) started.
+◇ Test case passing 1 argument limit → -7 to nonpositiveGlobalLimitsStillAllowOneByte(limit:) started.
+◇ Test case passing 1 argument limit → -9223372036854775808 to nonpositiveGlobalLimitsStillAllowOneByte(limit:) started.
+✔ Test nonpositiveGlobalLimitsStillAllowOneByte(limit:) with 3 test cases passed after 0.001 seconds.
+◇ Test accountingHandlesTheFullIntegerCapacity(withOwnerLimit:) started.
+◇ Test case passing 1 argument withOwnerLimit → false to accountingHandlesTheFullIntegerCapacity(withOwnerLimit:) started.
+◇ Test case passing 1 argument withOwnerLimit → true to accountingHandlesTheFullIntegerCapacity(withOwnerLimit:) started.
+✔ Test accountingHandlesTheFullIntegerCapacity(withOwnerLimit:) with 2 test cases passed after 0.001 seconds.
+◇ Test previouslyReturnedSnapshotsDoNotChangeAfterUpdates() started.
+✔ Test previouslyReturnedSnapshotsDoNotChangeAfterUpdates() passed after 0.001 seconds.
+◇ Test aliasesReleaseAReservationOnlyWhenTheFinalReferenceIsDropped() started.
+✔ Test aliasesReleaseAReservationOnlyWhenTheFinalReferenceIsDropped() passed after 0.001 seconds.
+◇ Test leasesDoNotKeepAnOrphanedBudgetAlive() started.
+✔ Test leasesDoNotKeepAnOrphanedBudgetAlive() passed after 0.001 seconds.
+◇ Test mixedOperationsMatchAnIndependentScanOracle(seed:) started.
+◇ Test case passing 1 argument seed → 1 to mixedOperationsMatchAnIndependentScanOracle(seed:) started.
+◇ Test case passing 1 argument seed → 42 to mixedOperationsMatchAnIndependentScanOracle(seed:) started.
+◇ Test case passing 1 argument seed → 1311768467463790320 to mixedOperationsMatchAnIndependentScanOracle(seed:) started.
+◇ Test case passing 1 argument seed → 3735928559 to mixedOperationsMatchAnIndependentScanOracle(seed:) started.
+✔ Test mixedOperationsMatchAnIndependentScanOracle(seed:) with 4 test cases passed after 1.248 seconds.
+◇ Test concurrentReservationsRespectLimitsAndReturnToKnownBaseline() started.
+✔ Test concurrentReservationsRespectLimitsAndReturnToKnownBaseline() passed after 0.868 seconds.
+◇ Test concurrentResizesOfSharedLeasesKeepZeroByteOwnersAndReleaseExactlyOnce() started.
+✔ Test concurrentResizesOfSharedLeasesKeepZeroByteOwnersAndReleaseExactlyOnce() passed after 0.413 seconds.
+✔ Suite "Subtitle memory budget accounting" passed after 2.535 seconds.
+✔ Test run with 23 tests in 2 suites passed after 5.825 seconds.

@@ -1,0 +1,111 @@
+Building for debugging...
+[0/15] Write sources
+[3/15] Write swift-version-4E1F6603DD102018.txt
+[5/17] Emitting module IlliquidCore
+[6/17] Compiling IlliquidCore MediaNameRecognition.swift
+[7/18] Compiling IlliquidCore NormalizedFileURL.swift
+[8/19] Wrapping AST for IlliquidCore for debugging
+[10/23] Emitting module IlliquidApp
+[11/23] Compiling IlliquidApp SourceBrowserFilter.swift
+[12/23] Compiling IlliquidApp SourceBrowserPortableSupport.swift
+[13/23] Compiling IlliquidApp SourceDirectoryListing.swift
+[14/26] Compiling IlliquidApp SourceFilesystemInvalidation.swift
+[15/26] Compiling IlliquidApp SourceTreeDirectoryState.swift
+[16/26] Compiling IlliquidApp SourceTreeProjectionInput.swift
+[17/29] Wrapping AST for IlliquidApp for debugging
+[19/29] Emitting module IlliquidAppTests
+[20/30] Compiling IlliquidAppTests SourceBrowserSearchTests.swift
+[21/30] Compiling IlliquidAppTests SourceTreeDirectoryStateTests.swift
+[22/31] /tmp/illiquid-directory-state-mn1qsgsa/build/x86_64-unknown-linux-gnu/debug/SourceBrowserSearchRegressionPackageDiscoveredTests.derived/all-discovered-tests.swift
+[23/31] Write sources
+[24/31] Wrapping AST for IlliquidAppTests for debugging
+[26/33] Compiling SourceBrowserSearchRegressionPackageDiscoveredTests IlliquidAppTests.swift
+[27/33] Emitting module SourceBrowserSearchRegressionPackageDiscoveredTests
+[28/34] Compiling SourceBrowserSearchRegressionPackageDiscoveredTests all-discovered-tests.swift
+[29/35] /tmp/illiquid-directory-state-mn1qsgsa/build/x86_64-unknown-linux-gnu/debug/SourceBrowserSearchRegressionPackageTests.derived/runner.swift
+[30/35] Write sources
+[31/35] Wrapping AST for SourceBrowserSearchRegressionPackageDiscoveredTests for debugging
+[33/37] Compiling SourceBrowserSearchRegressionPackageTests runner.swift
+[34/37] Emitting module SourceBrowserSearchRegressionPackageTests
+[35/38] Wrapping AST for SourceBrowserSearchRegressionPackageTests for debugging
+[36/38] Write Objects.LinkFileList
+[37/38] Linking SourceBrowserSearchRegressionPackageTests.xctest
+Build complete! (16.14s)
+Test Suite 'All tests' started at 2026-10-28 05:33:00.314
+Test Suite 'debug.xctest' started at 2026-10-28 05:33:00.316
+Test Suite 'debug.xctest' passed at 2026-10-28 05:33:00.316
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.0 (0.0) seconds
+Test Suite 'All tests' passed at 2026-10-28 05:33:00.316
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.0 (0.0) seconds
+◇ Test run started.
+↳ Testing Library Version: 6.3.2 (70eff261d7f462c)
+↳ Target Platform: x86_64-unknown-linux-gnu
+◇ Suite "Source browser search equivalence" started.
+◇ Suite "Sidebar directory consumer state" started.
+◇ Test reloadSelectionPreservesUnsupportedURLFallbackPaths() started.
+◇ Test removedTreeClearsExpansionAndReloadsItsParentWithoutReloadingTheRemoval() started.
+◇ Test targetedChildChangeReloadsAnExpandedDirectoryUnderFilesystemRoot(_:) started.
+◇ Test reloadSelectionPreservesCanonicalIdentityAndOriginalPathSpelling(_:) started.
+◇ Test ordinaryRootInvalidationPreservesSiblingPrefixes(_:) started.
+◇ Test repeatedLoadsAndExpansionChangesRetainExistingLoadPolicy() started.
+◇ Test filesystemRootRescanReloadsExpandedCachesErrorsAndRunningLoads(_:) started.
+◇ Test reloadSelectionReusesAliasedAndOverlappingRootsWithoutRequiringExpansion() started.
+◇ Test reloadSelectionDoesNotNormalizeAffectedOrExpandedPaths() started.
+◇ Test reloadSelectionKeepsActiveRootsAndExpandedDescendantsOnly() started.
+◇ Test removingFilesystemRootClearsAllDescendantExpansionAndState() started.
+◇ Test reloadSelectionCombinesReloadsAndRescansButNotInvalidatedTrees() started.
+◇ Test emptyQueryPreservesAllRowsExactly(query:) started.
+◇ Test collapsingFilesystemRootCancelsLoadsButKeepsCachesErrorsAndExpansion() started.
+◇ Test rootVisibilityIncludesAncestorsAndKeepsCompleteRelativePaths() started.
+◇ Test seededRowsMatchOriginalSearchIncludingDuplicateIdentities() started.
+◇ Test matchingFolderIncludesAncestorsWithoutExpandingDescendants() started.
+◇ Test actorMediaViewSearchGroupsOnlyMatchingFilesAndReusesTree() started.
+◇ Test actorSearchPreservesVisibilityMetadataAndReusesItsProjection() started.
+◇ Test recognizedMediaControlsAdditionalSearchFields() started.
+◇ Test case passing 1 argument decomposedRoot → true to reloadSelectionPreservesCanonicalIdentityAndOriginalPathSpelling(_:) started.
+◇ Test case passing 1 argument decomposedRoot → false to reloadSelectionPreservesCanonicalIdentityAndOriginalPathSpelling(_:) started.
+◇ Test cancellationBeforeSearchDoesNotPublishOrReplaceCachedProjection() started.
+◇ Test case passing 1 argument preserveExpansion → true to ordinaryRootInvalidationPreservesSiblingPrefixes(_:) started.
+◇ Test unionKeepsDuplicateRowsAndEveryMatchingRowsAncestors() started.
+◇ Test case passing 1 argument preserveExpansion → false to ordinaryRootInvalidationPreservesSiblingPrefixes(_:) started.
+◇ Test case passing 1 argument flag → Flags(rawValue: 64) to filesystemRootRescanReloadsExpandedCachesErrorsAndRunningLoads(_:) started.
+◇ Test case passing 1 argument flag → Flags(rawValue: 8) to targetedChildChangeReloadsAnExpandedDirectoryUnderFilesystemRoot(_:) started.
+◇ Test case passing 1 argument flag → Flags(rawValue: 128) to filesystemRootRescanReloadsExpandedCachesErrorsAndRunningLoads(_:) started.
+◇ Test case passing 1 argument query → "" to emptyQueryPreservesAllRowsExactly(query:) started.
+◇ Test case passing 1 argument query → " 	
+" to emptyQueryPreservesAllRowsExactly(query:) started.
+◇ Test case passing 1 argument query → " 
+" to emptyQueryPreservesAllRowsExactly(query:) started.
+◇ Test case passing 1 argument flag → Flags(rawValue: 2) to targetedChildChangeReloadsAnExpandedDirectoryUnderFilesystemRoot(_:) started.
+◇ Test case passing 1 argument flag → Flags(rawValue: 32) to filesystemRootRescanReloadsExpandedCachesErrorsAndRunningLoads(_:) started.
+◇ Test case passing 1 argument flag → Flags(rawValue: 16) to filesystemRootRescanReloadsExpandedCachesErrorsAndRunningLoads(_:) started.
+◇ Test case passing 1 argument flag → Flags(rawValue: 4) to targetedChildChangeReloadsAnExpandedDirectoryUnderFilesystemRoot(_:) started.
+◇ Test unicodeAndLocaleMatchingAgreeWithOriginalPredicate() started.
+◇ Test reloadSelectionUnderFilesystemRootStillRequiresExpandedDescendants() started.
+✔ Test emptyQueryPreservesAllRowsExactly(query:) with 3 test cases passed after 0.002 seconds.
+✔ Test unionKeepsDuplicateRowsAndEveryMatchingRowsAncestors() passed after 0.002 seconds.
+✔ Test cancellationBeforeSearchDoesNotPublishOrReplaceCachedProjection() passed after 0.002 seconds.
+✔ Test matchingFolderIncludesAncestorsWithoutExpandingDescendants() passed after 0.002 seconds.
+✔ Test actorSearchPreservesVisibilityMetadataAndReusesItsProjection() passed after 0.003 seconds.
+✔ Test reloadSelectionPreservesUnsupportedURLFallbackPaths() passed after 0.004 seconds.
+✔ Test reloadSelectionPreservesCanonicalIdentityAndOriginalPathSpelling(_:) with 2 test cases passed after 0.004 seconds.
+✔ Test reloadSelectionReusesAliasedAndOverlappingRootsWithoutRequiringExpansion() passed after 0.004 seconds.
+✔ Test reloadSelectionKeepsActiveRootsAndExpandedDescendantsOnly() passed after 0.004 seconds.
+✔ Test unicodeAndLocaleMatchingAgreeWithOriginalPredicate() passed after 0.003 seconds.
+✔ Test reloadSelectionCombinesReloadsAndRescansButNotInvalidatedTrees() passed after 0.004 seconds.
+✔ Test rootVisibilityIncludesAncestorsAndKeepsCompleteRelativePaths() passed after 0.004 seconds.
+✔ Test reloadSelectionUnderFilesystemRootStillRequiresExpandedDescendants() passed after 0.003 seconds.
+✔ Test reloadSelectionDoesNotNormalizeAffectedOrExpandedPaths() passed after 0.004 seconds.
+✔ Test repeatedLoadsAndExpansionChangesRetainExistingLoadPolicy() passed after 0.006 seconds.
+✔ Test removingFilesystemRootClearsAllDescendantExpansionAndState() passed after 0.006 seconds.
+✔ Test collapsingFilesystemRootCancelsLoadsButKeepsCachesErrorsAndExpansion() passed after 0.006 seconds.
+✔ Test recognizedMediaControlsAdditionalSearchFields() passed after 0.006 seconds.
+✔ Test actorMediaViewSearchGroupsOnlyMatchingFilesAndReusesTree() passed after 0.006 seconds.
+✔ Test targetedChildChangeReloadsAnExpandedDirectoryUnderFilesystemRoot(_:) with 3 test cases passed after 0.008 seconds.
+✔ Test removedTreeClearsExpansionAndReloadsItsParentWithoutReloadingTheRemoval() passed after 0.009 seconds.
+✔ Test ordinaryRootInvalidationPreservesSiblingPrefixes(_:) with 2 test cases passed after 0.009 seconds.
+✔ Test filesystemRootRescanReloadsExpandedCachesErrorsAndRunningLoads(_:) with 4 test cases passed after 0.009 seconds.
+✔ Suite "Sidebar directory consumer state" passed after 0.010 seconds.
+✔ Test seededRowsMatchOriginalSearchIncludingDuplicateIdentities() passed after 0.384 seconds.
+✔ Suite "Source browser search equivalence" passed after 0.385 seconds.
+✔ Test run with 24 tests in 2 suites passed after 0.385 seconds.

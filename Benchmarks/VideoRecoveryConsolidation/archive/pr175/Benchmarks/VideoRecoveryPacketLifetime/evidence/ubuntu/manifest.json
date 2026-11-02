@@ -1,0 +1,113 @@
+{
+  "baseline": {
+    "git_blob": "be28cdb3b568fa9adf7b9bf0da8a74bc2d715d4d",
+    "revision": "ea2ff568237e2667f7b1aeee67b11a44ebe95b72",
+    "sha256": "de1010a12b09431e01fa46366308b5b9f897615c669ac82f235a5f8f8934e197",
+    "source": "Sources/IlliquidNativePlayback/Media/FFmpegPacket.swift"
+  },
+  "binaries_sha256": {
+    "baseline-debug": "41cb9e042dd5d2ceb2a61e569eb65e04f25e727ae9ebf48e32dfd66599f96e1d",
+    "baseline-release": "9592d4fa92eac775031ee5ff4e1a398481e99432b93df533765133344455f7db",
+    "candidate-debug": "4f4a9bf1243158f9970b0024d051cd24f4a018895a645dc780b5dfb1f8b7d528",
+    "candidate-release": "f857ac7e77a766f5eccb5a03bf19ad42f32fe39fc2eecf755975b6d7edaaad8a"
+  },
+  "candidate_source_sha256": "adc7218f4bbf7ec19a871fcbcf0f45d612089ce32110726031244f2d5662953c",
+  "checkout_head": "9da2b2edb5b01924faad3469f68f3e5e2c17dfed",
+  "compiler": "Swift version 6.4.1 (swift-6.4.1-RELEASE)\nTarget: x86_64-unknown-linux-gnu",
+  "complete": true,
+  "harness_sha256": {
+    "Probe.swift": "f5daf18461e2aee9cb9ce28fbddb191711f009c2244aa6e4dc324ce09e9e868f",
+    "baseline/manifest.json": "5ebc4f740beffabd94a9b908e96b0d4b25220d9988056917bfc6029bb3bf79f2",
+    "run.py": "70295ec0a75fa4e543208b77e95a7cbaaf0dce0165e70f04816b69d95b6af5de"
+  },
+  "limitations": [
+    "Does not execute MediaSession, decode video, or qualify macOS playback",
+    "Requested tracked native payload/storage bytes, not RSS or allocator overhead",
+    "Cancellation control throws CancellationError; silent early-return cancellation is not modeled"
+  ],
+  "machine": "x86_64",
+  "platform": "Linux-7.0.0-1017-azure-x86_64-with-glibc2.39",
+  "schema_version": 1,
+  "scope": "Synthetic drain boundary; exact production packet/recovery owner and real FFmpeg AVBuffer callbacks",
+  "sdk": {
+    "build-receipt.json": {
+      "compiler": "cc (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0",
+      "configureLogSHA256": "9ee6d5cff45679fe3f2af05c691adfdd2aec93c82062aae15c5e730841606501",
+      "libraries": {
+        "libavcodec.a": "c5e14a4ac6a75b0d837525b5d16643d69f973200f69712655a73f9e21b9d849a",
+        "libavfilter.a": "885366e5371dfb0f5f4ad5dc4a8e7cc4ad1fc3ddb3404f534f084a5f98e1dfb8",
+        "libavformat.a": "42a26af0b990dfa605c1c578bd345fef0633777bec4bb1466b18d74bc0d4b37f",
+        "libavutil.a": "a71c141b55876b57f806fb2409734a26c194ade68fdb74f33acda40c8a5e70fd",
+        "libswresample.a": "f8547eb2eae8b1668f7a777925e0852dda45d772788f0d2a6363ba63c907d9da",
+        "libswscale.a": "2d04b5f7d58e9fbdb56d9b7ad67bd897c1f493ecdfce63cc7313e66c15c2da53"
+      },
+      "sdkRoot": "/home/runner/work/_temp/recovery-ffmpeg"
+    },
+    "libraries_sha256": {
+      "libavcodec.a": "c5e14a4ac6a75b0d837525b5d16643d69f973200f69712655a73f9e21b9d849a",
+      "libavutil.a": "a71c141b55876b57f806fb2409734a26c194ade68fdb74f33acda40c8a5e70fd"
+    },
+    "packages": {
+      "libavcodec": "62.28.102",
+      "libavutil": "60.26.102"
+    },
+    "prefix": "/home/runner/work/_temp/recovery-ffmpeg",
+    "source-receipt.json": {
+      "archive": "/home/runner/work/illiquid/illiquid/DependencySources/archives/ffmpeg-8.1.2.tar.xz",
+      "component": {
+        "archive": "archives/ffmpeg-8.1.2.tar.xz",
+        "bytes": 11710924,
+        "component": "ffmpeg",
+        "download_url": "https://ffmpeg.org/releases/ffmpeg-8.1.2.tar.xz",
+        "expected_sha256": "464beb5e7bf0c311e68b45ae2f04e9cc2af88851abb4082231742a74d97b524c",
+        "git_revision": null,
+        "installed_version": "8.1.2",
+        "libraries": [
+          {
+            "name": "libavcodec.62.28.102.dylib",
+            "sha256": "3963c76dc2430341edef6f75b27efa4e60f60af0bf3aa080751c061084c60b48"
+          },
+          {
+            "name": "libavfilter.11.14.102.dylib",
+            "sha256": "d37212f12cbf5875bed26cf1908537110c47720f73adcdb38c7b6f9e3e026110"
+          },
+          {
+            "name": "libavformat.62.12.102.dylib",
+            "sha256": "c671566dd5fd8cd2dc4df58093bb1fb440f2bedb464396ffc1583f1aa5d1aaa1"
+          },
+          {
+            "name": "libavutil.60.26.102.dylib",
+            "sha256": "475c71ddcf2a5141e12c8abfedb1c97681cded54f7f92a38eeaf17ba02703462"
+          },
+          {
+            "name": "libswresample.6.3.102.dylib",
+            "sha256": "0d92adcb41c113934de473bd95ebb7afd96c1d6177606b08331bdc9dcb6643c2"
+          },
+          {
+            "name": "libswscale.9.5.102.dylib",
+            "sha256": "9dc4a476e6e8f9a5c7f80565005242842f08c012922447943d6655d922e56dfc"
+          }
+        ],
+        "recipe": "recipes/ffmpeg-illiquid.rb",
+        "recipe_sha256": "d718b877dff8cef7f8cdb92eb22eda784f17d983607322e694e5aa8a14aa3d2b",
+        "retrieved_from": "https://ffmpeg.org/releases/ffmpeg-8.1.2.tar.xz",
+        "sha256": "464beb5e7bf0c311e68b45ae2f04e9cc2af88851abb4082231742a74d97b524c",
+        "source_url": "https://ffmpeg.org/releases/ffmpeg-8.1.2.tar.xz",
+        "status": "downloaded"
+      },
+      "sha256": "464beb5e7bf0c311e68b45ae2f04e9cc2af88851abb4082231742a74d97b524c",
+      "verifiedAgainstProjectManifest": true
+    }
+  },
+  "staged_sha256": {
+    "sources/CFFmpeg/module.modulemap": "083620fda48657831affdbac0424ea34da4ed851129f1f14f285e373423b7793",
+    "sources/CFFmpeg/packet_api.h": "cdb142b04ddc5f5dec45470ac6248d3765b8b065176bff471a7208739fbf555c",
+    "sources/baseline/FFmpegPacket.swift": "de1010a12b09431e01fa46366308b5b9f897615c669ac82f235a5f8f8934e197",
+    "sources/candidate/FFmpegPacket.swift": "adc7218f4bbf7ec19a871fcbcf0f45d612089ce32110726031244f2d5662953c",
+    "sources/originals/ffmpeg_shim.h": "d4092b963f12fdc708c8b7d6fcad61b80322af1c9eca6c0d903b90efaa2e7d96",
+    "sources/shared/PacketProbeSupport.swift": "f46e02b2ecb94bb0656c72ee510aaaf68829e550709b5d490116e8c04254ab2f",
+    "sources/shared/Probe.swift": "f5daf18461e2aee9cb9ce28fbddb191711f009c2244aa6e4dc324ce09e9e868f"
+  },
+  "started_utc": "2026-10-28T05:39:10.549843+00:00",
+  "worktree_status": ""
+}

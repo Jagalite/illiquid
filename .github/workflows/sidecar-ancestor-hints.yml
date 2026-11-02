@@ -1,0 +1,132 @@
+name: Sidecar ancestor metadata performance
+
+on:
+  push:
+    branches: ['perf/ancestor-metadata-merge-20261028-3388']
+    paths:
+      - 'Sources/IlliquidCore/MediaLibrary/MediaSidecarReader.swift'
+      - 'Sources/IlliquidCore/MediaLibrary/MediaNameRecognition.swift'
+      - 'Sources/IlliquidCore/MediaLibrary/MediaMetadataHints.swift'
+      - 'Sources/IlliquidCore/MediaLibrary/NFOMetadataHints.swift'
+      - 'Sources/IlliquidCore/MediaLibrary/PlexMatchHints.swift'
+      - 'Tests/IlliquidCoreTests/MediaSidecar*Tests.swift'
+      - 'Tests/IlliquidCoreTests/PlexMatch*Tests.swift'
+      - 'Tests/IlliquidCoreTests/NFO*Tests.swift'
+      - 'Tests/IlliquidCoreTests/MediaNameRecognition*Tests.swift'
+      - 'Tests/IlliquidCoreTests/EpisodeNameRecognitionRegressionTests.swift'
+      - 'Benchmarks/SidecarAncestorHints/**'
+      - '.github/workflows/sidecar-ancestor-hints.yml'
+      - '!Benchmarks/SidecarAncestorHints/*.md'
+      - '!Benchmarks/SidecarAncestorHints/evidence/**'
+  pull_request:
+    paths:
+      - 'Sources/IlliquidCore/MediaLibrary/MediaSidecarReader.swift'
+      - 'Sources/IlliquidCore/MediaLibrary/MediaNameRecognition.swift'
+      - 'Sources/IlliquidCore/MediaLibrary/MediaMetadataHints.swift'
+      - 'Sources/IlliquidCore/MediaLibrary/NFOMetadataHints.swift'
+      - 'Sources/IlliquidCore/MediaLibrary/PlexMatchHints.swift'
+      - 'Tests/IlliquidCoreTests/MediaSidecar*Tests.swift'
+      - 'Tests/IlliquidCoreTests/PlexMatch*Tests.swift'
+      - 'Tests/IlliquidCoreTests/NFO*Tests.swift'
+      - 'Tests/IlliquidCoreTests/MediaNameRecognition*Tests.swift'
+      - 'Tests/IlliquidCoreTests/EpisodeNameRecognitionRegressionTests.swift'
+      - 'Benchmarks/SidecarAncestorHints/**'
+      - '.github/workflows/sidecar-ancestor-hints.yml'
+      - '!Benchmarks/SidecarAncestorHints/*.md'
+      - '!Benchmarks/SidecarAncestorHints/evidence/**'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: sidecar-ancestor-hints-${{ github.head_ref || github.ref_name }}
+  cancel-in-progress: true
+
+jobs:
+  native-component:
+    runs-on: macos-26
+    timeout-minutes: 30
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - name: Test both readers and verify complete metadata scans
+        run: |
+          python3 - <<'PY'
+          import json, os, subprocess, sys
+          from pathlib import Path
+          compiler = subprocess.check_output(['xcrun', '--find', 'swiftc'], text=True).strip()
+          command = [sys.executable, 'Benchmarks/SidecarAncestorHints/run.py',
+                     '--output', str(Path(os.environ['RUNNER_TEMP']) / 'sidecar-ancestor-hints'),
+                     '--swiftc', compiler,
+                     '--run-tests', '--pairs', '10', '--target-ms', '150']
+          if os.environ['GITHUB_EVENT_NAME'] in {'push', 'pull_request'}:
+              command += ['--current-source-regression']
+          queue = Path('/Volumes/seed1/Projects/kyoto/kyoto.py')
+          if queue.is_file():
+              cli = [sys.executable, str(queue)]
+              submitted = subprocess.check_output([*cli, 'submit', '--', *command], text=True)
+              print(submitted, flush=True)
+              job_id = json.loads(submitted)['id']
+              subprocess.run([*cli, 'show', job_id], check=True)
+              result = subprocess.run([*cli, 'wait', job_id])
+              subprocess.run([*cli, 'logs', job_id], check=True)
+              sys.exit(result.returncode)
+          print('The shared Kyoto queue is unavailable on this hosted runner; '
+                'compiling isolated components directly and serially.', flush=True)
+          subprocess.run(command, check=True)
+          PY
+      - name: Preserve reviewable native receipts in the job log
+        if: always()
+        run: |
+          python3 - <<'PY'
+          import base64, gzip, hashlib, json, os, subprocess
+          from pathlib import Path
+          root = Path(os.environ['RUNNER_TEMP']) / 'sidecar-ancestor-hints'
+          root.mkdir(parents=True, exist_ok=True)
+          host = []
+          for command in (['sw_vers'], ['uname', '-a'], ['sysctl', '-n', 'machdep.cpu.brand_string']):
+              result = subprocess.run(command, capture_output=True, text=True, check=True)
+              host.append(' '.join(command) + '\n' + result.stdout)
+          (root / 'host.txt').write_text('\n'.join(host))
+          files = {}
+          for path in sorted(root.rglob('*')):
+              relative = path.relative_to(root)
+              if (path.is_file() and path.suffix in {'.json', '.jsonl', '.log', '.txt'}
+                      and not any(part in {'build', '.build', 'cache', 'module-cache', 'processes'}
+                                  for part in relative.parts)
+                      and path.stat().st_size < 4 * 1024 * 1024):
+                  files[str(relative)] = path.read_text()
+          for name, content in files.items():
+              if name.endswith(('summary.json', 'verification.json', 'tests.json', 'completion.json')):
+                  print(name + '\n' + content)
+          packed = gzip.compress(json.dumps(files, sort_keys=True).encode(), compresslevel=9, mtime=0)
+          if len(packed) <= 2 * 1024 * 1024:
+              print('ANCESTOR_HINTS_EVIDENCE_SHA256 ' + hashlib.sha256(packed).hexdigest())
+              encoded = base64.b64encode(packed).decode()
+              print('ANCESTOR_HINTS_EVIDENCE_BEGIN')
+              for offset in range(0, len(encoded), 4000):
+                  print(encoded[offset:offset + 4000])
+              print('ANCESTOR_HINTS_EVIDENCE_END')
+          else:
+              print('Recovery receipt exceeds the log limit; use the uploaded artifact.')
+          PY
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: sidecar-ancestor-hints-native
+          path: |
+            ${{ runner.temp }}/sidecar-ancestor-hints/**/*.json
+            ${{ runner.temp }}/sidecar-ancestor-hints/**/*.jsonl
+            ${{ runner.temp }}/sidecar-ancestor-hints/**/*.gz
+            ${{ runner.temp }}/sidecar-ancestor-hints/**/*.log
+            ${{ runner.temp }}/sidecar-ancestor-hints/**/*.txt
+            ${{ runner.temp }}/sidecar-ancestor-hints/**/*.swift
+            ${{ runner.temp }}/sidecar-ancestor-hints/**/*.py
+            !${{ runner.temp }}/sidecar-ancestor-hints/**/build/**
+            !${{ runner.temp }}/sidecar-ancestor-hints/**/.build/**
+            !${{ runner.temp }}/sidecar-ancestor-hints/**/module-cache/**
+          retention-days: 14

@@ -99,6 +99,16 @@ final class SubtitleOverlayView: NSView {
 
     deinit { NotificationCenter.default.removeObserver(self) }
 
+    /// The overlay is shared by committed and candidate subtitle pipelines.
+    /// Only the pipeline gaining presentation authority may retire its cache.
+    func retireSourceResources() {
+        metalRenderer?.retireSourceResources()
+    }
+
+    var resourcePoolSnapshotForTesting: MetalASSSubtitleRenderer.ResourcePool.Snapshot? {
+        metalRenderer?.resourcePoolSnapshotForTesting
+    }
+
     func clear(
         revision: SubtitleFenceRevision? = nil,
         mediaIdentity: String? = nil

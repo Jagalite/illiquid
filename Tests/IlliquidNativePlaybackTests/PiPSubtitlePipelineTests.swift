@@ -19,6 +19,30 @@ private final class LockedMismatchCounter: @unchecked Sendable {
     }
 }
 
+private final class PiPSubmissionGate: @unchecked Sendable {
+    private let lock = NSLock()
+    private let resume = DispatchSemaphore(value: 0)
+    private var consumed = false
+    private var arrived = false
+    private var expired = false
+
+    func pauseOnce() {
+        let shouldPause = lock.withLock {
+            guard !consumed else { return false }
+            consumed = true
+            arrived = true
+            return true
+        }
+        guard shouldPause else { return }
+        let timedOut = resume.wait(timeout: .now() + 10) == .timedOut
+        lock.withLock { expired = timedOut }
+    }
+
+    func release() { resume.signal() }
+    var hasArrived: Bool { lock.withLock { arrived } }
+    var didTimeOut: Bool { lock.withLock { expired } }
+}
+
 @Suite("Production PiP independent subtitle pipelines", .serialized)
 struct PiPSubtitlePipelineTests {
     @Test @MainActor func bitmapSubtitleUsesPremultipliedColorAndClearsInPiP() async throws {
@@ -488,7 +512,11 @@ struct PiPSubtitlePipelineTests {
         #expect(compositor.metricsSnapshot().subtitleVisibleFrames == 1)
 
         compositor.stop()
-        try await Task.sleep(for: .milliseconds(100))
+        let retired = await compositor.videoWorkingStorageSnapshotForTesting()
+        #expect(!retired.hasOutputPool)
+        #expect(!retired.hasOutputPoolObserver)
+        #expect(retired.hasPreparedSubtitleFrame)
+        #expect(retired.latestFrameSeconds == 0.5)
 
         compositor.start(onFirstSample: { _ in }, onFailure: { _ in })
         #expect(await waitUntil {
@@ -499,6 +527,288 @@ struct PiPSubtitlePipelineTests {
 
         compositor.stop()
         pipeline.terminate()
+    }
+
+    @Test(arguments: [Int32(0), 16, 18]) @MainActor
+    func stoppingRetiresVideoStorageAndPreservesCaptionPixels(
+        transfer: Int32
+    ) async throws {
+        let size = CGSize(width: 64, height: 32)
+        let isHDR = transfer != 0
+        let pipeline = try SubtitlePipeline(
+            overlay: SubtitleOverlayView(headless: true),
+            presentsOverlay: false
+        )
+        defer { pipeline.terminate() }
+        _ = try pipeline.configure(
+            codecPrivate: nil, codecName: "hdmv_pgs_subtitle", attachments: [],
+            frameSize: size, storageSize: size
+        )
+        let caption = NativeBitmapSubtitleComposition(
+            regions: [.init(
+                pixels: Data(repeating: 255, count: 16),
+                frame: CGRect(x: 0, y: 0, width: 2, height: 2),
+                isForced: false
+            )],
+            canvasSize: size, duration: 1, memoryLease: nil
+        )
+        pipeline.process(event: .init(
+            assData: Data(), presentationSeconds: 0, durationSeconds: 1,
+            generation: 0, bitmapComposition: caption
+        ))
+
+        let compositor = try PiPSubtitleCompositor(subtitles: pipeline)
+        defer { compositor.stop() }
+        let source: CVPixelBuffer
+        if isHDR {
+            source = try p010PixelBuffer(size: size, fullRange: false, black: true)
+        } else {
+            source = try blackPixelBuffer(size: size)
+        }
+        let frame = decodedFrame(
+            pixelBuffer: source, size: size, seconds: 0.5,
+            transferCharacteristic: isHDR ? transfer : nil,
+            sourceComponentDepth: isHDR ? 10 : 8,
+            matrix: isHDR ? 9 : nil
+        )
+        compositor.receive(frame)
+        let before = try await compositor.composedPixelBufferForTesting(frame)
+        let expectedPixels = try pipVideoPayload(before)
+        if isHDR {
+            #expect(try countBrightP010Pixels(before) > 0)
+        } else {
+            #expect(nonblackPixelCount(before) > 0)
+        }
+
+        let populated = await compositor.videoWorkingStorageSnapshotForTesting()
+        let beforeMetrics = compositor.metricsSnapshot()
+        #expect(populated.hasOutputPool)
+        #expect(populated.hasOutputPoolObserver)
+        #expect(populated.hasHDRTexture == isHDR)
+        #expect(populated.hasPreparedSubtitleFrame)
+        #expect(populated.latestFrameSeconds == 0.5)
+        #expect(beforeMetrics.subtitleTextureUploads == 1)
+
+        compositor.stop()
+        let retired = await compositor.videoWorkingStorageSnapshotForTesting()
+        #expect(!retired.hasOutputPool)
+        #expect(!retired.hasOutputPoolObserver)
+        #expect(!retired.hasHDRTexture)
+        #expect(retired.hdrTextureAllocatedBytes == 0)
+        #expect(retired.observedOutputBufferCount == 0)
+        #expect(retired.hasPreparedSubtitleFrame)
+        #expect(retired.latestFrameSeconds == 0.5)
+
+        // A consumer-held output remains readable after its pool is retired.
+        #expect(try pipVideoPayload(before) == expectedPixels)
+        let after = try await compositor.composedPixelBufferForTesting(frame)
+        #expect(CVPixelBufferGetPixelFormatType(after)
+            == CVPixelBufferGetPixelFormatType(before))
+        #expect(try pipVideoPayload(after) == expectedPixels)
+        let afterMetrics = compositor.metricsSnapshot()
+        #expect(afterMetrics.subtitleTextureUploads
+            == beforeMetrics.subtitleTextureUploads)
+        #expect(afterMetrics.subtitleResourceReuses
+            == beforeMetrics.subtitleResourceReuses + 1)
+        let rebuilt = await compositor.videoWorkingStorageSnapshotForTesting()
+        #expect(rebuilt.hasOutputPool)
+        #expect(rebuilt.hasOutputPoolObserver)
+        #expect(rebuilt.hasHDRTexture == isHDR)
+
+        compositor.stop()
+        let retiredAgain = await compositor.videoWorkingStorageSnapshotForTesting()
+        #expect(!retiredAgain.hasOutputPool)
+        #expect(!retiredAgain.hasOutputPoolObserver)
+        #expect(!retiredAgain.hasHDRTexture)
+    }
+
+    @Test @MainActor
+    func stoppedPoolCannotBlockReentryWhileOldOutputsRemainRetained()
+        async throws
+    {
+        let size = CGSize(width: 64, height: 32)
+        let compositor = try PiPSubtitleCompositor()
+        defer { compositor.stop() }
+        let frame = decodedFrame(
+            pixelBuffer: try blackPixelBuffer(size: size),
+            size: size, seconds: 0.5
+        )
+        var retained: [CVPixelBuffer] = []
+        for _ in 0..<12 {
+            retained.append(
+                try await compositor.composedPixelBufferForTesting(frame)
+            )
+        }
+        let failures = LockedMismatchCounter()
+        compositor.receive(frame)
+        compositor.start(
+            onFirstSample: { result in
+                if case .failure = result { failures.increment() }
+            },
+            onFailure: { _ in failures.increment() }
+        )
+        try #require(await waitUntil {
+            compositor.metricsSnapshot().outputPoolMisses > 0
+        })
+        #expect(compositor.metricsSnapshot().composedFrames == 0)
+
+        compositor.stop()
+        let retired = await compositor.videoWorkingStorageSnapshotForTesting()
+        #expect(!retired.hasOutputPool)
+        #expect(!retired.hasOutputPoolObserver)
+        #expect(retired.latestFrameSeconds == 0.5)
+        #expect(retained.count == 12)
+
+        // Reentry must not depend on returning any old, externally owned output.
+        let firstSamples = LockedMismatchCounter()
+        compositor.start(
+            onFirstSample: { result in
+                switch result {
+                case .success: firstSamples.increment()
+                case .failure: failures.increment()
+                }
+            },
+            onFailure: { _ in failures.increment() }
+        )
+        try #require(await waitUntil {
+            compositor.metricsSnapshot().composedFrames == 1
+                && firstSamples.snapshot == 1
+        })
+        #expect(compositor.metricsSnapshot().immediatelyDisplayedFrames == 1)
+        #expect(compositor.metricsSnapshot().outputPoolMisses == 0)
+        #expect(failures.snapshot == 0)
+
+        // Returning retired outputs must not schedule another composition.
+        withExtendedLifetime(retained) {}
+        retained.removeAll()
+        _ = await compositor.videoWorkingStorageSnapshotForTesting()
+        #expect(compositor.metricsSnapshot().composedFrames == 1)
+        compositor.stop()
+        let final = await compositor.videoWorkingStorageSnapshotForTesting()
+        #expect(!final.hasOutputPool)
+        #expect(!final.hasOutputPoolObserver)
+    }
+
+    @Test(arguments: [false, true]) @MainActor
+    func stoppedCompositionCannotCommitIntoTheNextSession(
+        restartImmediately: Bool
+    ) async throws {
+        let size = CGSize(width: 64, height: 32)
+        let gate = PiPSubmissionGate()
+        defer { gate.release() }
+        let compositor = try PiPSubtitleCompositor(
+            beforeSubmissionForTesting: { gate.pauseOnce() }
+        )
+        defer { compositor.stop() }
+        let frame = decodedFrame(
+            pixelBuffer: try p010PixelBuffer(
+                size: size, fullRange: false, black: true
+            ),
+            size: size, seconds: 0.5,
+            transferCharacteristic: 16, sourceComponentDepth: 10, matrix: 9
+        )
+        let oldCallbacks = LockedMismatchCounter()
+        let newFirstSamples = LockedMismatchCounter()
+        let failures = LockedMismatchCounter()
+        compositor.receive(frame)
+        compositor.start(
+            onFirstSample: { _ in oldCallbacks.increment() },
+            onFailure: { _ in oldCallbacks.increment() }
+        )
+        try #require(await waitUntil { gate.hasArrived })
+
+        // The encoded command owns its resources but cannot complete before
+        // stop invalidates its authority and queues resource retirement.
+        compositor.stop()
+        if restartImmediately {
+            compositor.start(
+                onFirstSample: { result in
+                    switch result {
+                    case .success: newFirstSamples.increment()
+                    case .failure: failures.increment()
+                    }
+                },
+                onFailure: { _ in failures.increment() }
+            )
+        }
+        gate.release()
+        try #require(await waitUntil {
+            let metrics = compositor.metricsSnapshot()
+            return metrics.discardedStaleCompositions == 1
+                && (!restartImmediately
+                    || (metrics.composedFrames == 1
+                        && newFirstSamples.snapshot == 1))
+        })
+        #expect(!gate.didTimeOut)
+        #expect(oldCallbacks.snapshot == 0)
+        #expect(failures.snapshot == 0)
+
+        let state = await compositor.videoWorkingStorageSnapshotForTesting()
+        if restartImmediately {
+            #expect(state.hasOutputPool)
+            #expect(state.hasOutputPoolObserver)
+            #expect(state.hasHDRTexture)
+            #expect(compositor.metricsSnapshot().composedFrames == 1)
+            #expect(compositor.metricsSnapshot().immediatelyDisplayedFrames == 1)
+            #expect(newFirstSamples.snapshot == 1)
+        } else {
+            #expect(!state.hasOutputPool)
+            #expect(!state.hasOutputPoolObserver)
+            #expect(!state.hasHDRTexture)
+            #expect(compositor.metricsSnapshot().composedFrames == 0)
+            #expect(newFirstSamples.snapshot == 0)
+        }
+        #expect(state.latestFrameSeconds == 0.5)
+        compositor.stop()
+        let final = await compositor.videoWorkingStorageSnapshotForTesting()
+        #expect(!final.hasOutputPool)
+        #expect(!final.hasOutputPoolObserver)
+        #expect(!final.hasHDRTexture)
+    }
+
+    /// Exclude allocator-dependent row padding from exact output comparisons.
+    private func pipVideoPayload(_ buffer: CVPixelBuffer) throws -> [UInt8] {
+        try #require(
+            CVPixelBufferLockBaseAddress(buffer, .readOnly) == kCVReturnSuccess
+        )
+        defer { CVPixelBufferUnlockBaseAddress(buffer, .readOnly) }
+        var result: [UInt8] = []
+        if CVPixelBufferIsPlanar(buffer) {
+            let format = CVPixelBufferGetPixelFormatType(buffer)
+            try #require(
+                format == kCVPixelFormatType_420YpCbCr10BiPlanarVideoRange
+                    || format == kCVPixelFormatType_420YpCbCr10BiPlanarFullRange
+            )
+            try #require(CVPixelBufferGetPlaneCount(buffer) == 2)
+            for plane in 0..<2 {
+                let base = try #require(
+                    CVPixelBufferGetBaseAddressOfPlane(buffer, plane)
+                ).assumingMemoryBound(to: UInt8.self)
+                let rowBytes = CVPixelBufferGetBytesPerRowOfPlane(buffer, plane)
+                let payloadBytes = CVPixelBufferGetWidthOfPlane(buffer, plane)
+                    * (plane == 0 ? 2 : 4)
+                for row in 0..<CVPixelBufferGetHeightOfPlane(buffer, plane) {
+                    result.append(contentsOf: UnsafeBufferPointer(
+                        start: base + row * rowBytes, count: payloadBytes
+                    ))
+                }
+            }
+        } else {
+            try #require(
+                CVPixelBufferGetPixelFormatType(buffer) == kCVPixelFormatType_32BGRA
+            )
+            let base = try #require(
+                CVPixelBufferGetBaseAddress(buffer)
+            ).assumingMemoryBound(to: UInt8.self)
+            let rowBytes = CVPixelBufferGetBytesPerRow(buffer)
+            let payloadBytes = CVPixelBufferGetWidth(buffer) * 4
+            for row in 0..<CVPixelBufferGetHeight(buffer) {
+                result.append(contentsOf: UnsafeBufferPointer(
+                    start: base + row * rowBytes, count: payloadBytes
+                ))
+            }
+        }
+        return result
     }
 
     @Test @MainActor

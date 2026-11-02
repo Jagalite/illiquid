@@ -26,6 +26,15 @@ HERE = Path(__file__).resolve().parent
 ROOT = HERE.parents[1]
 BASELINE = "6f70cd2446fc6ef38d4e5a0fbf96f91b2234e635"
 VARIANTS = ("baseline", "candidate")
+REGRESSION_TARGET = "d4155469a3b1657396a29f8d8e98a56f64afbf56"
+CURRENT_SUPPORT = {
+    'Sources/CFFmpeg/include/ffmpeg_shim.h': 'ca3ed76b8feff89079d1dca5fc96651923f5f0f4693f0c8fb4625741e15c7c05',
+    'Sources/IlliquidNativePlayback/Subtitles/BitmapSubtitleTimeline.swift': '5d12db66ead5f13fa1e0ab6d61975c9fb259fb1ca460fd4561155041d4beb6b6',
+    "Sources/IlliquidNativePlayback/Media/FFmpegPacket.swift": "9127a96fee6e66c2b43d37b7354b330040910e836f17a69d2a0feb25a3a6f694",
+    "Sources/IlliquidNativePlayback/Playback/FixedRingBuffer.swift": "e376c12e8332bc95894bffb916d578ef314f831161f0d9eb4700b88a0f04f4f5",
+    "Sources/IlliquidNativePlayback/Playback/PacketQueue.swift": "cbb61a58255926e1d8239e6c82534ede564712ac1c7fad3c02a18c30fba52993"
+}
+CURRENT_ADDITIONS = {'Sources/IlliquidNativePlayback/Subtitles/SubtitleAcquisitionPacket.swift': 'ac9faae7b4745e24c27dd4e5e88ada9bacfe7a6ebead9439b097d6aba57dafd6'}
 WORKLOADS = [("auxiliary", count) for count in (1, 2, 3)] + [("default", 1)]
 HELPER = ROOT / "Benchmarks/AttachmentAdmission/run.py"
 FOCAL = {"Sources/IlliquidNativePlayback/Media/FFmpegDemuxer.swift",
@@ -88,12 +97,12 @@ class Runner:
             "system": self.command(["system_profiler", "SPHardwareDataType", "SPSoftwareDataType"], "system"),
             "protocol": {key: str(value) if isinstance(value, Path) else value for key, value in vars(args).items()},
             "workloads": WORKLOADS, "allowed_production_differences": sorted(FOCAL),
-            "source_transformations": "None. Complete sources plus unchanged guarded error/PGS declarations.",
+            "source_transformations": "Complete focal sources unchanged. Regression support overrides and additions are explicit; guarded declarations use identical reviewed support in both arms.",
             "sources": self.sources, "binaries": self.binaries, "native_libraries": {},
             "drivers": {},
         }
         for path in [Path(__file__), HERE / "Harness.swift", HERE / "MemoryProbe.h",
-                     HERE / "generate-fixtures.py", HELPER]:
+                     HERE / "generate-fixtures.py", HERE / "test_source_policy.py", HELPER]:
             name = "admission-source-helper.py" if path == HELPER else path.name
             shutil.copyfile(path, self.output / name)
             self.receipt["drivers"][str(path.relative_to(ROOT))] = file_sha(path)
@@ -141,9 +150,16 @@ class Runner:
         write_json(self.output / "fixtures.json", fixtures)
         return fixtures
 
-    def prepare(self):
+    def prepare_sources(self, shared):
+        self.receipt["comparison_mode"] = ("current-support-regression-no-timing"
+            if self.args.current_support_regression else "strict-historical")
+        if self.args.current_support_regression:
+            self.receipt["target_oracle_revision"] = REGRESSION_TARGET
+            for path in FOCAL:
+                pinned = subprocess.check_output(["git", "show", f"{REGRESSION_TARGET}:{path}"], cwd=ROOT)
+                if (ROOT / path).read_bytes() != pinned:
+                    raise ValueError(f"Pinned regression target changed: {path}")
         original = {}
-        shared = helper()
         paths = shared.FULL_SOURCES + [shared.PRESENTATION, shared.BITMAP] + shared.C_SOURCES
         for variant in VARIANTS:
             original[variant] = {}
@@ -156,9 +172,41 @@ class Runner:
                 target.write_bytes(raw)
                 self.sources[f"{variant}:{path}"] = {"sha256": sha(raw), "bytes": len(raw),
                     "origin": "working-tree" if variant == "candidate" else "pinned-baseline"}
+        if self.args.current_support_regression:
+            # Historical snapshots remain archived; only this explicit support
+            # inventory is compiled from identical current bytes in both arms.
+            self.receipt["support_overrides"] = []
+            for path in sorted(CURRENT_SUPPORT):
+                if sha(original["candidate"][path].encode()) != CURRENT_SUPPORT[path]:
+                    raise ValueError(f"Reviewed regression support changed: {path}; review/requalify this comparison")
+                original["baseline"][path] = original["candidate"][path]
+                self.receipt["support_overrides"].append({
+                    "path": path,
+                    "historical_sha256": self.sources[f"baseline:{path}"]["sha256"],
+                    "both_arms_sha256": self.sources[f"candidate:{path}"]["sha256"]})
+        if self.args.current_support_regression:
+            self.receipt["support_additions"] = []
+            for path, digest in CURRENT_ADDITIONS.items():
+                raw = (ROOT / path).read_bytes()
+                if sha(raw) != digest:
+                    raise ValueError(f"Reviewed regression addition changed: {path}")
+                for variant in VARIANTS:
+                    original[variant][path] = raw.decode()
+                    target = self.output / "sources" / variant / path
+                    target.parent.mkdir(parents=True, exist_ok=True)
+                    target.write_bytes(raw)
+                    self.sources[f"{variant}:{path}"] = {"sha256": sha(raw), "bytes": len(raw),
+                        "origin": "current-support-addition-not-historical"}
+                self.receipt["support_additions"].append({"path": path, "both_arms_sha256": digest,
+                    "historical_origin": None})
         for path in set(shared.FULL_SOURCES + shared.C_SOURCES) - FOCAL:
             if original["baseline"][path] != original["candidate"][path]:
                 raise ValueError(f"Unrelated production dependency changed: {path}")
+        return original
+
+    def prepare(self):
+        shared = helper()
+        original = self.prepare_sources(shared)
         extracted = {}
         for variant in VARIANTS:
             extracted[variant] = "import Foundation\n\n" + shared.extract(
@@ -198,7 +246,7 @@ class Runner:
             directory = self.output / variant
             directory.mkdir()
             inputs = []
-            for path in shared.FULL_SOURCES:
+            for path in shared.FULL_SOURCES + (list(CURRENT_ADDITIONS) if self.args.current_support_regression else []):
                 target = directory / Path(path).name
                 target.write_text(original[variant][path])
                 inputs.append(target)
@@ -225,6 +273,8 @@ class Runner:
         write_json(self.output / "manifest.json", self.receipt)
 
     def invoke(self, variant, case, mode, policy, count, iterations, label):
+        if self.args.current_support_regression and mode == "timing":
+            raise ValueError("Timing is prohibited in current-support regression mode")
         raw = self.command([self.executables[variant], mode, case["path"], policy, count, iterations,
                             case["accepted_payload_bytes"]], label)
         result = json.loads(raw)
@@ -294,7 +344,7 @@ class Runner:
 
     def measure(self):
         calibrations = []
-        for mode in ("memory", "timing"):
+        for mode in (("memory",) if self.args.current_support_regression else ("memory", "timing")):
             for case in self.fixtures:
                 for policy, count in WORKLOADS:
                     iterations = 1
@@ -315,8 +365,10 @@ class Runner:
         return self.summarize()
 
     def summarize(self):
+        if self.args.current_support_regression and any(row["mode"] == "timing" for row in self.observations):
+            raise ValueError("Timing observations cannot qualify a current-support regression")
         measurements = [row for row in self.observations if row["stage"] == "measurement"]
-        expected = len(self.fixtures) * len(WORKLOADS) * 2 * self.args.pairs * 2
+        expected = len(self.fixtures) * len(WORKLOADS) * 2 * self.args.pairs * (1 if self.args.current_support_regression else 2)
         if len(measurements) != expected:
             raise ValueError("Incomplete measurement cohort")
         results = []
@@ -335,6 +387,8 @@ class Runner:
                     "open_close_cpu_seconds_per_batch": ("timing", lambda row: row["cpu_seconds"] / row["iterations"]),
                 }
                 for name, (mode, value) in metrics.items():
+                    if self.args.current_support_regression and mode == "timing":
+                        continue
                     rows = [row for row in selected if row["mode"] == mode]
                     variants = {variant: [value(row) for row in rows if row["variant"] == variant] for variant in VARIANTS}
                     savings, reductions = [], []
@@ -359,7 +413,8 @@ class Runner:
         return {"status": "complete", "pairs": self.args.pairs, "measurement_processes": expected,
                 "ordering": "AB/BA balanced per case, policy, input count, and measurement type; all samples retained",
                 "memory_boundary": "One default main input remains alive; add 1/2/3 auxiliary inputs, then release them. No tracing/hashing before checkpoints.",
-                "timing_boundary": "Open and close one batch of serialized input executors with a main input held alive; one warmup batch excluded.",
+                "comparison_mode": self.receipt["comparison_mode"],
+                "timing_boundary": None if self.args.current_support_regression else "Open and close one batch of serialized input executors with a main input held alive; one warmup batch excluded.",
                 "results": results}
 
     def verify_inputs(self):
@@ -385,6 +440,8 @@ def main():
     parser.add_argument("--output", required=True, type=Path)
     parser.add_argument("--ffmpeg-prefix", type=Path, default=Path("/opt/homebrew/opt/ffmpeg"))
     parser.add_argument("--swiftc")
+    parser.add_argument("--current-support-regression", action="store_true",
+                        help="Pinned-target regression with identical current packet/queue/ring support; timing prohibited")
     parser.add_argument("--pairs", type=int, default=6)
     parser.add_argument("--target-ms", type=float, default=100)
     parser.add_argument("--max-iterations", type=int, default=1000)
@@ -403,7 +460,8 @@ def main():
         if args.mode == "all":
             summary = runner.measure()
         else:
-            summary = {"status": "complete", "mode": args.mode, "parity": runner.parity}
+            summary = {"status": "complete", "mode": args.mode, "parity": runner.parity,
+                       "comparison_mode": runner.receipt["comparison_mode"]}
         runner.verify_inputs()
         runner.receipt["completed_utc"] = datetime.now(timezone.utc).isoformat()
         write_json(runner.output / "manifest.json", runner.receipt)

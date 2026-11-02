@@ -181,6 +181,43 @@ struct NaturalFilenameOrderingTests {
         }
     }
 
+    @Test func largePlaylistsKeepEqualKeysPairedWithTheirOriginalMetadata() throws {
+        let folder = URL(fileURLWithPath: "/Media", isDirectory: true)
+        let corpus = mixedFilenameURLs() + [
+            try #require(URL(string: "file:///Media/Season/../Episode%202.mkv")),
+            try #require(URL(string: "https://a.example.invalid/Episode%202.mkv?version=1")),
+            try #require(URL(string: "https://b.example.invalid/Episode%202.mkv?version=2#part")),
+        ]
+        var random = Generator(state: 0x494E444558534F52)
+        let mixedURLs = (0..<257).map { _ in corpus[random.next(upperBound: corpus.count)] }
+        let equalKeys = (0..<257).map { corpus[corpus.count - 2 + $0 % 2] }
+        // Cross multiple sort runs with shuffled key groups and an entirely tied
+        // group. Decode once per corpus to retain deliberately unsorted subtitles
+        // and raw media-URL spellings that an item reconstruction would change.
+        for urls in [mixedURLs, equalKeys] {
+            let fixtures = urls.enumerated().map { index, url in
+                ItemFixture(
+                    url: url,
+                    externalSubtitleURLs: [
+                        folder.appendingPathComponent("\(index) Subtitle 10.srt"),
+                        folder.appendingPathComponent("\(index) Subtitle 2.srt"),
+                    ],
+                    dateAdded: index.isMultiple(of: 3) ? nil : Date(timeIntervalSince1970: Double(index))
+                )
+            }
+            let items = try JSONDecoder().decode(
+                [FolderPlaylistItem].self, from: JSONEncoder().encode(fixtures)
+            )
+            let before = items.map(ItemReceipt.init)
+            for input in [items, Array(items.reversed())] {
+                let expected = input.sorted { referencePrecedes($0.url, $1.url) }
+                let actual = FolderPlaylist(folderURL: folder, items: input).items
+                #expect(actual.map(ItemReceipt.init) == expected.map(ItemReceipt.init))
+            }
+            #expect(items.map(ItemReceipt.init) == before)
+        }
+    }
+
     private func expectReferenceOrder(_ urls: [URL]) {
         let held = urls
         let before = urls.map(URLReceipt.init)

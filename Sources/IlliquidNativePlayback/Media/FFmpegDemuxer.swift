@@ -273,10 +273,9 @@ final class FFmpegDemuxer {
                         continue
                     }
                 } else if !isBitmap { continue }
-                let acquisition = needsAcquisition && packet.data.map { data in
-                    isPGS ? PGSSubtitlePacket.isAcquisition(data)
-                        : DVBSubtitlePacket.isAcquisition(data, compositionPageID: compositionPageID)
-                } == true
+                let acquisition = needsAcquisition && (isPGS
+                    ? PGSSubtitlePacket.isAcquisition(packet)
+                    : DVBSubtitlePacket.isAcquisition(packet, compositionPageID: compositionPageID))
                 if acquisition {
                     active.removeAll()
                     foundAcquisition = true

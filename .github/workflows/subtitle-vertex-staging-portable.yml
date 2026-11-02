@@ -1,0 +1,85 @@
+name: Subtitle vertex staging portable CPU proxy
+
+on:
+  push:
+    branches: ['perf/subtitle-vertex-staging-c6bbf6f8']
+    paths:
+      - 'Benchmarks/SubtitleVertexStagingPortable/**'
+      - '.github/workflows/subtitle-vertex-staging-portable.yml'
+      - 'Sources/IlliquidNativePlayback/Subtitles/ASSSubtitleVertexWriter.swift'
+      - 'Sources/IlliquidNativePlayback/Subtitles/MetalASSSubtitleCompositor.swift'
+      - 'Tests/IlliquidNativePlaybackTests/SubtitleVertexWriterTests.swift'
+      - 'Benchmarks/SubtitleVertexStaging/run.py'
+      - 'Benchmarks/SubtitleVertexStaging/Harness.swift'
+      - 'Benchmarks/SubtitleVertexStaging/baseline/**'
+      - '!Benchmarks/SubtitleVertexStagingPortable/*.md'
+      - '!Benchmarks/SubtitleVertexStagingPortable/evidence/**'
+  pull_request:
+    paths:
+      - 'Benchmarks/SubtitleVertexStagingPortable/**'
+      - '.github/workflows/subtitle-vertex-staging-portable.yml'
+      - 'Sources/IlliquidNativePlayback/Subtitles/ASSSubtitleVertexWriter.swift'
+      - 'Sources/IlliquidNativePlayback/Subtitles/MetalASSSubtitleCompositor.swift'
+      - 'Tests/IlliquidNativePlaybackTests/SubtitleVertexWriterTests.swift'
+      - 'Benchmarks/SubtitleVertexStaging/run.py'
+      - 'Benchmarks/SubtitleVertexStaging/Harness.swift'
+      - 'Benchmarks/SubtitleVertexStaging/baseline/**'
+      - '!Benchmarks/SubtitleVertexStagingPortable/*.md'
+      - '!Benchmarks/SubtitleVertexStagingPortable/evidence/**'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: subtitle-vertex-portable-${{ github.head_ref || github.ref_name }}
+  cancel-in-progress: true
+
+jobs:
+  portable-components:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - name: Check build coordination and compiler
+        run: |
+          if test -f /Volumes/seed1/Projects/kyoto/kyoto.py; then
+            echo 'Kyoto is available; submit qualification through the shared queue.'
+            exit 1
+          fi
+          echo 'Kyoto is unavailable on this isolated runner; portable builds run serially.'
+          echo 'This job measures a raw-memory CPU proxy. It does not run Metal or a GPU.'
+          swift --version
+      - name: Validate portable uploads and writer address safety
+        run: |
+          python3 Benchmarks/SubtitleVertexStagingPortable/run.py --tests-only \
+            --output "$RUNNER_TEMP/subtitle-vertex-portable/tests"
+      - name: Measure paired portable CPU work
+        run: |
+          python3 Benchmarks/SubtitleVertexStagingPortable/run.py --pairs 8 --target-ms 80 \
+            --output "$RUNNER_TEMP/subtitle-vertex-portable/timing"
+      - name: Emit portable review records
+        if: always()
+        run: |
+          python3 - <<'PY'
+          import json, os
+          from pathlib import Path
+          root = Path(os.environ["RUNNER_TEMP"]) / "subtitle-vertex-portable"
+          for path in sorted(root.rglob("*")):
+              if path.is_file() and "build" not in path.parts and "receipts" not in path.parts:
+                  content = path.read_text()
+                  chunks = [content[i:i + 12000] for i in range(0, len(content), 12000)] or [""]
+                  for index, chunk in enumerate(chunks):
+                      print("PORTABLE_VERTEX_PART " + json.dumps({
+                          "path": str(path.relative_to(root)), "part": index,
+                          "parts": len(chunks), "content": chunk
+                      }, sort_keys=True))
+          PY
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: subtitle-vertex-staging-portable-cpu-proxy
+          path: ${{ runner.temp }}/subtitle-vertex-portable/
+          retention-days: 14

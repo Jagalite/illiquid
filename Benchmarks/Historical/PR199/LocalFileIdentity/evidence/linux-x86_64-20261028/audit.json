@@ -1,0 +1,30 @@
+{
+  "status": "passed",
+  "errors": [],
+  "candidate_commit": "5715179b655f35c2b97f6816ab3ef122ad20873f",
+  "baseline_commit": "ea2ff568237e2667f7b1aeee67b11a44ebe95b72",
+  "source_and_qualification_hashes_verified": 19,
+  "observed_measurements": 400,
+  "summaries_recomputed": 20,
+  "tests_per_configuration": 47,
+  "test_configurations": 4,
+  "minimum_observed_sample_ms": 141.254831,
+  "maximum_observed_sample_ms": 310.176979,
+  "checks": [
+    "Exact source and qualification hashes match fetched committed files",
+    "Fresh-process pairs are complete, unique and balanced AB/BA",
+    "Durations and per-operation units agree",
+    "Iteration counts and paired output checksums match",
+    "All medians, paired reductions, ranges and faster-pair counts reproduced"
+  ],
+  "scope": "Audit of runner-emitted measurement rows and manifest. Calibration trials, full source snapshots and command logs remain in the CI artifact.",
+  "independent_review": {
+    "status": "passed",
+    "measurements": 400,
+    "workloads": 20,
+    "actual_schedule": "Alternating AB/BA and reversed workload order on odd pairs verified from logged sequence.",
+    "production_hashes": 10,
+    "qualification_hashes": 9,
+    "scope": "Separate recomputation of all summary statistics and exact committed-file hash verification."
+  }
+}

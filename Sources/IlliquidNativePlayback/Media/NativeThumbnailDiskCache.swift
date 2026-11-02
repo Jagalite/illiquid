@@ -13,7 +13,6 @@ import UniformTypeIdentifiers
 actor NativeThumbnailDiskCache {
     typealias Key = NativeThumbnailCache.Key
     private struct DiskEntry {
-        var url: URL
         let bytes: Int
         var used: Date
         var background: Bool
@@ -25,6 +24,9 @@ actor NativeThumbnailDiskCache {
     private var preferences = ThumbnailPreferences()
     // Key by physical filename, not digest: b- and f- aliases can coexist.
     // Both consume disk space and must survive in accounting until unlinked.
+    // The shared directory and physical filename already identify each file.
+    // Retain only eviction metadata, not a URL and its cached resource values
+    // for every inventoried thumbnail. Construct URLs at the I/O boundary.
     private var files: [String: DiskEntry] = [:]
     private var loadedDisk = false
     private var needsBudgetReconciliation = false
@@ -53,7 +55,7 @@ actor NativeThumbnailDiskCache {
     func image(for key: Key, background: Bool) -> CGImage? {
         let interval = NonDecodePerformance.begin("ThumbnailDiskRead")
         defer { NonDecodePerformance.end(interval) }
-        guard preferences.diskMiB > 0 else { return nil }
+        guard preferences.diskMiB > 0, let directory else { return nil }
         if background { loadDisk() }
         let digest = key.digest
         prepareExactLookup(digest)
@@ -61,8 +63,9 @@ actor NativeThumbnailDiskCache {
         // Deterministically prefer foreground. A corrupt foreground alias must
         // not hide a usable background copy, or remove its accounting.
         for name in Self.filenames(for: digest) {
-            guard let entry = files[name] else { continue }
-            guard let image = Self.readImage(at: entry.url, key: key) else {
+            guard files[name] != nil else { continue }
+            let url = directory.appendingPathComponent(name, isDirectory: false)
+            guard let image = Self.readImage(at: url, key: key) else {
                 _ = removeDisk(name)
                 continue
             }
@@ -142,7 +145,7 @@ actor NativeThumbnailDiskCache {
         do {
             try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
             try data.write(to: url, options: .atomic)
-            files[url.lastPathComponent] = DiskEntry(url: url, bytes: data.count, used: Date(), background: background)
+            files[url.lastPathComponent] = DiskEntry(bytes: data.count, used: Date(), background: background)
             diskBytes += data.count
         } catch { /* A cache write failure must not fail a preview. */ }
     }
@@ -214,13 +217,15 @@ actor NativeThumbnailDiskCache {
     }
 
     private func promoteDisk(_ digest: String, selectedName: String? = nil) {
-        guard var name = selectedName ?? preferredFilename(for: digest),
+        guard let directory,
+              var name = selectedName ?? preferredFilename(for: digest),
               var entry = files[name] else { return }
         let wasBackground = entry.background
         let destinationName = "f-\(digest).jpg"
-        let promoted = entry.url.deletingLastPathComponent().appendingPathComponent(destinationName)
         if name != destinationName {
-            if (try? FileManager.default.moveItem(at: entry.url, to: promoted)) != nil {
+            let source = directory.appendingPathComponent(name, isDirectory: false)
+            let promoted = directory.appendingPathComponent(destinationName, isDirectory: false)
+            if (try? FileManager.default.moveItem(at: source, to: promoted)) != nil {
                 files.removeValue(forKey: name)
                 // A previously indexed destination may have disappeared externally.
                 // Never double-count it after successfully moving the source there.
@@ -228,7 +233,6 @@ actor NativeThumbnailDiskCache {
                     diskBytes -= replaced.bytes
                 }
                 name = destinationName
-                entry.url = promoted
             } else if !loadedDisk {
                 // A failed rename cannot persist the foreground filename. Fall
                 // back to full accounting so the in-memory foreground tier is
@@ -244,7 +248,8 @@ actor NativeThumbnailDiskCache {
         entry.background = false
         if wasBackground || Date().timeIntervalSince(entry.used) > 60 {
             entry.used = Date()
-            try? FileManager.default.setAttributes([.modificationDate: entry.used], ofItemAtPath: entry.url.path)
+            let url = directory.appendingPathComponent(name, isDirectory: false)
+            try? FileManager.default.setAttributes([.modificationDate: entry.used], ofItemAtPath: url.path)
         }
         files[name] = entry
     }
@@ -282,7 +287,7 @@ actor NativeThumbnailDiskCache {
         guard let values = try? url.resourceValues(forKeys: keys),
               values.isRegularFile == true, values.isSymbolicLink != true,
               let bytes = values.fileSize, bytes >= 0 else { return nil }
-        return DiskEntry(url: url, bytes: bytes,
+        return DiskEntry(bytes: bytes,
             used: values.contentModificationDate ?? .distantPast, background: background)
     }
 
@@ -366,10 +371,12 @@ actor NativeThumbnailDiskCache {
     @discardableResult
     private func removeDisk(_ filename: String) -> Bool {
         guard let entry = files[filename] else { return true }
+        guard let directory else { return false }
+        let url = directory.appendingPathComponent(filename, isDirectory: false)
         // Never use recursive deletion for a cache image. A path may have
         // become a directory since inventory; unlink refuses directories and
         // removes only the link itself if a symlink was substituted meanwhile.
-        let removed = entry.url.withUnsafeFileSystemRepresentation { path in
+        let removed = url.withUnsafeFileSystemRepresentation { path in
             guard let path else { return false }
             return unlink(path) == 0 || errno == ENOENT
         }

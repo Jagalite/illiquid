@@ -1,0 +1,255 @@
+{
+  "archive": {
+    "bytes": 163372,
+    "members": 572,
+    "path": "receipts.tar.xz",
+    "sha256": "e84a425e613d28666c309c779cd3be0e41837441d4c3e019a9031aa06ef887c8"
+  },
+  "audited_utc": "2026-10-28T17:19:27.530731+00:00",
+  "balanced_pairs_per_workload": {
+    "AB": 5,
+    "BA": 5
+  },
+  "baseline_commit": "4077f8ad538dd8ed911b38c9b300a98c787c5135",
+  "checks": {
+    "archive_extracted_members": 572,
+    "archive_member_sha256": 571,
+    "build_source_hashes": 37,
+    "calibration_receipts": 70,
+    "command_logs": 420,
+    "driver_source_comparisons": 6,
+    "input_hashes": 120,
+    "measurement_receipts": 240,
+    "production_source_commit_comparisons": 75,
+    "reconstructed_package_hashes": 4,
+    "test_source_commit_comparisons": 6,
+    "tested_source_hashes": 116
+  },
+  "final_observations": 240,
+  "full_report_comparisons": 149,
+  "host": {
+    "ci_image": {
+      "ImageOS": "ubuntu24",
+      "ImageVersion": "20261026.354.1"
+    },
+    "compiler": {
+      "swift": "/usr/local/bin/swift",
+      "swift_binary_sha256": "dcfb86a6a452f63af1cf6857cf70898e375ba36e7a5ef63ef3a497a4e7fe54d8",
+      "swiftc": "/usr/local/bin/swiftc",
+      "swiftc_binary_sha256": "dcfb86a6a452f63af1cf6857cf70898e375ba36e7a5ef63ef3a497a4e7fe54d8",
+      "version": "Swift version 6.4.1 (swift-6.4.1-RELEASE)\nTarget: x86_64-unknown-linux-gnu"
+    },
+    "cpu_count": 4,
+    "machine": "x86_64",
+    "platform": "Linux-7.0.0-1017-azure-x86_64-with-glibc2.39"
+  },
+  "limitations": [
+    "Linux x86_64 component evidence; not native macOS qualification or player frame-rate evidence.",
+    "Real explorer cases have zero transaction states and bypass the modified predecessor block. Their changes are controls, not evidence of an indexing benefit.",
+    "Synthetic graphs exercise the modified predecessor index; peak memory and very large sparse-destination graphs were not measured.",
+    "End-to-end here means bounded state-space exploration plus analysis and deallocation.",
+    "Test package input hashes were verified from retained source snapshots; Package.swift was reconstructed from the archived runner literal.",
+    "Toolchain and binary hashes are recorded, but binary bytes are absent from the archive and were not rehashed locally.",
+    "The final cohort uses Swift 6.4.1 and a newer Linux CI image than the rejected guarded candidate cohort. Compare baseline versus candidate within this cohort; do not compare absolute timings across the two cohorts."
+  ],
+  "measured_candidate_commit": "f03f537b7781977695bb64dbbac37b346a8bc27a",
+  "recomputed_measurements": [
+    {
+      "baseline_median_ns": 575113.6091370558,
+      "candidate_median_ns": 565506.3248730964,
+      "edges": 2049,
+      "improved_pairs": 5,
+      "median_paired_change_percent": -0.07919539789220664,
+      "nodes": 573,
+      "pairs": 10,
+      "ratio_of_medians_change_percent": -1.6705019862727433,
+      "settled_transaction_states": 0,
+      "timing_scope": "analyze-prepared-graph",
+      "transaction_states": 0,
+      "workload": "real-seek"
+    },
+    {
+      "baseline_median_ns": 97517.44596988485,
+      "candidate_median_ns": 96972.82860938885,
+      "edges": 353,
+      "improved_pairs": 7,
+      "median_paired_change_percent": -0.5661239382865779,
+      "nodes": 69,
+      "pairs": 10,
+      "ratio_of_medians_change_percent": -0.5584819773317262,
+      "settled_transaction_states": 0,
+      "timing_scope": "analyze-prepared-graph",
+      "transaction_states": 0,
+      "workload": "real-eof-drain"
+    },
+    {
+      "baseline_median_ns": 278794.2151898734,
+      "candidate_median_ns": 279607.24936708866,
+      "edges": 1235,
+      "improved_pairs": 4,
+      "median_paired_change_percent": 0.24579512527034275,
+      "nodes": 214,
+      "pairs": 10,
+      "ratio_of_medians_change_percent": 0.29162519626224626,
+      "settled_transaction_states": 0,
+      "timing_scope": "analyze-prepared-graph",
+      "transaction_states": 0,
+      "workload": "real-stop-shutdown"
+    },
+    {
+      "baseline_median_ns": 519455.86739130435,
+      "candidate_median_ns": 476664.2239130435,
+      "edges": 512,
+      "improved_pairs": 10,
+      "median_paired_change_percent": -8.22284708159522,
+      "nodes": 513,
+      "pairs": 10,
+      "ratio_of_medians_change_percent": -8.237782295762585,
+      "settled_transaction_states": 512,
+      "timing_scope": "analyze-prepared-graph",
+      "transaction_states": 512,
+      "workload": "synthetic-chain-forward"
+    },
+    {
+      "baseline_median_ns": 518990.70043103443,
+      "candidate_median_ns": 476341.39224137936,
+      "edges": 512,
+      "improved_pairs": 10,
+      "median_paired_change_percent": -8.296198363288987,
+      "nodes": 513,
+      "pairs": 10,
+      "ratio_of_medians_change_percent": -8.217740347608116,
+      "settled_transaction_states": 512,
+      "timing_scope": "analyze-prepared-graph",
+      "transaction_states": 512,
+      "workload": "synthetic-chain-reverse"
+    },
+    {
+      "baseline_median_ns": 1723883.6363636362,
+      "candidate_median_ns": 1674874.7651515151,
+      "edges": 2047,
+      "improved_pairs": 10,
+      "median_paired_change_percent": -2.6411539641958304,
+      "nodes": 2048,
+      "pairs": 10,
+      "ratio_of_medians_change_percent": -2.8429338371991575,
+      "settled_transaction_states": 2047,
+      "timing_scope": "analyze-prepared-graph",
+      "transaction_states": 2047,
+      "workload": "synthetic-sparse"
+    },
+    {
+      "baseline_median_ns": 930688.890070922,
+      "candidate_median_ns": 783628.1737588653,
+      "edges": 4097,
+      "improved_pairs": 10,
+      "median_paired_change_percent": -15.762038226585073,
+      "nodes": 257,
+      "pairs": 10,
+      "ratio_of_medians_change_percent": -15.801275579947028,
+      "settled_transaction_states": 256,
+      "timing_scope": "analyze-prepared-graph",
+      "transaction_states": 256,
+      "workload": "synthetic-dense"
+    },
+    {
+      "baseline_median_ns": 1301198.7705882352,
+      "candidate_median_ns": 1310258.3294117646,
+      "edges": 2048,
+      "improved_pairs": 2,
+      "median_paired_change_percent": 0.6428371109054698,
+      "nodes": 2048,
+      "pairs": 10,
+      "ratio_of_medians_change_percent": 0.6962471090741884,
+      "settled_transaction_states": 0,
+      "timing_scope": "analyze-prepared-graph",
+      "transaction_states": 0,
+      "workload": "synthetic-all-settled"
+    },
+    {
+      "baseline_median_ns": 1512416.5675675676,
+      "candidate_median_ns": 1511259.1554054054,
+      "edges": 2048,
+      "improved_pairs": 5,
+      "median_paired_change_percent": 0.05033442024315882,
+      "nodes": 2048,
+      "pairs": 10,
+      "ratio_of_medians_change_percent": -0.07652733955589852,
+      "settled_transaction_states": 0,
+      "timing_scope": "analyze-prepared-graph",
+      "transaction_states": 2048,
+      "workload": "synthetic-no-settled"
+    },
+    {
+      "baseline_median_ns": 1505525.1849315069,
+      "candidate_median_ns": 1508490.191780822,
+      "edges": 2047,
+      "improved_pairs": 4,
+      "median_paired_change_percent": 0.05228277452562491,
+      "nodes": 2048,
+      "pairs": 10,
+      "ratio_of_medians_change_percent": 0.19694169708956988,
+      "settled_transaction_states": 0,
+      "timing_scope": "analyze-prepared-graph",
+      "transaction_states": 0,
+      "workload": "synthetic-no-fair"
+    },
+    {
+      "baseline_median_ns": 1800335.9772727273,
+      "candidate_median_ns": 1685944.6742424243,
+      "edges": 2047,
+      "improved_pairs": 10,
+      "median_paired_change_percent": -6.246358229974214,
+      "nodes": 2048,
+      "pairs": 10,
+      "ratio_of_medians_change_percent": -6.353886412001319,
+      "settled_transaction_states": 1,
+      "timing_scope": "analyze-prepared-graph",
+      "transaction_states": 2047,
+      "workload": "synthetic-partial-settled"
+    },
+    {
+      "baseline_median_ns": 40979123.666666664,
+      "candidate_median_ns": 41180702.83333333,
+      "edges": 1235,
+      "improved_pairs": 2,
+      "median_paired_change_percent": 0.41161063971231204,
+      "nodes": 214,
+      "pairs": 10,
+      "ratio_of_medians_change_percent": 0.49190697269749784,
+      "settled_transaction_states": 0,
+      "timing_scope": "explore-and-analyze",
+      "transaction_states": 0,
+      "workload": "end-to-end-stop-shutdown"
+    }
+  ],
+  "schema_version": 1,
+  "scope": "Independent archive/commit/input/log/test/report checks and timing recomputation; archived runner not imported.",
+  "status": "passed",
+  "tests": [
+    {
+      "configuration": "debug",
+      "status": "passed",
+      "test_count": 37,
+      "variant": "baseline"
+    },
+    {
+      "configuration": "debug",
+      "status": "passed",
+      "test_count": 37,
+      "variant": "candidate"
+    },
+    {
+      "configuration": "release",
+      "status": "passed",
+      "test_count": 37,
+      "variant": "baseline"
+    },
+    {
+      "configuration": "release",
+      "status": "passed",
+      "test_count": 37,
+      "variant": "candidate"
+    }
+  ]
+}

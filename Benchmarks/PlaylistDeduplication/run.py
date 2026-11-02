@@ -75,7 +75,13 @@ class Run:
         return completed.stdout.decode().strip()
 
 
-def snapshots(run, manifest):
+def snapshots(run, manifest, regression_only=False):
+    # Read once so both packages use the same supporting bytes, even if the
+    # worktree changes while the runner is preparing its isolated packages.
+    current = {path: (ROOT / path).read_bytes() for path in SOURCES}
+    historical = {path: subprocess.check_output(
+        ["git", "show", f"{BASELINE}:{path}"], cwd=ROOT) for path in SOURCES}
+    manifest["historical_source_sha256"] = {path: digest(raw) for path, raw in historical.items()}
     outputs = {}
     for variant in ["baseline", "candidate"]:
         directory = run.output / "sources" / variant
@@ -83,8 +89,9 @@ def snapshots(run, manifest):
         exported = []
         manifest[variant + "_sources"] = {}
         for path in SOURCES:
-            raw = (subprocess.check_output(["git", "show", f"{BASELINE}:{path}"], cwd=ROOT)
-                   if variant == "baseline" else (ROOT / path).read_bytes())
+            use_current = variant == "candidate" or (
+                regression_only and not path.endswith("PlaylistMutation.swift"))
+            raw = current[path] if use_current else historical[path]
             data = raw
             # Compile the complete production record type verbatim. The rest of
             # this file is disk I/O and macOS signposting, outside this study.
@@ -96,13 +103,24 @@ def snapshots(run, manifest):
             destination = directory / Path(path).name
             destination.write_bytes(data)
             exported.append(destination)
+            full_destination = directory / "full" / Path(path).name
+            full_destination.parent.mkdir(exist_ok=True)
+            full_destination.write_bytes(raw)
             manifest[variant + "_sources"][path] = dict(
-                full_sha256=digest(raw), compiled_sha256=digest(data))
+                origin="current-worktree" if use_current else "pinned-baseline",
+                source_revision=manifest["head"] if use_current else BASELINE,
+                full_sha256=digest(raw), compiled_sha256=digest(data),
+                full_snapshot=str(full_destination.relative_to(run.output)),
+                compiled_snapshot=str(destination.relative_to(run.output)),
+                transformation="prefix before PlaybackSessionStoring protocol plus newline"
+                    if data != raw else "none",
+                differs_from_historical=raw != historical[path])
         outputs[variant] = exported
     for path in SOURCES:
         if path.endswith("PlaylistMutation.swift"):
             continue
-        if manifest["baseline_sources"][path] != manifest["candidate_sources"][path]:
+        if any(manifest["baseline_sources"][path][key] != manifest["candidate_sources"][path][key]
+               for key in ["full_sha256", "compiled_sha256"]):
             raise RuntimeError(f"Unrelated benchmark dependency changed: {path}")
     for name in ["Driver.swift", "MemoryProbe.c", "run.py"]:
         data = (HERE / name).read_bytes()
@@ -113,7 +131,12 @@ def snapshots(run, manifest):
 
 def tests(run, sources, swift, summary, manifest):
     summary["tests"] = []
-    manifest["test_sha256"] = {}
+    test_sources = {name: (ROOT / "Tests/IlliquidCoreTests" / name).read_bytes() for name in TESTS}
+    manifest["test_sha256"] = {name: digest(data) for name, data in test_sources.items()}
+    retained_tests = run.output / "sources" / "tests"
+    retained_tests.mkdir()
+    for name, data in test_sources.items():
+        (retained_tests / name).write_bytes(data)
     for variant, files in sources.items():
         package = run.output / "build" / (variant + "-tests")
         source_dir = package / "Sources" / "IlliquidCore"
@@ -122,10 +145,8 @@ def tests(run, sources, swift, summary, manifest):
         test_dir.mkdir(parents=True)
         for source in files:
             shutil.copy2(source, source_dir)
-        for name in TESTS:
-            source = ROOT / "Tests" / "IlliquidCoreTests" / name
-            shutil.copy2(source, test_dir)
-            manifest["test_sha256"][name] = digest(source.read_bytes())
+        for name, data in test_sources.items():
+            (test_dir / name).write_bytes(data)
         (package / "Package.swift").write_text('''// swift-tools-version: 6.1
 import PackageDescription
 let package = Package(name: "PlaylistDeduplicationQualification",
@@ -133,6 +154,7 @@ let package = Package(name: "PlaylistDeduplicationQualification",
     targets: [.target(name: "IlliquidCore"),
         .testTarget(name: "IlliquidCoreTests", dependencies: ["IlliquidCore"])])
 ''')
+        manifest["test_package_sha256"] = digest((package / "Package.swift").read_bytes())
         env = os.environ.copy()
         env["CLANG_MODULE_CACHE_PATH"] = str(package / "module-cache")
         env["SWIFTPM_MODULECACHE_OVERRIDE"] = str(package / "module-cache")
@@ -253,10 +275,16 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--mode", choices=["all", "tests", "benchmark"], default="all")
+    parser.add_argument("--regression-only", action="store_true",
+        help="Run both variants' debug/release tests with identical current supporting sources; no performance measurement")
     parser.add_argument("--pairs", type=int, default=6)
     parser.add_argument("--target-ms", type=float, default=40)
     parser.add_argument("--quick", action="store_true")
     args = parser.parse_args()
+    if args.regression_only:
+        if args.mode == "benchmark":
+            parser.error("--regression-only cannot measure a historical performance comparison")
+        args.mode = "tests"
     if args.pairs < 2 or args.pairs % 2 or not math.isfinite(args.target_ms) or args.target_ms <= 0:
         parser.error("Use an even pair count >= 2 and a positive finite target duration")
     output = args.output.resolve()
@@ -264,13 +292,17 @@ def main():
     if any(output.iterdir()):
         parser.error("Output must be new or empty; existing evidence is never overwritten")
     run = Run(output)
-    summary = dict(status="running", baseline=BASELINE, mode=args.mode)
+    qualification = "current-support-regression" if args.regression_only else "historical"
+    summary = dict(status="running", baseline=BASELINE, mode=args.mode,
+                   qualification=qualification, performance_measured=False)
     manifest = dict(baseline=BASELINE, platform=platform.platform(), machine=platform.machine(),
         python_version=platform.python_version(), cpu_count=os.cpu_count(),
         allocator_probe=("default malloc zone size_in_use" if sys.platform == "darwin"
                          else "glibc mallinfo2 uordblks + hblkhd (includes allocator caches)"),
         timestamp_utc=time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
-        arguments=vars(args) | {"output": str(output)})
+        arguments=vars(args) | {"output": str(output)}, qualification=qualification,
+        source_policy="Pinned PlaylistMutation; identical current support in both variants"
+            if args.regression_only else "Pinned baseline; reject supporting-source drift")
     try:
         swift = shutil.which("swift")
         swiftc = shutil.which("swiftc")
@@ -281,7 +313,7 @@ def main():
         manifest["cc_version"] = run.command([cc, "--version"], label="cc-version")
         manifest["head"] = run.command(["git", "rev-parse", "HEAD"], label="head")
         manifest["worktree_status"] = run.command(["git", "status", "--short"], label="status")
-        sources = snapshots(run, manifest)
+        sources = snapshots(run, manifest, args.regression_only)
         save(output / "manifest.json", manifest)
         if args.mode in ["all", "tests"]:
             tests(run, sources, swift, summary, manifest)
@@ -289,6 +321,7 @@ def main():
             binaries = build(run, sources, swiftc, cc, manifest)
             save(output / "manifest.json", manifest)
             measure(run, binaries, args, summary)
+            summary["performance_measured"] = True
         summary["status"] = "passed"
         print("QUALIFICATION_PASS", flush=True)
     except BaseException as error:

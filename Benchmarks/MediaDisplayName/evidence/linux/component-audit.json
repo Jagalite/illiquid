@@ -1,0 +1,599 @@
+{
+  "audit_method": "Independent Python recomputation and hash/log validation; git object, nm/readelf/objdump static inspection only. No tested executables run and no compilation.",
+  "audited_utc": "2026-10-28T19:43:58.816866+00:00",
+  "balanced_orders": {
+    "cached-dated-control": {
+      "baseline,candidate": 5,
+      "candidate,baseline": 5
+    },
+    "cached-movie-control": {
+      "baseline,candidate": 5,
+      "candidate,baseline": 5
+    },
+    "cached-numbered": {
+      "baseline,candidate": 5,
+      "candidate,baseline": 5
+    },
+    "cached-ranges": {
+      "baseline,candidate": 5,
+      "candidate,baseline": 5
+    },
+    "cached-unbounded-control": {
+      "baseline,candidate": 5,
+      "candidate,baseline": 5
+    },
+    "cached-unicode-titles": {
+      "baseline,candidate": 5,
+      "candidate,baseline": 5
+    },
+    "cached-unknown-control": {
+      "baseline,candidate": 5,
+      "candidate,baseline": 5
+    },
+    "cached-wide-numbers": {
+      "baseline,candidate": 5,
+      "candidate,baseline": 5
+    },
+    "recognize-mixed": {
+      "baseline,candidate": 5,
+      "candidate,baseline": 5
+    },
+    "recognize-numbered": {
+      "baseline,candidate": 5,
+      "candidate,baseline": 5
+    },
+    "recognize-ranges": {
+      "baseline,candidate": 5,
+      "candidate,baseline": 5
+    }
+  },
+  "candidate_source_sha256": "cc3c1ac628498798384c3e93973ffa0dcd6f21036b1f1de779cd54c82cc944d1",
+  "checks": {
+    "all_13_input_source_hashes_match": true,
+    "all_268_raw_measurement_pilot_records_hashes_and_new_cohort_commands_match": true,
+    "all_285_command_and_stdout_stderr_log_hashes_match": true,
+    "all_command_returncodes_zero": true,
+    "all_executable_library_swiftmodule_hashes_match": true,
+    "all_pilot_and_final_checksums_agree_for_common_iterations": true,
+    "baseline_driver_imports_external_displayName_getter": true,
+    "baseline_driver_imports_external_recognizer": true,
+    "baseline_driver_links_shared_IlliquidCore": true,
+    "baseline_timed_displayBatch_calls_external_getter_and_recognizer": true,
+    "both_differential_archive_hashes_match": true,
+    "calibration_final_pilots_reach_target_for_both_variants": true,
+    "candidate_driver_imports_external_displayName_getter": true,
+    "candidate_driver_imports_external_recognizer": true,
+    "candidate_driver_links_shared_IlliquidCore": true,
+    "candidate_tests_and_runner_sources_match_measured_git_commit": true,
+    "candidate_timed_displayBatch_calls_external_getter_and_recognizer": true,
+    "command_log_names_unique": true,
+    "common_iterations_and_correct_operation_counts": true,
+    "compiler_driver_frontend_hashes_match": true,
+    "complete_paired_observations": true,
+    "differential_5767_complete_records_match": true,
+    "differential_archives_equal_new_process_stdout": true,
+    "differential_raw_utf8_bytes_identical": true,
+    "each_case_has_five_ab_and_five_ba_pairs": true,
+    "eleven_cases_ten_pairs_220_samples": true,
+    "exact_pr141_candidate_source_hash": true,
+    "exact_rotated_case_order_and_balanced_ab_ba_sequence": true,
+    "expected_measured_commit_and_clean_tree": true,
+    "four_debug_release_test_runs_each_complete_47_tests_five_suites": true,
+    "frozen_baseline_sha256_and_git_blob_hashes_match": true,
+    "independently_recomputed_summary_exactly_matches": true,
+    "manifest_matches_source_receipts": true,
+    "metadata_hints_identical_between_variants": true,
+    "no_previous_cohort_paths_in_command_receipts": true
+  },
+  "counts": {
+    "cases": 11,
+    "command_logs": 285,
+    "differential_records": 5767,
+    "final_samples": 220,
+    "pairs_per_case": 10,
+    "pilot_samples": 48,
+    "source_receipts": 13
+  },
+  "errors": [],
+  "final_process_elapsed_ms_ranges": {
+    "cached-dated-control": {
+      "baseline": {
+        "max_elapsed_ms": 145.288263,
+        "min_elapsed_ms": 108.341326
+      },
+      "candidate": {
+        "max_elapsed_ms": 130.330125,
+        "min_elapsed_ms": 107.535833
+      }
+    },
+    "cached-movie-control": {
+      "baseline": {
+        "max_elapsed_ms": 123.784649,
+        "min_elapsed_ms": 106.530577
+      },
+      "candidate": {
+        "max_elapsed_ms": 142.619122,
+        "min_elapsed_ms": 109.444361
+      }
+    },
+    "cached-numbered": {
+      "baseline": {
+        "max_elapsed_ms": 1003.566352,
+        "min_elapsed_ms": 791.295702
+      },
+      "candidate": {
+        "max_elapsed_ms": 130.042712,
+        "min_elapsed_ms": 104.616515
+      }
+    },
+    "cached-ranges": {
+      "baseline": {
+        "max_elapsed_ms": 1597.237179,
+        "min_elapsed_ms": 1443.978208
+      },
+      "candidate": {
+        "max_elapsed_ms": 142.783584,
+        "min_elapsed_ms": 116.761287
+      }
+    },
+    "cached-unbounded-control": {
+      "baseline": {
+        "max_elapsed_ms": 125.45863,
+        "min_elapsed_ms": 100.630392
+      },
+      "candidate": {
+        "max_elapsed_ms": 116.295252,
+        "min_elapsed_ms": 103.161541
+      }
+    },
+    "cached-unicode-titles": {
+      "baseline": {
+        "max_elapsed_ms": 962.252512,
+        "min_elapsed_ms": 801.693674
+      },
+      "candidate": {
+        "max_elapsed_ms": 164.056106,
+        "min_elapsed_ms": 106.617704
+      }
+    },
+    "cached-unknown-control": {
+      "baseline": {
+        "max_elapsed_ms": 126.926703,
+        "min_elapsed_ms": 105.804523
+      },
+      "candidate": {
+        "max_elapsed_ms": 130.673023,
+        "min_elapsed_ms": 106.065025
+      }
+    },
+    "cached-wide-numbers": {
+      "baseline": {
+        "max_elapsed_ms": 1451.378667,
+        "min_elapsed_ms": 1235.522249
+      },
+      "candidate": {
+        "max_elapsed_ms": 142.490978,
+        "min_elapsed_ms": 112.346925
+      }
+    },
+    "recognize-mixed": {
+      "baseline": {
+        "max_elapsed_ms": 300.657347,
+        "min_elapsed_ms": 108.955205
+      },
+      "candidate": {
+        "max_elapsed_ms": 151.127663,
+        "min_elapsed_ms": 104.168286
+      }
+    },
+    "recognize-numbered": {
+      "baseline": {
+        "max_elapsed_ms": 145.820036,
+        "min_elapsed_ms": 115.446361
+      },
+      "candidate": {
+        "max_elapsed_ms": 127.89424,
+        "min_elapsed_ms": 105.889709
+      }
+    },
+    "recognize-ranges": {
+      "baseline": {
+        "max_elapsed_ms": 153.628486,
+        "min_elapsed_ms": 116.423447
+      },
+      "candidate": {
+        "max_elapsed_ms": 131.135083,
+        "min_elapsed_ms": 103.71007
+      }
+    }
+  },
+  "input_directory": "/tmp/media-display-name-pr141-20261028/component",
+  "limitations": [
+    "Linux x86_64 / Swift 6.3.3 / Foundation implementation; native macOS results are not established by this run.",
+    "Synthetic warmed repeated in-memory label workloads include array handling and UTF-8 byte-count observation. They do not measure UI latency, startup, playback, power, or allocation counts.",
+    "Separate shared modules prevent cross-module fixture specialization; exact app-build inlining and optimization context can differ.",
+    "Unchanged controls fluctuate in both directions. Recognition-plus-label results are observations for these synthetic inputs and are not a whole-application speedup.",
+    "Ten pairs per case on one environment are not population-level confidence intervals. No observations were removed.",
+    "This audit uses only the new PR #141 source cohort and its raw receipts. Earlier candidate measurements are not pooled. The same frozen baseline and unchanged harness inputs can legitimately share hashes across cohorts."
+  ],
+  "linkage": {
+    "baseline": {
+      "displayBatch_calls_external_getter": true,
+      "displayBatch_calls_external_recognizer": true,
+      "displayBatch_disassembly_file": "baseline-displayBatch-disassembly.txt",
+      "displayBatch_disassembly_sha256": "bed53a558e64eb6f790fb7a1e68f55dc45478f795126a7c0ea51eab8eaec5070",
+      "executable_sha256": "53caf859e2ec83469f76002edc5a05deb32fd588104b9c943b35522b3a1a205c",
+      "getter_imports": [
+        "U $s12IlliquidCore19RecognizedMediaNameV07displayE0SSvg"
+      ],
+      "library_sha256": "e25b7bf2ea4f32df026bb067417840d7916dec4b4df979dd2ace1237318bcb86",
+      "recognizer_imports": [
+        "U $s12IlliquidCore20MediaNameRecognitionO9recognize12relativePathAA010RecognizedcD0VSS_tFZ"
+      ]
+    },
+    "candidate": {
+      "displayBatch_calls_external_getter": true,
+      "displayBatch_calls_external_recognizer": true,
+      "displayBatch_disassembly_file": "candidate-displayBatch-disassembly.txt",
+      "displayBatch_disassembly_sha256": "bed53a558e64eb6f790fb7a1e68f55dc45478f795126a7c0ea51eab8eaec5070",
+      "executable_sha256": "87dc9e1a31b041c7222ca59f51f9fad6fecf4510961c679e9b04e928e3dfe651",
+      "getter_imports": [
+        "U $s12IlliquidCore19RecognizedMediaNameV07displayE0SSvg"
+      ],
+      "library_sha256": "ec8f59e0fc26ea972b561adabfa6e7997936431b74a36dbe18fd4a2b228cd67d",
+      "recognizer_imports": [
+        "U $s12IlliquidCore20MediaNameRecognitionO9recognize12relativePathAA010RecognizedcD0VSS_tFZ"
+      ]
+    }
+  },
+  "measured_head": "c15703fcab7d7ccca3642eac626dad4923fb4fd9",
+  "metrics": [
+    {
+      "baseline_median_ns": 1958.038335867724,
+      "candidate_faster_pairs": 10,
+      "candidate_median_ns": 270.28530783222976,
+      "case": "cached-numbered",
+      "paired_reduction_percent": {
+        "max": 87.55321061453041,
+        "median": 86.48972400520789,
+        "min": 85.40557838190944,
+        "values": [
+          87.04194179678913,
+          86.80194922645768,
+          86.09640361174877,
+          86.66861373268834,
+          85.40557838190944,
+          87.23866597547912,
+          85.66859166967697,
+          86.31083427772744,
+          87.55321061453041,
+          85.91672563766753
+        ]
+      },
+      "process_cpu_paired_median_reduction_percent": 86.48765606145844
+    },
+    {
+      "baseline_median_ns": 3555.9839997576073,
+      "candidate_faster_pairs": 10,
+      "candidate_median_ns": 290.3552461683323,
+      "case": "cached-ranges",
+      "paired_reduction_percent": {
+        "max": 92.16418177812177,
+        "median": 91.93630859297559,
+        "min": 90.68356431673035,
+        "values": [
+          90.68356431673035,
+          91.98227241698963,
+          91.91391626597179,
+          92.10218653443954,
+          92.13747940397155,
+          92.16418177812177,
+          91.9587009199794,
+          91.90458056245215,
+          91.37472978259079,
+          91.34079717699103
+        ]
+      },
+      "process_cpu_paired_median_reduction_percent": 91.9321488123101
+    },
+    {
+      "baseline_median_ns": 1779.723867749743,
+      "candidate_faster_pairs": 10,
+      "candidate_median_ns": 158.06936739633312,
+      "case": "cached-wide-numbers",
+      "paired_reduction_percent": {
+        "max": 92.23413223835128,
+        "median": 91.04537757457055,
+        "min": 89.65513075881965,
+        "values": [
+          92.23413223835128,
+          91.34844422541869,
+          91.03970863228243,
+          91.43378303507636,
+          89.65513075881965,
+          90.62158820974398,
+          91.05104651685866,
+          91.16116909303884,
+          90.93709270799772,
+          90.41290951289052
+        ]
+      },
+      "process_cpu_paired_median_reduction_percent": 91.04489147468269
+    },
+    {
+      "baseline_median_ns": 1970.0312377021323,
+      "candidate_faster_pairs": 10,
+      "candidate_median_ns": 263.6848581944047,
+      "case": "cached-unicode-titles",
+      "paired_reduction_percent": {
+        "max": 87.95293412546582,
+        "median": 86.58246373364535,
+        "min": 81.33013689253814,
+        "values": [
+          85.58390872457221,
+          86.88961880845561,
+          87.95293412546582,
+          86.46398513205158,
+          85.93651472867127,
+          87.12738054360794,
+          86.27916204677251,
+          81.33013689253814,
+          86.7574945691858,
+          86.70094233523913
+        ]
+      },
+      "process_cpu_paired_median_reduction_percent": 86.58127979505772
+    },
+    {
+      "baseline_median_ns": 132.65046052153042,
+      "candidate_faster_pairs": 7,
+      "candidate_median_ns": 131.57473643893655,
+      "case": "cached-dated-control",
+      "paired_reduction_percent": {
+        "max": 25.984500895299433,
+        "median": 0.9179029381068016,
+        "min": -7.48325768361664,
+        "values": [
+          0.7577422509896348,
+          4.406775197600632,
+          1.657821541465887,
+          -2.2874410822699476,
+          -2.964675599055533,
+          -7.48325768361664,
+          25.984500895299433,
+          6.694523022436771,
+          1.0780636252239684,
+          0.312919671928813
+        ]
+      },
+      "process_cpu_paired_median_reduction_percent": 0.8989177605746024
+    },
+    {
+      "baseline_median_ns": 156.3864974649153,
+      "candidate_faster_pairs": 4,
+      "candidate_median_ns": 160.10619745314906,
+      "case": "cached-movie-control",
+      "paired_reduction_percent": {
+        "max": 3.4124438573447713,
+        "median": -1.6035415480895598,
+        "min": -25.167640056864826,
+        "values": [
+          -9.497948304879888,
+          -2.7351621309626317,
+          -23.5373585739451,
+          -0.47192096521648796,
+          1.0047403670398913,
+          3.4124438573447713,
+          -25.167640056864826,
+          2.0208394338138036,
+          2.7850568606557213,
+          -9.199453368043532
+        ]
+      },
+      "process_cpu_paired_median_reduction_percent": -1.5986373821376798
+    },
+    {
+      "baseline_median_ns": 111.8104221343035,
+      "candidate_faster_pairs": 2,
+      "candidate_median_ns": 114.46342592956374,
+      "case": "cached-unknown-control",
+      "paired_reduction_percent": {
+        "max": 9.712614216411186,
+        "median": -3.7441090553888112,
+        "min": -10.072315509774743,
+        "values": [
+          -4.843110544648455,
+          -5.282240410685435,
+          -0.2462106464012015,
+          -0.1894160812200507,
+          -4.518603113493924,
+          -4.366385035508258,
+          9.712614216411186,
+          -10.072315509774743,
+          1.8759848832551662,
+          -3.1218330752693646
+        ]
+      },
+      "process_cpu_paired_median_reduction_percent": -3.749489267936168
+    },
+    {
+      "baseline_median_ns": 3568.356935586735,
+      "candidate_faster_pairs": 6,
+      "candidate_median_ns": 3561.876992984694,
+      "case": "cached-unbounded-control",
+      "paired_reduction_percent": {
+        "max": 12.58626847750529,
+        "median": 0.6229923620813649,
+        "min": -6.001266718982445,
+        "values": [
+          -6.001266718982445,
+          9.600288741073204,
+          -2.51529279544096,
+          0.8289379556305154,
+          -5.991451016675864,
+          1.305699694480189,
+          4.955076899177147,
+          0.41704676853221434,
+          -3.3331580426447793,
+          12.58626847750529
+        ]
+      },
+      "process_cpu_paired_median_reduction_percent": 0.6198859703949566
+    },
+    {
+      "baseline_median_ns": 45239.890625,
+      "candidate_faster_pairs": 9,
+      "candidate_median_ns": 43519.787388392855,
+      "case": "recognize-numbered",
+      "paired_reduction_percent": {
+        "max": 12.999280357601272,
+        "median": 4.403050875571929,
+        "min": -0.5270994692131659,
+        "values": [
+          3.4654524145292576,
+          6.823082013936332,
+          8.278001937194023,
+          -0.5270994692131659,
+          3.40911039915347,
+          12.293095305503831,
+          2.279244391252333,
+          4.922403712652768,
+          12.999280357601272,
+          3.88369803849109
+        ]
+      },
+      "process_cpu_paired_median_reduction_percent": 4.405752315307898
+    },
+    {
+      "baseline_median_ns": 40275.1771875,
+      "candidate_faster_pairs": 10,
+      "candidate_median_ns": 35479.60171875,
+      "case": "recognize-ranges",
+      "paired_reduction_percent": {
+        "max": 30.057305257828293,
+        "median": 11.945868246095941,
+        "min": 2.4509787001900762,
+        "values": [
+          2.4509787001900762,
+          12.971790959227203,
+          10.91994553296468,
+          4.698370082207671,
+          30.057305257828293,
+          14.363108812975966,
+          13.14688361099422,
+          10.453032564857324,
+          13.188955594415564,
+          7.144614399470228
+        ]
+      },
+      "process_cpu_paired_median_reduction_percent": 11.945305270238183
+    },
+    {
+      "baseline_median_ns": 44671.94123641304,
+      "candidate_faster_pairs": 8,
+      "candidate_median_ns": 40487.37890625,
+      "case": "recognize-mixed",
+      "paired_reduction_percent": {
+        "max": 63.72521507016424,
+        "median": 6.999027107157829,
+        "min": -1.4977788324250563,
+        "values": [
+          12.495234726425563,
+          11.099143669940158,
+          -1.191411644813134,
+          63.72521507016424,
+          1.0920527717824813,
+          3.0342169247968065,
+          18.052797004281285,
+          -1.4977788324250563,
+          9.454201531840024,
+          4.543852682475635
+        ]
+      },
+      "process_cpu_paired_median_reduction_percent": 7.000599140153341
+    }
+  ],
+  "passed": true,
+  "primary_receipt_sha256": {
+    "build-receipts.json": "b00180e3e8c3b89baa2c286a0026f170777400c8272b1a8f12df7317efdd90de",
+    "calibration.jsonl": "99914950687f75961dccea57b4a0fa55afd45da6f5e0cebf02d1fa0dfa4cde37",
+    "commands.jsonl": "ab2f69354c0da0767fdc4fa1597dafbb0df6cfadc455be64286ceff163b45e2f",
+    "differential.json": "836b237c0077979e6d9d0425380fd7d8b9071834364084d04ee2b2e052daa6e3",
+    "manifest.json": "2bffabd666ccd15c08e768f8e0510d20b8fc2c8cc02640a03fe1945dcd73e80e",
+    "measurements.jsonl": "4c6338e4afda1340802b4a171c0ced0620c541de8f6d6b175fc62c819e6df630",
+    "source-receipts.json": "c85e4ad3abfaf5a190a2b537b6626053fd5081162d4695be8ccb850ee39aef3a",
+    "summary.json": "744cc1081c273a5f65258f6125b15d79b4d9d0c9de5e59fc3fc6e2665fb41608",
+    "tests.json": "f82af4da30cc2a08982d08c6ff408110770d4285acfd510a5bde9cfd55905e7d"
+  },
+  "source_commit_matches": {
+    "Corpus.swift": true,
+    "Driver.swift": true,
+    "candidate/MediaMetadataHints.swift": true,
+    "candidate/MediaNameRecognition.swift": true,
+    "run.py": true,
+    "tests/EpisodeDisplayNameTests.swift": true,
+    "tests/MediaDisplayNameTests.swift": true,
+    "tests/MediaNameRecognitionFastPathTests.swift": true,
+    "tests/MediaNameRecognitionPerformanceRegressionTests.swift": true,
+    "tests/MediaNameRecognitionTests.swift": true
+  },
+  "supportable_claim": "For the exact PR #141 source on this Linux toolchain, the four cached bounded-number episode-label workloads have 86.49\u201391.94% lower median paired elapsed time; the candidate is faster in all 10 pairs for every workload. Process CPU results agree. Native macOS and application-level benefits require separate evidence.",
+  "tests": [
+    {
+      "completed_test_counts": [
+        [
+          "47",
+          "5"
+        ]
+      ],
+      "configuration": "debug",
+      "log": "tests/baseline-debug.log",
+      "log_sha256": "18a7c792eb12964c1e3ecbe7f2ae4fecba885c53bd87a216c8198e9966d24b92",
+      "package_hashes_match": true,
+      "package_matches_staged_sources": true,
+      "variant": "baseline"
+    },
+    {
+      "completed_test_counts": [
+        [
+          "47",
+          "5"
+        ]
+      ],
+      "configuration": "release",
+      "log": "tests/baseline-release.log",
+      "log_sha256": "fbbea89c4d0395faa4841f9885cc0254c615021199edb07d571ae9c57ea9adfa",
+      "package_hashes_match": true,
+      "package_matches_staged_sources": true,
+      "variant": "baseline"
+    },
+    {
+      "completed_test_counts": [
+        [
+          "47",
+          "5"
+        ]
+      ],
+      "configuration": "debug",
+      "log": "tests/candidate-debug.log",
+      "log_sha256": "bf40fee25d7a8b93de4ec495bcaff64d70b3fe1bd23baeec8b1a0924c2684f4f",
+      "package_hashes_match": true,
+      "package_matches_staged_sources": true,
+      "variant": "candidate"
+    },
+    {
+      "completed_test_counts": [
+        [
+          "47",
+          "5"
+        ]
+      ],
+      "configuration": "release",
+      "log": "tests/candidate-release.log",
+      "log_sha256": "0a9010ea4a2f1f5879fb2b5bb97563bf9da076e528823354377a46deb41b108c",
+      "package_hashes_match": true,
+      "package_matches_staged_sources": true,
+      "variant": "candidate"
+    }
+  ]
+}

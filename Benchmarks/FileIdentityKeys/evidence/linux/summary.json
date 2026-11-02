@@ -1,0 +1,938 @@
+{
+  "baseline_revision": "ea2ff568237e2667f7b1aeee67b11a44ebe95b72",
+  "baseline_target_cpu_ms": 250.0,
+  "cases": {
+    "keys-aliases-256": {
+      "cpu": {
+        "baseline_median_ns_per_operation": 6723.701121363147,
+        "baseline_range_ns_per_operation": [
+          5431.984880118534,
+          12341.162345096982
+        ],
+        "candidate_faster_pairs": 12,
+        "candidate_median_ns_per_operation": 3023.4031687769398,
+        "candidate_range_ns_per_operation": [
+          2614.4225148168102,
+          4013.414904364224
+        ],
+        "median_change_bootstrap_95_percent": [
+          -57.5005337473012,
+          -47.726918760512646
+        ],
+        "median_paired_change_percent": -52.854641514512636,
+        "median_paired_delta_ns_per_operation": -3334.1834085398705,
+        "pair_count": 12,
+        "paired_change_percent_range": [
+          -76.82072603407528,
+          -41.363606091879866
+        ]
+      },
+      "operations_per_round": 256,
+      "rounds": 116,
+      "unit": "persistence key",
+      "wall": {
+        "baseline_median_ns_per_operation": 6799.876498518319,
+        "baseline_range_ns_per_operation": [
+          5432.632778825431,
+          12346.903151939656
+        ],
+        "candidate_faster_pairs": 12,
+        "candidate_median_ns_per_operation": 3059.2578125,
+        "candidate_range_ns_per_operation": [
+          2614.1506936961205,
+          4013.2583512931033
+        ],
+        "median_change_bootstrap_95_percent": [
+          -57.83077615780024,
+          -47.575635476284674
+        ],
+        "median_paired_change_percent": -53.00341250414695,
+        "median_paired_delta_ns_per_operation": -3328.547750538793,
+        "pair_count": 12,
+        "paired_change_percent_range": [
+          -76.83459710733648,
+          -42.57319904495061
+        ]
+      }
+    },
+    "keys-ascii-256": {
+      "cpu": {
+        "baseline_median_ns_per_operation": 5869.065621512276,
+        "baseline_range_ns_per_operation": [
+          5138.921282087053,
+          8834.42564174107
+        ],
+        "candidate_faster_pairs": 12,
+        "candidate_median_ns_per_operation": 2282.9918387276784,
+        "candidate_range_ns_per_operation": [
+          2045.8092215401787,
+          3550.789132254464
+        ],
+        "median_change_bootstrap_95_percent": [
+          -65.93011530142792,
+          -53.648471468448314
+        ],
+        "median_paired_change_percent": -60.9259011976902,
+        "median_paired_delta_ns_per_operation": -3472.4806605747767,
+        "pair_count": 12,
+        "paired_change_percent_range": [
+          -74.88318269311047,
+          -33.83511294158284
+        ]
+      },
+      "operations_per_round": 256,
+      "rounds": 112,
+      "unit": "persistence key",
+      "wall": {
+        "baseline_median_ns_per_operation": 5982.3212890625,
+        "baseline_range_ns_per_operation": [
+          5148.469029017857,
+          8834.272705078125
+        ],
+        "candidate_faster_pairs": 12,
+        "candidate_median_ns_per_operation": 2382.5467180524556,
+        "candidate_range_ns_per_operation": [
+          2045.572265625,
+          3560.644356863839
+        ],
+        "median_change_bootstrap_95_percent": [
+          -62.91418897750176,
+          -54.72697857091675
+        ],
+        "median_paired_change_percent": -59.955043687541476,
+        "median_paired_delta_ns_per_operation": -3488.4000069754466,
+        "pair_count": 12,
+        "paired_change_percent_range": [
+          -74.85649245671671,
+          -35.17295978720285
+        ]
+      }
+    },
+    "keys-late-unicode-256": {
+      "cpu": {
+        "baseline_median_ns_per_operation": 9960.212595813678,
+        "baseline_range_ns_per_operation": [
+          8799.019826061322,
+          16398.41174086085
+        ],
+        "candidate_faster_pairs": 4,
+        "candidate_median_ns_per_operation": 10411.193469929247,
+        "candidate_range_ns_per_operation": [
+          9275.193875294812,
+          16030.470002948114
+        ],
+        "median_change_bootstrap_95_percent": [
+          -7.715576397654667,
+          19.65733609351148
+        ],
+        "median_paired_change_percent": 4.677048859074784,
+        "median_paired_delta_ns_per_operation": 415.5123267983481,
+        "pair_count": 12,
+        "paired_change_percent_range": [
+          -33.46764585535892,
+          39.48452780039675
+        ]
+      },
+      "operations_per_round": 256,
+      "rounds": 106,
+      "unit": "persistence key",
+      "wall": {
+        "baseline_median_ns_per_operation": 9994.268812647406,
+        "baseline_range_ns_per_operation": [
+          8798.851083431604,
+          16410.67780807783
+        ],
+        "candidate_faster_pairs": 4,
+        "candidate_median_ns_per_operation": 10439.133586379718,
+        "candidate_range_ns_per_operation": [
+          9278.558556898584,
+          16030.695570459906
+        ],
+        "median_change_bootstrap_95_percent": [
+          -7.553539260262276,
+          19.21931903281573
+        ],
+        "median_paired_change_percent": 3.8608126218254935,
+        "median_paired_delta_ns_per_operation": 343.6696086379716,
+        "pair_count": 12,
+        "paired_change_percent_range": [
+          -31.450116294197905,
+          39.48896527916963
+        ]
+      }
+    },
+    "keys-long-ascii-256": {
+      "cpu": {
+        "baseline_median_ns_per_operation": 16433.20834263393,
+        "baseline_range_ns_per_operation": [
+          12844.138616071428,
+          23194.14603794643
+        ],
+        "candidate_faster_pairs": 12,
+        "candidate_median_ns_per_operation": 4538.9515625,
+        "candidate_range_ns_per_operation": [
+          4075.7210379464286,
+          8647.81947544643
+        ],
+        "median_change_bootstrap_95_percent": [
+          -73.91082550880135,
+          -65.58155243199187
+        ],
+        "median_paired_change_percent": -68.14160216616415,
+        "median_paired_delta_ns_per_operation": -9906.011467633927,
+        "pair_count": 12,
+        "paired_change_percent_range": [
+          -80.21003182960914,
+          -54.43603513240394
+        ]
+      },
+      "operations_per_round": 256,
+      "rounds": 70,
+      "unit": "persistence key",
+      "wall": {
+        "baseline_median_ns_per_operation": 16504.032087053572,
+        "baseline_range_ns_per_operation": [
+          12844.569977678571,
+          23193.95625
+        ],
+        "candidate_faster_pairs": 12,
+        "candidate_median_ns_per_operation": 4538.274972098214,
+        "candidate_range_ns_per_operation": [
+          4075.2229910714286,
+          8647.552678571428
+        ],
+        "median_change_bootstrap_95_percent": [
+          -74.00799089506404,
+          -65.66908313975385
+        ],
+        "median_paired_change_percent": -68.21433899441352,
+        "median_paired_delta_ns_per_operation": -9907.794559151786,
+        "pair_count": 12,
+        "paired_change_percent_range": [
+          -80.21043842201657,
+          -54.44240095344307
+        ]
+      }
+    },
+    "keys-mixed-256": {
+      "cpu": {
+        "baseline_median_ns_per_operation": 6918.158677455357,
+        "baseline_range_ns_per_operation": [
+          5992.199469866071,
+          10290.468805803572
+        ],
+        "candidate_faster_pairs": 12,
+        "candidate_median_ns_per_operation": 4572.370465959822,
+        "candidate_range_ns_per_operation": [
+          4118.581724330357,
+          7456.103236607143
+        ],
+        "median_change_bootstrap_95_percent": [
+          -36.34568366987742,
+          -27.449567020883002
+        ],
+        "median_paired_change_percent": -30.757274810227074,
+        "median_paired_delta_ns_per_operation": -1993.5964146205356,
+        "pair_count": 12,
+        "paired_change_percent_range": [
+          -50.736406298673685,
+          -5.497433726981537
+        ]
+      },
+      "operations_per_round": 256,
+      "rounds": 140,
+      "unit": "persistence key",
+      "wall": {
+        "baseline_median_ns_per_operation": 6917.9842494419645,
+        "baseline_range_ns_per_operation": [
+          6009.011997767857,
+          10324.770870535714
+        ],
+        "candidate_faster_pairs": 12,
+        "candidate_median_ns_per_operation": 4577.951492745536,
+        "candidate_range_ns_per_operation": [
+          4118.472935267857,
+          7776.530747767857
+        ],
+        "median_change_bootstrap_95_percent": [
+          -36.199904940654214,
+          -27.249208581275663
+        ],
+        "median_paired_change_percent": -30.62750816715949,
+        "median_paired_delta_ns_per_operation": -1981.062486049107,
+        "pair_count": 12,
+        "paired_change_percent_range": [
+          -50.615537168174015,
+          -1.4427236341969407
+        ]
+      }
+    },
+    "keys-rejected-256": {
+      "cpu": {
+        "baseline_median_ns_per_operation": 373.5911062081558,
+        "baseline_range_ns_per_operation": [
+          301.374229686549,
+          571.1060131999392
+        ],
+        "candidate_faster_pairs": 6,
+        "candidate_median_ns_per_operation": 391.37243585476267,
+        "candidate_range_ns_per_operation": [
+          300.8213847573037,
+          707.234491498022
+        ],
+        "median_change_bootstrap_95_percent": [
+          -17.041326166643955,
+          20.872918082112733
+        ],
+        "median_paired_change_percent": 0.9226274140348156,
+        "median_paired_delta_ns_per_operation": 3.414086275106513,
+        "pair_count": 12,
+        "paired_change_percent_range": [
+          -38.033513707498614,
+          44.925988407169285
+        ]
+      },
+      "operations_per_round": 256,
+      "rounds": 1643,
+      "unit": "persistence key",
+      "wall": {
+        "baseline_median_ns_per_operation": 380.9165672074711,
+        "baseline_range_ns_per_operation": [
+          304.96860497185025,
+          571.2981754983263
+        ],
+        "candidate_faster_pairs": 7,
+        "candidate_median_ns_per_operation": 391.9962518544583,
+        "candidate_range_ns_per_operation": [
+          300.811116288801,
+          707.8488259852404
+        ],
+        "median_change_bootstrap_95_percent": [
+          -16.91246546378471,
+          18.326559676528873
+        ],
+        "median_paired_change_percent": -4.237593265943196,
+        "median_paired_delta_ns_per_operation": -17.158664362066332,
+        "pair_count": 12,
+        "paired_change_percent_range": [
+          -38.03240931994194,
+          33.35051694994831
+        ]
+      }
+    },
+    "keys-tiny-ascii": {
+      "cpu": {
+        "baseline_median_ns_per_operation": 2925.502045915715,
+        "baseline_range_ns_per_operation": [
+          2454.2619107511196,
+          3964.4200667438076
+        ],
+        "candidate_faster_pairs": 12,
+        "candidate_median_ns_per_operation": 1375.6290268484513,
+        "candidate_range_ns_per_operation": [
+          1234.2546494273113,
+          2212.2313058643995
+        ],
+        "median_change_bootstrap_95_percent": [
+          -55.83119577061771,
+          -43.94773852272286
+        ],
+        "median_paired_change_percent": -49.76658885536267,
+        "median_paired_delta_ns_per_operation": -1434.8433532893964,
+        "pair_count": 12,
+        "paired_change_percent_range": [
+          -63.842921590456655,
+          -32.250459270439215
+        ]
+      },
+      "operations_per_round": 3,
+      "rounds": 19877,
+      "unit": "persistence key",
+      "wall": {
+        "baseline_median_ns_per_operation": 2933.9941808790727,
+        "baseline_range_ns_per_operation": [
+          2454.4928979893007,
+          3988.8447619526755
+        ],
+        "candidate_faster_pairs": 12,
+        "candidate_median_ns_per_operation": 1378.3284197816572,
+        "candidate_range_ns_per_operation": [
+          1234.1889621170196,
+          2557.261491506096
+        ],
+        "median_change_bootstrap_95_percent": [
+          -55.2260800373629,
+          -40.19459024629577
+        ],
+        "median_paired_change_percent": -49.68505757726347,
+        "median_paired_delta_ns_per_operation": -1429.9926296724857,
+        "pair_count": 12,
+        "paired_change_percent_range": [
+          -63.91209917243486,
+          -32.337183314535686
+        ]
+      }
+    },
+    "keys-unicode-256": {
+      "cpu": {
+        "baseline_median_ns_per_operation": 7335.136960872934,
+        "baseline_range_ns_per_operation": [
+          6353.655604338843,
+          10016.97611053719
+        ],
+        "candidate_faster_pairs": 5,
+        "candidate_median_ns_per_operation": 8006.116800103306,
+        "candidate_range_ns_per_operation": [
+          6142.951736828512,
+          10724.367413481405
+        ],
+        "median_change_bootstrap_95_percent": [
+          -12.741290195212828,
+          21.615114805711634
+        ],
+        "median_paired_change_percent": 9.92920798191168,
+        "median_paired_delta_ns_per_operation": 727.6350238894629,
+        "pair_count": 12,
+        "paired_change_percent_range": [
+          -31.468666791168854,
+          36.27363823923935
+        ]
+      },
+      "operations_per_round": 256,
+      "rounds": 121,
+      "unit": "persistence key",
+      "wall": {
+        "baseline_median_ns_per_operation": 7336.582999741735,
+        "baseline_range_ns_per_operation": [
+          6353.533283832645,
+          10076.472462551654
+        ],
+        "candidate_faster_pairs": 5,
+        "candidate_median_ns_per_operation": 8028.031750387397,
+        "candidate_range_ns_per_operation": [
+          6142.861505681818,
+          10878.750258264463
+        ],
+        "median_change_bootstrap_95_percent": [
+          -13.348239516663629,
+          21.71241344820991
+        ],
+        "median_paired_change_percent": 10.203784847797026,
+        "median_paired_delta_ns_per_operation": 748.0036641270663,
+        "pair_count": 12,
+        "paired_change_percent_range": [
+          -31.66128774980691,
+          36.260865032532095
+        ]
+      }
+    },
+    "playlist-empty": {
+      "cpu": {
+        "baseline_median_ns_per_operation": 14.984478876236683,
+        "baseline_range_ns_per_operation": [
+          13.540443023244222,
+          15.760349402305655
+        ],
+        "candidate_faster_pairs": 7,
+        "candidate_median_ns_per_operation": 14.372928895155038,
+        "candidate_range_ns_per_operation": [
+          13.219276471503496,
+          16.23053527677359
+        ],
+        "median_change_bootstrap_95_percent": [
+          -4.822798692962882,
+          3.9242634316201785
+        ],
+        "median_paired_change_percent": -3.2528620630121186,
+        "median_paired_delta_ns_per_operation": -0.49015478920444533,
+        "pair_count": 12,
+        "paired_change_percent_range": [
+          -7.428413305201564,
+          15.393873975204976
+        ]
+      },
+      "operations_per_round": 1,
+      "rounds": 18458264,
+      "unit": "playlist lookup",
+      "wall": {
+        "baseline_median_ns_per_operation": 15.0341298889213,
+        "baseline_range_ns_per_operation": [
+          13.540446761407248,
+          15.774453978987406
+        ],
+        "candidate_faster_pairs": 7,
+        "candidate_median_ns_per_operation": 14.520743012452309,
+        "candidate_range_ns_per_operation": [
+          13.225001170207555,
+          16.580427281785546
+        ],
+        "median_change_bootstrap_95_percent": [
+          -4.698118086215852,
+          4.719775634253742
+        ],
+        "median_paired_change_percent": -2.219335135242795,
+        "median_paired_delta_ns_per_operation": -0.3384338852234423,
+        "pair_count": 12,
+        "paired_change_percent_range": [
+          -5.756983768391066,
+          14.269906232749886
+        ]
+      }
+    },
+    "playlist-first-1000": {
+      "cpu": {
+        "baseline_median_ns_per_operation": 11905.74800744879,
+        "baseline_range_ns_per_operation": [
+          10067.737877094973,
+          19552.769087523277
+        ],
+        "candidate_faster_pairs": 12,
+        "candidate_median_ns_per_operation": 4689.211918063314,
+        "candidate_range_ns_per_operation": [
+          3962.924394785847,
+          7824.345027932961
+        ],
+        "median_change_bootstrap_95_percent": [
+          -64.45246363527733,
+          -57.46765315467989
+        ],
+        "median_paired_change_percent": -59.57118765520537,
+        "median_paired_delta_ns_per_operation": -6848.371322160149,
+        "pair_count": 12,
+        "paired_change_percent_range": [
+          -77.32513551700232,
+          -46.190462908138564
+        ]
+      },
+      "operations_per_round": 1,
+      "rounds": 13425,
+      "unit": "playlist lookup",
+      "wall": {
+        "baseline_median_ns_per_operation": 11914.779217877094,
+        "baseline_range_ns_per_operation": [
+          10072.248193668529,
+          19555.510689013034
+        ],
+        "candidate_faster_pairs": 12,
+        "candidate_median_ns_per_operation": 4704.82137802607,
+        "candidate_range_ns_per_operation": [
+          3962.507337057728,
+          7842.875754189944
+        ],
+        "median_change_bootstrap_95_percent": [
+          -64.79171695953588,
+          -57.81093929798858
+        ],
+        "median_paired_change_percent": -59.21083095819819,
+        "median_paired_delta_ns_per_operation": -6844.374338919924,
+        "pair_count": 12,
+        "paired_change_percent_range": [
+          -77.34385452392618,
+          -46.194209588587206
+        ]
+      }
+    },
+    "playlist-last-1000": {
+      "cpu": {
+        "baseline_median_ns_per_operation": 5799559.968085106,
+        "baseline_range_ns_per_operation": [
+          5261342.70212766,
+          8228964.957446809
+        ],
+        "candidate_faster_pairs": 12,
+        "candidate_median_ns_per_operation": 2323160.627659574,
+        "candidate_range_ns_per_operation": [
+          2111301.276595745,
+          3647648.234042553
+        ],
+        "median_change_bootstrap_95_percent": [
+          -62.20554428302668,
+          -55.60776452782552
+        ],
+        "median_paired_change_percent": -60.079786413000555,
+        "median_paired_delta_ns_per_operation": -3453385.3829787234,
+        "pair_count": 12,
+        "paired_change_percent_range": [
+          -64.20110869300588,
+          -47.471625673551955
+        ]
+      },
+      "operations_per_round": 1,
+      "rounds": 47,
+      "unit": "playlist lookup",
+      "wall": {
+        "baseline_median_ns_per_operation": 5809636.691489361,
+        "baseline_range_ns_per_operation": [
+          5261877.723404256,
+          8232061.70212766
+        ],
+        "candidate_faster_pairs": 12,
+        "candidate_median_ns_per_operation": 2324534.8829787234,
+        "candidate_range_ns_per_operation": [
+          2111100.659574468,
+          3654576.6170212766
+        ],
+        "median_change_bootstrap_95_percent": [
+          -62.203674685905085,
+          -55.58304226016656
+        ],
+        "median_paired_change_percent": -60.11224142128215,
+        "median_paired_delta_ns_per_operation": -3467635.8191489363,
+        "pair_count": 12,
+        "paired_change_percent_range": [
+          -64.28129472150962,
+          -47.373314077693784
+        ]
+      }
+    },
+    "playlist-middle-1000": {
+      "cpu": {
+        "baseline_median_ns_per_operation": 3040622.546875,
+        "baseline_range_ns_per_operation": [
+          2628984.6666666665,
+          4127126.6770833335
+        ],
+        "candidate_faster_pairs": 12,
+        "candidate_median_ns_per_operation": 1288733.4375,
+        "candidate_range_ns_per_operation": [
+          1008302.6666666666,
+          1568338.0833333333
+        ],
+        "median_change_bootstrap_95_percent": [
+          -66.71391733181504,
+          -53.5517906782828
+        ],
+        "median_paired_change_percent": -60.09067056886297,
+        "median_paired_delta_ns_per_operation": -1814869.8125,
+        "pair_count": 12,
+        "paired_change_percent_range": [
+          -70.57964557579159,
+          -42.75288620149688
+        ]
+      },
+      "operations_per_round": 1,
+      "rounds": 96,
+      "unit": "playlist lookup",
+      "wall": {
+        "baseline_median_ns_per_operation": 3042773.5260416665,
+        "baseline_range_ns_per_operation": [
+          2628993.8541666665,
+          4143688.1354166665
+        ],
+        "candidate_faster_pairs": 12,
+        "candidate_median_ns_per_operation": 1289127.5833333335,
+        "candidate_range_ns_per_operation": [
+          1008089.0104166666,
+          1568243.4583333333
+        ],
+        "median_change_bootstrap_95_percent": [
+          -66.78619388437768,
+          -53.57115646369059
+        ],
+        "median_paired_change_percent": -60.18376016007441,
+        "median_paired_delta_ns_per_operation": -1815996.802083333,
+        "pair_count": 12,
+        "paired_change_percent_range": [
+          -70.58195619353604,
+          -43.42684556932939
+        ]
+      }
+    },
+    "playlist-miss-1000": {
+      "cpu": {
+        "baseline_median_ns_per_operation": 6459549.673913044,
+        "baseline_range_ns_per_operation": [
+          5232550.239130435,
+          8245325.347826087
+        ],
+        "candidate_faster_pairs": 12,
+        "candidate_median_ns_per_operation": 2624413.6630434785,
+        "candidate_range_ns_per_operation": [
+          1979780.5869565217,
+          3366745.1739130435
+        ],
+        "median_change_bootstrap_95_percent": [
+          -67.78360296313646,
+          -53.28986647567041
+        ],
+        "median_paired_change_percent": -61.87569916288543,
+        "median_paired_delta_ns_per_operation": -4299945.630434783,
+        "pair_count": 12,
+        "paired_change_percent_range": [
+          -72.39053295680418,
+          -43.61433892379463
+        ]
+      },
+      "operations_per_round": 1,
+      "rounds": 46,
+      "unit": "playlist lookup",
+      "wall": {
+        "baseline_median_ns_per_operation": 6469929.173913043,
+        "baseline_range_ns_per_operation": [
+          5244616.630434782,
+          8266349.130434782
+        ],
+        "candidate_faster_pairs": 12,
+        "candidate_median_ns_per_operation": 2624224.282608696,
+        "candidate_range_ns_per_operation": [
+          1982421.7173913044,
+          3366548.3913043477
+        ],
+        "median_change_bootstrap_95_percent": [
+          -67.6376325451429,
+          -52.75934730748724
+        ],
+        "median_paired_change_percent": -61.926588689384054,
+        "median_paired_delta_ns_per_operation": -4306831.923913043,
+        "pair_count": 12,
+        "paired_change_percent_range": [
+          -72.39362576107527,
+          -43.747431035546526
+        ]
+      }
+    },
+    "playlist-rejected-query-256": {
+      "cpu": {
+        "baseline_median_ns_per_operation": 7758.964083133422,
+        "baseline_range_ns_per_operation": [
+          5969.47481111136,
+          10212.77133825079
+        ],
+        "candidate_faster_pairs": 12,
+        "candidate_median_ns_per_operation": 3305.412842185503,
+        "candidate_range_ns_per_operation": [
+          2530.8313790552206,
+          4214.047037194808
+        ],
+        "median_change_bootstrap_95_percent": [
+          -61.54880682765891,
+          -52.433540416378634
+        ],
+        "median_paired_change_percent": -55.34222929426556,
+        "median_paired_delta_ns_per_operation": -4511.144306436788,
+        "pair_count": 12,
+        "paired_change_percent_range": [
+          -70.05766307991057,
+          -45.82825628436794
+        ]
+      },
+      "operations_per_round": 1,
+      "rounds": 44603,
+      "unit": "playlist lookup",
+      "wall": {
+        "baseline_median_ns_per_operation": 7796.5625518462875,
+        "baseline_range_ns_per_operation": [
+          5969.356321323678,
+          10213.185548057305
+        ],
+        "candidate_faster_pairs": 12,
+        "candidate_median_ns_per_operation": 3319.289969284577,
+        "candidate_range_ns_per_operation": [
+          2545.3042844651704,
+          4277.584198372307
+        ],
+        "median_change_bootstrap_95_percent": [
+          -61.34254303249856,
+          -52.166548583614215
+        ],
+        "median_paired_change_percent": -55.3410806454536,
+        "median_paired_delta_ns_per_operation": -4547.158240477098,
+        "pair_count": 12,
+        "paired_change_percent_range": [
+          -69.79194534541374,
+          -45.84916693847646
+        ]
+      }
+    },
+    "playlist-single-hit": {
+      "cpu": {
+        "baseline_median_ns_per_operation": 13863.233092626024,
+        "baseline_range_ns_per_operation": [
+          10435.969379252881,
+          17656.505138175253
+        ],
+        "candidate_faster_pairs": 12,
+        "candidate_median_ns_per_operation": 4578.445701985835,
+        "candidate_range_ns_per_operation": [
+          4018.7927371198443,
+          6834.555617275379
+        ],
+        "median_change_bootstrap_95_percent": [
+          -66.39226139912799,
+          -58.767371850354856
+        ],
+        "median_paired_change_percent": -63.274449734340045,
+        "median_paired_delta_ns_per_operation": -8274.047146229692,
+        "pair_count": 12,
+        "paired_change_percent_range": [
+          -74.00117550307372,
+          -52.92594103443378
+        ]
+      },
+      "operations_per_round": 1,
+      "rounds": 14402,
+      "unit": "playlist lookup",
+      "wall": {
+        "baseline_median_ns_per_operation": 13868.549055686712,
+        "baseline_range_ns_per_operation": [
+          10435.851340091654,
+          17656.394111928897
+        ],
+        "candidate_faster_pairs": 12,
+        "candidate_median_ns_per_operation": 4579.557561449799,
+        "candidate_range_ns_per_operation": [
+          4018.290584641022,
+          6835.490209693098
+        ],
+        "median_change_bootstrap_95_percent": [
+          -66.41966347673646,
+          -57.948644227112354
+        ],
+        "median_paired_change_percent": -64.19458241957,
+        "median_paired_delta_ns_per_operation": -8428.15195806138,
+        "pair_count": 12,
+        "paired_change_percent_range": [
+          -74.66158862043567,
+          -52.77537919555857
+        ]
+      }
+    },
+    "playlist-small-last": {
+      "cpu": {
+        "baseline_median_ns_per_operation": 63223.52498756837,
+        "baseline_range_ns_per_operation": [
+          54405.92764793635,
+          75996.12655395326
+        ],
+        "candidate_faster_pairs": 12,
+        "candidate_median_ns_per_operation": 21791.724142217805,
+        "candidate_range_ns_per_operation": [
+          18317.94132272501,
+          34175.94977623073
+        ],
+        "median_change_bootstrap_95_percent": [
+          -68.19788609929907,
+          -56.43355182358868
+        ],
+        "median_paired_change_percent": -67.26323307100114,
+        "median_paired_delta_ns_per_operation": -40980.88040775733,
+        "pair_count": 12,
+        "paired_change_percent_range": [
+          -70.07208315281432,
+          -46.7365641666624
+        ]
+      },
+      "operations_per_round": 1,
+      "rounds": 4022,
+      "unit": "playlist lookup",
+      "wall": {
+        "baseline_median_ns_per_operation": 63254.57918945798,
+        "baseline_range_ns_per_operation": [
+          54406.99378418697,
+          76014.13823968175
+        ],
+        "candidate_faster_pairs": 12,
+        "candidate_median_ns_per_operation": 21790.376429637,
+        "candidate_range_ns_per_operation": [
+          18316.684733963204,
+          34196.40129288911
+        ],
+        "median_change_bootstrap_95_percent": [
+          -68.20379790254091,
+          -56.31714201640096
+        ],
+        "median_paired_change_percent": -67.29947726197342,
+        "median_paired_delta_ns_per_operation": -40982.58242168075,
+        "pair_count": 12,
+        "paired_change_percent_range": [
+          -70.07373856401924,
+          -46.70785688877769
+        ]
+      }
+    },
+    "playlist-unicode-last-256": {
+      "cpu": {
+        "baseline_median_ns_per_operation": 1804012.2875816994,
+        "baseline_range_ns_per_operation": [
+          1587344.6535947712,
+          2318433.320261438
+        ],
+        "candidate_faster_pairs": 4,
+        "candidate_median_ns_per_operation": 1854584.7189542484,
+        "candidate_range_ns_per_operation": [
+          1582607.8235294118,
+          2555192.248366013
+        ],
+        "median_change_bootstrap_95_percent": [
+          -9.404126726382234,
+          11.230297475117457
+        ],
+        "median_paired_change_percent": 4.739904056547939,
+        "median_paired_delta_ns_per_operation": 82592.9705882353,
+        "pair_count": 12,
+        "paired_change_percent_range": [
+          -17.467722192543555,
+          49.688729151209785
+        ]
+      },
+      "operations_per_round": 1,
+      "rounds": 153,
+      "unit": "playlist lookup",
+      "wall": {
+        "baseline_median_ns_per_operation": 1811322.7647058824,
+        "baseline_range_ns_per_operation": [
+          1587302.0915032679,
+          2329677.45751634
+        ],
+        "candidate_faster_pairs": 4,
+        "candidate_median_ns_per_operation": 1855596.545751634,
+        "candidate_range_ns_per_operation": [
+          1582607.549019608,
+          2557279.790849673
+        ],
+        "median_change_bootstrap_95_percent": [
+          -9.203646871071157,
+          11.07060283269532
+        ],
+        "median_paired_change_percent": 4.020758638725197,
+        "median_paired_delta_ns_per_operation": 72242.32352941169,
+        "pair_count": 12,
+        "paired_change_percent_range": [
+          -21.625698486989297,
+          49.69309127395927
+        ]
+      }
+    }
+  },
+  "complete": true,
+  "differential": {
+    "cases": 75220,
+    "examples": [],
+    "mismatches": 0,
+    "nativeReferenceCases": 0,
+    "rejected": 43909
+  },
+  "pairs": 12,
+  "schema_version": 1,
+  "screening": {
+    "median_cpu_improvements_over_threshold": [
+      "keys-tiny-ascii",
+      "keys-ascii-256",
+      "keys-long-ascii-256",
+      "keys-aliases-256",
+      "keys-mixed-256",
+      "playlist-single-hit",
+      "playlist-small-last",
+      "playlist-first-1000",
+      "playlist-middle-1000",
+      "playlist-last-1000",
+      "playlist-miss-1000",
+      "playlist-rejected-query-256"
+    ],
+    "median_cpu_regressions_over_threshold": [
+      "keys-unicode-256"
+    ],
+    "note": "Descriptive screening only; review absolute costs, paired distributions, native correctness, and workload relevance before claiming success.",
+    "threshold_percent": 5
+  }
+}

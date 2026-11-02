@@ -47,7 +47,9 @@ def main():
   data=(HERE/'fixtures'/name).read_bytes()
   actual=hashlib.sha1(f'blob {len(data)}\0'.encode()+data).hexdigest()
   if actual!=sha: raise RuntimeError(f'Baseline source mismatch: {name}')
- manifest={'platform':platform.platform(),'compiler':run(['swiftc','--version']),'flags':FLAGS,'phase':a.phase,'allocations':a.allocations,'baseline_git_blobs':EXPECTED,'source_sha256':{str(x.relative_to(ROOT)):hashlib.sha256(x.read_bytes()).hexdigest() for x in [*HERE.glob('*.swift'),*HERE.glob('fixtures/*.swift'),ROOT/'Sources/IlliquidCore/Persistence/PlaybackPersistenceStore.swift',ROOT/'Sources/IlliquidCore/Persistence/CoalescingPersistenceWriter.swift',ROOT/'Sources/IlliquidCore/Utilities/NonDecodePerformance.swift']}}
+ preferences=ROOT/'Sources/IlliquidCore/Persistence/PlaybackPreferences.swift'
+ manifest={'platform':platform.platform(),'compiler':run(['swiftc','--version']),'flags':FLAGS,'phase':a.phase,'allocations':a.allocations,'baseline_git_blobs':{name:blob for name,blob in EXPECTED.items() if name!='PlaybackPreferences.swift'},'verified_uncompiled_fixture_git_blobs':{'PlaybackPreferences.swift':EXPECTED['PlaybackPreferences.swift']},'source_sha256':{str(x.relative_to(ROOT)):hashlib.sha256(x.read_bytes()).hexdigest() for x in [*HERE.glob('*.swift'),*HERE.glob('fixtures/*.swift'),ROOT/'Sources/IlliquidCore/Persistence/PlaybackPersistenceStore.swift',ROOT/'Sources/IlliquidCore/Persistence/CoalescingPersistenceWriter.swift',ROOT/'Sources/IlliquidCore/Utilities/NonDecodePerformance.swift',preferences]},'compiled_source_paths':{}}
+ if a.phase=='store':manifest['shared_current_preferences']={'path':str(preferences.relative_to(ROOT)),'origin':'current_worktree','sha256':hashlib.sha256(preferences.read_bytes()).hexdigest()}
  (a.output/'manifest.json').write_text(json.dumps(manifest,indent=2))
  alloc=[]
  if a.allocations:
@@ -57,10 +59,14 @@ def main():
   source=HERE/'fixtures' if variant=='baseline' else ROOT/'Sources/IlliquidCore/Persistence'
   inputs=[source/'CoalescingPersistenceWriter.swift']
   if a.phase=='store':
-   inputs += [source/'PlaybackPersistenceStore.swift',ROOT/'Sources/IlliquidCore/Utilities/NonDecodePerformance.swift']
-   inputs += [x for x in sorted((HERE/'fixtures').glob('*.swift')) if x.name not in ['CoalescingPersistenceWriter.swift','PlaybackPersistenceStore.swift','PreviewCacheV1.swift','NativeThumbnailDiskCache.swift']]
+   # Use the same current preference validators in both store variants. The
+   # frozen fixture remains verified above, but is not a compiled input.
+   inputs += [source/'PlaybackPersistenceStore.swift',preferences,ROOT/'Sources/IlliquidCore/Utilities/NonDecodePerformance.swift']
+   inputs += [x for x in sorted((HERE/'fixtures').glob('*.swift')) if x.name not in ['CoalescingPersistenceWriter.swift','PlaybackPersistenceStore.swift','PlaybackPreferences.swift','PreviewCacheV1.swift','NativeThumbnailDiskCache.swift']]
   inputs += [HERE/('WriterHarness.swift' if a.phase=='writer' else 'StoreHarness.swift')]
   defines=['-D','CANDIDATE'] if variant=='candidate' else []
+  manifest['compiled_source_paths'][variant]=[str(path.relative_to(ROOT)) for path in inputs]
+  (a.output/'manifest.json').write_text(json.dumps(manifest,indent=2))
   run(['swiftc',*FLAGS,*defines,*alloc,*inputs,'-o',build/variant])
  manifest['binary_sha256']={v:hashlib.sha256((build/v).read_bytes()).hexdigest() for v in ['baseline','candidate']}
  (a.output/'manifest.json').write_text(json.dumps(manifest,indent=2))

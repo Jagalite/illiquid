@@ -1,0 +1,106 @@
+name: Source visibility ancestor performance
+
+on:
+  push:
+    branches: ['perf/recursive-visibility-ancestor-cache-20261028-a611']
+    paths:
+      - Sources/IlliquidApp/UI/SourcesSidebar.swift
+      - Sources/IlliquidApp/UI/SourceBrowserFilter.swift
+      - Tests/IlliquidAppTests/SourceAncestorVisibilityTests.swift
+      - Benchmarks/SourceVisibilityAncestors/**
+      - .github/workflows/source-visibility-ancestors.yml
+      - '!Benchmarks/SourceVisibilityAncestors/README.md'
+      - '!Benchmarks/SourceVisibilityAncestors/evidence/**'
+  pull_request:
+    paths:
+      - Sources/IlliquidApp/UI/SourcesSidebar.swift
+      - Sources/IlliquidApp/UI/SourceBrowserFilter.swift
+      - Tests/IlliquidAppTests/SourceAncestorVisibilityTests.swift
+      - Benchmarks/SourceVisibilityAncestors/**
+      - .github/workflows/source-visibility-ancestors.yml
+      - '!Benchmarks/SourceVisibilityAncestors/README.md'
+      - '!Benchmarks/SourceVisibilityAncestors/evidence/**'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: source-visibility-ancestors-${{ github.head_ref || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  portable-components:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Verify available Swift
+        run: |
+          swift --version
+          python3 - <<'PY'
+          import re, subprocess
+          version = subprocess.check_output(["swift", "--version"], text=True)
+          match = re.search(r"Swift version (\d+)\.(\d+)(?:\.(\d+))?", version)
+          if not match or tuple(int(x or 0) for x in match.groups()) < (6, 3, 2):
+              raise SystemExit("Swift 6.3.2 or later is required")
+          PY
+      - name: Execute regressions and projection qualification
+        run: |
+          echo "Kyoto is unavailable on this ephemeral runner; compiling serially in this isolated checkout."
+          mode=()
+          if [[ "$GITHUB_EVENT_NAME" != "workflow_dispatch" ]]; then mode=(--current-source-correctness); fi
+          python3 Benchmarks/SourceVisibilityAncestors/run.py "${mode[@]}" \
+            --pairs 6 --target-ms 120 --jobs 2 \
+            --output "$RUNNER_TEMP/visibility-ancestors"
+      - name: Emit complete numerical receipts
+        if: always()
+        run: |
+          python3 - <<'PY'
+          import json, os
+          from pathlib import Path
+          root = Path(os.environ["RUNNER_TEMP"]) / "visibility-ancestors"
+          for name in ["environment.json", "tests.json", "summary.json", "completion.json"]:
+              path = root / name
+              if path.is_file():
+                  print("ANCESTOR_EVIDENCE " + json.dumps({"file": name, "data": json.loads(path.read_text())}, sort_keys=True))
+          path = root / "measurements.jsonl"
+          if path.is_file():
+              for line in path.read_text().splitlines():
+                  print("ANCESTOR_MEASUREMENT " + line)
+          PY
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: visibility-ancestors-linux
+          path: ${{ runner.temp }}/visibility-ancestors/evidence/
+          retention-days: 14
+
+  native-components:
+    if: github.event_name != 'push'
+    runs-on: macos-26
+    timeout-minutes: 25
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Execute native regressions and projection qualification
+        run: |
+          echo "Kyoto is unavailable on this ephemeral runner; compiling serially in this isolated checkout."
+          mode=()
+          if [[ "$GITHUB_EVENT_NAME" != "workflow_dispatch" ]]; then mode=(--current-source-correctness); fi
+          python3 Benchmarks/SourceVisibilityAncestors/run.py "${mode[@]}" \
+            --pairs 6 --target-ms 120 --jobs 2 \
+            --output "$RUNNER_TEMP/visibility-ancestors-native"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: visibility-ancestors-macos
+          path: ${{ runner.temp }}/visibility-ancestors-native/evidence/
+          retention-days: 14

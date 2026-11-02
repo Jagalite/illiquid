@@ -1,0 +1,44 @@
+{
+  "schema": 1,
+  "kind": "trace-reconstruction",
+  "source": {
+    "path": "../ancestor-exploration-linux/state-traces.json.gz",
+    "sha256": "f3dc869596b67f82e5a04b8ac3bdc1eda3775517f0705ce25342f37eb1300673"
+  },
+  "keyInventory": {
+    "path": "validation.json",
+    "sha256": "a73366e5b1a2668d6b8e98fb932f955437de0d6b2e95b926d00a1f9a3fce121a",
+    "jsonPointer": "/baseline-debug/traces",
+    "selection": "Object keys; all four build receipts have the same key set",
+    "count": 28
+  },
+  "caseNameMapping": {
+    "active-burst-1000-16": "queued-burst-1000-16"
+  },
+  "derivation": [
+    "Split each original inventory key once at / into ownership and original case name.",
+    "Map the original case name to its source case name using caseNameMapping, leaving every other name unchanged.",
+    "Select the complete source trace at ownership/source-case-name.",
+    "Copy the trace object, restore its case field to the original case name, and store it under the original inventory key.",
+    "Serialize the resulting object as UTF-8 JSON with sort_keys=true, ensure_ascii=true, and separators=[comma,colon].",
+    "Verify the canonical JSON byte count and SHA256; these identify the reconstructed trace independently of gzip encoding."
+  ],
+  "original": {
+    "filename": "state-traces.json.gz",
+    "sha256": "e294fe7ee2f3e67e69b8d750bf20db3c725684595085ee9792d5dacd8c924fa4",
+    "bytes": 1652624,
+    "canonicalJSONSHA256": "12198e0fbacead8d7d1457ec91b3e889f16774a7e4afd3fd380af2af061d4242",
+    "canonicalJSONBytes": 29114407,
+    "gzipHeaderHex": "1f8b0800000000000203"
+  },
+  "verification": {
+    "pythonVersion": "3.12.14",
+    "zlibVersion": "1.3.2",
+    "compression": "gzip.compress(canonical_bytes, compresslevel=9, mtime=0)",
+    "unchangedTraceCount": 26,
+    "renamedTraceCount": 2,
+    "canonicalBytesMatchedOriginal": true,
+    "compressedBytesMatchedOriginal": true,
+    "encodingScope": "The compressed-byte match was verified with the recorded Python/zlib encoding. Other gzip encodings may differ; the canonical JSON hash is the portable verification gate."
+  }
+}

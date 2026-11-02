@@ -127,6 +127,9 @@ struct PacketQueueWakeupTests {
         weak var retained = value
         #expect(queue.push(value!)); value = nil
         #expect(retained != nil); queue.removeAll(); #expect(retained == nil)
-        queue.close()
+        value = Payload()
+        retained = value
+        #expect(queue.push(value!)); value = nil
+        #expect(retained != nil); queue.close(); #expect(retained == nil)
     }
 }

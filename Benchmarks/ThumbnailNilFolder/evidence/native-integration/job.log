@@ -1,0 +1,491 @@
+﻿2026-10-28T04:44:18.4253950Z Current runner version: '2.338.0'
+2026-10-28T04:44:18.4269060Z ##[group]Runner Image Provisioner
+2026-10-28T04:44:18.4269540Z Hosted Compute Agent
+2026-10-28T04:44:18.4270050Z Version: 20261021.618
+2026-10-28T04:44:18.4270430Z Commit: 21505ad2541d5be6135ed84fc33697146cf75b8e
+2026-10-28T04:44:18.4270880Z Build Date: 2026-10-21T00:45:21Z
+2026-10-28T04:44:18.4271310Z Worker ID: {94e8781e-bf17-4adc-86fa-e8ef1da234fa}
+2026-10-28T04:44:18.4271750Z Region: westus
+2026-10-28T04:44:18.4272080Z Cloud: MacCloud
+2026-10-28T04:44:18.4272420Z ##[endgroup]
+2026-10-28T04:44:18.4273220Z ##[group]Operating System
+2026-10-28T04:44:18.4273590Z macOS
+2026-10-28T04:44:18.4273900Z 26.6.2
+2026-10-28T04:44:18.4274210Z 25G83
+2026-10-28T04:44:18.4274530Z ##[endgroup]
+2026-10-28T04:44:18.4274860Z ##[group]Runner Image
+2026-10-28T04:44:18.4275230Z Image: macos-26-arm64
+2026-10-28T04:44:18.4275760Z Version: 20261021.0445.8
+2026-10-28T04:44:18.4276600Z Included Software: https://github.com/actions/runner-images/blob/macos-26-arm64/20261021.0445/images/macos/macos-26-arm64-Readme.md
+2026-10-28T04:44:18.4277630Z Image Release: https://github.com/actions/runner-images/releases/tag/macos-26-arm64%2F20261021.0445
+2026-10-28T04:44:18.4278300Z ##[endgroup]
+2026-10-28T04:44:18.4279020Z ##[group]GITHUB_TOKEN Permissions
+2026-10-28T04:44:18.4279970Z Contents: read
+2026-10-28T04:44:18.4280330Z Metadata: read
+2026-10-28T04:44:18.4280670Z ##[endgroup]
+2026-10-28T04:44:18.4281900Z Secret source: Actions
+2026-10-28T04:44:18.4282430Z Cache mode: write
+2026-10-28T04:44:18.4282850Z Prepare workflow directory
+2026-10-28T04:44:18.4594720Z Prepare all required actions
+2026-10-28T04:44:18.4636500Z Getting action download info
+2026-10-28T04:44:18.6002900Z Download action repository 'actions/checkout@11d5960a326750d5838078e36cf38b85af677262' (SHA:11d5960a326750d5838078e36cf38b85af677262)
+2026-10-28T04:44:18.8164550Z Download action repository 'actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02' (SHA:ea165f8d65b6e75b540449e92b4886f43607fa02)
+2026-10-28T04:44:18.9851530Z Complete job name: native-integration
+2026-10-28T04:44:19.0276130Z ##[group]Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+2026-10-28T04:44:19.0276730Z with:
+2026-10-28T04:44:19.0277040Z   persist-credentials: false
+2026-10-28T04:44:19.0277400Z   repository: Jagalite/illiquid
+2026-10-28T04:44:19.0279970Z   token: ***
+2026-10-28T04:44:19.0280260Z   ssh-strict: true
+2026-10-28T04:44:19.0280560Z   ssh-user: git
+2026-10-28T04:44:19.0280860Z   clean: true
+2026-10-28T04:44:19.0281160Z   sparse-checkout-cone-mode: true
+2026-10-28T04:44:19.0281520Z   fetch-depth: 1
+2026-10-28T04:44:19.0281820Z   fetch-tags: false
+2026-10-28T04:44:19.0282140Z   show-progress: true
+2026-10-28T04:44:19.0282450Z   lfs: false
+2026-10-28T04:44:19.0282740Z   submodules: false
+2026-10-28T04:44:19.0283060Z   set-safe-directory: true
+2026-10-28T04:44:19.0283420Z   allow-unsafe-pr-checkout: false
+2026-10-28T04:44:19.0284490Z env:
+2026-10-28T04:44:19.0284990Z   DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+2026-10-28T04:44:19.0285470Z ##[endgroup]
+2026-10-28T04:44:19.3940900Z Syncing repository: Jagalite/illiquid
+2026-10-28T04:44:19.3942960Z ##[group]Getting Git version info
+2026-10-28T04:44:19.3943810Z Working directory is '/Users/runner/work/illiquid/illiquid'
+2026-10-28T04:44:19.3944980Z [command]/opt/homebrew/bin/git version
+2026-10-28T04:44:19.4187520Z git version 2.56.0
+2026-10-28T04:44:19.4202470Z ##[endgroup]
+2026-10-28T04:44:19.4208250Z Copying '/Users/runner/.gitconfig' to '/Users/runner/work/_temp/0fb1ed1d-707b-4363-a07b-84329d95fa1a/.gitconfig'
+2026-10-28T04:44:19.4214380Z Temporarily overriding HOME='/Users/runner/work/_temp/0fb1ed1d-707b-4363-a07b-84329d95fa1a' before making global git config changes
+2026-10-28T04:44:19.4215570Z Adding repository directory to the temporary git global config as a safe directory
+2026-10-28T04:44:19.4218090Z [command]/opt/homebrew/bin/git config --global --add safe.directory /Users/runner/work/illiquid/illiquid
+2026-10-28T04:44:19.4327410Z Deleting the contents of '/Users/runner/work/illiquid/illiquid'
+2026-10-28T04:44:19.4329100Z ##[group]Initializing the repository
+2026-10-28T04:44:19.4333080Z [command]/opt/homebrew/bin/git init /Users/runner/work/illiquid/illiquid
+2026-10-28T04:44:19.4602350Z hint: Using 'master' as the name for the initial branch. This default branch name
+2026-10-28T04:44:19.4604170Z hint: will change to "main" in Git 3.0. To configure the initial branch name
+2026-10-28T04:44:19.4605250Z hint: to use in all of your new repositories, which will suppress this warning,
+2026-10-28T04:44:19.4607870Z hint: call:
+2026-10-28T04:44:19.4612680Z hint:
+2026-10-28T04:44:19.4614080Z hint: 	git config --global init.defaultBranch <name>
+2026-10-28T04:44:19.4615180Z hint:
+2026-10-28T04:44:19.4619240Z hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
+2026-10-28T04:44:19.4620960Z hint: 'development'. The just-created branch can be renamed via this command:
+2026-10-28T04:44:19.4625260Z hint:
+2026-10-28T04:44:19.4626440Z hint: 	git branch -m <name>
+2026-10-28T04:44:19.4627690Z hint:
+2026-10-28T04:44:19.4628410Z hint: Disable this message with "git config set advice.defaultBranchName false"
+2026-10-28T04:44:19.4631970Z Initialized empty Git repository in /Users/runner/work/illiquid/illiquid/.git/
+2026-10-28T04:44:19.4634660Z [command]/opt/homebrew/bin/git remote add origin https://github.com/Jagalite/illiquid
+2026-10-28T04:44:19.4712410Z ##[endgroup]
+2026-10-28T04:44:19.4713310Z ##[group]Disabling automatic garbage collection
+2026-10-28T04:44:19.4714410Z [command]/opt/homebrew/bin/git config --local gc.auto 0
+2026-10-28T04:44:19.4786020Z ##[endgroup]
+2026-10-28T04:44:19.4786990Z ##[group]Setting up auth
+2026-10-28T04:44:19.4788870Z [command]/opt/homebrew/bin/git config --local --name-only --get-regexp core\.sshCommand
+2026-10-28T04:44:19.4855680Z [command]/opt/homebrew/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2026-10-28T04:44:19.5929740Z [command]/opt/homebrew/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2026-10-28T04:44:19.5995950Z [command]/opt/homebrew/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2026-10-28T04:44:19.6717700Z [command]/opt/homebrew/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+2026-10-28T04:44:19.6778900Z [command]/opt/homebrew/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+2026-10-28T04:44:19.7399580Z [command]/opt/homebrew/bin/git config --local http.https://github.com/.extraheader AUTHORIZATION: basic ***
+2026-10-28T04:44:19.7456090Z ##[endgroup]
+2026-10-28T04:44:19.7456760Z ##[group]Fetching the repository
+2026-10-28T04:44:19.7461500Z [command]/opt/homebrew/bin/git -c protocol.version=2 fetch --no-tags --prune --no-recurse-submodules --depth=1 origin +5095f4f03ef535ad194e10ac7de45b11e83739e4:refs/remotes/origin/perf/thumbnail-nil-folder-20261028
+2026-10-28T04:44:25.0697660Z From https://github.com/Jagalite/illiquid
+2026-10-28T04:44:25.0699050Z  * [new ref]         5095f4f03ef535ad194e10ac7de45b11e83739e4 -> origin/perf/thumbnail-nil-folder-20261028
+2026-10-28T04:44:25.0701900Z ##[endgroup]
+2026-10-28T04:44:25.0702760Z ##[group]Determining the checkout info
+2026-10-28T04:44:25.0703700Z ##[endgroup]
+2026-10-28T04:44:25.0705340Z [command]/opt/homebrew/bin/git sparse-checkout disable
+2026-10-28T04:44:25.0786180Z [command]/opt/homebrew/bin/git config --local --unset-all extensions.worktreeConfig
+2026-10-28T04:44:25.0845990Z ##[group]Checking out the ref
+2026-10-28T04:44:25.0848900Z [command]/opt/homebrew/bin/git checkout --progress --force -B perf/thumbnail-nil-folder-20261028 refs/remotes/origin/perf/thumbnail-nil-folder-20261028
+2026-10-28T04:44:26.0301700Z Switched to a new branch 'perf/thumbnail-nil-folder-20261028'
+2026-10-28T04:44:26.0312650Z branch 'perf/thumbnail-nil-folder-20261028' set up to track 'origin/perf/thumbnail-nil-folder-20261028'.
+2026-10-28T04:44:26.0348060Z ##[endgroup]
+2026-10-28T04:44:26.0506750Z [command]/opt/homebrew/bin/git log -1 --format=%H
+2026-10-28T04:44:26.0579790Z 5095f4f03ef535ad194e10ac7de45b11e83739e4
+2026-10-28T04:44:26.0587220Z ##[group]Removing auth
+2026-10-28T04:44:26.0590600Z [command]/opt/homebrew/bin/git config --local --name-only --get-regexp core\.sshCommand
+2026-10-28T04:44:26.0655130Z [command]/opt/homebrew/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2026-10-28T04:44:26.1550070Z [command]/opt/homebrew/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2026-10-28T04:44:26.1604830Z http.https://github.com/.extraheader
+2026-10-28T04:44:26.1608670Z [command]/opt/homebrew/bin/git config --local --unset-all http.https://github.com/.extraheader
+2026-10-28T04:44:26.1664830Z [command]/opt/homebrew/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2026-10-28T04:44:26.2301500Z [command]/opt/homebrew/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+2026-10-28T04:44:26.2350650Z [command]/opt/homebrew/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+2026-10-28T04:44:26.3297330Z ##[endgroup]
+2026-10-28T04:44:26.3569340Z ##[group]Run echo "Kyoto is unavailable on this ephemeral GitHub-hosted runner; builds run directly and sequentially."
+2026-10-28T04:44:26.3570050Z [36;1mecho "Kyoto is unavailable on this ephemeral GitHub-hosted runner; builds run directly and sequentially."[0m
+2026-10-28T04:44:26.3570550Z [36;1mif ! xcrun -sdk macosx metal --version; then[0m
+2026-10-28T04:44:26.3570850Z [36;1m  xcodebuild -downloadComponent MetalToolchain[0m
+2026-10-28T04:44:26.3571090Z [36;1mfi[0m
+2026-10-28T04:44:26.3571350Z [36;1mpython3 Scripts/verify-corresponding-source.py DependencySources[0m
+2026-10-28T04:44:26.3571720Z [36;1mpython3 Scripts/install-ci-native-sdk.py[0m
+2026-10-28T04:44:26.3616630Z shell: /bin/bash -e {0}
+2026-10-28T04:44:26.3616860Z env:
+2026-10-28T04:44:26.3617100Z   DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+2026-10-28T04:44:26.3617390Z ##[endgroup]
+2026-10-28T04:44:26.3802010Z Kyoto is unavailable on this ephemeral GitHub-hosted runner; builds run directly and sequentially.
+2026-10-28T04:44:30.4649820Z Apple metal version 32023.883 (metalfe-32023.883)
+2026-10-28T04:44:30.4831010Z Target: air64-apple-darwin25.6.0
+2026-10-28T04:44:30.5242590Z Thread model: posix
+2026-10-28T04:44:30.5388080Z InstalledDir: /private/var/run/com.apple.security.cryptexd/mnt/com.apple.MobileAsset.MetalToolchain-v17.6.109.0.k3rLH7/Metal.xctoolchain/usr/metal/current/bin
+2026-10-28T04:44:39.8511100Z Verified 28 source/resource/patch inputs and 114 notice documents
+2026-10-28T04:44:40.7018380Z Installed checksum-verified SDK on ephemeral runner
+2026-10-28T04:44:40.7151750Z ##[group]Run mkdir -p "$RUNNER_TEMP/thumbnail-nil-folder-integration"
+2026-10-28T04:44:40.7152260Z [36;1mmkdir -p "$RUNNER_TEMP/thumbnail-nil-folder-integration"[0m
+2026-10-28T04:44:40.7152750Z [36;1msw_vers > "$RUNNER_TEMP/thumbnail-nil-folder-integration/host.txt"[0m
+2026-10-28T04:44:40.7153220Z [36;1mswift --version >> "$RUNNER_TEMP/thumbnail-nil-folder-integration/host.txt"[0m
+2026-10-28T04:44:40.7153790Z [36;1mgit rev-parse HEAD >> "$RUNNER_TEMP/thumbnail-nil-folder-integration/host.txt"[0m
+2026-10-28T04:44:40.7154270Z [36;1mset -o pipefail[0m
+2026-10-28T04:44:40.7154730Z [36;1mswift test --force-resolved-versions -c release --jobs 2 --no-parallel \[0m
+2026-10-28T04:44:40.7155420Z [36;1m  --filter 'ThumbnailPolicyTests|ThumbnailSchedulingPolicyRegressionTests|ThumbnailBackgroundSchedulerTests' \[0m
+2026-10-28T04:44:40.7158770Z [36;1m  2>&1 | tee "$RUNNER_TEMP/thumbnail-nil-folder-integration/tests.log"[0m
+2026-10-28T04:44:40.7426570Z shell: /bin/bash -e {0}
+2026-10-28T04:44:40.7427040Z env:
+2026-10-28T04:44:40.7427440Z   DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+2026-10-28T04:44:40.7430480Z   PKG_CONFIG_LIBDIR: /Users/runner/work/illiquid/illiquid/BuildInputs/system-pkgconfig:/opt/homebrew/Cellar/dav1d/1.5.3/lib/pkgconfig:/opt/homebrew/Cellar/ffmpeg/8.1.2-illiquid1/lib/pkgconfig:/opt/homebrew/Cellar/freetype/2.14.3/lib/pkgconfig:/opt/homebrew/Cellar/fribidi/1.0.16/lib/pkgconfig:/opt/homebrew/Cellar/glib/2.88.2/lib/pkgconfig:/opt/homebrew/Cellar/graphite2/1.3.15/lib/pkgconfig:/opt/homebrew/Cellar/harfbuzz/14.2.1/lib/pkgconfig:/opt/homebrew/Cellar/libass/0.17.5/lib/pkgconfig:/opt/homebrew/Cellar/libpng/1.6.58/lib/pkgconfig:/opt/homebrew/Cellar/libunibreak/7.0/lib/pkgconfig:/opt/homebrew/Cellar/libvmaf/3.1.0/lib/pkgconfig:/opt/homebrew/Cellar/libvpx/1.16.0/lib/pkgconfig:/opt/homebrew/Cellar/openssl@3/3.6.3/lib/pkgconfig:/opt/homebrew/Cellar/opus/1.6.1/lib/pkgconfig:/opt/homebrew/Cellar/pcre2/10.47_1/lib/pkgconfig:/opt/homebrew/Cellar/svt-av1/4.1.0/lib/pkgconfig:/opt/homebrew/Cellar/x264/r3222/lib/pkgconfig:/opt/homebrew/Cellar/x265/4.2/lib/pkgconfig
+2026-10-28T04:44:40.7436360Z   PKG_CONFIG_PATH: /Users/runner/work/illiquid/illiquid/BuildInputs/system-pkgconfig:/opt/homebrew/Cellar/dav1d/1.5.3/lib/pkgconfig:/opt/homebrew/Cellar/ffmpeg/8.1.2-illiquid1/lib/pkgconfig:/opt/homebrew/Cellar/freetype/2.14.3/lib/pkgconfig:/opt/homebrew/Cellar/fribidi/1.0.16/lib/pkgconfig:/opt/homebrew/Cellar/glib/2.88.2/lib/pkgconfig:/opt/homebrew/Cellar/graphite2/1.3.15/lib/pkgconfig:/opt/homebrew/Cellar/harfbuzz/14.2.1/lib/pkgconfig:/opt/homebrew/Cellar/libass/0.17.5/lib/pkgconfig:/opt/homebrew/Cellar/libpng/1.6.58/lib/pkgconfig:/opt/homebrew/Cellar/libunibreak/7.0/lib/pkgconfig:/opt/homebrew/Cellar/libvmaf/3.1.0/lib/pkgconfig:/opt/homebrew/Cellar/libvpx/1.16.0/lib/pkgconfig:/opt/homebrew/Cellar/openssl@3/3.6.3/lib/pkgconfig:/opt/homebrew/Cellar/opus/1.6.1/lib/pkgconfig:/opt/homebrew/Cellar/pcre2/10.47_1/lib/pkgconfig:/opt/homebrew/Cellar/svt-av1/4.1.0/lib/pkgconfig:/opt/homebrew/Cellar/x264/r3222/lib/pkgconfig:/opt/homebrew/Cellar/x265/4.2/lib/pkgconfig
+2026-10-28T04:44:40.7439360Z ##[endgroup]
+2026-10-28T04:44:47.0279910Z Fetching https://github.com/swiftlang/swift-testing.git
+2026-10-28T04:44:47.0291240Z Fetching https://github.com/sparkle-project/Sparkle.git
+2026-10-28T04:44:47.9995110Z [1/44268] Fetching sparkle
+2026-10-28T04:44:48.1978760Z [5314/89476] Fetching sparkle, swift-testing
+2026-10-28T04:44:49.8508700Z Fetched https://github.com/swiftlang/swift-testing.git from cache (2.82s)
+2026-10-28T04:44:49.8512650Z Fetched https://github.com/sparkle-project/Sparkle.git from cache (2.82s)
+2026-10-28T04:44:49.8582540Z Fetching https://github.com/swiftlang/swift-syntax.git
+2026-10-28T04:44:51.6103850Z [1/81259] Fetching swift-syntax
+2026-10-28T04:44:54.0463910Z Fetched https://github.com/swiftlang/swift-syntax.git from cache (4.18s)
+2026-10-28T04:44:54.0876820Z Creating working copy for https://github.com/swiftlang/swift-testing.git
+2026-10-28T04:44:54.0977770Z Creating working copy for https://github.com/swiftlang/swift-syntax.git
+2026-10-28T04:44:54.1710260Z Creating working copy for https://github.com/sparkle-project/Sparkle.git
+2026-10-28T04:44:54.3929920Z Working copy of https://github.com/swiftlang/swift-testing.git resolved at swift-6.3.2-RELEASE (70eff26)
+2026-10-28T04:44:54.4416440Z Working copy of https://github.com/swiftlang/swift-syntax.git resolved at 603.0.2
+2026-10-28T04:44:54.6086160Z Working copy of https://github.com/sparkle-project/Sparkle.git resolved at 2.10.0
+2026-10-28T04:44:58.2553140Z Downloading binary artifact https://github.com/sparkle-project/Sparkle/releases/download/2.10.0/Sparkle-for-Swift-Package-Manager.zip
+2026-10-28T04:44:58.5096480Z [20652/10193895] Downloading https://github.com/sparkle-project/Sparkle/releases/download/2.10.0/Sparkle-for-Swift-Package-Manager.zip
+2026-10-28T04:44:59.0775440Z Downloaded https://github.com/sparkle-project/Sparkle/releases/download/2.10.0/Sparkle-for-Swift-Package-Manager.zip (0.82s)
+2026-10-28T04:44:59.6440640Z Downloading package prebuilt https://download.swift.org/prebuilts/swift-syntax/603.0.2/swiftlang-6.3.3.1.3-macosx26.5-MacroSupport.zip
+2026-10-28T04:45:00.7509320Z Downloaded https://download.swift.org/prebuilts/swift-syntax/603.0.2/swiftlang-6.3.3.1.3-macosx26.5-MacroSupport.zip (1.11s)
+2026-10-28T04:45:02.7690870Z Building for production...
+2026-10-28T04:45:02.8001790Z [0/49] /Users/runner/work/illiquid/illiquid/.build/arm64-apple-macosx/release/IlliquidPackageTests.derived/runner.swift
+2026-10-28T04:45:03.0560300Z [1/49] Write swift-version-7974D3F7F03D5E95.txt
+2026-10-28T04:45:03.7558330Z [2/49] Compiling _TestingInternals WillThrow.cpp
+2026-10-28T04:45:04.0867590Z [3/49] Compiling _TestingInternals ExecutablePath.cpp
+2026-10-28T04:45:04.3174320Z [4/49] Compiling _TestingInternals Discovery.cpp
+2026-10-28T04:45:04.3280560Z [5/49] Write sources
+2026-10-28T04:45:04.7730140Z [8/50] Compiling _TestingInternals Versions.cpp
+2026-10-28T04:45:04.8058850Z [9/50] Copying Sparkle.framework
+2026-10-28T04:45:07.0354270Z [11/51] Compiling _TestDiscovery WinSDKAdditions.swift
+2026-10-28T04:45:07.0379490Z [11/51] Copying NativePlaybackShaders.metal
+2026-10-28T04:45:07.0389240Z [12/51] Copying Resources
+2026-10-28T04:45:07.0390840Z [13/51] Write sources
+2026-10-28T04:45:15.3758490Z [32/52] Compiling TestingMacros ConditionMacro.swift
+2026-10-28T04:45:15.3958630Z [32/52] Write sources
+2026-10-28T04:45:15.4060020Z [33/52] Write Objects.LinkFileList
+2026-10-28T04:45:15.4161430Z [34/52] Write sources
+2026-10-28T04:45:16.1193350Z [35/52] Linking TestingMacros-tool
+2026-10-28T04:45:18.8464380Z [36/52] Compiling CNativeAudio AudioOutputDevice.m
+2026-10-28T04:45:27.8359090Z [38/53] Compiling IlliquidCore MediaMetadataHints.swift
+2026-10-28T04:45:49.7558520Z [39/54] Compiling IlliquidPlaybackCore CompletedPlaybackEffectHistory.swift
+2026-10-28T04:46:02.8362360Z [40/55] Compiling Testing ABI.Record+Streaming.swift
+2026-10-28T04:46:09.4968660Z [41/56] Compiling IlliquidPlayback Module.swift
+2026-10-28T04:46:10.1958540Z [42/57] Compiling IlliquidPlaybackStateSpace PlaybackPartialOrderReducer.swift
+2026-10-28T04:46:17.6462820Z [43/58] Compiling IlliquidPlaybackTests RuntimeContractTests.swift
+2026-10-28T04:46:19.7561720Z [44/59] Compiling IlliquidStateSpaceExplorer main.swift
+2026-10-28T04:46:23.7673310Z [45/60] Compiling IlliquidPlaybackStateSpaceTests PlaybackStateSpaceTests.swift
+2026-10-28T04:46:32.0743740Z [46/61] Compiling IlliquidPlaybackCoreTests CompletedEffectHistoryTests.swift
+2026-10-28T04:47:38.5659120Z [47/62] Compiling IlliquidNativePlayback DeterministicCommitBarrier.swift
+2026-10-28T04:47:38.5747120Z /Users/runner/work/illiquid/illiquid/Sources/IlliquidNativePlayback/Presentation/PiPSubtitleCompositor.swift:1152:23: warning: capture of 'commandBuffer' with non-Sendable type 'any MTLCommandBuffer' in a '@Sendable' closure [#SendableClosureCaptures]
+2026-10-28T04:47:38.5852380Z 1150 |             self.workQueue.async {
+2026-10-28T04:47:38.5955900Z 1151 |                 _ = resources.retainedCVTextures
+2026-10-28T04:47:38.6074790Z 1152 |                 guard commandBuffer.status != .error else {
+2026-10-28T04:47:38.6160800Z      |                       `- warning: capture of 'commandBuffer' with non-Sendable type 'any MTLCommandBuffer' in a '@Sendable' closure [#SendableClosureCaptures]
+2026-10-28T04:47:38.6263370Z 1153 |                     completion(.failure(
+2026-10-28T04:47:38.6365820Z 1154 |                         commandBuffer.error
+2026-10-28T04:47:38.6468500Z 
+2026-10-28T04:47:38.6572640Z /Applications/Xcode_26.6.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.5.sdk/System/Library/Frameworks/Metal.framework/Headers/MTLCommandBuffer.h:245:11: note: protocol 'MTLCommandBuffer' does not conform to the 'Sendable' protocol
+2026-10-28T04:47:38.6671020Z 243 |  */
+2026-10-28T04:47:38.6787160Z 244 | API_AVAILABLE(macos(10.11), ios(8.0))
+2026-10-28T04:47:38.6901230Z 245 | @protocol MTLCommandBuffer <NSObject>
+2026-10-28T04:47:38.7003580Z     |           `- note: protocol 'MTLCommandBuffer' does not conform to the 'Sendable' protocol
+2026-10-28T04:47:38.7104760Z 246 | 
+2026-10-28T04:47:38.7212980Z 247 | /*!
+2026-10-28T04:47:38.7332190Z 
+2026-10-28T04:47:38.7450430Z /Users/runner/work/illiquid/illiquid/Sources/IlliquidNativePlayback/Presentation/PiPSubtitleCompositor.swift:6:1: warning: add '@preconcurrency' to treat 'Sendable'-related errors from module 'Metal' as warnings
+2026-10-28T04:47:38.7554020Z    4 | import CoreVideo
+2026-10-28T04:47:38.7657250Z    5 | import Foundation
+2026-10-28T04:47:38.7760880Z    6 | import Metal
+2026-10-28T04:47:38.7864560Z      | `- warning: add '@preconcurrency' to treat 'Sendable'-related errors from module 'Metal' as warnings
+2026-10-28T04:47:38.7968730Z    7 | import OSLog
+2026-10-28T04:47:38.8076490Z    8 | import QuartzCore
+2026-10-28T04:47:38.8181480Z 
+2026-10-28T04:47:38.8283490Z [#SendableClosureCaptures]: <https://docs.swift.org/compiler/documentation/diagnostics/sendable-closure-captures>
+2026-10-28T04:47:38.8387530Z [47/62] Write Objects.LinkFileList
+2026-10-28T04:47:49.9790010Z [49/63] Compiling IlliquidRenderProfile main.swift
+2026-10-28T04:47:51.6912840Z [49/63] Linking IlliquidStateSpaceExplorer
+2026-10-28T04:48:11.3908330Z [51/64] Compiling IlliquidPlayer ArchitectureValidation.swift
+2026-10-28T04:48:21.2269230Z [52/65] Compiling IlliquidCoreTests AspectFitWindowSizingTests.swift
+2026-10-28T04:48:21.2380250Z /Users/runner/work/illiquid/illiquid/Tests/IlliquidCoreTests/PlaylistIdentityLookupTests.swift:99:26: warning: '#require(_:_:)' is redundant because 'URL(string: "https://example.invalid/Media/A.mkv")' never equals 'nil' (from macro 'require')
+2026-10-28T04:48:21.2482710Z  97 |             nil,
+2026-10-28T04:48:21.2583950Z  98 |             URL(fileURLWithPath: "/Media/A.mkv"),
+2026-10-28T04:48:21.2686190Z  99 |             try #require(URL(string: "https://example.invalid/Media/A.mkv")),
+2026-10-28T04:48:21.2795100Z     |                          `- warning: '#require(_:_:)' is redundant because 'URL(string: "https://example.invalid/Media/A.mkv")' never equals 'nil' (from macro 'require')
+2026-10-28T04:48:21.2897230Z 100 |             try #require(URL(string: "file://media-server.example/Media/A.mkv")),
+2026-10-28T04:48:21.3030970Z 101 |         ]
+2026-10-28T04:48:21.3133640Z 
+2026-10-28T04:48:21.3238990Z /Users/runner/work/illiquid/illiquid/Tests/IlliquidCoreTests/PlaylistIdentityLookupTests.swift:100:26: warning: '#require(_:_:)' is redundant because 'URL(string: "file://media-server.example/Media/A.mkv")' never equals 'nil' (from macro 'require')
+2026-10-28T04:48:21.3383450Z  98 |             URL(fileURLWithPath: "/Media/A.mkv"),
+2026-10-28T04:48:21.3393400Z  99 |             try #require(URL(string: "https://example.invalid/Media/A.mkv")),
+2026-10-28T04:48:21.3495500Z 100 |             try #require(URL(string: "file://media-server.example/Media/A.mkv")),
+2026-10-28T04:48:21.3610470Z     |                          `- warning: '#require(_:_:)' is redundant because 'URL(string: "file://media-server.example/Media/A.mkv")' never equals 'nil' (from macro 'require')
+2026-10-28T04:48:21.3715220Z 101 |         ]
+2026-10-28T04:48:21.3821780Z 102 |         let folder = FolderPlaylist(folderURL: URL(fileURLWithPath: "/Media"), items: [])
+2026-10-28T04:48:58.1283980Z [53/66] Compiling IlliquidPlayerTests PlaybackCoordinatorTests.swift
+2026-10-28T04:48:59.9763730Z [54/67] Compiling IlliquidPlaybackStress main.swift
+2026-10-28T04:49:08.9435810Z [55/68] Compiling IlliquidDifferentialHarness main.swift
+2026-10-28T04:49:10.7097840Z [56/69] Compiling IlliquidArchitectureCheck main.swift
+2026-10-28T04:50:36.6969940Z [57/70] Compiling IlliquidApp AppDelegate.swift
+2026-10-28T04:50:36.7280790Z [57/70] Write Objects.LinkFileList
+2026-10-28T04:50:39.0668670Z [59/70] Linking IlliquidRenderProfile
+2026-10-28T04:50:40.7035870Z [60/70] Linking IlliquidPlaybackStress
+2026-10-28T04:50:40.7139550Z [61/70] Write Objects.LinkFileList
+2026-10-28T04:50:42.7136640Z [63/70] Linking IlliquidDifferentialHarness
+2026-10-28T04:50:44.4061620Z [64/70] Linking IlliquidArchitectureCheck
+2026-10-28T04:50:44.4165830Z [65/70] Write Objects.LinkFileList
+2026-10-28T04:50:46.6693920Z [66/70] Linking Illiquid
+2026-10-28T04:52:27.7597650Z [68/71] Compiling IlliquidNativePlaybackTests ASSBitmapCopyTests.swift
+2026-10-28T04:52:27.7611110Z /Users/runner/work/illiquid/illiquid/Tests/IlliquidNativePlaybackTests/PGSSubtitlePacketBorrowTests.swift:77:18: warning: weak variable 'released' was never mutated; consider changing to 'let' constant [#WeakMutability]
+2026-10-28T04:52:27.7680770Z  75 |             reference(x: 30, y: 40),
+2026-10-28T04:52:27.7681600Z  76 |         ]))
+2026-10-28T04:52:27.7682130Z  77 |         weak var released = owner
+2026-10-28T04:52:27.7682970Z     |                  `- warning: weak variable 'released' was never mutated; consider changing to 'let' constant [#WeakMutability]
+2026-10-28T04:52:27.7683960Z  78 |         let metadata = try parseThenOverwrite(try #require(owner))
+2026-10-28T04:52:27.7685940Z  79 |         owner = nil
+2026-10-28T04:52:27.7686460Z 
+2026-10-28T04:52:27.7687220Z /Users/runner/work/illiquid/illiquid/Tests/IlliquidNativePlaybackTests/PacketQueueWakeupTests.swift:127:18: warning: weak variable 'retained' was never mutated; consider changing to 'let' constant [#WeakMutability]
+2026-10-28T04:52:27.7688500Z 125 |         let queue = BoundedQueue<Payload>(capacity: 1)
+2026-10-28T04:52:27.7689230Z 126 |         var value: Payload? = Payload()
+2026-10-28T04:52:27.7689830Z 127 |         weak var retained = value
+2026-10-28T04:52:27.7690760Z     |                  `- warning: weak variable 'retained' was never mutated; consider changing to 'let' constant [#WeakMutability]
+2026-10-28T04:52:27.7691470Z 128 |         #expect(queue.push(value!)); value = nil
+2026-10-28T04:52:27.7692180Z 129 |         #expect(retained != nil); queue.removeAll(); #expect(retained == nil)
+2026-10-28T04:52:27.7692680Z 
+2026-10-28T04:52:27.7693560Z /Users/runner/work/illiquid/illiquid/Tests/IlliquidNativePlaybackTests/PlanarOwnershipTransitionTests.swift:99:13: warning: '#require(_:_:)' is redundant because 'ledger.makeRendererSampleAttachment(checkoutID: checkoutID)' never equals 'nil' (from macro 'require')
+2026-10-28T04:52:27.7698940Z  97 |         let checkoutID = try #require(token).checkoutID
+2026-10-28T04:52:27.7700690Z  98 |         var attachment: PlanarRendererSampleLifetimeAttachment? = try #require(
+2026-10-28T04:52:27.7705470Z  99 |             ledger.makeRendererSampleAttachment(checkoutID: checkoutID)
+2026-10-28T04:52:27.7706500Z     |             `- warning: '#require(_:_:)' is redundant because 'ledger.makeRendererSampleAttachment(checkoutID: checkoutID)' never equals 'nil' (from macro 'require')
+2026-10-28T04:52:27.7707520Z 100 |         )
+2026-10-28T04:52:27.7708040Z 101 |         token?.transition(to: .queued)
+2026-10-28T04:52:27.7708320Z 
+2026-10-28T04:52:27.7709500Z /Users/runner/work/illiquid/illiquid/Tests/IlliquidNativePlaybackTests/PlaybackPerformanceRegressionTests.swift:168:18: warning: weak variable 'released' was never mutated; consider changing to 'let' constant [#WeakMutability]
+2026-10-28T04:52:27.7722860Z 166 |         var ring = FixedRingBuffer<Value>(capacity: 3)
+2026-10-28T04:52:27.7724010Z 167 |         var first: Value? = Value()
+2026-10-28T04:52:27.7724300Z 168 |         weak var released = first
+2026-10-28T04:52:27.7725060Z     |                  `- warning: weak variable 'released' was never mutated; consider changing to 'let' constant [#WeakMutability]
+2026-10-28T04:52:27.7725990Z 169 |         ring.append(first!)
+2026-10-28T04:52:27.7726420Z 170 |         first = nil
+2026-10-28T04:52:27.7726860Z 
+2026-10-28T04:52:27.7727610Z /Users/runner/work/illiquid/illiquid/Tests/IlliquidNativePlaybackTests/SubtitleResultLifetimeTests.swift:11:18: warning: weak variable 'retiredDecoder' was never mutated; consider changing to 'let' constant [#WeakMutability]
+2026-10-28T04:52:27.7728630Z   9 |     @Test func bitmapEventsOutliveNativeOutputUpdatesFlushAndDecoderDestruction() throws {
+2026-10-28T04:52:27.7736810Z  10 |         var decoder: SubtitleDecoder? = try makeDecoder()
+2026-10-28T04:52:27.7737390Z  11 |         weak var retiredDecoder = decoder
+2026-10-28T04:52:27.7738030Z     |                  `- warning: weak variable 'retiredDecoder' was never mutated; consider changing to 'let' constant [#WeakMutability]
+2026-10-28T04:52:27.7739220Z  12 |         let first = try #require(try decoder?.decode(packet(fullPGS, at: 2)).first)
+2026-10-28T04:52:27.7739780Z  13 |         let bitmap = try #require(first.bitmapComposition)
+2026-10-28T04:52:27.7739980Z 
+2026-10-28T04:52:27.7740750Z /Users/runner/work/illiquid/illiquid/Tests/IlliquidNativePlaybackTests/SubtitleResultLifetimeTests.swift:66:18: warning: weak variable 'retiredDecoder' was never mutated; consider changing to 'let' constant [#WeakMutability]
+2026-10-28T04:52:27.7742140Z  64 |     @Test func textEventsOwnTheirBytesAcrossNativeOutputReuseFlushAndDestruction() throws {
+2026-10-28T04:52:27.7742910Z  65 |         var decoder: SubtitleDecoder? = try makeDecoder(codec: AV_CODEC_ID_SUBRIP, name: "subrip")
+2026-10-28T04:52:27.7743560Z  66 |         weak var retiredDecoder = decoder
+2026-10-28T04:52:27.7744300Z     |                  `- warning: weak variable 'retiredDecoder' was never mutated; consider changing to 'let' constant [#WeakMutability]
+2026-10-28T04:52:27.7744970Z  67 |         let first = try #require(try decoder?.decode(packet(Array("First caption".utf8), at: 2)).first)
+2026-10-28T04:52:27.7746070Z  68 |         #expect(decoder?.hasRetainedDecodedOutput == false)
+2026-10-28T04:52:27.7746280Z 
+2026-10-28T04:52:27.7747080Z /Users/runner/work/illiquid/illiquid/Tests/IlliquidNativePlaybackTests/VideoScratchFrameLifetimeMeasurements.swift:58:18: warning: weak variable 'retiredDecoder' was never mutated; consider changing to 'let' constant [#WeakMutability]
+2026-10-28T04:52:27.7748150Z  56 |             width: workload.width, height: workload.height
+2026-10-28T04:52:27.7748640Z  57 |         )
+2026-10-28T04:52:27.7749230Z  58 |         weak var retiredDecoder = decoder
+2026-10-28T04:52:27.7749910Z     |                  `- warning: weak variable 'retiredDecoder' was never mutated; consider changing to 'let' constant [#WeakMutability]
+2026-10-28T04:52:27.7750630Z  59 |         var probes: [VideoScratchAllocationProbe] = []
+2026-10-28T04:52:27.7751010Z  60 |         var refcounts: [Int] = []
+2026-10-28T04:52:27.7751310Z 
+2026-10-28T04:52:27.7751930Z /Users/runner/work/illiquid/illiquid/Tests/IlliquidNativePlaybackTests/VideoScratchFrameLifetimeTests.swift:317:18: warning: weak variable 'retiredDecoder' was never mutated; consider changing to 'let' constant [#WeakMutability]
+2026-10-28T04:52:27.7753070Z 315 |             width: 32, height: 24, deinterlacing: deinterlacing
+2026-10-28T04:52:27.7753470Z 316 |         )
+2026-10-28T04:52:27.7753830Z 317 |         weak var retiredDecoder = decoder
+2026-10-28T04:52:27.7754770Z     |                  `- warning: weak variable 'retiredDecoder' was never mutated; consider changing to 'let' constant [#WeakMutability]
+2026-10-28T04:52:27.7756030Z 318 |         var tracked: (FFmpegPacket, VideoScratchAllocationProbe)? =
+2026-10-28T04:52:27.7756700Z 319 |             try VideoScratchFrameFixture.makePacket(width: 32, height: 24,
+2026-10-28T04:52:27.7757510Z 
+2026-10-28T04:52:27.7757770Z [#WeakMutability]: <https://docs.swift.org/compiler/documentation/diagnostics/weak-mutability>
+2026-10-28T04:53:04.2495440Z [69/71] Compiling IlliquidAppTests AdaptiveRainbowTextColorTests.swift
+2026-10-28T04:53:08.5897630Z [70/72] Compiling IlliquidPackageTests runner.swift
+2026-10-28T04:53:08.6012870Z [70/72] Write Objects.LinkFileList
+2026-10-28T04:53:14.8283430Z [71/72] Linking IlliquidPackageTests
+2026-10-28T04:53:14.8523470Z Build complete! (507.83s)
+2026-10-28T04:53:36.2163920Z Test Suite 'Selected tests' started at 2026-10-28 04:53:17.360.
+2026-10-28T04:53:36.2271430Z swift-driver version: 1.148.6 
+2026-10-28T04:53:36.2272160Z Test Suite 'IlliquidPackageTests.xctest' started at 2026-10-28 04:53:17.367.
+2026-10-28T04:53:36.2278090Z Test Suite 'IlliquidPackageTests.xctest' passed at 2026-10-28 04:53:17.367.
+2026-10-28T04:53:36.2279740Z 	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.000) seconds
+2026-10-28T04:53:36.2280260Z Test Suite 'Selected tests' passed at 2026-10-28 04:53:17.367.
+2026-10-28T04:53:36.2281100Z 	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.007) seconds
+2026-10-28T04:53:36.2332590Z ◇ Test run started.
+2026-10-28T04:53:36.2333800Z ↳ Testing Library Version: 6.3.2 (70eff261d7f462c)
+2026-10-28T04:53:36.2334280Z ◇ Suite "Background thumbnail scheduling" started.
+2026-10-28T04:53:36.2335400Z ◇ Test currentVideoPreparationUsesRealPlaybackAndSharedCache() started.
+2026-10-28T04:53:36.2336510Z ✔ Test currentVideoPreparationUsesRealPlaybackAndSharedCache() passed after 0.002 seconds.
+2026-10-28T04:53:36.2337300Z ◇ Test supersededCompletionCannotMarkNewSourcePrepared() started.
+2026-10-28T04:53:36.2338070Z [ass-compositor] selected=metal-r8 activation=success
+2026-10-28T04:53:36.2338590Z [ass] libass API version: 0x1705000
+2026-10-28T04:53:36.2339490Z [ass] libass source: tarball: 0.17.5
+2026-10-28T04:53:36.2339880Z [ass] Shaper: FriBidi 1.0.16 (SIMPLE) HarfBuzz-ng 14.2.1 (COMPLEX)
+2026-10-28T04:53:36.2340430Z [ass] Using font provider coretext
+2026-10-28T04:53:36.2341000Z ✔ Test supersededCompletionCannotMarkNewSourcePrepared() passed after 3.923 seconds.
+2026-10-28T04:53:36.2341920Z ◇ Test automaticCurrentCoverageSurvivesHoverAndStopsForRecovery() started.
+2026-10-28T04:53:36.2343260Z [ass-compositor] selected=metal-r8 activation=success
+2026-10-28T04:53:36.2343650Z [ass] libass API version: 0x1705000
+2026-10-28T04:53:36.2344210Z [ass] libass source: tarball: 0.17.5
+2026-10-28T04:53:36.2344600Z [ass] Shaper: FriBidi 1.0.16 (SIMPLE) HarfBuzz-ng 14.2.1 (COMPLEX)
+2026-10-28T04:53:36.2345440Z [ass] Using font provider coretext
+2026-10-28T04:53:36.2346220Z [ass-compositor-summary] selected=metal-r8 metal-frames=0 metal-clears=0 failure-count=0 last-failure=none drawable-failures=0 command-buffer-failures=0
+2026-10-28T04:53:36.2349050Z [ass-profile-summary] epoch=1793163205.435073 selected=metal-r8 failure-count=0 requests=0 duplicate-requests=0 superseded-before-libass=0 libass-calls=0 libass-changed=0 libass-unchanged=0 libass-config-requests=0 libass-geometry-changes=0 libass-render-ms=0.000 libass-copy-ms=0.000 resource-limit-rejections=0 superseded-after-libass=0 superseded-before-upload=0 images=0 mask-bytes=0 packing-ms=0.000 atlas-reallocations=0 atlas-clear-bytes=0 atlas-max=0x0 uploads=0 upload-bytes=0 quads=0 metal-frames=0 metal-failures=0 drawables=0 drawable-failures=0 command-buffers=0 command-buffer-failures=0 texture-allocation-failures=0 buffer-allocation-failures=0 main-ops=0 main-ms=0.000
+2026-10-28T04:53:36.2352370Z ✔ Test automaticCurrentCoverageSurvivesHoverAndStopsForRecovery() passed after 3.760 seconds.
+2026-10-28T04:53:36.2353250Z ◇ Test currentVideoPreparationSharesIdleBudgetWithLibraryWork() started.
+2026-10-28T04:53:36.2353980Z [ass-compositor] selected=metal-r8 activation=success
+2026-10-28T04:53:36.2354490Z [ass] libass API version: 0x1705000
+2026-10-28T04:53:36.2358150Z [ass] libass source: tarball: 0.17.5
+2026-10-28T04:53:36.2358760Z [ass] Shaper: FriBidi 1.0.16 (SIMPLE) HarfBuzz-ng 14.2.1 (COMPLEX)
+2026-10-28T04:53:36.2359300Z [ass] Using font provider coretext
+2026-10-28T04:53:36.2360140Z [ass-compositor-summary] selected=metal-r8 metal-frames=0 metal-clears=0 failure-count=0 last-failure=none drawable-failures=0 command-buffer-failures=0
+2026-10-28T04:53:36.2362690Z [ass-profile-summary] epoch=1793163206.639369 selected=metal-r8 failure-count=0 requests=0 duplicate-requests=0 superseded-before-libass=0 libass-calls=0 libass-changed=0 libass-unchanged=0 libass-config-requests=0 libass-geometry-changes=0 libass-render-ms=0.000 libass-copy-ms=0.000 resource-limit-rejections=0 superseded-after-libass=0 superseded-before-upload=0 images=0 mask-bytes=0 packing-ms=0.000 atlas-reallocations=0 atlas-clear-bytes=0 atlas-max=0x0 uploads=0 upload-bytes=0 quads=0 metal-frames=0 metal-failures=0 drawables=0 drawable-failures=0 command-buffers=0 command-buffer-failures=0 texture-allocation-failures=0 buffer-allocation-failures=0 main-ops=0 main-ms=0.000
+2026-10-28T04:53:36.2365950Z ✔ Test currentVideoPreparationSharesIdleBudgetWithLibraryWork() passed after 1.206 seconds.
+2026-10-28T04:53:36.2367060Z ◇ Test memoryPressureCancelsBackgroundWorkUntilNormalAndExclusionsPreventProbes() started.
+2026-10-28T04:53:36.2367680Z [ass-compositor] selected=metal-r8 activation=success
+2026-10-28T04:53:36.2368280Z [ass] libass API version: 0x1705000
+2026-10-28T04:53:36.2368790Z [ass] libass source: tarball: 0.17.5
+2026-10-28T04:53:36.2369740Z [ass] Shaper: FriBidi 1.0.16 (SIMPLE) HarfBuzz-ng 14.2.1 (COMPLEX)
+2026-10-28T04:53:36.2370150Z [ass] Using font provider coretext
+2026-10-28T04:53:36.2370890Z [ass-compositor-summary] selected=metal-r8 metal-frames=0 metal-clears=0 failure-count=0 last-failure=none drawable-failures=0 command-buffer-failures=0
+2026-10-28T04:53:36.2373670Z [ass-profile-summary] epoch=1793163209.108774 selected=metal-r8 failure-count=0 requests=0 duplicate-requests=0 superseded-before-libass=0 libass-calls=0 libass-changed=0 libass-unchanged=0 libass-config-requests=0 libass-geometry-changes=0 libass-render-ms=0.000 libass-copy-ms=0.000 resource-limit-rejections=0 superseded-after-libass=0 superseded-before-upload=0 images=0 mask-bytes=0 packing-ms=0.000 atlas-reallocations=0 atlas-clear-bytes=0 atlas-max=0x0 uploads=0 upload-bytes=0 quads=0 metal-frames=0 metal-failures=0 drawables=0 drawable-failures=0 command-buffers=0 command-buffer-failures=0 texture-allocation-failures=0 buffer-allocation-failures=0 main-ops=0 main-ms=0.000
+2026-10-28T04:53:36.2376460Z ✔ Test memoryPressureCancelsBackgroundWorkUntilNormalAndExclusionsPreventProbes() passed after 2.469 seconds.
+2026-10-28T04:53:36.2377300Z ◇ Test nativeIdlePassPreparesDiscoveredVideosWithoutStartingPlayback() started.
+2026-10-28T04:53:36.2378370Z ✔ Test nativeIdlePassPreparesDiscoveredVideosWithoutStartingPlayback() passed after 0.001 seconds.
+2026-10-28T04:53:36.2379010Z ◇ Test renderSettingsControls() started.
+2026-10-28T04:53:36.2379950Z ✔ Test renderSettingsControls() passed after 0.001 seconds.
+2026-10-28T04:53:36.2380600Z ◇ Test navigationReplacesPendingWorkAndPlaybackCancelsAnActivePass() started.
+2026-10-28T04:53:36.2381260Z [ass-compositor] selected=metal-r8 activation=success
+2026-10-28T04:53:36.2381740Z [ass] libass API version: 0x1705000
+2026-10-28T04:53:36.2382300Z [ass] libass source: tarball: 0.17.5
+2026-10-28T04:53:36.2382700Z [ass] Shaper: FriBidi 1.0.16 (SIMPLE) HarfBuzz-ng 14.2.1 (COMPLEX)
+2026-10-28T04:53:36.2383340Z [ass] Using font provider coretext
+2026-10-28T04:53:36.2384130Z [ass-compositor-summary] selected=metal-r8 metal-frames=0 metal-clears=0 failure-count=0 last-failure=none drawable-failures=0 command-buffer-failures=0
+2026-10-28T04:53:36.2387290Z [ass-profile-summary] epoch=1793163210.269332 selected=metal-r8 failure-count=0 requests=0 duplicate-requests=0 superseded-before-libass=0 libass-calls=0 libass-changed=0 libass-unchanged=0 libass-config-requests=0 libass-geometry-changes=0 libass-render-ms=0.000 libass-copy-ms=0.000 resource-limit-rejections=0 superseded-after-libass=0 superseded-before-upload=0 images=0 mask-bytes=0 packing-ms=0.000 atlas-reallocations=0 atlas-clear-bytes=0 atlas-max=0x0 uploads=0 upload-bytes=0 quads=0 metal-frames=0 metal-failures=0 drawables=0 drawable-failures=0 command-buffers=0 command-buffer-failures=0 texture-allocation-failures=0 buffer-allocation-failures=0 main-ops=0 main-ms=0.000
+2026-10-28T04:53:36.2390340Z ✔ Test navigationReplacesPendingWorkAndPlaybackCancelsAnActivePass() passed after 1.154 seconds.
+2026-10-28T04:53:36.2391080Z ◇ Test closedWindowRequiresOptInAndBudgetCancelsWork() started.
+2026-10-28T04:53:36.2391730Z [ass-compositor] selected=metal-r8 activation=success
+2026-10-28T04:53:36.2392380Z [ass] libass API version: 0x1705000
+2026-10-28T04:53:36.2392720Z [ass] libass source: tarball: 0.17.5
+2026-10-28T04:53:36.2394220Z [ass] Shaper: FriBidi 1.0.16 (SIMPLE) HarfBuzz-ng 14.2.1 (COMPLEX)
+2026-10-28T04:53:36.2394610Z [ass] Using font provider coretext
+2026-10-28T04:53:36.2395600Z [ass-compositor-summary] selected=metal-r8 metal-frames=0 metal-clears=0 failure-count=0 last-failure=none drawable-failures=0 command-buffer-failures=0
+2026-10-28T04:53:36.2402890Z [ass-profile-summary] epoch=1793163213.693328 selected=metal-r8 failure-count=0 requests=0 duplicate-requests=0 superseded-before-libass=0 libass-calls=0 libass-changed=0 libass-unchanged=0 libass-config-requests=0 libass-geometry-changes=0 libass-render-ms=0.000 libass-copy-ms=0.000 resource-limit-rejections=0 superseded-after-libass=0 superseded-before-upload=0 images=0 mask-bytes=0 packing-ms=0.000 atlas-reallocations=0 atlas-clear-bytes=0 atlas-max=0x0 uploads=0 upload-bytes=0 quads=0 metal-frames=0 metal-failures=0 drawables=0 drawable-failures=0 command-buffers=0 command-buffer-failures=0 texture-allocation-failures=0 buffer-allocation-failures=0 main-ops=0 main-ms=0.000
+2026-10-28T04:53:36.2405470Z ✔ Test closedWindowRequiresOptInAndBudgetCancelsWork() passed after 3.425 seconds.
+2026-10-28T04:53:36.2406370Z ◇ Test removingVisibleRowsBeyondDiscoveryLimitCancelsTheirWork(projected:) started.
+2026-10-28T04:53:36.2407750Z ◇ Test case passing 1 argument projected → false to removingVisibleRowsBeyondDiscoveryLimitCancelsTheirWork(projected:) started.
+2026-10-28T04:53:36.2408650Z [ass-compositor] selected=metal-r8 activation=success
+2026-10-28T04:53:36.2409050Z [ass] libass API version: 0x1705000
+2026-10-28T04:53:36.2409580Z [ass] libass source: tarball: 0.17.5
+2026-10-28T04:53:36.2409960Z [ass] Shaper: FriBidi 1.0.16 (SIMPLE) HarfBuzz-ng 14.2.1 (COMPLEX)
+2026-10-28T04:53:36.2410540Z [ass] Using font provider coretext
+2026-10-28T04:53:36.2411260Z [ass-compositor-summary] selected=metal-r8 metal-frames=0 metal-clears=0 failure-count=0 last-failure=none drawable-failures=0 command-buffer-failures=0
+2026-10-28T04:53:36.2420600Z [ass-profile-summary] epoch=1793163214.872269 selected=metal-r8 failure-count=0 requests=0 duplicate-requests=0 superseded-before-libass=0 libass-calls=0 libass-changed=0 libass-unchanged=0 libass-config-requests=0 libass-geometry-changes=0 libass-render-ms=0.000 libass-copy-ms=0.000 resource-limit-rejections=0 superseded-after-libass=0 superseded-before-upload=0 images=0 mask-bytes=0 packing-ms=0.000 atlas-reallocations=0 atlas-clear-bytes=0 atlas-max=0x0 uploads=0 upload-bytes=0 quads=0 metal-frames=0 metal-failures=0 drawables=0 drawable-failures=0 command-buffers=0 command-buffer-failures=0 texture-allocation-failures=0 buffer-allocation-failures=0 main-ops=0 main-ms=0.000
+2026-10-28T04:53:36.2423260Z ◇ Test case passing 1 argument projected → true to removingVisibleRowsBeyondDiscoveryLimitCancelsTheirWork(projected:) started.
+2026-10-28T04:53:36.2424050Z [ass-compositor] selected=metal-r8 activation=success
+2026-10-28T04:53:36.2424600Z [ass] libass API version: 0x1705000
+2026-10-28T04:53:36.2425400Z [ass] libass source: tarball: 0.17.5
+2026-10-28T04:53:36.2426040Z [ass] Shaper: FriBidi 1.0.16 (SIMPLE) HarfBuzz-ng 14.2.1 (COMPLEX)
+2026-10-28T04:53:36.2427060Z [ass] Using font provider coretext
+2026-10-28T04:53:36.2428170Z [ass-compositor-summary] selected=metal-r8 metal-frames=0 metal-clears=0 failure-count=0 last-failure=none drawable-failures=0 command-buffer-failures=0
+2026-10-28T04:53:36.2431250Z [ass-profile-summary] epoch=1793163216.114534 selected=metal-r8 failure-count=0 requests=0 duplicate-requests=0 superseded-before-libass=0 libass-calls=0 libass-changed=0 libass-unchanged=0 libass-config-requests=0 libass-geometry-changes=0 libass-render-ms=0.000 libass-copy-ms=0.000 resource-limit-rejections=0 superseded-after-libass=0 superseded-before-upload=0 images=0 mask-bytes=0 packing-ms=0.000 atlas-reallocations=0 atlas-clear-bytes=0 atlas-max=0x0 uploads=0 upload-bytes=0 quads=0 metal-frames=0 metal-failures=0 drawables=0 drawable-failures=0 command-buffers=0 command-buffer-failures=0 texture-allocation-failures=0 buffer-allocation-failures=0 main-ops=0 main-ms=0.000
+2026-10-28T04:53:36.2434210Z ✔ Test removingVisibleRowsBeyondDiscoveryLimitCancelsTheirWork(projected:) with 2 test cases passed after 2.425 seconds.
+2026-10-28T04:53:36.2435280Z ✔ Suite "Background thumbnail scheduling" passed after 18.372 seconds.
+2026-10-28T04:53:36.2435820Z ◇ Suite "Thumbnail scheduling policy" started.
+2026-10-28T04:53:36.2436830Z ◇ Test storyboardAndLocalCoverageStayBoundedAndValid() started.
+2026-10-28T04:53:36.2437800Z ✔ Test storyboardAndLocalCoverageStayBoundedAndValid() passed after 0.001 seconds.
+2026-10-28T04:53:36.2438450Z ◇ Test oldPreferencesKeepTheirBudgetsWhenExclusionsAreAdded() started.
+2026-10-28T04:53:36.2442620Z ✔ Test oldPreferencesKeepTheirBudgetsWhenExclusionsAreAdded() passed after 0.001 seconds.
+2026-10-28T04:53:36.2443220Z ◇ Test presetsPreserveConsentAndExclusionsAndMatchPathBoundaries() started.
+2026-10-28T04:53:36.2443950Z ✔ Test presetsPreserveConsentAndExclusionsAndMatchPathBoundaries() passed after 0.001 seconds.
+2026-10-28T04:53:36.2444550Z ◇ Test foregroundAndViewportCannotBeOvertakenByHistory() started.
+2026-10-28T04:53:36.2445180Z ✔ Test foregroundAndViewportCannotBeOvertakenByHistory() passed after 0.001 seconds.
+2026-10-28T04:53:36.2630940Z ◇ Test userPriorityChangesTheNextSpeculativeVideo() started.
+2026-10-28T04:53:36.2631450Z ✔ Test userPriorityChangesTheNextSpeculativeVideo() passed after 0.001 seconds.
+2026-10-28T04:53:36.2632000Z ◇ Test navigationRetiresDistantUnseenFilesAndExpiresHistory() started.
+2026-10-28T04:53:36.2632530Z ✔ Test navigationRetiresDistantUnseenFilesAndExpiresHistory() passed after 0.001 seconds.
+2026-10-28T04:53:36.2633100Z ◇ Test samplesAreUniqueBoundedAndStartAtInterest() started.
+2026-10-28T04:53:36.2633540Z ✔ Test samplesAreUniqueBoundedAndStartAtInterest() passed after 0.001 seconds.
+2026-10-28T04:53:36.2634250Z ◇ Test malformedBudgetsAreClampedAndGenerationDefaultsOff() started.
+2026-10-28T04:53:36.2634760Z ✔ Test malformedBudgetsAreClampedAndGenerationDefaultsOff() passed after 0.001 seconds.
+2026-10-28T04:53:36.2635370Z ◇ Test refinementKeepsBoundedLocalVisitsWithoutChangingPerVideoSamplePriority() started.
+2026-10-28T04:53:36.2636050Z ✔ Test refinementKeepsBoundedLocalVisitsWithoutChangingPerVideoSamplePriority() passed after 0.001 seconds.
+2026-10-28T04:53:36.2636600Z ✔ Suite "Thumbnail scheduling policy" passed after 0.004 seconds.
+2026-10-28T04:53:36.2636950Z ◇ Suite "Thumbnail scheduling policy regressions" started.
+2026-10-28T04:53:36.2637380Z ◇ Test visibilityTruthTable() started.
+2026-10-28T04:53:36.2637690Z ✔ Test visibilityTruthTable() passed after 0.001 seconds.
+2026-10-28T04:53:36.2638080Z ◇ Test cancelledLeaderIsNotRetriedBeforeLaterFiles() started.
+2026-10-28T04:53:36.2638570Z ✔ Test cancelledLeaderIsNotRetriedBeforeLaterFiles() passed after 0.001 seconds.
+2026-10-28T04:53:36.2639040Z ◇ Test cursorReconcilesRemovedAndReorderedCandidates() started.
+2026-10-28T04:53:36.2639710Z ✔ Test cursorReconcilesRemovedAndReorderedCandidates() passed after 0.001 seconds.
+2026-10-28T04:53:36.2640240Z ◇ Test rankingBeforeBatchingReachesBeyondOriginalPrefix() started.
+2026-10-28T04:53:36.2641560Z ✔ Test rankingBeforeBatchingReachesBeyondOriginalPrefix() passed after 0.001 seconds.
+2026-10-28T04:53:36.2642150Z ✔ Suite "Thumbnail scheduling policy regressions" passed after 0.001 seconds.
+2026-10-28T04:53:36.2642570Z ✔ Test run with 23 tests in 3 suites passed after 18.379 seconds.
+2026-10-28T04:53:36.2934620Z ##[group]Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+2026-10-28T04:53:36.2935090Z with:
+2026-10-28T04:53:36.2935320Z   name: thumbnail-nil-folder-integration
+2026-10-28T04:53:36.2935730Z   path: /Users/runner/work/_temp/thumbnail-nil-folder-integration/
+2026-10-28T04:53:36.2936070Z   retention-days: 14
+2026-10-28T04:53:36.2936350Z   if-no-files-found: warn
+2026-10-28T04:53:36.2936640Z   compression-level: 6
+2026-10-28T04:53:36.2936860Z   overwrite: false
+2026-10-28T04:53:36.2937120Z   include-hidden-files: false
+2026-10-28T04:53:36.2937390Z env:
+2026-10-28T04:53:36.2938030Z   DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+2026-10-28T04:53:36.2941070Z   PKG_CONFIG_LIBDIR: /Users/runner/work/illiquid/illiquid/BuildInputs/system-pkgconfig:/opt/homebrew/Cellar/dav1d/1.5.3/lib/pkgconfig:/opt/homebrew/Cellar/ffmpeg/8.1.2-illiquid1/lib/pkgconfig:/opt/homebrew/Cellar/freetype/2.14.3/lib/pkgconfig:/opt/homebrew/Cellar/fribidi/1.0.16/lib/pkgconfig:/opt/homebrew/Cellar/glib/2.88.2/lib/pkgconfig:/opt/homebrew/Cellar/graphite2/1.3.15/lib/pkgconfig:/opt/homebrew/Cellar/harfbuzz/14.2.1/lib/pkgconfig:/opt/homebrew/Cellar/libass/0.17.5/lib/pkgconfig:/opt/homebrew/Cellar/libpng/1.6.58/lib/pkgconfig:/opt/homebrew/Cellar/libunibreak/7.0/lib/pkgconfig:/opt/homebrew/Cellar/libvmaf/3.1.0/lib/pkgconfig:/opt/homebrew/Cellar/libvpx/1.16.0/lib/pkgconfig:/opt/homebrew/Cellar/openssl@3/3.6.3/lib/pkgconfig:/opt/homebrew/Cellar/opus/1.6.1/lib/pkgconfig:/opt/homebrew/Cellar/pcre2/10.47_1/lib/pkgconfig:/opt/homebrew/Cellar/svt-av1/4.1.0/lib/pkgconfig:/opt/homebrew/Cellar/x264/r3222/lib/pkgconfig:/opt/homebrew/Cellar/x265/4.2/lib/pkgconfig
+2026-10-28T04:53:36.2946590Z   PKG_CONFIG_PATH: /Users/runner/work/illiquid/illiquid/BuildInputs/system-pkgconfig:/opt/homebrew/Cellar/dav1d/1.5.3/lib/pkgconfig:/opt/homebrew/Cellar/ffmpeg/8.1.2-illiquid1/lib/pkgconfig:/opt/homebrew/Cellar/freetype/2.14.3/lib/pkgconfig:/opt/homebrew/Cellar/fribidi/1.0.16/lib/pkgconfig:/opt/homebrew/Cellar/glib/2.88.2/lib/pkgconfig:/opt/homebrew/Cellar/graphite2/1.3.15/lib/pkgconfig:/opt/homebrew/Cellar/harfbuzz/14.2.1/lib/pkgconfig:/opt/homebrew/Cellar/libass/0.17.5/lib/pkgconfig:/opt/homebrew/Cellar/libpng/1.6.58/lib/pkgconfig:/opt/homebrew/Cellar/libunibreak/7.0/lib/pkgconfig:/opt/homebrew/Cellar/libvmaf/3.1.0/lib/pkgconfig:/opt/homebrew/Cellar/libvpx/1.16.0/lib/pkgconfig:/opt/homebrew/Cellar/openssl@3/3.6.3/lib/pkgconfig:/opt/homebrew/Cellar/opus/1.6.1/lib/pkgconfig:/opt/homebrew/Cellar/pcre2/10.47_1/lib/pkgconfig:/opt/homebrew/Cellar/svt-av1/4.1.0/lib/pkgconfig:/opt/homebrew/Cellar/x264/r3222/lib/pkgconfig:/opt/homebrew/Cellar/x265/4.2/lib/pkgconfig
+2026-10-28T04:53:36.2949510Z ##[endgroup]
+2026-10-28T04:53:36.7659590Z (node:15925) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+2026-10-28T04:53:36.7661180Z (Use `node --trace-deprecation ...` to show where the warning was created)
+2026-10-28T04:53:36.7728760Z With the provided path, there will be 2 files uploaded
+2026-10-28T04:53:36.7730680Z Artifact name is valid!
+2026-10-28T04:53:36.7731340Z Root directory input is valid!
+2026-10-28T04:53:37.0867990Z (node:15925) [DEP0169] DeprecationWarning: `url.parse()` behavior is not standardized and prone to errors that have security implications. Use the WHATWG URL API instead. CVEs are not issued for `url.parse()` vulnerabilities.
+2026-10-28T04:53:37.0876450Z Beginning upload of artifact content to blob storage
+2026-10-28T04:53:37.1329720Z Uploaded bytes 5413
+2026-10-28T04:53:37.1480760Z Finished uploading artifact content to blob storage!
+2026-10-28T04:53:37.1481520Z SHA256 digest of uploaded artifact zip is 74386b6711326d193ec7ba7716a03d7dbb3b883eb1e494199ebad0d2c7479a12
+2026-10-28T04:53:37.1482260Z Finalizing artifact upload
+2026-10-28T04:53:37.5960030Z Artifact thumbnail-nil-folder-integration.zip successfully finalized. Artifact ID 12792474826
+2026-10-28T04:53:37.5962040Z Artifact thumbnail-nil-folder-integration has been successfully uploaded! Final size is 5413 bytes. Artifact ID is 12792474826
+2026-10-28T04:53:37.5971220Z Artifact download URL: https://github.com/Jagalite/illiquid/actions/runs/40633988090/artifacts/12792474826
+2026-10-28T04:53:37.6167380Z Post job cleanup.
+2026-10-28T04:53:37.7405180Z [command]/opt/homebrew/bin/git version
+2026-10-28T04:53:37.7633260Z git version 2.56.0
+2026-10-28T04:53:37.7653290Z Copying '/Users/runner/.gitconfig' to '/Users/runner/work/_temp/ee09be96-69bc-4d53-8948-563b2e2c59e6/.gitconfig'
+2026-10-28T04:53:37.7660670Z Temporarily overriding HOME='/Users/runner/work/_temp/ee09be96-69bc-4d53-8948-563b2e2c59e6' before making global git config changes
+2026-10-28T04:53:37.7662000Z Adding repository directory to the temporary git global config as a safe directory
+2026-10-28T04:53:37.7664890Z [command]/opt/homebrew/bin/git config --global --add safe.directory /Users/runner/work/illiquid/illiquid
+2026-10-28T04:53:37.7801550Z [command]/opt/homebrew/bin/git config --local --name-only --get-regexp core\.sshCommand
+2026-10-28T04:53:37.7894170Z [command]/opt/homebrew/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2026-10-28T04:53:37.9215820Z [command]/opt/homebrew/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2026-10-28T04:53:37.9294750Z [command]/opt/homebrew/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2026-10-28T04:53:38.0480610Z [command]/opt/homebrew/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+2026-10-28T04:53:38.0550980Z [command]/opt/homebrew/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+2026-10-28T04:53:38.1606860Z Cleaning up orphan processes
+2026-10-28T04:53:39.5498500Z ##[warning]Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/checkout@11d5960a326750d5838078e36cf38b85af677262, actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/

@@ -40,7 +40,11 @@ static const Workload workloads[] = {
     { "dvd-720x64-4", 720, 64, 4, 4, 16 },
     { "caption-1280x96-sparse4", 1280, 96, 256, 4, 16 },
     { "caption-1280x96-dense256", 1280, 96, 256, 256, 16 },
+    { "caption-1280x96-255", 1280, 96, 255, 255, 16 },
+    { "caption-1280x96-sparse4-contiguous", 1280, 96, 256, 4, 0 },
+    { "caption-1280x96-dense256-contiguous", 1280, 96, 256, 256, 0 },
     { "pgs-1920x216-256", 1920, 216, 256, 256, 32 },
+    { "pgs-1920x216-256-contiguous", 1920, 216, 256, 256, 0 },
     { "large-1920x1080-256", 1920, 1080, 256, 256, 32 },
 };
 
@@ -75,7 +79,8 @@ static uint32_t next_random(uint32_t *state) {
 static Fixture make_fixture(const Workload *workload, uint32_t variant) {
     Fixture fixture = {0};
     AVSubtitleRect *rect = &fixture.rect;
-    const int crop_x = 3, crop_y = 1;
+    const int crop_x = workload->padding ? 3 : 0;
+    const int crop_y = workload->padding ? 1 : 0;
     rect->type = SUBTITLE_BITMAP;
     rect->w = workload->width;
     rect->h = workload->height;
@@ -187,11 +192,11 @@ static void check_valid(const char *label, const Fixture *fixture) {
                      fixture->output_bytes, 0, 0, fixture->output_bytes / 4);
 }
 
-static void verify_exhaustive_alpha(void) {
-    Workload workload = { "alpha/channel exhaustive", 256, 1, 256, 256, 7 };
+static void verify_exhaustive_alpha(int width) {
+    Workload workload = { "alpha/channel exhaustive", width, 1, 256, 256, 7 };
     Fixture fixture = make_fixture(&workload, 0);
-    for (int component = 0; component < 256; ++component)
-        fixture.rect.data[0][component] = (uint8_t)component;
+    for (int x = 0; x < width; ++x)
+        fixture.rect.data[0][x] = (uint8_t)x;
     for (unsigned int alpha = 0; alpha < 256; ++alpha) {
         for (unsigned int component = 0; component < 256; ++component) {
             uint32_t color = (alpha << 24) | (component << 16)
@@ -205,6 +210,25 @@ static void verify_exhaustive_alpha(void) {
     fixture.output_bytes = 4;
     fixture.rect.data[0][0] = 255;
     check_valid("index 255 / one pixel", &fixture);
+    free_fixture(&fixture);
+}
+
+static void verify_incomplete_palette(void) {
+    /* A 255-entry table must still reject index 255 at the first bad pixel. */
+    Workload workload = { "255-entry palette", 32, 16, 255, 255, 7 };
+    Fixture fixture = make_fixture(&workload, 0);
+    check_valid(workload.name, &fixture);
+    const size_t positions[] = { 0, 256, 511 };
+    for (size_t i = 0; i < sizeof(positions) / sizeof(positions[0]); ++i) {
+        size_t position = positions[i];
+        size_t offset = position / 32 * (size_t)fixture.rect.linesize[0] + position % 32;
+        uint8_t previous = fixture.rect.data[0][offset];
+        fixture.rect.data[0][offset] = 255;
+        check_conversion("255-entry palette / invalid index 255", &fixture.rect,
+                         fixture.output_bytes, fixture.output_bytes, 0,
+                         AVERROR_INVALIDDATA, position);
+        fixture.rect.data[0][offset] = previous;
+    }
     free_fixture(&fixture);
 }
 
@@ -313,7 +337,9 @@ static void verify_randomized(void) {
 }
 
 static void verify(void) {
-    verify_exhaustive_alpha();
+    verify_exhaustive_alpha(256);  /* Scalar path. */
+    verify_exhaustive_alpha(512);  /* Full-palette table path. */
+    verify_incomplete_palette();
     verify_thresholds();
     verify_invalid_arguments();
     verify_randomized();
@@ -326,7 +352,7 @@ static void verify(void) {
     }
     printf("{\"status\":\"passed\",\"checks\":%" PRIu64
            ",\"native_calls\":%" PRIu64 ",\"independent_pixel_checks\":%" PRIu64
-           ",\"alpha_channel_pairs\":65536,\"randomized_fixtures\":%d,"
+           ",\"alpha_channel_pairs\":65536,\"alpha_channel_paths\":2,\"randomized_fixtures\":%d,"
            "\"workload_fixtures\":%zu}\n",
            checks, checks * 2, independent_pixel_checks, random_fixture_count,
            sizeof(workloads) / sizeof(workloads[0]) * (size_t)fixture_count);
@@ -396,9 +422,12 @@ static void list_workloads(void) {
     for (size_t i = 0; i < sizeof(workloads) / sizeof(workloads[0]); ++i) {
         const Workload *workload = &workloads[i];
         printf("%s{\"name\":\"%s\",\"w\":%d,\"h\":%d,\"colors\":%d,"
-               "\"index_pool_size\":%d,\"source_padding\":%d,\"fixture_count\":%d}",
+               "\"index_pool_size\":%d,\"source_padding\":%d,\"fixture_count\":%d,"
+               "\"source_crop_x\":%d,\"source_crop_y\":%d,\"source_stride\":%d}",
                i ? ",\n" : "", workload->name, workload->width, workload->height,
-               workload->colors, workload->used_colors, workload->padding, fixture_count);
+               workload->colors, workload->used_colors, workload->padding, fixture_count,
+               workload->padding ? 3 : 0, workload->padding ? 1 : 0,
+               workload->width + workload->padding + (workload->padding ? 3 : 0));
     }
     puts("\n]");
 }

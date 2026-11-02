@@ -7,9 +7,11 @@ on:
       - 'Tests/IlliquidAppTests/SourceFilesystemMonitorTests.swift'
       - 'Tests/IlliquidAppTests/SourceFilesystemEventLossTests.swift'
       - 'Tests/IlliquidAppTests/SourceFilesystemEventBufferTests.swift'
+      - 'Tests/IlliquidAppTests/SourceFilesystemEventBatchTests.swift'
       - 'Scripts/test-filesystem-event-loss-regressions.sh'
       - 'Validation/SourceFilesystemEventLoss/**'
       - 'Benchmarks/FilesystemEventBuffer/**'
+      - 'Benchmarks/FilesystemEventBatch/**'
       - 'Benchmarks/RuntimeLeaseHistory/CLeaseHeap/**'
       - '.github/workflows/filesystem-event-loss-regressions.yml'
   workflow_dispatch:
@@ -38,9 +40,19 @@ jobs:
         run: bash Validation/SourceFilesystemEventLoss/run.sh
       - name: Measure bounded debounce event retention
         run: python3 Benchmarks/FilesystemEventBuffer/run.py --output "$RUNNER_TEMP/filesystem-event-buffer" --pairs 4
+      - name: Measure bounded native callback materialization
+        run: python3 Benchmarks/FilesystemEventBatch/run.py --output "$RUNNER_TEMP/filesystem-event-batch" --pairs 6 --target-ms 60
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         if: always()
         with:
           name: filesystem-event-buffer-memory
           path: ${{ runner.temp }}/filesystem-event-buffer/evidence/
+          retention-days: 14
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: filesystem-event-batch-memory
+          path: |
+            ${{ runner.temp }}/filesystem-event-batch/
+            !${{ runner.temp }}/filesystem-event-batch/build/**
           retention-days: 14

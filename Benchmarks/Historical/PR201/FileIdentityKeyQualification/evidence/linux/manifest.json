@@ -1,0 +1,90 @@
+{
+  "baseline_commit": "ea2ff568237e2667f7b1aeee67b11a44ebe95b72",
+  "baseline_blob": "d90e4fc199eabfa4e554c3c8d01a1ed48277ae20",
+  "candidate_commit": "1e0d10bcb234a888c0aae5e4d37316480760ca15",
+  "candidate_status": "",
+  "platform": "Linux-6.17.0-1022-azure-x86_64-with-glibc2.39",
+  "machine": "x86_64",
+  "swift": "Swift version 6.4 (swift-6.4-RELEASE)\nTarget: x86_64-unknown-linux-gnu",
+  "compiler_flags": [
+    "-O",
+    "-whole-module-optimization",
+    "-swift-version",
+    "6",
+    "-warnings-as-errors",
+    "-Xfrontend",
+    "-disable-cmo"
+  ],
+  "source_sha256": {
+    "baseline/NormalizedFileURL.swift": {
+      "repository_path": "Sources/IlliquidCore/Utilities/NormalizedFileURL.swift",
+      "sha256": "3b65c98b88722ca4d51c315a7fd5e2fde0e40c846071b6b1e34cd1f1eddb3fd2"
+    },
+    "baseline/NaturalFilenameOrdering.swift": {
+      "repository_path": "Sources/IlliquidCore/Utilities/NaturalFilenameOrdering.swift",
+      "sha256": "d167212f90dd5cd6d8e0e73c208d8e9b4648cc7f4dd21212d51c85a693a263e7"
+    },
+    "baseline/FolderPlaylist.swift": {
+      "repository_path": "Sources/IlliquidCore/Playlist/FolderPlaylist.swift",
+      "sha256": "8a3c017132f0e79cb8280551ff686066b9a3005c49bd7833efc54bb11dfe75fe"
+    },
+    "baseline/MediaSource.swift": {
+      "repository_path": "Sources/IlliquidCore/Player/MediaSource.swift",
+      "sha256": "d3e776abaa9bdae73a6a656114eee1bc761ddbea78017a6b710ed22895f6d254"
+    },
+    "candidate/NormalizedFileURL.swift": {
+      "repository_path": "Sources/IlliquidCore/Utilities/NormalizedFileURL.swift",
+      "sha256": "bb34064bfa3c15ab0ce9ddebd59920c17ab252ea48069ca9d4f66dff424c92aa"
+    },
+    "candidate/NaturalFilenameOrdering.swift": {
+      "repository_path": "Sources/IlliquidCore/Utilities/NaturalFilenameOrdering.swift",
+      "sha256": "d167212f90dd5cd6d8e0e73c208d8e9b4648cc7f4dd21212d51c85a693a263e7"
+    },
+    "candidate/FolderPlaylist.swift": {
+      "repository_path": "Sources/IlliquidCore/Playlist/FolderPlaylist.swift",
+      "sha256": "8a3c017132f0e79cb8280551ff686066b9a3005c49bd7833efc54bb11dfe75fe"
+    },
+    "candidate/MediaSource.swift": {
+      "repository_path": "Sources/IlliquidCore/Player/MediaSource.swift",
+      "sha256": "d3e776abaa9bdae73a6a656114eee1bc761ddbea78017a6b710ed22895f6d254"
+    },
+    "qualification/Driver.swift": {
+      "sha256": "57062d9b62d4f6fb903357568784c4c6d81fda6807a5fd28e932e897f4a2d5bd"
+    },
+    "qualification/run.py": {
+      "sha256": "7510db8903c403a667e009bfc2d56731125a5ac74aebc85e9e1864c3d3d00fd9"
+    },
+    "qualification/LocalMediaSourceValidationTests.swift": {
+      "sha256": "f1a3fc0a42fe826b223bc32e2df6c1983d03592dd5d92a952373be29196d6604"
+    },
+    "qualification/NormalizedFileURLPersistenceKeyTests.swift": {
+      "sha256": "ba3c7859418102eb607e954466033a345af066b24eef71d212a54ecd17987524"
+    },
+    "qualification/FolderPlaylistTests.swift": {
+      "sha256": "4788f003238a7f8bac174e2bf37db415efb46ec0a38b65313b46e51b87ee779d"
+    },
+    "qualification/FolderPlaylistLookupTests.swift": {
+      "sha256": "f3becac9488c2b12890933ab74c188098aa1fc5fee6870e4a646db3a64a1880f"
+    }
+  },
+  "module_boundary": "Production module and driver compiled separately with -Xfrontend -disable-cmo",
+  "sampling": "Fresh process per variant per pair; AB/BA order alternates; all samples retained",
+  "calibration": "One shared iteration count per workload, chosen using both variants",
+  "scope": "Steady-state component calls; fixture creation, sorting and warmup excluded",
+  "pairs": 10,
+  "target_ms": 100,
+  "logical_cpu_count": 4,
+  "mode": "all",
+  "developer_dir": null,
+  "cpu": "AMD EPYC 7763 64-Core Processor",
+  "binary_sha256": {
+    "baseline": {
+      "module": "24662674a249311e93c50440073b8e6320b545d8181327043636731f184b251e",
+      "driver": "6652c9a2c28136e2b63091ecf0a738bfdff197a4bb93d94afe28155d2173ac44"
+    },
+    "candidate": {
+      "module": "2f6c01cf8664154547437b46b27e7d253128ec02e09f6863a74ee586a6bbfc1b",
+      "driver": "d8670df1b57f73297f6f899538a547a4e5146841003bb7af886c7061eb310661"
+    }
+  }
+}

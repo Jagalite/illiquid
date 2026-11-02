@@ -1,0 +1,66 @@
+name: Thumbnail sample prefix portable research
+
+on:
+  push:
+    branches:
+      - perf/thumbnail-sample-prefix-20261028-ccf7e3
+    paths:
+      - .github/workflows/thumbnail-sample-prefix-portable.yml
+      - Sources/IlliquidCore/Player/ThumbnailPolicy.swift
+      - Tests/IlliquidCoreTests/Thumbnail*Tests.swift
+      - Benchmarks/ThumbnailSamplePrefix/**
+      - '!Benchmarks/ThumbnailSamplePrefix/README.md'
+      - '!Benchmarks/ThumbnailSamplePrefix/evidence/**'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: thumbnail-sample-prefix-portable-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  qualify:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    container:
+      image: swift:6.3.2-jammy
+    steps:
+      - name: Install harness tools
+        run: |
+          apt-get update
+          apt-get install -y --no-install-recommends python3 git ca-certificates
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - name: Trust this disposable checkout
+        run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
+      - name: Test exact outputs and measure paired sample planning
+        run: |
+          python3 Benchmarks/ThumbnailSamplePrefix/run.py \
+            --pairs 12 --target-ms 80 \
+            --output "$RUNNER_TEMP/thumbnail-sample-prefix"
+      - name: Emit reviewable evidence
+        if: always()
+        run: |
+          python3 - <<'PY'
+          import json, os
+          from pathlib import Path
+          root = Path(os.environ["RUNNER_TEMP"]) / "thumbnail-sample-prefix"
+          for name in ("manifest.json", "tests.json", "differential.json", "cases.json",
+                       "calibration.json", "observations.jsonl", "summary.json", "completion.json"):
+              path = root / name
+              if path.is_file():
+                  print("THUMBNAIL_SAMPLE_EVIDENCE " + json.dumps(
+                      {"path": name, "content": path.read_text()}, sort_keys=True))
+          PY
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: thumbnail-sample-prefix-linux
+          path: |
+            ${{ runner.temp }}/thumbnail-sample-prefix/*.json
+            ${{ runner.temp }}/thumbnail-sample-prefix/*.jsonl
+            ${{ runner.temp }}/thumbnail-sample-prefix/logs
+          retention-days: 14

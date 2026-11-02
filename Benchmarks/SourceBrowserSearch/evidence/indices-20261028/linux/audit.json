@@ -1,0 +1,79 @@
+{
+  "schema": 1,
+  "status": "pass",
+  "repository": "Jagalite/illiquid",
+  "workflow_run_id": 40636607350,
+  "job_id": 122644913586,
+  "baseline": "ea2ff568237e2667f7b1aeee67b11a44ebe95b72",
+  "candidate": "2cd7ea9b7fc80cfcea8d7b7dab5d9d5a26fc5ecd",
+  "platform": "Linux x86_64; Swift 6.4; glibc 2.39; AMD EPYC 9V74; CPU affinity [0]",
+  "evidence_blocks": 17,
+  "independent_checks": 3776,
+  "issues": [],
+  "timing": {
+    "observations": 216,
+    "cases": 18,
+    "pairs_per_case": 6,
+    "nonblank_cases": 16,
+    "nonblank_faster_pairs": 96,
+    "nonblank_pairs_total": 96
+  },
+  "allocations": {
+    "observations": 72,
+    "cases": 18,
+    "pairs_per_case": 2,
+    "metric": "Cumulative requested allocation bytes per operation; not live memory, peak memory, or RSS"
+  },
+  "parity": {
+    "all_oracle_checks": true,
+    "paired_fingerprints_checksums_rows_iterations_equal": true,
+    "balanced_ab_ba_order": true,
+    "all_summary_statistics_recomputed": true
+  },
+  "provenance": {
+    "only_differing_compiled_input": "Sources/IlliquidApp/SourceBrowserFilter.swift",
+    "github_source_and_test_hashes_verified": 7,
+    "harness_hashes_verified": 3,
+    "support_declaration_slice_hashes_verified": 18,
+    "reassembled_support_hash_verified": true,
+    "reconstructed_baseline_oracle_hash_verified": true,
+    "baseline_filter_sha256": "b630c3134611c650aed75ba6eb0eee8e739555f80356d9307f9f22cb4886924e",
+    "candidate_filter_sha256": "ce8f71ebc78e595f83fa1e5fecc2007325f7a708b29d1a54e9b8ec3b1ea7b88a"
+  },
+  "tests": {
+    "baseline_debug": 9,
+    "baseline_release": 9,
+    "candidate_debug": 9,
+    "candidate_release": 9,
+    "all_exit_codes": 0
+  },
+  "selected_results": [
+    {
+      "case": "search/100000/2/broad",
+      "baseline_median_ms": 200.427986,
+      "candidate_median_ms": 164.7071005,
+      "median_paired_wall_reduction_percent": 16.78142960333055,
+      "baseline_requested_bytes_per_operation": 184239975,
+      "candidate_requested_bytes_per_operation": 102451055,
+      "median_paired_byte_reduction_percent": 44.39260263685989
+    },
+    {
+      "case": "project/100000/2/broad",
+      "baseline_median_ms": 318.9999365,
+      "candidate_median_ms": 283.8526335,
+      "median_paired_wall_reduction_percent": 11.007767225561304,
+      "baseline_requested_bytes_per_operation": 259801238,
+      "candidate_requested_bytes_per_operation": 178012882,
+      "median_paired_byte_reduction_percent": 31.48112635247059
+    }
+  ],
+  "caveats": [
+    "Isolated component qualification; no full player, native playback, or live UI qualification.",
+    "macOS results were outside this audit.",
+    "Timing and allocation cohorts are separate; timing results have no allocation instrumentation.",
+    "Blank-query controls regress slightly: approximately 5.88 ns in median search time and 0.509 microseconds in median cached projection time.",
+    "No-match search allocation bytes are unchanged.",
+    "Allocation controls contain small async/runtime noise: cached no-match projection increases by 596 requested bytes per operation in the reported medians.",
+    "Only two balanced allocation pairs were collected; allocation bytes quantify churn rather than memory footprint."
+  ]
+}

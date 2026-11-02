@@ -1,0 +1,149 @@
+name: Episode display name formatting
+
+on:
+  push:
+    branches: [perf/episode-display-formatting-20261028-355e]
+    paths:
+      - Sources/IlliquidCore/MediaLibrary/MediaNameRecognition.swift
+      - Tests/IlliquidCoreTests/EpisodeDisplayNameTests.swift
+      - Benchmarks/EpisodeDisplayName/**
+      - .github/workflows/episode-display-name.yml
+      - '!Benchmarks/EpisodeDisplayName/*.md'
+      - '!Benchmarks/EpisodeDisplayName/evidence/**'
+  pull_request:
+    paths:
+      - Sources/IlliquidCore/MediaLibrary/MediaNameRecognition.swift
+      - Tests/IlliquidCoreTests/EpisodeDisplayNameTests.swift
+      - Benchmarks/EpisodeDisplayName/**
+      - .github/workflows/episode-display-name.yml
+      - '!Benchmarks/EpisodeDisplayName/*.md'
+      - '!Benchmarks/EpisodeDisplayName/evidence/**'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: episode-display-name-${{ github.head_ref || github.ref_name }}
+  cancel-in-progress: true
+
+jobs:
+  native-component:
+    runs-on: macos-26
+    timeout-minutes: 25
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      # The existing source-tree-sorting workflow also builds the app graph and
+      # tests projection callers when MediaNameRecognition.swift changes.
+      - name: Test exact sources, compare complete labels, and measure native formatting
+        shell: python3 {0}
+        run: |
+          import json
+          import os
+          from pathlib import Path
+          import subprocess
+          import sys
+
+          command = [
+              sys.executable, 'Benchmarks/EpisodeDisplayName/run.py',
+              '--output', str(Path(os.environ['RUNNER_TEMP']) / 'episode-display-name'),
+              '--pairs', '12', '--target-ms', '150',
+          ]
+          queue = Path('/Volumes/seed1/Projects/kyoto/kyoto.py')
+          if queue.is_file():
+              cli = [sys.executable, str(queue)]
+              submitted = subprocess.check_output([*cli, 'submit', '--', *command], text=True)
+              print(submitted, flush=True)
+              job_id = str(json.loads(submitted)['id'])
+              subprocess.run([*cli, 'show', job_id], check=True)
+              result = subprocess.run([*cli, 'wait', job_id])
+              subprocess.run([*cli, 'logs', job_id], check=True)
+              sys.exit(result.returncode)
+          print('Shared Kyoto queue is unavailable on this hosted runner; '
+                'compiling isolated component packages directly and serially.', flush=True)
+          subprocess.run(command, check=True)
+      - name: Retain complete compact evidence in the run log
+        if: always()
+        shell: python3 {0}
+        run: |
+          import base64
+          import gzip
+          import hashlib
+          import json
+          import os
+          from pathlib import Path
+          import sys
+
+          root = Path(os.environ['RUNNER_TEMP']) / 'episode-display-name'
+          if not root.is_dir():
+              print('No component evidence directory was created; inspect the preceding failure.')
+              sys.exit(0)
+          excluded = {'work', 'build', '.build', 'cache', 'module-cache', 'swiftpm-cache'}
+          files = {}
+          for path in sorted(root.rglob('*')):
+              relative = path.relative_to(root)
+              if (not path.is_file() or path.is_symlink()
+                      or excluded.intersection(relative.parts)
+                      or path.name == 'native-log-bundle.json.gz'):
+                  continue
+              if path.suffix not in {'.json', '.jsonl', '.log', '.txt', '.swift', '.py'} and not path.name.endswith('.json.gz'):
+                  continue
+              data = path.read_bytes()
+              files[relative.as_posix()] = {
+                  'bytes': len(data), 'sha256': hashlib.sha256(data).hexdigest(),
+                  'content_base64': base64.b64encode(data).decode('ascii'),
+              }
+          run = {
+              'id': os.environ['GITHUB_RUN_ID'],
+              'attempt': os.environ['GITHUB_RUN_ATTEMPT'],
+              'sha': os.environ['GITHUB_SHA'],
+              'event': os.environ['GITHUB_EVENT_NAME'],
+              'url': f"https://github.com/{os.environ['GITHUB_REPOSITORY']}/actions/runs/{os.environ['GITHUB_RUN_ID']}",
+          }
+          packed = gzip.compress(json.dumps(
+              {'schema': 1, 'github_run': run, 'files': files},
+              sort_keys=True, separators=(',', ':')).encode(), compresslevel=9, mtime=0)
+          (root / 'native-log-bundle.json.gz').write_bytes(packed)
+          if len(packed) > 2 * 1024 * 1024:
+              raise SystemExit('Complete evidence exceeds the 2 MiB log-bundle limit; '
+                               'the uploaded artifact retains every evidence file.')
+          print('EPISODE_DISPLAY_NAME_BUNDLE_META ' + json.dumps({
+              'schema': 1, 'format': 'base64(gzip(json))', 'bytes': len(packed),
+              'sha256': hashlib.sha256(packed).hexdigest(), 'files': sorted(files),
+          }, sort_keys=True))
+          encoded = base64.b64encode(packed).decode('ascii')
+          chunks = [encoded[offset:offset + 12000] for offset in range(0, len(encoded), 12000)]
+          for index, chunk in enumerate(chunks):
+              print('EPISODE_DISPLAY_NAME_BUNDLE_PART ' + json.dumps({
+                  'index': index, 'parts': len(chunks), 'data': chunk,
+              }, separators=(',', ':')))
+          for name in ['tests.json', 'parity.json', 'summary.json']:
+              path = root / name
+              if path.is_file():
+                  print(name + '\n' + path.read_text())
+          with open(os.environ['GITHUB_STEP_SUMMARY'], 'a') as summary:
+              summary.write('## Episode display name formatting\n\n')
+              summary.write(f'Collected {len(files)} evidence files in the artifact and a '
+                            f'{len(packed):,}-byte complete log bundle.\n\n')
+              summary.write('Inspect the test, parity, and timing receipts for the outcome. '
+                            'These are component measurements; live UI, playback, and '
+                            'whole-application performance are not measured.\n')
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: episode-display-name-macos
+          path: |
+            ${{ runner.temp }}/episode-display-name/
+            !${{ runner.temp }}/episode-display-name/work/**
+            !${{ runner.temp }}/episode-display-name/**/build/**
+            !${{ runner.temp }}/episode-display-name/**/.build/**
+            !${{ runner.temp }}/episode-display-name/**/cache/**
+            !${{ runner.temp }}/episode-display-name/**/module-cache/**
+            !${{ runner.temp }}/episode-display-name/**/swiftpm-cache/**
+          if-no-files-found: warn
+          retention-days: 14

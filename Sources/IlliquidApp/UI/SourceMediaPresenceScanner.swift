@@ -48,10 +48,23 @@ final class SourceMediaPresenceScanner {
         revision += 1
         for path in directories { directoryRevisions[path] = revision; summaries[path] = nil }
         for path in subtrees { treeRevisions[path] = revision }
-        summaries = summaries.filter { entry in !subtrees.contains { Self.contains(entry.key, in: $0) } }
-        results = results.filter { entry in
-            !directories.contains { Self.contains($0, in: entry.key) }
-                && !subtrees.contains { Self.contains(entry.key, in: $0) || Self.contains($0, in: entry.key) }
+        if !subtrees.isEmpty {
+            summaries = summaries.filter { entry in !subtrees.contains { Self.contains(entry.key, in: $0) } }
+        }
+        if subtrees.isEmpty {
+            // The former filter also released an emptied summary table.
+            if summaries.isEmpty { summaries = [:] }
+            // A listing change invalidates that folder and its ancestors, not
+            // its cached descendants. Find those keys without scanning every
+            // watched folder. Skip an unchanged result to preserve Observation's
+            // setter suppression, then mutate through one property access.
+            let keys = Self.ancestorResultKeys(for: directories, in: results)
+            if !keys.isEmpty { Self.removeResults(keys, from: &results) }
+        } else {
+            results = results.filter { entry in
+                !directories.contains { Self.contains($0, in: entry.key) }
+                    && !subtrees.contains { Self.contains(entry.key, in: $0) || Self.contains($0, in: entry.key) }
+            }
         }
         for path in directories { enqueue(path) }
         // Removed directories need a parent listing, not a scan of a vanished path.
@@ -170,6 +183,35 @@ final class SourceMediaPresenceScanner {
     }
 
     private func isWatched(_ path: String) -> Bool { roots.contains { Self.contains(path, in: $0) } }
+
+    private static func ancestorResultKeys(
+        for paths: Set<String>, in results: [String: Bool]
+    ) -> Set<String> {
+        guard !results.isEmpty else { return [] }
+        var keys: Set<String> = []
+        for path in paths {
+            if results[path] != nil { keys.insert(path) }
+            if results["/"] != nil, contains(path, in: "/") { keys.insert("/") }
+            // Use literal slash bytes, without URL standardization or Character
+            // splitting. Combining scalars can share a Character with a slash;
+            // the existing containment predicate still decides each boundary.
+            let bytes = path.utf8
+            for index in bytes.indices where bytes[index] == 0x2F {
+                let prefix = String(decoding: bytes[..<index], as: UTF8.self)
+                if results[prefix] != nil, contains(path, in: prefix) { keys.insert(prefix) }
+            }
+        }
+        return keys
+    }
+
+    private static func removeResults(_ keys: Set<String>, from results: inout [String: Bool]) {
+        if keys.count == results.count {
+            results.removeAll(keepingCapacity: false)
+            return
+        }
+        for key in keys { results.removeValue(forKey: key) }
+    }
+
     private static func contains(_ path: String, in root: String) -> Bool {
         path == root || path.hasPrefix(root == "/" ? root : root + "/")
     }
@@ -254,13 +296,9 @@ final class SourceMediaPresenceCursor: @unchecked Sendable {
                 break
             }
             visited += 1
-            // Enumerator URLs may spell macOS aliases differently (/var versus
-            // /private/var). Keep cache keys in the prepared source's namespace.
             let level = enumerator?.level ?? 1
             while folders.count > level { finishFolder(updates: &updates) }
             guard let parent = folders.last else { markUnknown(); continue }
-            let path = URL(fileURLWithPath: parent.path, isDirectory: true)
-                .appendingPathComponent(url.lastPathComponent).path
             guard let values = try? url.resourceValues(forKeys: Self.keys) else {
                 markUnknown()
                 continue
@@ -269,6 +307,11 @@ final class SourceMediaPresenceCursor: @unchecked Sendable {
                 if values.isSymbolicLink == true || values.isPackage == true {
                     enumerator?.skipDescendants()
                 } else {
+                    // Only traversed directories need a key. Enumerator URLs
+                    // may spell macOS aliases differently (/var versus
+                    // /private/var), so retain the prepared parent's namespace.
+                    let path = URL(fileURLWithPath: parent.path, isDirectory: true)
+                        .appendingPathComponent(url.lastPathComponent).path
                     folders[folders.count - 1].children.insert(path)
                     if let cached = cachedResults[path] {
                         enumerator?.skipDescendants()

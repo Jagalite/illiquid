@@ -4,18 +4,21 @@ import Foundation
 enum PGSSubtitlePacket {
     static func isAcquisition(_ data: Data) -> Bool {
         data.withUnsafeBytes { raw in
-            let bytes = raw.bindMemory(to: UInt8.self)
-            var offset = 0
-            while bytes.count - offset >= 3 {
-                let kind = bytes[offset]
-                let length = Int(bytes[offset + 1]) * 256 + Int(bytes[offset + 2])
-                offset += 3
-                guard length <= bytes.count - offset else { return false }
-                if kind == 0x16, length >= 11, bytes[offset + 7] & 0xC0 != 0 { return true }
-                offset += length
-            }
-            return false
+            isAcquisition(raw.bindMemory(to: UInt8.self))
         }
+    }
+
+    static func isAcquisition(_ bytes: UnsafeBufferPointer<UInt8>) -> Bool {
+        var offset = 0
+        while bytes.count - offset >= 3 {
+            let kind = bytes[offset]
+            let length = Int(bytes[offset + 1]) * 256 + Int(bytes[offset + 2])
+            offset += 3
+            guard length <= bytes.count - offset else { return false }
+            if kind == 0x16, length >= 11, bytes[offset + 7] & 0xC0 != 0 { return true }
+            offset += length
+        }
+        return false
     }
 }
 
@@ -25,24 +28,27 @@ enum DVBSubtitlePacket {
     /// replace decoder history; ancillary pages must not reset a selected page.
     static func isAcquisition(_ data: Data, compositionPageID: UInt16?) -> Bool {
         data.withUnsafeBytes { raw in
-            let bytes = raw.bindMemory(to: UInt8.self)
-            var offset = 0
-            while bytes.count - offset >= 6 {
-                guard bytes[offset] == 0x0F else { return false }
-                let kind = bytes[offset + 1]
-                let pageID = UInt16(bytes[offset + 2]) * 256 + UInt16(bytes[offset + 3])
-                let length = Int(bytes[offset + 4]) * 256 + Int(bytes[offset + 5])
-                offset += 6
-                guard length <= bytes.count - offset else { return false }
-                if kind == 0x10, length >= 2,
-                   compositionPageID == nil || compositionPageID == pageID {
-                    let state = (bytes[offset + 1] >> 2) & 3
-                    if state == 1 || state == 2 { return true }
-                }
-                offset += length
-            }
-            return false
+            isAcquisition(raw.bindMemory(to: UInt8.self), compositionPageID: compositionPageID)
         }
+    }
+
+    static func isAcquisition(_ bytes: UnsafeBufferPointer<UInt8>, compositionPageID: UInt16?) -> Bool {
+        var offset = 0
+        while bytes.count - offset >= 6 {
+            guard bytes[offset] == 0x0F else { return false }
+            let kind = bytes[offset + 1]
+            let pageID = UInt16(bytes[offset + 2]) * 256 + UInt16(bytes[offset + 3])
+            let length = Int(bytes[offset + 4]) * 256 + Int(bytes[offset + 5])
+            offset += 6
+            guard length <= bytes.count - offset else { return false }
+            if kind == 0x10, length >= 2,
+               compositionPageID == nil || compositionPageID == pageID {
+                let state = (bytes[offset + 1] >> 2) & 3
+                if state == 1 || state == 2 { return true }
+            }
+            offset += length
+        }
+        return false
     }
 }
 
@@ -66,7 +72,8 @@ struct NativeBitmapSubtitleComposition: Sendable {
         guard canvasSize.width > 0, canvasSize.height > 0 else { return [] }
         let scaleX = viewport.width / canvasSize.width
         let scaleY = viewport.height / canvasSize.height
-        return regions.filter { !forcedOnly || $0.isForced }.map { region in
+        let visibleRegions = forcedOnly ? regions.filter(\.isForced) : regions
+        return visibleRegions.map { region in
             ASSRenderedRegion(bitmap: region.pixels, color: 0,
                 frame: CGRect(x: viewport.minX + region.frame.minX * scaleX,
                               y: viewport.minY + region.frame.minY * scaleY,
@@ -149,7 +156,14 @@ struct BitmapSubtitleTimeline: Sendable {
     mutating func prune(before seconds: Double) {
         // Keep the final set preceding the cutoff: an indefinite PGS display
         // can span an arbitrarily long silent interval before its clear event.
-        guard let lastPastIndex = entries.lastIndex(where: { $0.start <= seconds }), lastPastIndex > 0 else { return }
+        // Nothing can retire until the second event reaches the cutoff. A
+        // steady read-ahead window commonly retires just its oldest event.
+        guard entries.count > 1, entries[1].start <= seconds else { return }
+        var lastPastIndex = 1
+        if entries.count > 2, entries[2].start <= seconds,
+           let bulkIndex = entries.lastIndex(where: { $0.start <= seconds }) {
+            lastPastIndex = bulkIndex
+        }
         for entry in entries[..<lastPastIndex] { retainedBytes -= entry.composition.byteCount }
         entries.removeFirst(lastPastIndex)
     }

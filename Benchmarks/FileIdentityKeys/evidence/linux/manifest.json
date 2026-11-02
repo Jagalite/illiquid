@@ -1,0 +1,176 @@
+{
+  "baseline": {
+    "files": {
+      "FolderPlaylist.swift": {
+        "git_blob_sha1": "3ff5f3c2abccf3a26bcc170a7806aa857f45b37f",
+        "sha256": "8a3c017132f0e79cb8280551ff686066b9a3005c49bd7833efc54bb11dfe75fe",
+        "source": "Sources/IlliquidCore/Playlist/FolderPlaylist.swift"
+      },
+      "NaturalFilenameOrdering.swift": {
+        "git_blob_sha1": "d116171a69648d2bd6ce5ea5fb00b7fc6a2cb12a",
+        "sha256": "d167212f90dd5cd6d8e0e73c208d8e9b4648cc7f4dd21212d51c85a693a263e7",
+        "source": "Sources/IlliquidCore/Utilities/NaturalFilenameOrdering.swift"
+      },
+      "NormalizedFileURL.swift": {
+        "git_blob_sha1": "d90e4fc199eabfa4e554c3c8d01a1ed48277ae20",
+        "sha256": "3b65c98b88722ca4d51c315a7fd5e2fde0e40c846071b6b1e34cd1f1eddb3fd2",
+        "source": "Sources/IlliquidCore/Utilities/NormalizedFileURL.swift"
+      }
+    },
+    "repository": "https://github.com/Jagalite/illiquid",
+    "revision": "ea2ff568237e2667f7b1aeee67b11a44ebe95b72"
+  },
+  "binary_hashes": {
+    "URLBaseline.o": "965d0548a00aa363ba9bc83f0a7b7d870a5c6825693a42bf47f85af8a5c40146",
+    "URLCandidate.o": "69d2f9d518290f3cf0c3165be377e53c42d33ae2c72fd098d32c3b7799303806",
+    "differential": "9f07d8d04385e9076e8ae382f1000ce24e195e1b2e06f19bba69c4337b55a994",
+    "driver": "f4be1b8543f0ae68bf7669ba738178ef50a90d982d44696d9fd8dfb8155b52ff"
+  },
+  "checkout": {
+    "head": "ea2ff568237e2667f7b1aeee67b11a44ebe95b72",
+    "relevant_status": "M Sources/IlliquidCore/Utilities/NormalizedFileURL.swift\n?? Benchmarks/FileIdentityKeys/"
+  },
+  "completed_utc": "2026-10-28T04:56:22.202602+00:00",
+  "environment": {
+    "actual_swift_frontends": [
+      {
+        "path": "/tmp/illiquid-swift/usr/bin/swift-frontend",
+        "sha256": "81a8f92138bb9b2544abb5446eeb554fc37c5b5bf9bef2569f70232578ec15b6"
+      }
+    ],
+    "cpu": "AMD EPYC 9V74 80-Core Processor",
+    "logical_cpus": 9,
+    "machine": "x86_64",
+    "platform": "Linux-6.18.55-x86_64-with-glibc2.39",
+    "python": "3.12.14",
+    "swift_target_info": {
+      "compilerVersion": "Swift version 6.3.2 (swift-6.3.2-RELEASE)",
+      "paths": {
+        "runtimeLibraryImportPaths": [
+          "/tmp/illiquid-swift/usr/lib/swift/linux",
+          "/tmp/illiquid-swift/usr/lib/swift/linux/x86_64"
+        ],
+        "runtimeLibraryPaths": [
+          "/tmp/illiquid-swift/usr/lib/swift/linux"
+        ],
+        "runtimeResourcePath": "/tmp/illiquid-swift/usr/lib/swift"
+      },
+      "swiftCompilerTag": "swift-6.3.2-RELEASE",
+      "target": {
+        "arch": "x86_64",
+        "compatibilityLibraries": [],
+        "librariesRequireRPath": false,
+        "moduleTriple": "x86_64-unknown-linux-gnu",
+        "openbsdBTCFIEnabled": false,
+        "platform": "linux",
+        "pointerWidthInBits": 64,
+        "pointerWidthInBytes": 8,
+        "triple": "x86_64-unknown-linux-gnu",
+        "unversionedTriple": "x86_64-unknown-linux-gnu"
+      }
+    },
+    "swift_version": "Swift version 6.3.2 (swift-6.3.2-RELEASE)\nTarget: x86_64-unknown-linux-gnu",
+    "swiftc_invocation_path": "/tmp/illiquid-swift/usr/bin/swiftc",
+    "swiftc_resolved_path": "/tmp/illiquid-swift/usr/bin/swift-driver",
+    "variables": {
+      "DEVELOPER_DIR": null,
+      "LANG": "C.UTF-8",
+      "LC_ALL": "C.UTF-8",
+      "LC_COLLATE": null,
+      "SDKROOT": null,
+      "SWIFT_DETERMINISTIC_HASHING": null
+    }
+  },
+  "method": {
+    "autorelease_scope": "On macOS, one autorelease pool covers the complete measured batch and drains inside both timers. Warmup uses a separate untimed pool; there is no pool per key/lookup.",
+    "baseline_target_cpu_ms": 250.0,
+    "boundary": "Frozen baseline and live candidate are separate optimized Swift modules/objects. The driver imports them without cross-module optimization or @inlinable production methods.",
+    "calibration": "Retained baseline calibration reaches at least 10 ms process CPU, then selects equal rounds for both variants targeting the requested baseline CPU duration. Calibration is not included in fixed-work summaries.",
+    "cases": [
+      "keys-tiny-ascii",
+      "keys-ascii-256",
+      "keys-long-ascii-256",
+      "keys-aliases-256",
+      "keys-unicode-256",
+      "keys-late-unicode-256",
+      "keys-mixed-256",
+      "keys-rejected-256",
+      "playlist-empty",
+      "playlist-single-hit",
+      "playlist-small-last",
+      "playlist-first-1000",
+      "playlist-middle-1000",
+      "playlist-last-1000",
+      "playlist-miss-1000",
+      "playlist-unicode-last-256",
+      "playlist-rejected-query-256"
+    ],
+    "driver_flags": [
+      "-swift-version",
+      "6",
+      "-O",
+      "-parse-as-library"
+    ],
+    "included_work": "Production call plus driver loop/closure and checksum consumption; identical caller structure for both variants.",
+    "limitations": "Process CPU removes descheduled waiting but not frequency/cache/host-load effects. Bootstrap intervals describe these samples, not every device or workload.",
+    "module_flags": [
+      "-swift-version",
+      "6",
+      "-O",
+      "-whole-module-optimization",
+      "-parse-as-library"
+    ],
+    "outside_timers": "Fixture creation, actual playlist construction/sorting, full receipts before and after, two warmup rounds, and validation.",
+    "pairs": 12,
+    "sampling": "Fresh processes in adjacent AB/BA pairs; alternating order gives equal baseline-first/candidate-first counts. Case order is seeded and shuffled for each pair.",
+    "scope": "Warm in-memory persistence keys and actual FolderPlaylist.index(of:) calls. No filesystem scan, whole-player CPU, frame-rate, or visible UI latency claim.",
+    "seed": 20261028,
+    "statistics": "All fixed-work observations retained; median paired change and absolute per-operation times, ranges, faster-pair counts, and seeded 5000-resample percentile bootstrap interval. No outlier deletion.",
+    "timers": "One DispatchTime wall interval inside one CLOCK_PROCESS_CPUTIME_ID CPU interval per process. CPU includes wall-clock sampling and all process threads."
+  },
+  "schema_version": 1,
+  "source_hashes": {
+    "Differential.swift": {
+      "git_blob_sha1": "5471b8ddf6f437e8873233a20889979b7bc95692",
+      "sha256": "7980892968e82e089247cd8cbae46d7450d75fc70b9a3a8fc167bd643a44071a"
+    },
+    "Driver.swift": {
+      "git_blob_sha1": "1747331ccfce46b8e1dfbab7e7f284fc5fd1ed7c",
+      "sha256": "48bd0e31dc996dd80d93c2846c85e58a0eda208ec84365bce0cbf17a085bde2a"
+    },
+    "baseline": {
+      "FolderPlaylist.swift": {
+        "git_blob_sha1": "3ff5f3c2abccf3a26bcc170a7806aa857f45b37f",
+        "sha256": "8a3c017132f0e79cb8280551ff686066b9a3005c49bd7833efc54bb11dfe75fe"
+      },
+      "NaturalFilenameOrdering.swift": {
+        "git_blob_sha1": "d116171a69648d2bd6ce5ea5fb00b7fc6a2cb12a",
+        "sha256": "d167212f90dd5cd6d8e0e73c208d8e9b4648cc7f4dd21212d51c85a693a263e7"
+      },
+      "NormalizedFileURL.swift": {
+        "git_blob_sha1": "d90e4fc199eabfa4e554c3c8d01a1ed48277ae20",
+        "sha256": "3b65c98b88722ca4d51c315a7fd5e2fde0e40c846071b6b1e34cd1f1eddb3fd2"
+      }
+    },
+    "candidate": {
+      "FolderPlaylist.swift": {
+        "git_blob_sha1": "3ff5f3c2abccf3a26bcc170a7806aa857f45b37f",
+        "sha256": "8a3c017132f0e79cb8280551ff686066b9a3005c49bd7833efc54bb11dfe75fe"
+      },
+      "NaturalFilenameOrdering.swift": {
+        "git_blob_sha1": "d116171a69648d2bd6ce5ea5fb00b7fc6a2cb12a",
+        "sha256": "d167212f90dd5cd6d8e0e73c208d8e9b4648cc7f4dd21212d51c85a693a263e7"
+      },
+      "NormalizedFileURL.swift": {
+        "git_blob_sha1": "a1c628cbf4ee5655bb50c88fad25c7b94fbd5f5e",
+        "sha256": "5cd5d029b7a5d8573ac3688676d5ea15117848e10249ed74b1f4df8a9566c18c"
+      }
+    },
+    "run.py": {
+      "git_blob_sha1": "775603caf78c05ce77ccf30166bd34a4faf37388",
+      "sha256": "4f9c384e09202e869997eb948570d189a6c881a7dad4f60f6f4a879d69e4cad7"
+    }
+  },
+  "started_utc": "2026-10-28T04:53:44.738665+00:00",
+  "status": "complete"
+}

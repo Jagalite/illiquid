@@ -1,0 +1,85 @@
+name: Checkpoint index hint performance
+
+on:
+  push:
+    branches: ['codex/perf-checkpoint-index-hint']
+    paths:
+      - 'Sources/IlliquidPlayer/Player/PlaybackCheckpointWriter.swift'
+      - 'Tests/IlliquidPlayerTests/PlaybackCheckpointIndexHintTests.swift'
+      - 'Benchmarks/CheckpointIndexHint/Benchmark.swift'
+      - 'Benchmarks/CheckpointIndexHint/run.py'
+  pull_request:
+    paths:
+      - 'Sources/IlliquidPlayer/Player/PlaybackCheckpointWriter.swift'
+      - 'Sources/IlliquidCore/Persistence/PlaybackSessionStore.swift'
+      - 'Sources/IlliquidCore/Playlist/**'
+      - 'Sources/IlliquidCore/Utilities/NormalizedFileURL.swift'
+      - 'Tests/IlliquidPlayerTests/PlaybackCheckpointIndexHintTests.swift'
+      - 'Benchmarks/CheckpointIndexHint/Benchmark.swift'
+      - 'Benchmarks/CheckpointIndexHint/run.py'
+      - '.github/workflows/checkpoint-index-hint.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: checkpoint-index-hint-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  portable:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Verify complete records and compare the normalized scan with the index hint
+        run: python3 Benchmarks/CheckpointIndexHint/run.py --pairs 8 --target-ms 40 --output "$RUNNER_TEMP/checkpoint-index-hint"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: checkpoint-index-hint-linux
+          path: |
+            ${{ runner.temp }}/checkpoint-index-hint/
+            !${{ runner.temp }}/checkpoint-index-hint/packages/**/.build/**
+          retention-days: 14
+
+  native:
+    needs: portable
+    runs-on: macos-26
+    timeout-minutes: 40
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Verify and benchmark on native macOS
+        run: python3 Benchmarks/CheckpointIndexHint/run.py --pairs 8 --target-ms 40 --output "$RUNNER_TEMP/checkpoint-index-hint"
+      - name: Prepare pinned native dependencies
+        run: |
+          if ! xcrun -sdk macosx metal --version; then
+            xcodebuild -downloadComponent MetalToolchain
+          fi
+          python3 Scripts/verify-corresponding-source.py DependencySources
+          python3 Scripts/install-ci-native-sdk.py
+      - name: Compile the application graph and exercise checkpoint integration
+        run: |
+          mkdir -p "$RUNNER_TEMP/checkpoint-index-integration"
+          set -o pipefail
+          swift test --force-resolved-versions --no-parallel --filter \
+            'PlaybackCheckpointIndexHintTests|PlaybackCheckpointTests|PlaylistSessionRecordTests|PlaybackSessionStoreTests|failedCheckpointDoesNotAdvanceThePlaylist|shutdownJoinsBlockedSaveWithoutBlockingMainActorOrLosingLatestProgress|quittingAfterStopKeepsTheLastPlaybackCheckpoint|shutdownFlushesLatestProgressWithoutDependingOnDebouncedTask|restoresDirectPlaylistIndexPausedStateAndExactPosition|shuffleRestoresBaseOrderAcrossRelaunch' \
+            2>&1 | tee "$RUNNER_TEMP/checkpoint-index-integration/tests.log"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: checkpoint-index-hint-macos
+          path: |
+            ${{ runner.temp }}/checkpoint-index-hint/
+            !${{ runner.temp }}/checkpoint-index-hint/packages/**/.build/**
+            ${{ runner.temp }}/checkpoint-index-integration/
+          retention-days: 14

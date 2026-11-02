@@ -1,0 +1,222 @@
+st case passing 1 argument input → "***localhost/Movies/Feature.mkv" to "Direct enum construction cannot bypass file URL validation" started.
+◇ Test case passing 1 argument input → "file://localhost:1234/Movies/Feature.mkv" to "Direct enum construction cannot bypass file URL validation" started.
+◇ Test case passing 1 argument input → "file://localhost:0/Movies/Feature.mkv" to "Direct enum construction cannot bypass file URL validation" started.
+◇ Test case passing 1 argument input → "file:relative.mkv" to "Direct enum construction cannot bypass file URL validation" started.
+◇ Test case passing 1 argument input → "file:" to "Direct enum construction cannot bypass file URL validation" started.
+◇ Test case passing 1 argument input → "file://" to "Direct enum construction cannot bypass file URL validation" started.
+◇ Test case passing 1 argument input → "file://localhost" to "Direct enum construction cannot bypass file URL validation" started.
+✔ Test "Direct enum construction cannot bypass file URL validation" with 12 test cases passed after 0.001 seconds.
+◇ Test "Remote authorities cannot collide with local files or other hosts" started.
+✔ Test "Remote authorities cannot collide with local files or other hosts" passed after 0.001 seconds.
+◇ Test "Local paths, localhost and mounted volumes remain supported" started.
+◇ Test case passing 1 argument input → "file:///Movies/Feature.mkv" to "Local paths, localhost and mounted volumes remain supported" started.
+◇ Test case passing 1 argument input → "file:/Movies/Feature.mkv" to "Local paths, localhost and mounted volumes remain supported" started.
+◇ Test case passing 1 argument input → "file://localhost/Movies/Feature.mkv" to "Local paths, localhost and mounted volumes remain supported" started.
+◇ Test case passing 1 argument input → "file://LOCALHOST/Movies/Feature.mkv" to "Local paths, localhost and mounted volumes remain supported" started.
+◇ Test case passing 1 argument input → "file:///Volumes/Media%20Share/Feature.mkv" to "Local paths, localhost and mounted volumes remain supported" started.
+◇ Test case passing 1 argument input → "file:///Movies/Caf%C3%A9%20%231.mkv" to "Local paths, localhost and mounted volumes remain supported" started.
+◇ Test case passing 1 argument input → "file:///Movies/Season/../Feature.mkv" to "Local paths, localhost and mounted volumes remain supported" started.
+◇ Test case passing 1 argument input → "file:///" to "Local paths, localhost and mounted volumes remain supported" started.
+✔ Test "Local paths, localhost and mounted volumes remain supported" with 8 test cases passed after 0.001 seconds.
+◇ Test "Localhost and empty authorities retain the same local identity" started.
+✔ Test "Localhost and empty authorities retain the same local identity" passed after 0.001 seconds.
+◇ Test "Relative references inherit and validate their absolute base" started.
+✔ Test "Relative references inherit and validate their absolute base" passed after 0.001 seconds.
+◇ Test "Mislabeled persisted URLs cannot authorize local restoration" started.
+◇ Test case passing 1 argument input → "https://media.example/Feature.mp4" to "Mislabeled persisted URLs cannot authorize local restoration" started.
+◇ Test case passing 1 argument input → "http://media.example/Feature.mp4" to "Mislabeled persisted URLs cannot authorize local restoration" started.
+◇ Test case passing 1 argument input → "ftp://media.example/Feature.mp4" to "Mislabeled persisted URLs cannot authorize local restoration" started.
+◇ Test case passing 1 argument input → "file://media-server.example/Movies/Feature.mkv" to "Mislabeled persisted URLs cannot authorize local restoration" started.
+◇ Test case passing 1 argument input → "file:relative.mkv" to "Mislabeled persisted URLs cannot authorize local restoration" started.
+✔ Test "Mislabeled persisted URLs cannot authorize local restoration" with 5 test cases passed after 0.001 seconds.
+◇ Test "Stream labels cannot authorize local or unsupported schemes" started.
+◇ Test case passing 1 argument input → "file:///Movies/Feature.mkv" to "Stream labels cannot authorize local or unsupported schemes" started.
+◇ Test case passing 1 argument input → "ftp://media.example/Feature.mp4" to "Stream labels cannot authorize local or unsupported schemes" started.
+◇ Test case passing 1 argument input → "data:text/plain,not-media" to "Stream labels cannot authorize local or unsupported schemes" started.
+✔ Test "Stream labels cannot authorize local or unsupported schemes" with 3 test cases passed after 0.001 seconds.
+◇ Test "Explicit HTTP and HTTPS playback remains supported" started.
+◇ Test case passing 1 argument input → "https://media.example/Feature.mp4?token=abc#chapter" to "Explicit HTTP and HTTPS playback remains supported" started.
+◇ Test case passing 1 argument input → "http://media.example/Feature.mp4" to "Explicit HTTP and HTTPS playback remains supported" started.
+◇ Test case passing 1 argument input → "HTTPS://media.example/Feature.mp4" to "Explicit HTTP and HTTPS playback remains supported" started.
+✔ Test "Explicit HTTP and HTTPS playback remains supported" with 3 test cases passed after 0.001 seconds.
+◇ Test "Existing source payloads keep their encoding and restore behavior" started.
+✔ Test "Existing source payloads keep their encoding and restore behavior" passed after 0.001 seconds.
+◇ Test "Lexical validation does not resolve symlinks; preparation still does" started.
+✔ Test "Lexical validation does not resolve symlinks; preparation still does" passed after 0.001 seconds.
+✔ Suite "Local media source validation" passed after 0.007 seconds.
+◇ Suite "Natural filename ordering parity" started.
+◇ Test emptySingletonAndPairInputsKeepEveryValue() started.
+✔ Test emptySingletonAndPairInputsKeepEveryValue() passed after 0.001 seconds.
+◇ Test numbersRetainTheirNaturalOrder() started.
+✔ Test numbersRetainTheirNaturalOrder() passed after 0.001 seconds.
+◇ Test unicodeCaseAndNumericVariantsMatchTheReference() started.
+✔ Test unicodeCaseAndNumericVariantsMatchTheReference() passed after 0.006 seconds.
+◇ Test identicalNamesUseTheOriginalLiteralPathTieBreak() started.
+✔ Test identicalNamesUseTheOriginalLiteralPathTieBreak() passed after 0.001 seconds.
+◇ Test equalRemoteKeysAndExactDuplicatesKeepTheirInputOrder() started.
+✔ Test equalRemoteKeysAndExactDuplicatesKeepTheirInputOrder() passed after 0.001 seconds.
+◇ Test relativeEscapedAndRootURLRepresentationsArePreserved() started.
+✔ Test relativeEscapedAndRootURLRepresentationsArePreserved() passed after 0.001 seconds.
+◇ Test boundedSeededInputsMatchTheOriginalComparator() started.
+✔ Test boundedSeededInputsMatchTheOriginalComparator() passed after 0.088 seconds.
+◇ Test playlistSortingPreservesCompleteItemsAndEqualKeyOrder() started.
+✔ Test playlistSortingPreservesCompleteItemsAndEqualKeyOrder() passed after 0.001 seconds.
+◇ Test emptySingletonAndReversedPlaylistsKeepTheirMetadata() started.
+✔ Test emptySingletonAndReversedPlaylistsKeepTheirMetadata() passed after 0.004 seconds.
+✔ Suite "Natural filename ordering parity" passed after 0.104 seconds.
+◇ Suite "Normalized file identity compatibility" started.
+◇ Test ordinaryKeysHaveIndependentExpectedBytes() started.
+✔ Test ordinaryKeysHaveIndependentExpectedBytes() passed after 0.001 seconds.
+◇ Test encodedAndLiteralPathFormsMatchTheLegacyRoundTrip() started.
+✔ Test encodedAndLiteralPathFormsMatchTheLegacyRoundTrip() passed after 0.087 seconds.
+◇ Test decodedSegmentsAndPathParametersKeepTheLegacyInterpretation() started.
+✔ Test decodedSegmentsAndPathParametersKeepTheLegacyInterpretation() passed after 0.001 seconds.
+◇ Test fileURLConstructorsPreserveOddPaths() started.
+✔ Test fileURLConstructorsPreserveOddPaths() passed after 0.001 seconds.
+◇ Test relativeReferencesQueriesAndAuthoritiesKeepTheirIdentity() started.
+✔ Test relativeReferencesQueriesAndAuthoritiesKeepTheirIdentity() passed after 0.001 seconds.
+◇ Test normalizedAndDecodedPlaylistItemsKeepFirstOccurrenceMetadata() started.
+✔ Test normalizedAndDecodedPlaylistItemsKeepFirstOccurrenceMetadata() passed after 0.001 seconds.
+✔ Suite "Normalized file identity compatibility" passed after 0.090 seconds.
+◇ Suite "Playlist deduplication" started.
+◇ Test emptySingletonAndUniquePlaylistsKeepTheirOrderAndMetadata() started.
+✔ Test emptySingletonAndUniquePlaylistsKeepTheirOrderAndMetadata() passed after 0.001 seconds.
+◇ Test firstDuplicateAtDifferentPositionsDoesNotLoseFollowingItems(position:) started.
+◇ Test case passing 1 argument position → 1 to firstDuplicateAtDifferentPositionsDoesNotLoseFollowingItems(position:) started.
+◇ Test case passing 1 argument position → 2 to firstDuplicateAtDifferentPositionsDoesNotLoseFollowingItems(position:) started.
+◇ Test case passing 1 argument position → 4 to firstDuplicateAtDifferentPositionsDoesNotLoseFollowingItems(position:) started.
+◇ Test case passing 1 argument position → 7 to firstDuplicateAtDifferentPositionsDoesNotLoseFollowingItems(position:) started.
+◇ Test case passing 1 argument position → 8 to firstDuplicateAtDifferentPositionsDoesNotLoseFollowingItems(position:) started.
+✔ Test firstDuplicateAtDifferentPositionsDoesNotLoseFollowingItems(position:) with 5 test cases passed after 0.001 seconds.
+◇ Test adjacentAndSeparatedDuplicatesKeepTheFirstCompleteItem() started.
+✔ Test adjacentAndSeparatedDuplicatesKeepTheFirstCompleteItem() passed after 0.001 seconds.
+◇ Test normalizedIdentitiesPreserveTheFirstDecodedRepresentation() started.
+✔ Test normalizedIdentitiesPreserveTheFirstDecodedRepresentation() passed after 0.001 seconds.
+◇ Test unsupportedLocalAuthoritiesAndRemoteURLsKeepTheirFallbackIdentity() started.
+✔ Test unsupportedLocalAuthoritiesAndRemoteURLsKeepTheirFallbackIdentity() passed after 0.001 seconds.
+◇ Test resultsAndExistingSnapshotsRemainIndependentAfterMutation(hasDuplicate:) started.
+◇ Test case passing 1 argument hasDuplicate → false to resultsAndExistingSnapshotsRemainIndependentAfterMutation(hasDuplicate:) started.
+◇ Test case passing 1 argument hasDuplicate → true to resultsAndExistingSnapshotsRemainIndependentAfterMutation(hasDuplicate:) started.
+✔ Test resultsAndExistingSnapshotsRemainIndependentAfterMutation(hasDuplicate:) with 2 test cases passed after 0.001 seconds.
+◇ Test heavilyReducedPlaylistsKeepSurvivingMetadataAndIndependentSnapshots(survivors:) started.
+◇ Test case passing 1 argument survivors → 0 to heavilyReducedPlaylistsKeepSurvivingMetadataAndIndependentSnapshots(survivors:) started.
+◇ Test case passing 1 argument survivors → 1 to heavilyReducedPlaylistsKeepSurvivingMetadataAndIndependentSnapshots(survivors:) started.
+◇ Test case passing 1 argument survivors → 32 to heavilyReducedPlaylistsKeepSurvivingMetadataAndIndependentSnapshots(survivors:) started.
+✔ Test heavilyReducedPlaylistsKeepSurvivingMetadataAndIndependentSnapshots(survivors:) with 3 test cases passed after 0.009 seconds.
+◇ Test mixedIdentityInputsMatchStableFirstOccurrenceSemantics() started.
+✔ Test mixedIdentityInputsMatchStableFirstOccurrenceSemantics() passed after 0.015 seconds.
+✔ Suite "Playlist deduplication" passed after 0.030 seconds.
+◇ Suite "Playlist identity lookup" started.
+◇ Test localAliasesSelectTheSameItem() started.
+✔ Test localAliasesSelectTheSameItem() passed after 0.001 seconds.
+◇ Test firstDuplicateWinsWithoutReplacingItsMetadata() started.
+✔ Test firstDuplicateWinsWithoutReplacingItsMetadata() passed after 0.001 seconds.
+◇ Test decodedRawItemsAreNormalizedDuringLookup() started.
+✔ Test decodedRawItemsAreNormalizedDuringLookup() passed after 0.001 seconds.
+◇ Test matchesOverrideFallbackAndMissingTargetsRespectItsBounds() started.
+✔ Test matchesOverrideFallbackAndMissingTargetsRespectItsBounds() passed after 0.001 seconds.
+◇ Test emptyPlaylistsHaveNoSelection() started.
+✔ Test emptyPlaylistsHaveNoSelection() passed after 0.001 seconds.
+◇ Test identicalUnsupportedURLsDoNotBecomeMatches(_:) started.
+◇ Test case passing 1 argument spelling → "https://example.invalid/Media/A.mkv" to identicalUnsupportedURLsDoNotBecomeMatches(_:) started.
+◇ Test case passing 1 argument spelling → "file://media-server.example/Media/A.mkv" to identicalUnsupportedURLsDoNotBecomeMatches(_:) started.
+◇ Test case passing 1 argument spelling → "file://127.0.0.1/Media/A.mkv" to identicalUnsupportedURLsDoNotBecomeMatches(_:) started.
+◇ Test case passing 1 argument spelling → "file://user@localhost/Media/A.mkv" to identicalUnsupportedURLsDoNotBecomeMatches(_:) started.
+◇ Test case passing 1 argument spelling → "***localhost/Media/A.mkv" to identicalUnsupportedURLsDoNotBecomeMatches(_:) started.
+◇ Test case passing 1 argument spelling → "file://localhost:1234/Media/A.mkv" to identicalUnsupportedURLsDoNotBecomeMatches(_:) started.
+◇ Test case passing 1 argument spelling → "file://localhost:0/Media/A.mkv" to identicalUnsupportedURLsDoNotBecomeMatches(_:) started.
+◇ Test case passing 1 argument spelling → "file:relative.mkv" to identicalUnsupportedURLsDoNotBecomeMatches(_:) started.
+✔ Test identicalUnsupportedURLsDoNotBecomeMatches(_:) with 8 test cases passed after 0.001 seconds.
+◇ Test supportedTargetDoesNotMatchAnAllUnsupportedPlaylist() started.
+✔ Test supportedTargetDoesNotMatchAnAllUnsupportedPlaylist() passed after 0.001 seconds.
+◇ Test distinctPathsRemainDistinct() started.
+✔ Test distinctPathsRemainDistinct() passed after 0.001 seconds.
+◇ Test allSmallQueuesMatchIndependentIdentityLabels() started.
+✔ Test allSmallQueuesMatchIndependentIdentityLabels() passed after 0.028 seconds.
+✔ Suite "Playlist identity lookup" passed after 0.032 seconds.
+◇ Suite "Playlist mutation" started.
+◇ Test sortingIsStableAndDefinesPlaybackOrder() started.
+✔ Test sortingIsStableAndDefinesPlaybackOrder() passed after 0.001 seconds.
+◇ Test deduplicationAndReorderingPreserveResourceIdentity() started.
+✔ Test deduplicationAndReorderingPreserveResourceIdentity() passed after 0.001 seconds.
+✔ Suite "Playlist mutation" passed after 0.001 seconds.
+◇ Suite "Playlist order restoration" started.
+◇ Test emptyQueueDoesNotRestoreRemovedEntries() started.
+✔ Test emptyQueueDoesNotRestoreRemovedEntries() passed after 0.001 seconds.
+◇ Test emptyBaseKeepsFirstOccurrencesInCurrentOrder() started.
+✔ Test emptyBaseKeepsFirstOccurrencesInCurrentOrder() passed after 0.001 seconds.
+◇ Test savedOrderPrecedesNewEntriesWithoutResurrectingRemovals() started.
+✔ Test savedOrderPrecedesNewEntriesWithoutResurrectingRemovals() passed after 0.001 seconds.
+◇ Test repeatedAndMissingSavedIDsDoNotDuplicateOrReplaceMetadata() started.
+✔ Test repeatedAndMissingSavedIDsDoNotDuplicateOrReplaceMetadata() passed after 0.001 seconds.
+◇ Test normalizedAliasesKeepTheFirstCompleteItem() started.
+✔ Test normalizedAliasesKeepTheFirstCompleteItem() passed after 0.001 seconds.
+◇ Test nonFileIdentitiesRetainDistinctQueryStrings() started.
+✔ Test nonFileIdentitiesRetainDistinctQueryStrings() passed after 0.001 seconds.
+◇ Test repeatedShuffleEditsPreservePlaybackIdentityAndNewItemOrder() started.
+✔ Test repeatedShuffleEditsPreservePlaybackIdentityAndNewItemOrder() passed after 0.001 seconds.
+◇ Test allSmallQueueAndSavedOrderSequencesMatchAnIndependentModel() started.
+✔ Test allSmallQueueAndSavedOrderSequencesMatchAnIndependentModel() passed after 0.894 seconds.
+✔ Suite "Playlist order restoration" passed after 0.896 seconds.
+◇ Suite "Playlist sorting parity" started.
+◇ Test emptySingletonAndPairInputsKeepEveryEntry() started.
+✔ Test emptySingletonAndPairInputsKeepEveryEntry() passed after 0.003 seconds.
+◇ Test numericNameOrderingIgnoresConflictingDates() started.
+✔ Test numericNameOrderingIgnoresConflictingDates() passed after 0.001 seconds.
+◇ Test dateOrderingReversesMissingPlacementAndFilenameTies() started.
+✔ Test dateOrderingReversesMissingPlacementAndFilenameTies() passed after 0.001 seconds.
+◇ Test normalizedLocalAliasesRemainStableInNameOrder() started.
+✔ Test normalizedLocalAliasesRemainStableInNameOrder() passed after 0.001 seconds.
+◇ Test dateTiesUseLiteralPathsWhileNameTiesUseNormalizedIdentities() started.
+✔ Test dateTiesUseLiteralPathsWhileNameTiesUseNormalizedIdentities() passed after 0.001 seconds.
+◇ Test remoteNameTiesIncludeTheFullURLButDateTiesKeepInputOrder() started.
+✔ Test remoteNameTiesIncludeTheFullURLButDateTiesKeepInputOrder() passed after 0.001 seconds.
+◇ Test completeTiesKeepDuplicateEntriesAndTheirMetadataInBothDirections() started.
+✔ Test completeTiesKeepDuplicateEntriesAndTheirMetadataInBothDirections() passed after 0.020 seconds.
+◇ Test decodedURLsAndUnsortedDuplicateSubtitlesSurviveReordering() started.
+✔ Test decodedURLsAndUnsortedDuplicateSubtitlesSurviveReordering() passed after 0.001 seconds.
+◇ Test unicodeEncodedAndRelativeURLFormsMatchTheOriginalComparator() started.
+✔ Test unicodeEncodedAndRelativeURLFormsMatchTheOriginalComparator() passed after 0.051 seconds.
+◇ Test boundedSeededQueuesMatchTheOriginalComparator() started.
+✔ Test boundedSeededQueuesMatchTheOriginalComparator() passed after 0.171 seconds.
+✔ Suite "Playlist sorting parity" passed after 0.252 seconds.
+◇ Suite "Core utilities" started.
+◇ Test "Natural ordering sorts numbers by value" started.
+✔ Test "Natural ordering sorts numbers by value" passed after 0.001 seconds.
+◇ Test "Media and subtitle extension checks are case insensitive" started.
+✔ Test "Media and subtitle extension checks are case insensitive" passed after 0.001 seconds.
+◇ Test "Normalized file identity standardizes path segments" started.
+✔ Test "Normalized file identity standardizes path segments" passed after 0.001 seconds.
+◇ Test lexicalKeysDoNotResolveAliasesAndPreparationObservesRetargeting() started.
+✔ Test lexicalKeysDoNotResolveAliasesAndPreparationObservesRetargeting() passed after 0.001 seconds.
+✔ Suite "Core utilities" passed after 0.001 seconds.
+✔ Test run with 70 tests in 10 suites passed after 1.420 seconds.
+Building for debugging...
+[Pre-planning 1 / 95]
+[Starting]
+[30 / 54] IlliquidCore
+[37 / 54] IlliquidCore
+[42 / 61] IlliquidCoreTests-product
+/home/runner/work/_temp/normalized-file-identity/candidate/Tests/IlliquidCoreTests/PlaylistIdentityLookupTests.swift:99:26: [1;33mwarning: [1;39m'#require(_:_:)' is redundant because 'URL(string: "https://example.invalid/Media/A.mkv")' never equals 'nil' (from macro 'require')[0;0m
+ [0;36m97 |[0;0m             nil,
+ [0;36m98 |[0;0m             URL(fileURLWithPath: "/Media/A.mkv"),
+ [0;36m99 |[0;0m             try #require([4;39mURL(string: "https://example.invalid/Media/A.mkv")[0;0m),
+    [0;36m|[0;0m                          `- [1;33mwarning: [1;39m'#require(_:_:)' is redundant because 'URL(string: "https://example.invalid/Media/A.mkv")' never equals 'nil' (from macro 'require')[0;0m
+[0;36m100 |[0;0m             try #require(URL(string: "file://media-server.example/Media/A.mkv")),
+[0;36m101 |[0;0m         ]
+
+/home/runner/work/_temp/normalized-file-identity/candidate/Tests/IlliquidCoreTests/PlaylistIdentityLookupTests.swift:100:26: [1;33mwarning: [1;39m'#require(_:_:)' is redundant because 'URL(string: "file://media-server.example/Media/A.mkv")' never equals 'nil' (from macro 'require')[0;0m
+ [0;36m98 |[0;0m             URL(fileURLWithPath: "/Media/A.mkv"),
+ [0;36m99 |[0;0m             try #require(URL(string: "https://example.invalid/Media/A.mkv")),
+[0;36m100 |[0;0m             try #require([4;39mURL(string: "file://media-server.example/Media/A.mkv")[0;0m),
+    [0;36m|[0;0m                          `- [1;33mwarning: [1;39m'#require(_:_:)' is redundant because 'URL(string: "file://media-server.example/Media/A.mkv")' never equals 'nil' (from macro 'require')[0;0m
+[0;36m101 |[0;0m         ]
+[0;36m102 |[0;0m         let folder = FolderPlaylist(folderURL: URL(fileURLWithPath: "/Media"), items: [])
+[45 / 61] IlliquidCoreTests-product
+[48 / 61] IlliquidCoreTests-product
+[50 / 61] IlliquidCoreTests-product
+[54 / 62] IlliquidCoreTests-product
+[58 / 65] IlliquidCoreTests-test-runner
+[62 / 65] IlliquidCoreTests-test-runner
+[66 / 66] IlliquidCoreTests-test-runner
+Build complete! (15.40 secs)

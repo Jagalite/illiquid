@@ -1,0 +1,133 @@
+name: Thumbnail memory eviction
+
+on:
+  push:
+    branches: ['perf/thumbnail-memory-eviction-*']
+  pull_request:
+    paths:
+      - 'Sources/IlliquidNativePlayback/Media/NativeThumbnailCache.swift'
+      - 'Sources/IlliquidCore/Player/ThumbnailPolicy.swift'
+      - 'Sources/IlliquidCore/Utilities/NonDecodePerformance.swift'
+      - 'Tests/IlliquidNativePlaybackTests/ThumbnailMemoryEvictionTests.swift'
+      - 'Benchmarks/ThumbnailMemoryEviction/**'
+      - '.github/workflows/thumbnail-memory-eviction.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: thumbnail-memory-eviction-${{ github.head_ref || github.ref_name }}
+  cancel-in-progress: true
+
+jobs:
+  component:
+    runs-on: macos-26
+    timeout-minutes: 20
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Record native host
+        run: |
+          mkdir -p "$RUNNER_TEMP/thumbnail-memory"
+          sw_vers > "$RUNNER_TEMP/thumbnail-memory/host.txt"
+          uname -a >> "$RUNNER_TEMP/thumbnail-memory/host.txt"
+          sysctl -n machdep.cpu.brand_string >> "$RUNNER_TEMP/thumbnail-memory/host.txt"
+          swift --version >> "$RUNNER_TEMP/thumbnail-memory/host.txt"
+      - name: Compare exact cache bodies and measure paired public API operations
+        run: |
+          python3 - <<'PY'
+          import json, os, subprocess, sys
+          from pathlib import Path
+          command = [sys.executable, 'Benchmarks/ThumbnailMemoryEviction/run.py',
+                     '--pairs', '8', '--bulk-iterations', '300',
+                     '--output', os.environ['RUNNER_TEMP'] + '/thumbnail-memory/results']
+          queue = Path('/Volumes/seed1/Projects/kyoto/kyoto.py')
+          if queue.is_file():
+              cli = [sys.executable, str(queue)]
+              submitted = subprocess.check_output([*cli, 'submit', '--', *command], text=True)
+              print(submitted, flush=True)
+              job_id = json.loads(submitted)['id']
+              subprocess.run([*cli, 'show', job_id], check=True)
+              result = subprocess.run([*cli, 'wait', job_id])
+              subprocess.run([*cli, 'logs', job_id], check=True)
+              sys.exit(result.returncode)
+          print('Shared Kyoto queue is unavailable on this hosted runner; '
+                'compiling isolated components directly and serially.', flush=True)
+          subprocess.run(command, check=True)
+          PY
+      - name: Publish compact reproducibility receipts
+        if: always()
+        run: |
+          python3 - <<'PY'
+          import base64, gzip, hashlib, json, os
+          from pathlib import Path
+          root = Path(os.environ['RUNNER_TEMP']) / 'thumbnail-memory'
+          names = ['host.txt', 'results/manifest.json', 'results/verification.json',
+                   'results/summary.json', 'results/measurements.jsonl', 'results/commands.jsonl']
+          records = {name: (root / name).read_text() for name in names if (root / name).is_file()}
+          bundle = gzip.compress(json.dumps(records, sort_keys=True).encode(), mtime=0)
+          print('THUMBNAIL_MEMORY_BUNDLE_SHA256', hashlib.sha256(bundle).hexdigest())
+          print('THUMBNAIL_MEMORY_BUNDLE_BASE64', base64.b64encode(bundle).decode())
+          PY
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: thumbnail-memory-eviction-component
+          path: |
+            ${{ runner.temp }}/thumbnail-memory/
+            !${{ runner.temp }}/thumbnail-memory/results/build/**
+            !${{ runner.temp }}/thumbnail-memory/results/module-cache/**
+          retention-days: 14
+
+  native-regressions:
+    needs: component
+    runs-on: macos-26
+    timeout-minutes: 40
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - name: Prepare pinned native dependencies
+        run: |
+          if ! xcrun -sdk macosx metal --version; then
+            xcodebuild -downloadComponent MetalToolchain
+          fi
+          python3 Scripts/verify-corresponding-source.py DependencySources
+          python3 Scripts/install-ci-native-sdk.py
+      - name: Build the app graph and run native cache regressions
+        run: |
+          mkdir -p "$RUNNER_TEMP/thumbnail-memory-native"
+          set -o pipefail
+          python3 - <<'PY' 2>&1 | tee "$RUNNER_TEMP/thumbnail-memory-native/tests.log"
+          import json, subprocess, sys
+          from pathlib import Path
+          command = ['swift', 'test', '--force-resolved-versions', '--jobs', '2', '--no-parallel',
+                     '--filter', 'ThumbnailMemoryEvictionTests|NativeThumbnailCacheTests|'
+                     'NonDecodePerformanceTests|ThumbnailImageLifetimeTests']
+          queue = Path('/Volumes/seed1/Projects/kyoto/kyoto.py')
+          if queue.is_file():
+              cli = [sys.executable, str(queue)]
+              submitted = subprocess.check_output([*cli, 'submit', '--', *command], text=True)
+              print(submitted, flush=True)
+              job_id = json.loads(submitted)['id']
+              subprocess.run([*cli, 'show', job_id], check=True)
+              result = subprocess.run([*cli, 'wait', job_id])
+              subprocess.run([*cli, 'logs', job_id], check=True)
+              sys.exit(result.returncode)
+          print('Shared Kyoto queue is unavailable on this hosted runner; '
+                'building the app graph and running native tests directly.', flush=True)
+          subprocess.run(command, check=True)
+          PY
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: thumbnail-memory-eviction-native-regressions
+          path: ${{ runner.temp }}/thumbnail-memory-native/
+          retention-days: 14

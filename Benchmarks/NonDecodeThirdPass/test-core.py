@@ -1,13 +1,15 @@
 #!/usr/bin/env python3
 """Run real persistence sources and XCTest regressions without the macOS app graph."""
-import argparse, pathlib, shutil, subprocess, tempfile
+import argparse, hashlib, json, pathlib, shutil, subprocess, tempfile
 here=pathlib.Path(__file__).resolve().parent;root=here.parent.parent
 p=argparse.ArgumentParser(description=__doc__);p.add_argument('--configuration',choices=['debug','release'],default='release');p.add_argument('--output',type=pathlib.Path);p.add_argument('--v2',action='store_true');p.add_argument('--filter');a=p.parse_args()
 with tempfile.TemporaryDirectory(prefix='illiquid-core-tests-') as d:
  work=pathlib.Path(d);source=work/'Sources/IlliquidCore';source.mkdir(parents=True)
  for path in (root/'Benchmarks/NonDecodeFollowup/fixtures').glob('*.swift'):
-  if path.name not in ['PlaybackPersistenceStore.swift','CoalescingPersistenceWriter.swift','PreviewCacheV1.swift','NativeThumbnailDiskCache.swift']: shutil.copy2(path,source/path.name)
- for name in ['PlaybackPersistenceStore.swift','CoalescingPersistenceWriter.swift']:
+  if path.name not in ['PlaybackPersistenceStore.swift','PlaybackPreferences.swift','CoalescingPersistenceWriter.swift','PreviewCacheV1.swift','NativeThumbnailDiskCache.swift']: shutil.copy2(path,source/path.name)
+ # Both historical/current store selections use identical current preferences;
+ # only the selected store implementation changes with --v2.
+ for name in ['PlaybackPersistenceStore.swift','PlaybackPreferences.swift','CoalescingPersistenceWriter.swift']:
   path = here/'baseline/PlaybackPersistenceStoreV2.swift' if a.v2 and name == 'PlaybackPersistenceStore.swift' else root/'Sources/IlliquidCore/Persistence'/name
   shutil.copy2(path,source/name)
  shutil.copy2(root/'Sources/IlliquidCore/Utilities/NonDecodePerformance.swift',source/'NonDecodePerformance.swift')
@@ -21,7 +23,8 @@ let package = Package(name: "IlliquidPersistenceTests", platforms: [.macOS("26.0
 ])
 ''')
  r=subprocess.run(['swift','test','--package-path',str(work),'-c',a.configuration,'--jobs','2','-Xswiftc','-warnings-as-errors',*(['--filter',a.filter] if a.filter else [])],capture_output=True,text=True)
- text=r.stdout+'\n'+r.stderr
+ preference_source={'path':'Sources/IlliquidCore/Persistence/PlaybackPreferences.swift','origin':'current_worktree','sha256':hashlib.sha256((source/'PlaybackPreferences.swift').read_bytes()).hexdigest()}
+ text='Shared preference support: '+json.dumps(preference_source,sort_keys=True)+'\n'+r.stdout+'\n'+r.stderr
  if a.output:
   if a.output.exists():raise SystemExit('refusing to overwrite test evidence')
   a.output.parent.mkdir(parents=True,exist_ok=True);a.output.write_text(text)

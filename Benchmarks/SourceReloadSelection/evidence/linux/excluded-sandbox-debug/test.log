@@ -1,0 +1,170 @@
+warning: /root/.swiftpm/configuration is not accessible or not writable, disabling user-level cache features.
+warning: /root/.swiftpm/security is not accessible or not writable, disabling user-level cache features.
+warning: /root/.cache/org.swift.swiftpm is not accessible or not writable, disabling user-level cache features.
+warning: 'package': failed loading cached manifest for 'package': encountered an I/O error (code: 30) while reading /root/.cache/org.swift.swiftpm/manifests
+warning: 'package': failed storing manifest for 'package' in cache: encountered an I/O error (code: 30) while reading /root/.cache/org.swift.swiftpm/manifests
+warning: 'package': failed closing manifest db cache: encountered an I/O error (code: 30) while reading /root/.cache/org.swift.swiftpm/manifests
+Building for debugging...
+[0/15] Write sources
+[3/15] Write swift-version-4E1F6603DD102018.txt
+swift-runtime: failed to suspend thread 29690 while processing a crash; backtraces will be missing information
+swift-runtime: failed to suspend thread 29691 while processing a crash; backtraces will be missing information
+swift-runtime: failed to suspend thread 29692 while processing a crash; backtraces will be missing information
+swift-runtime: failed to suspend thread 29693 while processing a crash; backtraces will be missing information
+swift-runtime: failed to suspend thread 29694 while processing a crash; backtraces will be missing information
+
+*** Signal 4: Backtracing from 0x7fb849cad2c0...3979
+{
+  "command_arguments" : [
+    "-frontend",
+    "-emit-module",
+    "-experimental-skip-non-inlinable-function-bodies-without-types",
+    "\/tmp\/illiquid-directory-state-sucw6mnl\/package\/Sources\/IlliquidCore\/MediaNameRecognition.swift",
+    "\/tmp\/illiquid-directory-state-sucw6mnl\/package\/Sources\/IlliquidCore\/NormalizedFileURL.swift",
+    "-target",
+    "x86_64-unknown-linux-gnu",
+    "-disable-objc-interop",
+    "-I",
+    "\/tmp\/illiquid-directory-state-sucw6mnl\/build\/x86_64-unknown-linux-gnu\/debug\/Modules",
+    "-no-color-diagnostics",
+    "-Xcc",
+    "-fno-color-diagnostics",
+    "-enable-testing",
+    "-g",
+    "-debug-info-format=dwarf",
+    "-dwarf-version=4",
+    "-module-cache-path",
+    "\/tmp\/illiquid-directory-state-sucw6mnl\/build\/x86_64-unknown-linux-gnu\/debug\/ModuleCache",
+    "-warnings-as-errors",
+    "-swift-version",
+    "6",
+    "-Onone",
+    "-D",
+    "SWIFT_PACKAGE",
+    "-D",
+    "DEBUG",
+    "-D",
+    "SWIFT_MODULE_RESOURCE_BUNDLE_UNAVAILABLE",
+    "-empty-abi-descriptor",
+    "-enable-anonymous-context-mangled-names",
+    "-file-compilation-dir",
+    "\/tmp\/illiquid-directory-state-sucw6mnl\/package",
+    "-Xcc",
+    "-fPIC",
+    "-Xcc",
+    "-g",
+    "-Xcc",
+    "-fno-omit-frame-pointer",
+    "-no-auto-bridging-header-chaining",
+    "-module-name",
+    "IlliquidCore",
+    "-package-name",
+    "package",
+    "-in-process-plugin-server-path",
+    "\/tmp\/illiquid-swift\/usr\/lib\/swift\/host\/libSwiftInProcPluginServer.so",
+    "-plugin-path",
+    "\/tmp\/illiquid-swift\/usr\/lib\/swift\/host\/plugins",
+    "-plugin-path",
+    "\/tmp\/illiquid-swift\/usr\/local\/lib\/swift\/host\/plugins",
+    "-emit-module-doc-path",
+    "\/tmp\/illiquid-directory-state-sucw6mnl\/build\/x86_64-unknown-linux-gnu\/debug\/Modules\/IlliquidCore.swiftdoc",
+    "-emit-module-source-info-path",
+    "\/tmp\/illiquid-directory-state-sucw6mnl\/build\/x86_64-unknown-linux-gnu\/debug\/Modules\/IlliquidCore.swiftsourceinfo",
+    "-emit-objc-header-path",
+    "\/tmp\/illiquid-directory-state-sucw6mnl\/build\/x86_64-unknown-linux-gnu\/debug\/IlliquidCore.build\/include\/IlliquidCore-Swift.h",
+    "-serialize-diagnostics-path",
+    "\/tmp\/illiquid-directory-state-sucw6mnl\/build\/x86_64-unknown-linux-gnu\/debug\/IlliquidCore.build\/IlliquidCore.emit-module.dia",
+    "-emit-dependencies-path",
+    "\/tmp\/illiquid-directory-state-sucw6mnl\/build\/x86_64-unknown-linux-gnu\/debug\/IlliquidCore.build\/IlliquidCore.emit-module.d",
+    "-parse-as-library",
+    "-o",
+    "\/tmp\/illiquid-directory-state-sucw6mnl\/build\/x86_64-unknown-linux-gnu\/debug\/Modules\/IlliquidCore.swiftmodule"
+  ],
+  "command_executable" : "\/tmp\/illiquid-swift\/usr\/bin\/swift-frontend",
+  "inputs" : [
+
+  ],
+  "kind" : "began",
+  "name" : "emit-module",
+  "outputs" : [
+    {
+      "path" : "\/tmp\/illiquid-directory-state-sucw6mnl\/build\/x86_64-unknown-linux-gnu\/debug\/Modules\/IlliquidCore.swiftmodule",
+      "type" : "swiftmodule"
+    },
+    {
+      "path" : "\/tmp\/illiquid-directory-state-sucw6mnl\/build\/x86_64-unknown-linux-gnu\/debug\/Modules\/IlliquidCore.swiftdoc",
+      "type" : "swiftdoc"
+    },
+    {
+      "path" : "\/tmp\/illiquid-directory-state-sucw6mnl\/build\/x86_64-unknown-linux-gnu\/debug\/Modules\/IlliquidCore.swiftsourceinfo",
+      "type" : "swiftsourceinfo"
+    },
+    {
+      "path" : "\/tmp\/illiquid-directory-state-sucw6mnl\/build\/x86_64-unknown-linux-gnu\/debug\/IlliquidCore.build\/include\/IlliquidCore-Swift.h",
+      "type" : "objc-header"
+    },
+    {
+      "path" : "\/tmp\/illiquid-directory-state-sucw6mnl\/build\/x86_64-unknown-linux-gnu\/debug\/IlliquidCore.build\/IlliquidCore.emit-module.dia",
+      "type" : "emit-module-diagnostics"
+    },
+    {
+      "path" : "\/tmp\/illiquid-directory-state-sucw6mnl\/build\/x86_64-unknown-linux-gnu\/debug\/IlliquidCore.build\/IlliquidCore.emit-module.d",
+      "type" : "emit-module.d"
+    }
+  ],
+  "pid" : 69,
+  "process" : {
+    "real_pid" : 69
+  }
+}
+ done ***
+
+*** Program crashed: Illegal instruction at 0x00007fb849cad2c0 ***
+
+Platform: x86_64 Linux (Ubuntu 24.04.3 LTS)
+
+Thread 0 crashed:
+
+  0      0x00007fb849cad2c0
+  1 [ra] 0x00007fb849cb6048
+  2 [ra] 0x00007fb849cc1696
+  3 [ra] 0x00007fb849cb8ff6
+  4 [ra] 0x00007fb849cbbfe0
+  5 [ra] 0x00007fb849cbbf1d
+  6 [ra] 0x00007fb849cbf125
+  7 [ra] 0x00007fb8486c7aa4
+...
+
+
+Registers:
+
+rax 0x00000000ffffffff  4294967295
+rdx 0x00007fb84609fa70  2f 70 72 6f 63 2f 36 35 2f 73 74 61 74 00 00 00  /proc/65/stat···
+rcx 0x0000000000000000  0
+rbx 0x0000000000000000  0
+rsi 0x00007fb8460a09c8  00 00 00 00 81 00 00 00 00 00 00 00 00 00 00 00  ················
+rdi 0x00007fb84609fa70  2f 70 72 6f 63 2f 36 35 2f 73 74 61 74 00 00 00  /proc/65/stat···
+rbp 0x00007fb84609fb50  a0 fb 09 46 b8 7f 00 00 48 60 cb 49 b8 7f 00 00   û·F¸···H`ËI¸···
+rsp 0x00007fb84609ea68  4b 78 cc 49 b8 7f 00 00 00 00 00 00 00 00 00 00  KxÌI¸···········
+ r8 0x0000000000000000  0
+ r9 0x0000000000000000  0
+r10 0x0000000000000000  0
+r11 0x0000000000000293  659
+r12 0x00007fb849ce7f50  c0 55 ce 49 b8 7f 00 00 00 00 00 00 09 00 00 00  ÀUÎI¸···········
+r13 0x00007fb849ce7fc8  c0 58 ce 49 b8 7f 00 00 00 00 00 00 09 00 00 00  ÀXÎI¸···········
+r14 0x00007fb849ce7fd8  3f 00 00 80 00 00 00 00 90 13 00 30 b8 7f 00 00  ?··········0¸···
+r15 0x0000000000000000  0
+rip 0x00007fb849cad2c0  0f 0b 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ················
+
+rflags 0x0000000000010246  ZF PF
+
+cs 0x0033  fs 0x0000  gs 0x0000
+
+
+Images:
+
+
+
+Backtrace took 0.00s
+
+error: fatalError

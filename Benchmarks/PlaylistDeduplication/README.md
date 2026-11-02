@@ -33,6 +33,35 @@ per constructed record, not an accumulating history of checkpoints.
 
 ## Reproduce
 
+### Current supporting-source regressions
+
+Pull-request CI uses `--regression-only`. This runs all six current test files
+against both variants in debug and release, without calibration or measurement.
+The baseline keeps the pinned `PlaylistMutation.swift`; all five supporting
+files are captured once from the current worktree and used identically in both
+variants. The candidate mutation file also comes from that capture. This permits
+support changes such as filename ordering to receive regression coverage.
+
+```sh
+python3 Benchmarks/PlaylistDeduplication/run.py \
+  --regression-only --output /tmp/playlist-deduplication-regressions
+```
+
+The manifest identifies the source policy, checkout/status, historical hashes,
+each file's origin and revision, full and compiled hashes, retained snapshots,
+and any difference from the historical bytes. The complete session-store source
+is retained alongside its compiled record-type prefix and extraction description.
+Current-worktree hashes, not the checkout revision alone, identify dirty inputs.
+The summary labels this as current-support regression evidence and explicitly
+records that performance was not measured. `--mode benchmark` is incompatible.
+
+Default/manual runs retain strict historical dependency guards. They still fail
+if any supporting file differs from the pinned revision; `--mode tests` alone
+does not relax this policy. Reproduce historical performance in a compatible
+checkout. The immutable `evidence/` results and runner snapshots are unchanged.
+
+### Historical measurements
+
 The frozen baseline is commit
 `6f70cd2446fc6ef38d4e5a0fbf96f91b2234e635`. It must be present in the local Git
 history; CI checks out full history. The candidate uses the current worktree.
@@ -71,8 +100,8 @@ Both variants compile the real `FolderPlaylist`, `PlaylistMutation`,
 complete `PlaybackSessionRecord` type is copied verbatim from the beginning of
 `PlaybackSessionStore.swift`, ending at a checked protocol boundary. This excludes
 the unrelated disk store and macOS signposting without replacing record logic
-with a model or stub. The runner rejects changes to the five unchanged dependency
-files between the baseline and candidate.
+with a model or stub. Historical mode rejects changes to the five unchanged
+dependency files between the baseline and candidate.
 
 The same six test files run against both variants in debug and release:
 

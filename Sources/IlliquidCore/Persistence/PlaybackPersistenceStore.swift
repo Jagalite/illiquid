@@ -164,7 +164,13 @@ public final class PlaybackPersistenceStore: @unchecked Sendable {
         let preferencesStatus = preferencesWriteStatus
         historyWriter = CoalescingPersistenceWriter(label: "com.illiquid.history-writer") { snapshot in
             try historyStatus.perform {
-                let data = try NonDecodePerformance.measure("HistoryEncode") { try JSONEncoder().encode(snapshot) }
+                let data = try NonDecodePerformance.measure("HistoryEncode") {
+                    let encoder = JSONEncoder()
+                    // History is standalone JSON Data, so paths do not need the
+                    // optional slash escapes used when embedding JSON in HTML.
+                    encoder.outputFormatting = [.withoutEscapingSlashes]
+                    return try encoder.encode(snapshot)
+                }
                 NonDecodePerformance.historyPayload(bytes: data.count)
                 NonDecodePerformance.measure("HistoryDefaultsSet") {
                     destination.defaults.set(data, forKey: historyKey)
@@ -482,8 +488,9 @@ public final class PlaybackPersistenceStore: @unchecked Sendable {
 
     public func setVolume(_ volume: Double) {
         mutatePreferences {
-            $0.preferences.volume = volume
-            $0.preferences = $0.preferences.sanitized()
+            // Preferences are sanitized on load/save and by each field setter.
+            // Do not normalize unrelated language lists on every slider update.
+            $0.preferences.volume = PlaybackPreferences.validVolume(volume)
         }
     }
 
@@ -501,8 +508,7 @@ public final class PlaybackPersistenceStore: @unchecked Sendable {
 
     public func setPlaybackSpeed(_ playbackSpeed: Double) {
         mutatePreferences {
-            $0.preferences.playbackSpeed = playbackSpeed
-            $0.preferences = $0.preferences.sanitized()
+            $0.preferences.playbackSpeed = PlaybackPreferences.validPlaybackSpeed(playbackSpeed)
         }
     }
 

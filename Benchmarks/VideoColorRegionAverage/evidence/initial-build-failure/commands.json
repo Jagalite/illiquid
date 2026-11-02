@@ -1,0 +1,108 @@
+[
+  {
+    "argv": [
+      "git",
+      "rev-parse",
+      "HEAD"
+    ],
+    "elapsed_seconds": 0.0011830329895019531,
+    "exit_code": 0,
+    "name": "head",
+    "started_unix_seconds": 1793164705.5248997
+  },
+  {
+    "argv": [
+      "git",
+      "status",
+      "--porcelain"
+    ],
+    "elapsed_seconds": 0.46721935272216797,
+    "exit_code": 0,
+    "name": "status",
+    "started_unix_seconds": 1793164705.5262446
+  },
+  {
+    "argv": [
+      "/usr/local/bin/swiftc",
+      "--version"
+    ],
+    "elapsed_seconds": 10.999117136001587,
+    "exit_code": 0,
+    "name": "swift-version",
+    "started_unix_seconds": 1793164705.9947357
+  },
+  {
+    "argv": [
+      "/usr/local/bin/swift",
+      "test",
+      "--package-path",
+      "/home/runner/work/_temp/video-color-regions/build/tests-baseline",
+      "--scratch-path",
+      "/home/runner/work/_temp/video-color-regions/build/tests-baseline/.build",
+      "-c",
+      "debug",
+      "--jobs",
+      "2",
+      "--no-parallel",
+      "-Xswiftc",
+      "-warnings-as-errors"
+    ],
+    "elapsed_seconds": 24.91386604309082,
+    "exit_code": 0,
+    "name": "baseline-debug-tests",
+    "started_unix_seconds": 1793164716.9949665
+  },
+  {
+    "argv": [
+      "/usr/local/bin/swiftc",
+      "-swift-version",
+      "6",
+      "-warnings-as-errors",
+      "-parse-as-library",
+      "-module-cache-path",
+      "/home/runner/work/_temp/video-color-regions/module-cache",
+      "-Onone",
+      "-emit-module",
+      "-emit-library",
+      "-module-name",
+      "IlliquidCore",
+      "-emit-module-path",
+      "/home/runner/work/_temp/video-color-regions/build/baseline-debug/IlliquidCore.swiftmodule",
+      "/home/runner/work/_temp/video-color-regions/sources/baseline.swift",
+      "-o",
+      "/home/runner/work/_temp/video-color-regions/build/baseline-debug/libIlliquidCore.so"
+    ],
+    "elapsed_seconds": 1.1337528228759766,
+    "exit_code": 0,
+    "name": "baseline-debug-core-build",
+    "started_unix_seconds": 1793164741.9097013
+  },
+  {
+    "argv": [
+      "/usr/local/bin/swiftc",
+      "-swift-version",
+      "6",
+      "-warnings-as-errors",
+      "-parse-as-library",
+      "-module-cache-path",
+      "/home/runner/work/_temp/video-color-regions/module-cache",
+      "-Onone",
+      "-I",
+      "/home/runner/work/_temp/video-color-regions/build/baseline-debug",
+      "-L",
+      "/home/runner/work/_temp/video-color-regions/build/baseline-debug",
+      "-lIlliquidCore",
+      "-Xlinker",
+      "-rpath",
+      "-Xlinker",
+      "/home/runner/work/_temp/video-color-regions/build/baseline-debug",
+      "/home/runner/work/_temp/video-color-regions/sources/Driver.swift",
+      "-o",
+      "/home/runner/work/_temp/video-color-regions/build/baseline-debug/measure"
+    ],
+    "elapsed_seconds": 6.503113508224487,
+    "exit_code": 1,
+    "name": "baseline-debug-driver-build",
+    "started_unix_seconds": 1793164743.0439758
+  }
+]

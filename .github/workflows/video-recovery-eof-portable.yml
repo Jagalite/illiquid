@@ -1,0 +1,118 @@
+name: Video recovery EOF portable ownership
+
+on:
+  push:
+    branches: ['perf/video-recovery-eof-release-20261028-2d367', 'perf/video-recovery-eof-lifetime-20261028']
+    paths:
+      - 'Sources/IlliquidNativePlayback/Media/**'
+      - 'Sources/IlliquidNativePlayback/Playback/**'
+      - 'Sources/IlliquidNativePlayback/Runtime/**'
+      - 'Sources/CFFmpeg/**'
+      - 'Tests/IlliquidNativePlaybackTests/**'
+      - 'Scripts/install-ci-native-sdk.py'
+      - 'Scripts/verify-corresponding-source.py'
+      - 'Scripts/lib/native-sdk-environment.sh'
+      - 'Scripts/tests/run-native-swift-tests.sh'
+      - 'DependencySources/**'
+      - 'Licenses/corresponding-source-manifest.json'
+      - 'Package.swift'
+      - 'Package.resolved'
+      - 'Benchmarks/DeinterlacerEOFMemory/build-linux-ffmpeg.sh'
+      - 'Sources/IlliquidNativePlayback/Media/MediaSession.swift'
+      - 'Sources/IlliquidNativePlayback/Media/FFmpegPacket.swift'
+      - 'Benchmarks/VideoRecoveryEOFMemory/**'
+      - '.github/workflows/video-recovery-eof-portable.yml'
+      - '!Benchmarks/VideoRecoveryEOFMemory/*.md'
+      - '!Benchmarks/VideoRecoveryEOFMemory/evidence/**'
+  pull_request:
+    paths:
+      - 'Sources/IlliquidNativePlayback/Media/**'
+      - 'Sources/IlliquidNativePlayback/Playback/**'
+      - 'Sources/IlliquidNativePlayback/Runtime/**'
+      - 'Sources/CFFmpeg/**'
+      - 'Tests/IlliquidNativePlaybackTests/**'
+      - 'Scripts/install-ci-native-sdk.py'
+      - 'Scripts/verify-corresponding-source.py'
+      - 'Scripts/lib/native-sdk-environment.sh'
+      - 'Scripts/tests/run-native-swift-tests.sh'
+      - 'DependencySources/**'
+      - 'Licenses/corresponding-source-manifest.json'
+      - 'Package.swift'
+      - 'Package.resolved'
+      - 'Benchmarks/DeinterlacerEOFMemory/build-linux-ffmpeg.sh'
+      - 'Sources/IlliquidNativePlayback/Media/MediaSession.swift'
+      - 'Sources/IlliquidNativePlayback/Media/FFmpegPacket.swift'
+      - 'Sources/IlliquidNativePlayback/Playback/PacketQueue.swift'
+      - 'Sources/IlliquidNativePlayback/Playback/FixedRingBuffer.swift'
+      - 'Sources/IlliquidNativePlayback/Playback/PlaybackGeneration.swift'
+      - 'Sources/IlliquidNativePlayback/Runtime/VideoFrameCapacityGate.swift'
+      - 'Sources/CFFmpeg/**'
+      - 'Benchmarks/VideoRecoveryEOFMemory/**'
+      - 'Benchmarks/DeinterlacerEOFMemory/build-linux-ffmpeg.sh'
+      - '.github/workflows/video-recovery-eof-portable.yml'
+      - '!Benchmarks/VideoRecoveryEOFMemory/*.md'
+      - '!Benchmarks/VideoRecoveryEOFMemory/evidence/**'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: video-recovery-eof-portable-${{ github.head_ref || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  portable-ownership:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Build FFmpeg from the repository's verified source archive
+        env:
+          ILLIQUID_FFMPEG_BUILD_JOBS: '4'
+        run: |
+          bash Benchmarks/DeinterlacerEOFMemory/build-linux-ffmpeg.sh \
+            "$RUNNER_TEMP/video-recovery-eof-sdk"
+      - name: Compare production control flow and real native buffer ownership
+        run: |
+          python3 Benchmarks/VideoRecoveryEOFMemory/run.py \
+            --sdk-prefix "$RUNNER_TEMP/video-recovery-eof-sdk" \
+            --output "$RUNNER_TEMP/video-recovery-eof-linux" --pairs 2
+      - name: Emit portable evidence
+        if: always()
+        run: |
+          python3 - <<'PY'
+          import json, os
+          from pathlib import Path
+          root = Path(os.environ['RUNNER_TEMP']) / 'video-recovery-eof-linux'
+          for name in ('manifest.json', 'summary.json', 'observations.json', 'complete-outputs.json', 'commands.json'):
+              path = root / name
+              if path.is_file():
+                  data = path.read_text()
+                  for offset in range(0, len(data), 16000):
+                      print('RECOVERY_EOF_FILE ' + json.dumps({
+                          'name': name, 'offset': offset, 'length': len(data),
+                          'content': data[offset:offset + 16000]
+                      }, sort_keys=True))
+          summary = root / 'summary.json'
+          if summary.is_file():
+              with open(os.environ['GITHUB_STEP_SUMMARY'], 'a') as out:
+                  out.write('## Linux component ownership\n\n')
+                  out.write('Debug/release session-loop comparisons and negative controls passed.\n\n')
+                  out.write('Real FFmpeg native buffer releases; macOS app, pixel output and hardware decode are separate gates.\n')
+          PY
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: video-recovery-eof-linux
+          path: |
+            ${{ runner.temp }}/video-recovery-eof-linux/*.json
+            ${{ runner.temp }}/video-recovery-eof-linux/metrics/
+            ${{ runner.temp }}/video-recovery-eof-linux/logs/
+            ${{ runner.temp }}/video-recovery-eof-linux/sources/
+            ${{ runner.temp }}/video-recovery-eof-sdk/*-receipt.json
+            ${{ runner.temp }}/video-recovery-eof-sdk/*.log
+          retention-days: 14

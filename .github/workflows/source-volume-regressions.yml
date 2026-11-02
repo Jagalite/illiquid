@@ -18,6 +18,9 @@ on:
       - 'Sources/IlliquidCore/Utilities/LifecyclePerformance.swift'
       - 'Tests/IlliquidAppTests/SourceVolumeChangePolicyTests.swift'
       - 'Tests/IlliquidAppTests/SourceFilesystemLifecycleTests.swift'
+      - 'Tests/IlliquidAppTests/SourceFilesystemEventDeliveryTests.swift'
+      - 'Benchmarks/FilesystemEventDelivery/**'
+      - 'Benchmarks/RuntimeLeaseHistory/CLeaseHeap/**'
       - 'Tests/IlliquidAppTests/SourceTreeDirectoryStateTests.swift'
       - 'Tests/IlliquidAppTests/SourceBrowserSearchTests.swift'
   workflow_dispatch:
@@ -49,7 +52,7 @@ jobs:
 
   volume-routing:
     runs-on: macos-26
-    timeout-minutes: 10
+    timeout-minutes: 20
     env:
       DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
     steps:
@@ -60,3 +63,30 @@ jobs:
         run: bash Scripts/test-source-volume-regressions.sh --jobs 2 -Xswiftc -warnings-as-errors
       - name: Release selection and native adapter integration
         run: bash Scripts/test-source-volume-regressions.sh -c release --jobs 2 -Xswiftc -warnings-as-errors
+      - name: Measure pending MainActor delivery memory
+        run: |
+          python3 - <<'PY'
+          import json, os, subprocess, sys
+          from pathlib import Path
+          command = [sys.executable, 'Benchmarks/FilesystemEventDelivery/run.py',
+                     '--output', os.environ['RUNNER_TEMP'] + '/filesystem-event-delivery', '--pairs', '4']
+          queue = Path('/Volumes/seed1/Projects/kyoto/kyoto.py')
+          if queue.is_file():
+              cli = [sys.executable, str(queue)]
+              submitted = subprocess.check_output([*cli, 'submit', '--', *command], text=True)
+              print(submitted, flush=True)
+              job_id = json.loads(submitted)['id']
+              subprocess.run([*cli, 'show', job_id], check=True)
+              result = subprocess.run([*cli, 'wait', job_id])
+              subprocess.run([*cli, 'logs', job_id], check=True)
+              sys.exit(result.returncode)
+          print('Shared Kyoto queue is unavailable on this hosted runner; '
+                'compiling isolated delivery components directly and serially.', flush=True)
+          subprocess.run(command, check=True)
+          PY
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: filesystem-event-delivery-memory
+          path: ${{ runner.temp }}/filesystem-event-delivery/evidence/
+          retention-days: 14

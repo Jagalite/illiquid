@@ -1,5 +1,10 @@
 # Bitmap subtitle palette conversion
 
+For the follow-up optimization of complete 256-entry palettes, see
+[FullPalette.md](FullPalette.md). That experiment compares against the already
+optimized table implementation; the results below describe the original
+scalar-to-table change and are not incremental gains from the follow-up.
+
 The selected optimization prepares premultiplied BGRA colors once per bitmap
 subtitle rectangle and reuses them while expanding its indexed pixels. In the
 recorded Linux experiment, the five caption and larger bitmap workloads used

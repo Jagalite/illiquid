@@ -34,13 +34,16 @@ struct SourceFilesystemEvent: Equatable, Sendable {
 /// Bounds event retention while the sidebar waits for its debounce deadline.
 /// A sustained stream can keep postponing that deadline. Once detail exceeds
 /// the budget, use the planner's existing event-loss recovery for every root.
-/// Native callback arrays and tasks awaiting main-actor delivery are separate.
+/// Native callbacks apply the same per-batch bound before decoding paths;
+/// tasks awaiting main-actor delivery remain a separate retention boundary.
 struct SourceFilesystemEventBuffer {
+    static let defaultMaximumCount = 4096
+
     private let maximumCount: Int
     private var events: [SourceFilesystemEvent] = []
     private var requiresFullRescan = false
 
-    init(maximumCount: Int = 4096) {
+    init(maximumCount: Int = SourceFilesystemEventBuffer.defaultMaximumCount) {
         self.maximumCount = max(1, maximumCount)
     }
 

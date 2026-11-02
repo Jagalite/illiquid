@@ -1,0 +1,81 @@
+name: Bitmap subtitle acquisition strategy comparison
+
+on:
+  push:
+    branches: ['research/bitmap-subtitle-acquisition-comparison-20261028']
+    paths:
+      - 'Benchmarks/BitmapSubtitleAcquisitionComparison/**'
+      - '.github/workflows/bitmap-subtitle-acquisition-comparison.yml'
+      - '!Benchmarks/BitmapSubtitleAcquisitionComparison/README.md'
+      - '!Benchmarks/BitmapSubtitleAcquisitionComparison/evidence/**'
+  pull_request:
+    paths:
+      - 'Benchmarks/BitmapSubtitleAcquisitionComparison/**'
+      - '.github/workflows/bitmap-subtitle-acquisition-comparison.yml'
+      - '!Benchmarks/BitmapSubtitleAcquisitionComparison/README.md'
+      - '!Benchmarks/BitmapSubtitleAcquisitionComparison/evidence/**'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: acquisition-strategy-comparison-${{ github.head_ref || github.ref_name }}
+  cancel-in-progress: true
+
+jobs:
+  compare-linux-components:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    container:
+      image: swift:6.3.2-noble@sha256:c4336909a71b2e69b884f4078cdf98c0cd081911632cb349ef72abc4cbed69fc
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Install actual FFmpeg development dependencies
+        run: |
+          apt-get update
+          apt-get install -y --no-install-recommends python3 pkg-config libavcodec-dev libavutil-dev
+          git config --global --add safe.directory "$GITHUB_WORKSPACE"
+      - name: Compare fixed production implementations under one protocol
+        run: |
+          if [ -f /Volumes/seed1/Projects/kyoto/kyoto.py ]; then
+            echo '::error::Kyoto is available; submit these builds through its shared queue.'
+            exit 1
+          fi
+          echo 'Kyoto is unavailable on this hosted Linux runner; isolated builds run directly and sequentially.'
+          echo 'These are component measurements. Native macOS playback qualification is separate.'
+          python3 Benchmarks/BitmapSubtitleAcquisitionComparison/run.py \
+            --triplets 6 --target-ms 240 --minimum-ms 60 \
+            --output "$RUNNER_TEMP/bitmap-acquisition-comparison"
+      - name: Emit reproducible comparison receipts
+        if: always()
+        run: |
+          python3 - <<'PY'
+          import base64, gzip, hashlib, json, os
+          from pathlib import Path
+          root = Path(os.environ['RUNNER_TEMP']) / 'bitmap-acquisition-comparison'
+          files = {str(path.relative_to(root)): path.read_text()
+                   for path in sorted(root.rglob('*'))
+                   if path.is_file() and path.suffix in {'.json', '.jsonl', '.log', '.txt'}
+                   and not any(part in {'.build', 'module-cache'}
+                               for part in path.relative_to(root).parts)}
+          packed = gzip.compress(json.dumps(files, sort_keys=True).encode(), compresslevel=9, mtime=0)
+          print('ACQUISITION_COMPARISON_REVIEW_SHA256 ' + hashlib.sha256(packed).hexdigest())
+          print('ACQUISITION_COMPARISON_REVIEW_BASE64 ' + base64.b64encode(packed).decode())
+          for name in ['parity.json', 'test-results.json', 'summary.json', 'completion.json']:
+              if name in files:
+                  print(name + '\n' + files[name])
+          PY
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: bitmap-acquisition-strategy-comparison
+          path: |
+            ${{ runner.temp }}/bitmap-acquisition-comparison/
+            !${{ runner.temp }}/bitmap-acquisition-comparison/**/.build/**
+            !${{ runner.temp }}/bitmap-acquisition-comparison/module-cache/**
+            !${{ runner.temp }}/bitmap-acquisition-comparison/*/benchmark
+          retention-days: 14

@@ -289,7 +289,11 @@ final class AppModel {
     private(set) var isUIObservationActive = true
     let openVideoTabs = OpenVideoTabStore()
     private(set) var sourceTabs: [SourceTab] {
-        didSet { sourceRootIndex.replace(tabs: sourceTabs) }
+        didSet {
+            if !SourceRootIndex.canReuseSnapshot(from: oldValue, for: sourceTabs) {
+                sourceRootIndex.replace(tabs: sourceTabs)
+            }
+        }
     }
     private let sourceRootIndex = SourceRootIndexStore()
     private(set) var activeSourceTabID: String?

@@ -1,0 +1,77 @@
+name: Media file classification research
+
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/media-file-classification.yml'
+      - 'Sources/IlliquidCore/Utilities/MediaFileSupport.swift'
+      - 'Sources/IlliquidCore/Utilities/NormalizedFileURL.swift'
+      - 'Sources/IlliquidCore/Utilities/NaturalFilenameOrdering.swift'
+      - 'Sources/IlliquidCore/Playlist/ExternalSubtitleMatcher.swift'
+      - 'Sources/IlliquidCore/Playlist/FolderPlaylist.swift'
+      - 'Sources/IlliquidCore/Playlist/FolderPlaylistDiscovery.swift'
+      - 'Sources/IlliquidCore/Playlist/PlaylistMutation.swift'
+      - 'Tests/IlliquidCoreTests/MediaFileSupportTests.swift'
+      - 'Tests/IlliquidCoreTests/FolderPlaylistDiscoveryTests.swift'
+      - 'Tests/IlliquidCoreTests/FolderDiscoveryFilesystemRegressionTests.swift'
+      - 'Tests/IlliquidCoreTests/ExternalSubtitleMatcherTests.swift'
+      - 'Tests/IlliquidCoreTests/TestSupport/TemporaryDirectory.swift'
+      - 'Benchmarks/MediaFileClassification/*.swift'
+      - 'Benchmarks/MediaFileClassification/*.py'
+      - 'Benchmarks/MediaFileClassification/baseline/**'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: media-file-classification-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  qualification:
+    runs-on: macos-26
+    timeout-minutes: 30
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+
+      - name: Verify baseline against its pinned upstream revision
+        run: |
+          python3 - <<'PY'
+          import hashlib
+          import json
+          from pathlib import Path
+          from urllib.request import urlopen
+          root = Path('Benchmarks/MediaFileClassification/baseline')
+          manifest = json.loads((root / 'manifest.json').read_text())
+          url = f"https://raw.githubusercontent.com/Jagalite/illiquid/{manifest['revision']}/{manifest['path']}"
+          with urlopen(url, timeout=30) as response:
+              original = response.read()
+          assert original == (root / 'MediaFileSupport.swift').read_bytes()
+          assert hashlib.sha256(original).hexdigest() == manifest['sha256']
+          print('Pinned production baseline matches upstream:', manifest['revision'])
+          PY
+
+      - name: Run focused debug and release regressions, parity checks, and paired benchmarks
+        run: |
+          queue=/Volumes/seed1/Projects/kyoto/kyoto.py
+          if test -f "$queue"; then
+            echo 'A shared Kyoto queue exists. Run this command through it and inspect show/logs/wait before qualification; this workflow expects an isolated ephemeral runner.'
+            exit 1
+          fi
+          echo 'The shared Kyoto queue is unavailable on this ephemeral runner; using isolated, serialized direct builds.'
+          python3 Benchmarks/MediaFileClassification/run.py \
+            --output "$RUNNER_TEMP/media-file-classification" \
+            --pairs 12 --target-ms 250 --discovery-target-ms 100
+
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: media-file-classification-evidence
+          path: ${{ runner.temp }}/media-file-classification/evidence/
+          retention-days: 14
+          if-no-files-found: error

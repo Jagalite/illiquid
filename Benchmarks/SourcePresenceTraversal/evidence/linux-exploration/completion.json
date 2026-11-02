@@ -1,0 +1,130 @@
+{
+  "cases": [
+    "flat_media_4096",
+    "flat_nonmedia_4096",
+    "nested_mixed_4096",
+    "directory_only_512",
+    "cached_repair",
+    "small_32"
+  ],
+  "exactReceiptParity": true,
+  "nativeQualificationSuccess": false,
+  "pairs": 2,
+  "sampleDurations": {
+    "allSamplesRetained": true,
+    "minimumObservedNanoseconds": 26845816,
+    "nativeMinimumNanoseconds": 250000000,
+    "requestedTargetNanoseconds": 25000000.0,
+    "samplesUnderNativeMinimum": [
+      {
+        "elapsedNanoseconds": 237878996,
+        "iterations": 1,
+        "pair": 0,
+        "variant": "candidate",
+        "workload": "flat_media_4096"
+      },
+      {
+        "elapsedNanoseconds": 45486734,
+        "iterations": 1,
+        "pair": 0,
+        "variant": "baseline",
+        "workload": "directory_only_512"
+      },
+      {
+        "elapsedNanoseconds": 57270616,
+        "iterations": 1,
+        "pair": 0,
+        "variant": "candidate",
+        "workload": "directory_only_512"
+      },
+      {
+        "elapsedNanoseconds": 47165925,
+        "iterations": 8,
+        "pair": 0,
+        "variant": "baseline",
+        "workload": "cached_repair"
+      },
+      {
+        "elapsedNanoseconds": 42954232,
+        "iterations": 8,
+        "pair": 0,
+        "variant": "candidate",
+        "workload": "cached_repair"
+      },
+      {
+        "elapsedNanoseconds": 32868294,
+        "iterations": 16,
+        "pair": 0,
+        "variant": "baseline",
+        "workload": "small_32"
+      },
+      {
+        "elapsedNanoseconds": 35315899,
+        "iterations": 16,
+        "pair": 0,
+        "variant": "candidate",
+        "workload": "small_32"
+      },
+      {
+        "elapsedNanoseconds": 48016919,
+        "iterations": 1,
+        "pair": 1,
+        "variant": "candidate",
+        "workload": "directory_only_512"
+      },
+      {
+        "elapsedNanoseconds": 56193364,
+        "iterations": 1,
+        "pair": 1,
+        "variant": "baseline",
+        "workload": "directory_only_512"
+      },
+      {
+        "elapsedNanoseconds": 39437557,
+        "iterations": 8,
+        "pair": 1,
+        "variant": "candidate",
+        "workload": "cached_repair"
+      },
+      {
+        "elapsedNanoseconds": 38230247,
+        "iterations": 8,
+        "pair": 1,
+        "variant": "baseline",
+        "workload": "cached_repair"
+      },
+      {
+        "elapsedNanoseconds": 26845816,
+        "iterations": 16,
+        "pair": 1,
+        "variant": "candidate",
+        "workload": "small_32"
+      },
+      {
+        "elapsedNanoseconds": 30521677,
+        "iterations": 16,
+        "pair": 1,
+        "variant": "baseline",
+        "workload": "small_32"
+      },
+      {
+        "elapsedNanoseconds": 247692331,
+        "iterations": 1,
+        "pair": 1,
+        "variant": "baseline",
+        "workload": "flat_media_4096"
+      }
+    ],
+    "samplesUnderRequestedTarget": []
+  },
+  "samples": 24,
+  "sourceAndBinaryIntegrity": true,
+  "status": "completed",
+  "testsSkipped": false,
+  "verifiedExecutables": [
+    "baseline-debug",
+    "baseline-release",
+    "candidate-debug",
+    "candidate-release"
+  ]
+}

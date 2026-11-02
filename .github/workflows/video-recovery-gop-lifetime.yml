@@ -1,0 +1,77 @@
+name: Video recovery GOP lifetime
+
+on:
+  push:
+    branches: ['perf/video-recovery-eof-release-20261028-2d367']
+    paths:
+      - 'Sources/IlliquidNativePlayback/Media/FFmpegPacket.swift'
+      - 'Sources/IlliquidNativePlayback/Media/MediaSession.swift'
+      - 'Tests/IlliquidNativePlaybackTests/VideoRecoveryPacketLifetimeTests.swift'
+      - 'Tests/IlliquidNativePlaybackTests/VideoRecoveryGOPSequencingTests.swift'
+      - 'Tests/IlliquidNativePlaybackTests/VideoRecoveryPacketSessionLifetimeTests.swift'
+      - 'Benchmarks/VideoRecoveryPacketLifetime/**'
+      - '.github/workflows/video-recovery-gop-lifetime.yml'
+      - '!Benchmarks/VideoRecoveryPacketLifetime/*.md'
+      - '!Benchmarks/VideoRecoveryPacketLifetime/evidence/**'
+  pull_request:
+    paths:
+      - 'Sources/IlliquidNativePlayback/Media/FFmpegPacket.swift'
+      - 'Sources/IlliquidNativePlayback/Media/MediaSession.swift'
+      - 'Sources/IlliquidNativePlayback/Media/VideoDecoder.swift'
+      - 'Tests/IlliquidNativePlaybackTests/VideoRecoveryPacketLifetimeTests.swift'
+      - 'Tests/IlliquidNativePlaybackTests/VideoRecoveryGOPSequencingTests.swift'
+      - 'Tests/IlliquidNativePlaybackTests/VideoRecoveryPacketSessionLifetimeTests.swift'
+      - 'Benchmarks/VideoRecoveryPacketLifetime/**'
+      - '.github/workflows/video-recovery-gop-lifetime.yml'
+      - '!Benchmarks/VideoRecoveryPacketLifetime/*.md'
+      - '!Benchmarks/VideoRecoveryPacketLifetime/evidence/**'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: video-recovery-gop-lifetime-${{ github.head_ref && format('refs/heads/{0}', github.head_ref) || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  macos-integration:
+    runs-on: macos-26
+    timeout-minutes: 40
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+      ILLIQUID_RECOVERY_PACKET_REQUIRE_FIXTURE: '1'
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - name: Prepare the pinned native SDK
+        run: |
+          echo 'Shared Kyoto queue is unavailable on this hosted runner; building serially in this isolated checkout.'
+          if ! xcrun -sdk macosx metal --version; then
+            xcodebuild -downloadComponent MetalToolchain
+          fi
+          python3 Scripts/verify-corresponding-source.py DependencySources
+          python3 Scripts/install-ci-native-sdk.py
+      - name: Generate and verify the native B-frame EOF fixture
+        run: |
+          python3 Benchmarks/FrameStepTimestamps/generate-fixtures.py \
+            --output "$RUNNER_TEMP/recovery-native/fixtures"
+      - name: Build the application graph and test packet recovery lifetime
+        env:
+          ILLIQUID_NATIVE_FIXTURE_DIR: ${{ runner.temp }}/recovery-native/fixtures
+        run: |
+          mkdir -p "$RUNNER_TEMP/recovery-native"
+          sw_vers > "$RUNNER_TEMP/recovery-native/host.txt"
+          swift --version >> "$RUNNER_TEMP/recovery-native/host.txt"
+          git rev-parse HEAD >> "$RUNNER_TEMP/recovery-native/host.txt"
+          set -o pipefail
+          bash Scripts/tests/run-native-swift-tests.sh --build --jobs 2 \
+            --filter 'VideoRecoveryPacketLifetimeTests|VideoRecoveryGOPSequencingTests|VideoRecoveryPacketSessionLifetimeTests|PlaybackBufferRegressionTests|PacketOwnershipTests' \
+            2>&1 | tee "$RUNNER_TEMP/recovery-native/tests.log"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: video-recovery-gop-native
+          path: ${{ runner.temp }}/recovery-native/
+          retention-days: 14

@@ -1,0 +1,103 @@
+name: Batch-open selection performance
+
+on:
+  push:
+    branches: ['perf/batch-open-selection-20261028']
+    paths:
+      - 'Sources/IlliquidPlayer/Player/PlaybackController.swift'
+      - 'Sources/IlliquidCore/Playlist/FolderPlaylist.swift'
+      - 'Sources/IlliquidCore/Playlist/PlaylistMutation.swift'
+      - 'Sources/IlliquidCore/Utilities/NormalizedFileURL.swift'
+      - 'Sources/IlliquidCore/Utilities/NaturalFilenameOrdering.swift'
+      - 'Tests/IlliquidPlayerTests/PlaybackCoordinatorTests.swift'
+      - 'Benchmarks/BatchOpenSelection/**'
+      - '.github/workflows/batch-open-selection-performance.yml'
+  pull_request:
+    paths:
+      - 'Sources/IlliquidPlayer/Player/PlaybackController.swift'
+      - 'Sources/IlliquidCore/Playlist/FolderPlaylist.swift'
+      - 'Sources/IlliquidCore/Playlist/PlaylistMutation.swift'
+      - 'Sources/IlliquidCore/Utilities/NormalizedFileURL.swift'
+      - 'Sources/IlliquidCore/Utilities/NaturalFilenameOrdering.swift'
+      - 'Tests/IlliquidPlayerTests/PlaybackCoordinatorTests.swift'
+      - 'Benchmarks/BatchOpenSelection/**'
+      - '.github/workflows/batch-open-selection-performance.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: batch-open-selection-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  native-component:
+    runs-on: macos-26
+    timeout-minutes: 20
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Check source selection and receipt policy without compilation
+        run: python3 -B Benchmarks/BatchOpenSelection/test_policy.py
+      - name: Qualify selection sources (manual runs also measure native timings)
+        run: >-
+          python3 Benchmarks/BatchOpenSelection/run.py
+          ${{ github.event_name != 'workflow_dispatch' && '--regression-only' || '' }}
+          --pairs 8 --target-ms 50
+          --output "$RUNNER_TEMP/batch-open-selection"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: batch-open-selection-native
+          path: |
+            ${{ runner.temp }}/batch-open-selection/**/*.json
+            ${{ runner.temp }}/batch-open-selection/**/*.jsonl
+            ${{ runner.temp }}/batch-open-selection/**/*.log
+            ${{ runner.temp }}/batch-open-selection/**/*.txt
+            ${{ runner.temp }}/batch-open-selection/**/*.swift
+            ${{ runner.temp }}/batch-open-selection/**/*.py
+          retention-days: 14
+
+  coordinator-tests:
+    runs-on: macos-26
+    timeout-minutes: 40
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - name: Check build coordination
+        run: |
+          if test -f /Volumes/seed1/Projects/kyoto/kyoto.py; then
+            echo 'Kyoto is available; submit this qualification through the shared queue.'
+            exit 1
+          fi
+          echo 'Kyoto is unavailable on this ephemeral runner; compiling serially in this isolated checkout.'
+      - name: Prepare pinned native dependencies
+        run: |
+          if ! xcrun -sdk macosx metal --version; then
+            xcodebuild -downloadComponent MetalToolchain
+          fi
+          python3 Scripts/verify-corresponding-source.py DependencySources
+          python3 Scripts/install-ci-native-sdk.py
+      - name: Compile the app graph and run controller regressions
+        run: |
+          mkdir -p "$RUNNER_TEMP/batch-open-controller"
+          set -o pipefail
+          for configuration in debug release; do
+            swift test --force-resolved-versions -c "$configuration" --jobs 3 --no-parallel \
+              --filter 'PlaybackCoordinatorTests|PlaylistIdentityLookupTests' \
+              2>&1 | tee "$RUNNER_TEMP/batch-open-controller/$configuration.log"
+          done
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: batch-open-controller-tests
+          path: ${{ runner.temp }}/batch-open-controller/
+          retention-days: 14

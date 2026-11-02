@@ -1,0 +1,371 @@
+{
+  "attribution": "This audit covers the already measured c60321f implementation, not the separate unmeasured 40bd6a0 implementation.",
+  "audit_kind": "Independent read-only evidence verification; summaries recomputed in Python from retained raw observations",
+  "audit_utc": "2026-10-28T05:13:36.392064+00:00",
+  "auditor": "Independent browser/research agent in root task 563b88a02673",
+  "binary_integrity_limit": {
+    "post_download_binary_hashes_recomputed": false,
+    "reason": "Executable and dylib bytes are absent from this artifact. The runner records their hashes and checks them at completion; this independent audit verifies retained source bytes, repository provenance, commands, and observations, but cannot rehash the absent binaries.",
+    "recorded_binary_sha256": {
+      "baseline": "d02e6011ad8e999ce9c160d477e28c2ed019c8ff64b7ddb315ba728a954b4cec",
+      "candidate": "4279c36868870c357f106ed28d1b8a9309e283ba0abe0bc4615033c61cf391f1",
+      "shared_core": "b4b571affbdec9bba87e231e789011426708a878ee6de3734babf94507d42f64"
+    }
+  },
+  "command_receipts": {
+    "all_compared_logs_equal_persisted_json": true,
+    "all_exit_codes_zero": true,
+    "all_referenced_logs_present": true,
+    "calibration_and_observation_command_logs_compared": 302,
+    "commands": 324
+  },
+  "environment": {
+    "compiler": "swift-driver version: 1.148.6 Apple Swift version 6.3.3 (swiftlang-6.3.3.1.3 clang-2100.1.1.101)\nTarget: arm64-apple-macosx26.0",
+    "hardware": "hw.model: VirtualMac2,1\nhw.ncpu: 3\nhw.memsize: 7516192768\nmachdep.cpu.brand_string: Apple M1 (Virtual)",
+    "machine": "arm64",
+    "os_version": "ProductName:\t\tmacOS\nProductVersion:\t\t26.6.2\nBuildVersion:\t\t25G83",
+    "sdk": "/Applications/Xcode_26.6.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.5.sdk",
+    "xcode": "Xcode 26.6\nBuild version 17F113"
+  },
+  "exact_output_parity": {
+    "baseline_candidate_complete_records_equal": true,
+    "canonical_trace_sha256": "8b6fd17b568b3748a8e36f94b3c4532c1ad0755b69632fea5911892086acd7a9",
+    "comparison_method": "Python structural equality of complete records, with 16-digit hexadecimal Double bit patterns validated as exact integers; no floating-point parsing or tolerance",
+    "full_trace_build_configuration": "Optimized only; debug and release both separately execute the 10-test component suite",
+    "nil_temporal_records_per_variant": 4,
+    "nonnull_grids_per_variant": 96,
+    "rgb_component_comparisons": 27648,
+    "spatial_matrix_records_per_variant": 90,
+    "temporal_outcomes": [
+      {
+        "event": "initial-black",
+        "published": true
+      },
+      {
+        "event": "throttled-white",
+        "published": false
+      },
+      {
+        "event": "tiny-change",
+        "published": false
+      },
+      {
+        "event": "smooth-gray",
+        "published": true
+      },
+      {
+        "event": "scene-cut-white",
+        "published": true
+      },
+      {
+        "event": "unchanged-white",
+        "published": false
+      },
+      {
+        "event": "throttled-black",
+        "published": false
+      },
+      {
+        "event": "scene-cut-black",
+        "published": true
+      },
+      {
+        "event": "clock-regression",
+        "published": true
+      },
+      {
+        "event": "reset-publishes-again",
+        "published": true
+      }
+    ],
+    "temporal_records_per_variant": 10
+  },
+  "native_component_tests": {
+    "completed_counts_reparsed_from_logs": true,
+    "distinct_test_functions_per_run": 10,
+    "runs": [
+      {
+        "configuration": "debug",
+        "exit": 0,
+        "log": "test-baseline-debug.log",
+        "passed_tests": 10,
+        "variant": "baseline"
+      },
+      {
+        "configuration": "release",
+        "exit": 0,
+        "log": "test-baseline-release.log",
+        "passed_tests": 10,
+        "variant": "baseline"
+      },
+      {
+        "configuration": "debug",
+        "exit": 0,
+        "log": "test-candidate-debug.log",
+        "passed_tests": 10,
+        "variant": "candidate"
+      },
+      {
+        "configuration": "release",
+        "exit": 0,
+        "log": "test-candidate-release.log",
+        "passed_tests": 10,
+        "variant": "candidate"
+      }
+    ],
+    "scope": "Isolated package using exact production core, mapping, sampler, and test sources; no full application or FFmpeg dependencies",
+    "total_test_executions": 40
+  },
+  "provenance": {
+    "artifact_zip_sha256": "0334bedee97fb8c379a0aba855f9b49f2febf351236cf38df4999512f6a8e92a",
+    "artifact_zip_sha256_verified": true,
+    "baseline_commit": "ea2ff568237e2667f7b1aeee67b11a44ebe95b72",
+    "branch": "perf/video-color-sampling-layout-20261028-f5db9f9",
+    "candidate_commit": "c60321fc2418bbb9bb801e85388bd95fcc4dccb5",
+    "candidate_working_tree_status_recorded": "",
+    "github_artifact_id": 12793522961,
+    "github_run_id": 40635423170,
+    "repository": "Jagalite/illiquid",
+    "run_url": "https://github.com/Jagalite/illiquid/actions/runs/40635423170"
+  },
+  "qualifications": [
+    "Eight candidate P010 full-range 1080p observations were shorter than the 30 ms calibration target (15.7\u201322.4 ms); none were discarded and all eight pairs favored the candidate.",
+    "Timed fixtures are warmed synthetic IOSurface-backed buffers. One buffer is reused per measured process.",
+    "All timed cases call sample() directly; unsupported-format and throttled-call timing controls are absent, and stateful smoothing/publication cost is not timed.",
+    "The temporal verification covers throttle, tiny-change suppression, smoothing, scene cuts, clock regression, and reset correctness.",
+    "Only elapsed wall time is recorded. This evidence does not establish process CPU, energy, GPU, whole-player latency, or playback improvements.",
+    "The production caller is limited to four accepted samples per second. Multiplying the 1080p paired microsecond savings by four suggests only about 11\u201331 microseconds of component wall time per second; this is arithmetic context, not an application measurement.",
+    "Full application compilation, broader integration tests, and live UI/playback qualification must be supported by separate receipts; this audit covers the component artifact only."
+  ],
+  "schema": 1,
+  "source_integrity": {
+    "candidate_production_tests_and_drivers_also_verified_against_github_at_exact_commit": true,
+    "checks": [
+      {
+        "commit": "c60321fc2418bbb9bb801e85388bd95fcc4dccb5",
+        "commit_bytes_match": true,
+        "manifest_key": "Tests/IlliquidNativePlaybackTests/VideoFrameColorSamplerTests.swift",
+        "repository_path": "Tests/IlliquidNativePlaybackTests/VideoFrameColorSamplerTests.swift",
+        "retained_bytes_match": true,
+        "sha256": "5df4d77d11b76c11e1f63406789743d48fb98795c7a1046057bf89220942b6bb"
+      },
+      {
+        "commit": "ea2ff568237e2667f7b1aeee67b11a44ebe95b72",
+        "commit_bytes_match": true,
+        "manifest_key": "baseline/Sources/IlliquidCore/Player/VideoColorSample.swift",
+        "repository_path": "Sources/IlliquidCore/Player/VideoColorSample.swift",
+        "retained_bytes_match": true,
+        "sha256": "e296cb8ddb45850b8c6356bdec8b6f128e22fe48119bc5c24c6c42f1e32fad06"
+      },
+      {
+        "commit": "ea2ff568237e2667f7b1aeee67b11a44ebe95b72",
+        "commit_bytes_match": true,
+        "manifest_key": "baseline/Sources/IlliquidNativePlayback/Presentation/PiPVideoMapping.swift",
+        "repository_path": "Sources/IlliquidNativePlayback/Presentation/PiPVideoMapping.swift",
+        "retained_bytes_match": true,
+        "sha256": "39f2c35a9c8d6e0154b01643c75045214b7d5b763936b8befbde8a988f206f16"
+      },
+      {
+        "commit": "ea2ff568237e2667f7b1aeee67b11a44ebe95b72",
+        "commit_bytes_match": true,
+        "manifest_key": "baseline/Sources/IlliquidNativePlayback/Presentation/VideoFrameColorSampler.swift",
+        "repository_path": "Sources/IlliquidNativePlayback/Presentation/VideoFrameColorSampler.swift",
+        "retained_bytes_match": true,
+        "sha256": "322086dbd5b17be713fe10fc760e0d5051ff3f66b47ca3e7a4c69ea90d7b3d19"
+      },
+      {
+        "commit": "c60321fc2418bbb9bb801e85388bd95fcc4dccb5",
+        "commit_bytes_match": true,
+        "manifest_key": "candidate/Sources/IlliquidCore/Player/VideoColorSample.swift",
+        "repository_path": "Sources/IlliquidCore/Player/VideoColorSample.swift",
+        "retained_bytes_match": true,
+        "sha256": "e296cb8ddb45850b8c6356bdec8b6f128e22fe48119bc5c24c6c42f1e32fad06"
+      },
+      {
+        "commit": "c60321fc2418bbb9bb801e85388bd95fcc4dccb5",
+        "commit_bytes_match": true,
+        "manifest_key": "candidate/Sources/IlliquidNativePlayback/Presentation/PiPVideoMapping.swift",
+        "repository_path": "Sources/IlliquidNativePlayback/Presentation/PiPVideoMapping.swift",
+        "retained_bytes_match": true,
+        "sha256": "39f2c35a9c8d6e0154b01643c75045214b7d5b763936b8befbde8a988f206f16"
+      },
+      {
+        "commit": "c60321fc2418bbb9bb801e85388bd95fcc4dccb5",
+        "commit_bytes_match": true,
+        "manifest_key": "candidate/Sources/IlliquidNativePlayback/Presentation/VideoFrameColorSampler.swift",
+        "repository_path": "Sources/IlliquidNativePlayback/Presentation/VideoFrameColorSampler.swift",
+        "retained_bytes_match": true,
+        "sha256": "a91a8b3b2a40d1992f8bfe1cc7feae34171bccb1a930daf0b88a0091f6a65ccc"
+      },
+      {
+        "commit": "c60321fc2418bbb9bb801e85388bd95fcc4dccb5",
+        "commit_bytes_match": true,
+        "manifest_key": "driver/Harness.swift",
+        "repository_path": "Benchmarks/VideoColorSampling/Harness.swift",
+        "retained_bytes_match": true,
+        "sha256": "1ffbc5216a689ec9305f7de60ea1099b529b1f03466e8331aa9aac08ea936296"
+      },
+      {
+        "commit": "c60321fc2418bbb9bb801e85388bd95fcc4dccb5",
+        "commit_bytes_match": true,
+        "manifest_key": "driver/run.py",
+        "repository_path": "Benchmarks/VideoColorSampling/run.py",
+        "retained_bytes_match": true,
+        "sha256": "8fc126280c863db18259592b397e41c478f633dfaf09ec91c86f86d785823e68"
+      }
+    ],
+    "generated_package_hashes_verified": 2,
+    "generated_package_sha256": "f1ac6b194bbf6e02acb8a4eb0681e47f1c53e81b6de873f318a67c0517a62378",
+    "same_test_source_in_both_variants": true,
+    "source_and_driver_hashes_verified": 9
+  },
+  "timing_audit": {
+    "all_duration_shortfalls": [
+      {
+        "case": "yuv10-full-1920x1080",
+        "elapsed_ms": 22.402458,
+        "elapsed_ns": 22402458,
+        "pair": 0,
+        "target_ms": 30,
+        "variant": "candidate"
+      },
+      {
+        "case": "yuv10-full-1920x1080",
+        "elapsed_ms": 22.258167,
+        "elapsed_ns": 22258167,
+        "pair": 1,
+        "target_ms": 30,
+        "variant": "candidate"
+      },
+      {
+        "case": "yuv10-full-1920x1080",
+        "elapsed_ms": 18.953541,
+        "elapsed_ns": 18953541,
+        "pair": 2,
+        "target_ms": 30,
+        "variant": "candidate"
+      },
+      {
+        "case": "yuv10-full-1920x1080",
+        "elapsed_ms": 15.713458,
+        "elapsed_ns": 15713458,
+        "pair": 3,
+        "target_ms": 30,
+        "variant": "candidate"
+      },
+      {
+        "case": "yuv10-full-1920x1080",
+        "elapsed_ms": 22.13725,
+        "elapsed_ns": 22137250,
+        "pair": 4,
+        "target_ms": 30,
+        "variant": "candidate"
+      },
+      {
+        "case": "yuv10-full-1920x1080",
+        "elapsed_ms": 18.026083,
+        "elapsed_ns": 18026083,
+        "pair": 5,
+        "target_ms": 30,
+        "variant": "candidate"
+      },
+      {
+        "case": "yuv10-full-1920x1080",
+        "elapsed_ms": 18.8075,
+        "elapsed_ns": 18807500,
+        "pair": 6,
+        "target_ms": 30,
+        "variant": "candidate"
+      },
+      {
+        "case": "yuv10-full-1920x1080",
+        "elapsed_ms": 20.703833,
+        "elapsed_ns": 20703833,
+        "pair": 7,
+        "target_ms": 30,
+        "variant": "candidate"
+      }
+    ],
+    "all_observations_match_final_calibration_checksums": true,
+    "all_pair_iterations_checksums_warmup_checksums_layouts_and_dimensions_match": true,
+    "all_summary_case_count": 15,
+    "all_summary_fields_recomputed_exactly": true,
+    "calibration_iteration_rules_recomputed": true,
+    "calibration_records_verified": 62,
+    "cases": 15,
+    "duration_shortfall_count": 8,
+    "improved_pairs": 120,
+    "measurement_elapsed_ms_range": [
+      15.713458,
+      264.276584
+    ],
+    "median_paired_reduction_range_percent": [
+      40.95336134231299,
+      65.8748046212174
+    ],
+    "metric": "Elapsed wall time for synchronous sample(), including lock, metadata, sample allocation, and full-result checksum; setup/fill excluded",
+    "metrics_1080p": [
+      {
+        "baseline_median_us": 6.434722445661475,
+        "candidate_median_us": 3.4565915625534824,
+        "case": "bgra-1920x1080",
+        "improved_pairs": 8,
+        "median_paired_reduction_percent": 45.30972198241976,
+        "median_paired_saved_us": 2.740510354270067,
+        "pairs": 8,
+        "ratio_of_medians_reduction_percent": 46.28219644680955
+      },
+      {
+        "baseline_median_us": 10.789496650757766,
+        "candidate_median_us": 4.367401406681738,
+        "case": "yuv8-video-1920x1080",
+        "improved_pairs": 8,
+        "median_paired_reduction_percent": 61.451922738217135,
+        "median_paired_saved_us": 6.555318345474337,
+        "pairs": 8,
+        "ratio_of_medians_reduction_percent": 59.52173166136525
+      },
+      {
+        "baseline_median_us": 11.130251583189407,
+        "candidate_median_us": 4.00814038983469,
+        "case": "yuv8-full-1920x1080",
+        "improved_pairs": 8,
+        "median_paired_reduction_percent": 64.89739706546865,
+        "median_paired_saved_us": 7.404979439098611,
+        "pairs": 8,
+        "ratio_of_medians_reduction_percent": 63.98877096463487
+      },
+      {
+        "baseline_median_us": 11.261395518849284,
+        "candidate_median_us": 3.9452534181617005,
+        "case": "yuv10-video-1920x1080",
+        "improved_pairs": 8,
+        "median_paired_reduction_percent": 65.00905932179417,
+        "median_paired_saved_us": 7.0988171579862485,
+        "pairs": 8,
+        "ratio_of_medians_reduction_percent": 64.96656731789457
+      },
+      {
+        "baseline_median_us": 12.332762842272007,
+        "candidate_median_us": 4.4871434713736145,
+        "case": "yuv10-full-1920x1080",
+        "improved_pairs": 8,
+        "median_paired_reduction_percent": 60.81814532468275,
+        "median_paired_saved_us": 7.831966168816474,
+        "pairs": 8,
+        "ratio_of_medians_reduction_percent": 63.616072661404
+      }
+    ],
+    "observations": 240,
+    "orders_per_case": {
+      "baseline_first": 4,
+      "candidate_first": 4
+    },
+    "paired_comparisons": 120,
+    "pairs_per_case": 8,
+    "percentage_definition": "Median paired reductions and reductions calculated from independent medians are distinct statistics; both are labeled in the 1080p metrics.",
+    "process_cpu_time_recorded": false,
+    "schedule_exactly_reconstructed": true
+  },
+  "verdict": "Native component performance improvement supported; qualification limits and eight duration shortfalls retained"
+}

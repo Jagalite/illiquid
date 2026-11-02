@@ -82,7 +82,7 @@ Keeping the exact expression matters when a combining mark, regional indicator, 
 
 The change preserves the document-size and nesting limits, captured-field selection, XML validation, declaration rejection, and metadata interpretation.
 
-## Current qualification (no timing)
+## Current-source regressions (no timing)
 
 Run on macOS with Python 3.10+ and Swift 6.1+. The runner uses the actual five MediaLibrary sources, including the Darwin-based sidecar reader.
 
@@ -93,13 +93,13 @@ python3 Benchmarks/NFOTextLimits/run.py \
   --output .build/nfo-current-qualification
 ```
 
-`qualify` is the default and the [automatic workflow](../../.github/workflows/nfo-text-limits.yml) uses it explicitly. Both variants receive a snapshot of the **current** four shared production dependencies, the same five current test files, and the current driver. Only the baseline NFO parser comes from `68274d1b09dcc866296321a5a8858efc297c4f19`; this is a composite input, not a claim to test that entire old tree. In particular, both versions retain the current filesystem-root reader repair and its regressions.
+`qualify` is the default and the [automatic workflow](../../.github/workflows/nfo-text-limits.yml) uses it explicitly. Both variants receive a snapshot of the **current** four shared production dependencies, the same six current test files (including declaration-preflight safety regressions), and the current driver. Only the baseline NFO parser comes from `68274d1b09dcc866296321a5a8858efc297c4f19`; this independent frozen oracle is a composite input, not a claim to test that entire old tree. In particular, both versions retain the current filesystem-root reader repair and its regressions.
 
-Before compiling, the runner requires byte-identical shared dependencies and exactly one differing source, `NFOMetadataHints.swift`. It also requires the reviewed baseline/candidate parser blobs `55e84590829c678f6ac5cb1328e64dead63651b6` / `051c475fd33bcd16ec33f6b4b93ee98fffdb21d3`. Any new parser change requires a separately reviewed comparison. The manifest records both source sets' Git blob and SHA-256 hashes, test/driver/runner identities, checkout state, toolchain, commands, and test counts.
+Before compiling, the runner requires byte-identical shared dependencies and exactly one differing source, `NFOMetadataHints.swift`. Current regressions require the exact reviewed baseline/candidate parser blobs `55e84590829c678f6ac5cb1328e64dead63651b6` / `1dbcc6eb188c95f428e2600d3f585c6e30981676`. The latter is PR #195's ASCII-without-exclamation shortcut; non-ASCII input and declaration candidates still use the original localized checks. This is a new, explicitly pinned regression comparison, not an extension of the historical measured cohort. Any further parser change fails closed and requires a separately reviewed comparison. The manifest labels this path `current-regression-2-declaration-preflight` and records the expected parser pair, both source sets' Git blob and SHA-256 hashes, test/driver/runner identities, checkout state, toolchain, commands, and test counts.
 
 Qualification runs all current regressions in debug and release with each parser, then compares all **136 complete** release differential outputs, preserving explicit nulls, strings, and array order. Missing cases, duplicate cases, missing receipt fields, differing test counts, or any output difference fail the run. It never invokes the driver's timing path, and it rejects `--skip-tests` and `--rounds`. Passing results set `completed: true` in `manifest.json`; four test logs, two compiler logs, and `differential.json` supply the evidence. Use a fresh output directory. Swift builds are sequential with at most two compiler jobs.
 
-The fast Python controls exercise the original old-sidecar staging error, unexpected parser changes, incomplete corpora, exact output mismatches, and the no-timing path. They also verify historical source/test/driver hashes against the archived manifest without executing historical timings:
+The fast Python controls exercise the original old-sidecar staging error, unexpected parser changes, incomplete corpora, exact output mismatches, and the no-timing path. They reject substitution of the current candidate into historical timing, substitution of the historical candidate into current regressions, and changes to the frozen oracle in either mode. They also verify historical source/test/driver hashes against the archived manifest without executing historical timings:
 
 ```sh
 git fetch --no-tags --depth=1 origin 91dab495865210bbaced94ef39a2eb613209c3c7
@@ -108,7 +108,7 @@ python3 -m unittest discover -s Benchmarks/NFOTextLimits -p test_harness.py -v
 
 ## Reproduce historical protocol 3 (explicit timing)
 
-Historical reproduction loads **all** baseline production sources from `68274d1b09dcc866296321a5a8858efc297c4f19` and candidate sources, tests, and driver from `91dab495865210bbaced94ef39a2eb613209c3c7`. Those blobs match the recorded merge checkout in the final native cohort. Current shared code and root regressions are qualified by the separate path above.
+Historical reproduction loads **all** baseline production sources from `68274d1b09dcc866296321a5a8858efc297c4f19` and candidate sources, tests, and driver from `91dab495865210bbaced94ef39a2eb613209c3c7`. It still requires the original baseline/candidate parser blobs `55e84590829c678f6ac5cb1328e64dead63651b6` / `051c475fd33bcd16ec33f6b4b93ee98fffdb21d3`, and only the original five test files. Those blobs match the recorded merge checkout in the final native cohort. Current shared code and root regressions are qualified by the separate path above. Neither a current regression pass nor the historical cohort's measurements establish performance of the declaration-preflight change.
 
 ```sh
 git fetch --no-tags --depth=1 origin 68274d1b09dcc866296321a5a8858efc297c4f19

@@ -1,6 +1,18 @@
 name: Source browser search performance
 
 on:
+  push:
+    branches: ['perf/source-search-match-indices-20261028']
+    paths:
+      - Sources/IlliquidApp/UI/SourceBrowserFilter.swift
+      - Sources/IlliquidApp/UI/SourceTreeProjectionInput.swift
+      - Sources/IlliquidApp/UI/SourcesSidebar.swift
+      - Tests/IlliquidAppTests/SourceBrowserSearchTests.swift
+      - Scripts/test-source-browser-search.py
+      - Scripts/print-source-search-evidence.py
+      - Benchmarks/SourceBrowserSearch/Harness.swift
+      - Benchmarks/SourceBrowserSearch/run.py
+      - .github/workflows/source-browser-search-performance.yml
   pull_request:
     paths:
       - Sources/IlliquidApp/UI/SourceBrowserFilter.swift
@@ -8,10 +20,17 @@ on:
       - Sources/IlliquidApp/UI/SourcesSidebar.swift
       - Tests/IlliquidAppTests/SourceBrowserSearchTests.swift
       - Scripts/test-source-browser-search.py
+      - Scripts/print-source-search-evidence.py
       - Benchmarks/SourceBrowserSearch/Harness.swift
       - Benchmarks/SourceBrowserSearch/run.py
       - .github/workflows/source-browser-search-performance.yml
   workflow_dispatch:
+    inputs:
+      baseline_ref:
+        description: Git ref for the baseline Filter and exact-source oracle
+        required: true
+        default: ea2ff568237e2667f7b1aeee67b11a44ebe95b72
+        type: string
 
 permissions:
   contents: read
@@ -19,6 +38,11 @@ permissions:
 concurrency:
   group: source-browser-search-${{ github.ref }}
   cancel-in-progress: true
+
+# Use the PR base for current comparisons; manual and branch runs can isolate
+# the historical matching-row change.
+env:
+  SOURCE_SEARCH_BASELINE: ${{ github.event.pull_request.base.sha || inputs.baseline_ref || 'ea2ff568237e2667f7b1aeee67b11a44ebe95b72' }}
 
 jobs:
   linux-component:
@@ -41,7 +65,7 @@ jobs:
         run: |
           for configuration in debug release; do
             python3 Scripts/test-source-browser-search.py \
-              --configuration "$configuration" --baseline-ref \
+              --configuration "$configuration" --baseline-ref "$SOURCE_SEARCH_BASELINE" \
               --output "$RUNNER_TEMP/source-search/baseline-$configuration"
             python3 Scripts/test-source-browser-search.py \
               --configuration "$configuration" \
@@ -51,14 +75,18 @@ jobs:
         run: |
           search_cpu="$(python3 -c 'import os; print(min(os.sched_getaffinity(0)))')"
           python3 Benchmarks/SourceBrowserSearch/run.py \
+            --baseline-ref "$SOURCE_SEARCH_BASELINE" \
             --pairs 6 --target-ms 120 --cpu "$search_cpu" \
             --output "$RUNNER_TEMP/source-search/timing"
       - name: Measure allocation requests separately from timing
         run: |
           search_cpu="$(python3 -c 'import os; print(min(os.sched_getaffinity(0)))')"
           python3 Benchmarks/SourceBrowserSearch/run.py \
+            --baseline-ref "$SOURCE_SEARCH_BASELINE" \
             --allocations --pairs 2 --cpu "$search_cpu" \
             --output "$RUNNER_TEMP/source-search/allocations"
+      - name: Retain compact source, test, and measurement receipts in logs
+        run: python3 Scripts/print-source-search-evidence.py "$RUNNER_TEMP/source-search" --allocations
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         if: always()
         with:
@@ -91,7 +119,7 @@ jobs:
         run: |
           for configuration in debug release; do
             python3 Scripts/test-source-browser-search.py \
-              --configuration "$configuration" --baseline-ref \
+              --configuration "$configuration" --baseline-ref "$SOURCE_SEARCH_BASELINE" \
               --output "$RUNNER_TEMP/source-search/baseline-$configuration"
             python3 Scripts/test-source-browser-search.py \
               --configuration "$configuration" \
@@ -100,8 +128,11 @@ jobs:
       - name: Measure complete search and cached projection workloads
         run: |
           python3 Benchmarks/SourceBrowserSearch/run.py \
+            --baseline-ref "$SOURCE_SEARCH_BASELINE" \
             --pairs 6 --target-ms 120 \
             --output "$RUNNER_TEMP/source-search/timing"
+      - name: Retain compact source, test, and measurement receipts in logs
+        run: python3 Scripts/print-source-search-evidence.py "$RUNNER_TEMP/source-search"
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         if: always()
         with:

@@ -1,0 +1,4 @@
+                let acquisition = needsAcquisition && packet.data.map { data in
+                    isPGS ? PGSSubtitlePacket.isAcquisition(data)
+                        : DVBSubtitlePacket.isAcquisition(data, compositionPageID: compositionPageID)
+                } == true

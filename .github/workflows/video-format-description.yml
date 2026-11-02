@@ -1,0 +1,107 @@
+name: Video format description reuse
+
+on:
+  push:
+    branches: ['perf/video-format-description-*']
+    paths:
+      - 'Sources/IlliquidNativePlayback/Presentation/VideoFormatDescriptionCache.swift'
+      - 'Sources/IlliquidNativePlayback/Presentation/SampleBufferVideoPresenter.swift'
+      - 'Sources/IlliquidNativePlayback/Diagnostics/NativePlaybackSignposts.swift'
+      - 'Tests/IlliquidNativePlaybackTests/VideoFormatDescriptionCacheTests.swift'
+      - 'Benchmarks/VideoFormatDescription/**'
+      - '.github/workflows/video-format-description.yml'
+      - '!Benchmarks/VideoFormatDescription/*.md'
+      - '!Benchmarks/VideoFormatDescription/evidence/**'
+  pull_request:
+    paths:
+      - 'Sources/IlliquidNativePlayback/Presentation/VideoFormatDescriptionCache.swift'
+      - 'Sources/IlliquidNativePlayback/Presentation/SampleBufferVideoPresenter.swift'
+      - 'Sources/IlliquidNativePlayback/Diagnostics/NativePlaybackSignposts.swift'
+      - 'Tests/IlliquidNativePlaybackTests/VideoFormatDescriptionCacheTests.swift'
+      - 'Benchmarks/VideoFormatDescription/**'
+      - '.github/workflows/video-format-description.yml'
+      - '!Benchmarks/VideoFormatDescription/*.md'
+      - '!Benchmarks/VideoFormatDescription/evidence/**'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: video-format-description-${{ github.head_ref || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  native-component:
+    runs-on: macos-26
+    timeout-minutes: 20
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Qualify real CoreMedia output and measure paired implementations
+        run: |
+          mode=()
+          if test "$GITHUB_EVENT_NAME" = 'pull_request'; then
+            mode+=(--tests-only)
+          fi
+          python3 Benchmarks/VideoFormatDescription/run.py \
+            --pairs 8 --target-ms 150 \
+            --output "$RUNNER_TEMP/video-format-description" "${mode[@]}"
+      - name: Print reviewable evidence
+        if: always()
+        run: |
+          python3 - <<'PY'
+          import json, os
+          from pathlib import Path
+          root = Path(os.environ["RUNNER_TEMP"]) / "video-format-description"
+          for name in ["manifest.json", "tests.json", "verification.json", "calibrations.json",
+                       "observations.json", "summary.json", "completion.json", "commands.json",
+                       "logs/tests-debug.log", "logs/tests-release.log"]:
+              path = root / name
+              if path.is_file():
+                  print("VIDEO_FORMAT_FILE " + json.dumps({"name": name, "content": path.read_text()}))
+          PY
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: video-format-description-component
+          path: |
+            ${{ runner.temp }}/video-format-description/*.json
+            ${{ runner.temp }}/video-format-description/logs/
+            ${{ runner.temp }}/video-format-description/sources/
+          retention-days: 14
+
+  native-app:
+    runs-on: macos-26
+    timeout-minutes: 40
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - name: Prepare pinned native dependencies
+        run: |
+          if ! xcrun -sdk macosx metal --version; then
+            xcodebuild -downloadComponent MetalToolchain
+          fi
+          python3 Scripts/verify-corresponding-source.py DependencySources
+          python3 Scripts/install-ci-native-sdk.py
+      - name: Compile app graph and run native format regressions
+        run: |
+          echo "Kyoto is unavailable on this hosted runner; using a serialized direct build."
+          mkdir -p "$RUNNER_TEMP/video-format-description-app"
+          set -o pipefail
+          swift test --force-resolved-versions -c release --jobs 2 --no-parallel \
+            --filter 'VideoFormatDescriptionCacheTests|PiPVideoMappingTests' \
+            2>&1 | tee "$RUNNER_TEMP/video-format-description-app/tests.log"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: video-format-description-app
+          path: ${{ runner.temp }}/video-format-description-app/
+          retention-days: 14

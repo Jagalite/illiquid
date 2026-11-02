@@ -1,0 +1,47 @@
+{
+  "audited_at_utc": "2026-10-28T05:56:39.732005+00:00",
+  "auditor": {
+    "path": "/workspace/scratch/663a3fdba62e/research/audit_sort.py",
+    "python": "3.12.14",
+    "sha256": "8736e6eabc2ce2630555609d33cea5fa0753f29270f25e234b55719af6fe8d94"
+  },
+  "checks": 22870,
+  "counts": {
+    "AB_pairs": 180,
+    "BA_pairs": 180,
+    "balanced_case_mode_groups": 60,
+    "binary_hashes": 14,
+    "case_metric_summaries_recomputed": 120,
+    "cases": 30,
+    "category_distributions_recomputed": 8,
+    "commands": 740,
+    "driver_snapshots": 4,
+    "measurement_commands": 720,
+    "modes": {
+      "allocations": 360,
+      "latency": 360
+    },
+    "observations": 720,
+    "paired_comparisons": 360,
+    "source_snapshots": 6,
+    "test_configurations": 3,
+    "test_snapshots": 4,
+    "tests_per_configuration": 13,
+    "unique_observation_keys": 720,
+    "verification_cases_per_variant": 66
+  },
+  "error": null,
+  "evidence_directory": "/workspace/scratch/663a3fdba62e/research/sort-full",
+  "failures": [],
+  "full_audit": "audit-full.json.gz",
+  "full_audit_uncompressed_sha256": "c2bac2700806af238b1dd7bf093360d4d0abc352d2372551be1b027607c27af7",
+  "passed": true,
+  "schema": "natural-filename-sort-storage-independent-audit-v1",
+  "scope": [
+    "Read-only verification of the frozen Linux/glibc cohort, not a measurement rerun.",
+    "No benchmark-runner import; summaries are reconstructed independently from persisted observations.",
+    "Fingerprints and warmup checksums match across modes; timed checksums match across variants/repeats within each mode.",
+    "Cross-mode timed checksums are compared only when latency and allocation both execute one iteration.",
+    "Allocation-request accounting is cumulative traffic, not retained heap, peak RSS, or macOS footprint."
+  ]
+}

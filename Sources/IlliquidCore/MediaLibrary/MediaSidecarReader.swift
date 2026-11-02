@@ -20,6 +20,12 @@ public final class MediaSidecarReader {
         let folders: [URL]
         let sidecars: [FolderSidecarPaths]
     }
+    // Keep metadata out of the small path-plan value; empty plans need no box.
+    private final class AncestorHints {
+        let hints: MediaMetadataHints
+
+        init(_ hints: MediaMetadataHints) { self.hints = hints }
+    }
     private var cache: [String: Sidecar] = [:]
     // A missing or unusable sidecar needs only its path. Keeping those entries
     // out of the value dictionary avoids reserving the enum's metadata payload
@@ -28,6 +34,7 @@ public final class MediaSidecarReader {
     // A metadata pass normally visits sibling files consecutively. Retain only
     // their last validated path plan, bounded by the existing 64-folder limit.
     private var ancestorPathPlan: AncestorPathPlan?
+    private var ancestorHints: AncestorHints?
     private var remainingBytes = 16 * 1024 * 1024
     public private(set) var filesRead = 0
     public static let maximumFileBytes = 128 * 1024
@@ -44,14 +51,19 @@ public final class MediaSidecarReader {
         let rootKey = root.absoluteString
         let parentKey = parent.absoluteString
         let cachedPlan: AncestorPathPlan?
+        let cachedHints: AncestorHints?
         // Canonically equivalent Swift strings can name different URL paths.
         // Reuse only the exact representations that passed the root walk.
         if let plan = ancestorPathPlan,
            plan.root.utf8.elementsEqual(rootKey.utf8),
            plan.parent.utf8.elementsEqual(parentKey.utf8) {
             cachedPlan = plan
+            // Capture the pair before a cancellation callback can reenter
+            // recognition and publish a plan for another parent.
+            cachedHints = ancestorHints
         } else {
             cachedPlan = nil
+            cachedHints = nil
         }
         var folders: [URL] = []
         if let cachedPlan {
@@ -73,7 +85,7 @@ public final class MediaSidecarReader {
         }
         var plannedSidecars: [FolderSidecarPaths] = []
         if cachedPlan == nil { plannedSidecars.reserveCapacity(folders.count) }
-        var hints = MediaMetadataHints()
+        var hints = cachedHints?.hints ?? MediaMetadataHints()
         var foundSeriesPlex = false
         var mappedEpisode: MediaMetadataHints?
         for (offset, folder) in folders.reversed().enumerated() {
@@ -81,7 +93,7 @@ public final class MediaSidecarReader {
             let cachedPaths = cachedPlan?.sidecars[offset]
             let showURL = cachedPaths?.show ?? folder.appendingPathComponent("tvshow.nfo")
             if case let .nfo(nfo) = read(showURL), nfo.content == .show {
-                hints = nfo.overriding(hints)
+                if cachedPlan == nil { hints = nfo.overriding(hints) }
             }
             let plexURL = cachedPaths?.plex ?? folder.appendingPathComponent(".plexmatch")
             if case let .plex(plex) = read(plexURL) {
@@ -89,7 +101,7 @@ public final class MediaSidecarReader {
                    let mapping = plex.episodeHint(for: relative, inheritsDescendantMappings: !foundSeriesPlex) {
                     mappedEpisode = mapping
                 }
-                hints = plex.metadata.overriding(hints)
+                if cachedPlan == nil { hints = plex.metadata.overriding(hints) }
                 foundSeriesPlex = true
             }
             if cachedPaths == nil {
@@ -99,8 +111,13 @@ public final class MediaSidecarReader {
         if cachedPlan == nil {
             // Publish only after all ancestor reads. Later calls still perform
             // those reads, preserving negative caching and byte/entry budgets.
+            // Cached sidecars do not change during this reader's lifetime, so
+            // siblings can reuse their merged metadata. Per-file mappings and
+            // NFO overrides must remain outside this ancestor-only snapshot.
+            // Publish the paired fields without a cancellation callback between.
             ancestorPathPlan = AncestorPathPlan(root: rootKey, parent: parentKey,
                 folders: folders, sidecars: plannedSidecars)
+            ancestorHints = hints == MediaMetadataHints() ? nil : AncestorHints(hints)
         }
         if var mapping = mappedEpisode {
             mapping.season = mapping.season ?? hints.season ?? directorySeason(parent.lastPathComponent) ?? 1

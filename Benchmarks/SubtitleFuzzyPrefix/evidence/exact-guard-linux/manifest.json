@@ -1,0 +1,77 @@
+{
+  "baseline_commit": "1063508a14bbc7a08669171880069c4df9472350",
+  "binaries": {
+    "baseline": "12acdf5ff8d287cbaee07c97813a6c56b3871b52cfc8262dc56700cace1bf35e",
+    "candidate": "f16c74d001fc24e4c03d80b5134bd3bf798461bed076c5ff8fe317196c12614f"
+  },
+  "candidate_commit": "9d5dfceeecdaa0579d7979af71316da394d62c35",
+  "candidate_status": "",
+  "cases_sha256": "255b4a987b69a5d2e80c22c9fd17781d3a047f92a32539f11b2ee8e90ea8e3ac",
+  "compiler": "Swift version 6.4 (swift-6.4-RELEASE)\nTarget: x86_64-unknown-linux-gnu",
+  "driver_sha256": "0bc6be5d4c436012cb0f67621b0d67d677f2b8a74b112d2b9717e64e3700c1f7",
+  "hashing": "SWIFT_DETERMINISTIC_HASHING=1",
+  "machine": "x86_64",
+  "pairs": 16,
+  "platform": "Linux-6.17.0-1022-azure-x86_64-with-glibc2.39",
+  "protocol": "fresh process per sample; balanced AB/BA; separately compiled production module; full association, result consumption and destruction",
+  "qualification": "isolated production component; no app startup, UI, decoding, playback, RSS or allocation-count claim",
+  "runner_sha256": "a9758c0aee631fb6496f6308a395002b56c03c08a37910a9c05e760356d53d69",
+  "sources": {
+    "Sources/IlliquidCore/Playlist/ExternalSubtitleMatcher.swift": {
+      "baseline": {
+        "git_blob": "a30534e22e8cb4a4b0cae8acc6fcced83edb4ac0",
+        "sha256": "94656822499f695e46c9accb43d364f54b828779959dcccf6d46d3aefcdf6e34"
+      },
+      "candidate": {
+        "git_blob": "a216a70ffa0032b6f51328c80525186e98a76699",
+        "sha256": "59539c93272cd94cc39882178782c49158009c02bd7c99bd4075d462f7bd4d88"
+      }
+    },
+    "Sources/IlliquidCore/Utilities/MediaFileSupport.swift": {
+      "baseline": {
+        "git_blob": "7826ec75f3febc25b3e901ce5955a79771ef4082",
+        "sha256": "85680a02f22355e0c7514fe00c12ba253c88d26be3eb2b5ee1149b212e047a00"
+      },
+      "candidate": {
+        "git_blob": "7826ec75f3febc25b3e901ce5955a79771ef4082",
+        "sha256": "85680a02f22355e0c7514fe00c12ba253c88d26be3eb2b5ee1149b212e047a00"
+      }
+    },
+    "Sources/IlliquidCore/Utilities/NaturalFilenameOrdering.swift": {
+      "baseline": {
+        "git_blob": "d116171a69648d2bd6ce5ea5fb00b7fc6a2cb12a",
+        "sha256": "d167212f90dd5cd6d8e0e73c208d8e9b4648cc7f4dd21212d51c85a693a263e7"
+      },
+      "candidate": {
+        "git_blob": "d116171a69648d2bd6ce5ea5fb00b7fc6a2cb12a",
+        "sha256": "d167212f90dd5cd6d8e0e73c208d8e9b4648cc7f4dd21212d51c85a693a263e7"
+      }
+    }
+  },
+  "started_utc": "2026-10-28T05:41:56.641728+00:00",
+  "target_cpu_ms": 250,
+  "tests": {
+    "Tests/IlliquidCoreTests/ExternalSubtitleCandidateTraversalTests.swift": "09cbe51e493ee7e7d976eac3d22bdd1d7ebd790ea237818669351e5711abcdff",
+    "Tests/IlliquidCoreTests/ExternalSubtitleMatcherEmptyTests.swift": "335fd5ed2057a0399663cd7d650b3755515479b2899cb1a9ac159953451a873d",
+    "Tests/IlliquidCoreTests/ExternalSubtitleMatcherTests.swift": "8e87e9870e636aa622ce977fdc3e36814e77607b250987fa1592484a3aa0c370",
+    "Tests/IlliquidCoreTests/ExternalSubtitleQualifierStorageTests.swift": "10cbb0011fdb891b50bd8b9cabf007f4194a317e7f257a0c35df774d690b2107",
+    "Tests/IlliquidCoreTests/ExternalSubtitleTokenizationTests.swift": "30cc9f50ad8a5123f9aefd403111bf2126006e088d2aba18eff6ac0d41aa9ab4"
+  },
+  "timed_cases": [
+    "ancestor_plain_1_1",
+    "ancestor_plain_16_1",
+    "ancestor_plain_256_1",
+    "ancestor_plain_4096_1",
+    "ancestor_plain_256_8",
+    "ancestor_long_plain_256_8",
+    "ancestor_unicode_plain_256_8",
+    "plain_prefix_256_8",
+    "ancestor_qualified_256_8",
+    "ancestor_long_qualified_256_8",
+    "exact_plain_256",
+    "exact_256",
+    "fuzzy_256_8",
+    "unrelated_256",
+    "empty_256"
+  ]
+}

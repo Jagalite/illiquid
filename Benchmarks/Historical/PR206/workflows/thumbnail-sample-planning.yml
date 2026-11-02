@@ -1,0 +1,49 @@
+name: Thumbnail sample planning
+
+on:
+  push:
+    branches: [perf/thumbnail-sample-planning-20261028-279e]
+    paths:
+      - Sources/IlliquidCore/Player/ThumbnailPolicy.swift
+      - Tests/IlliquidCoreTests/ThumbnailSamplePlanningTests.swift
+      - Benchmarks/ThumbnailSamplePlanning/**
+      - .github/workflows/thumbnail-sample-planning.yml
+  pull_request:
+    paths:
+      - Sources/IlliquidCore/Player/ThumbnailPolicy.swift
+      - Tests/IlliquidCoreTests/ThumbnailPolicyTests.swift
+      - Tests/IlliquidCoreTests/ThumbnailSchedulingPolicyRegressionTests.swift
+      - Tests/IlliquidCoreTests/ThumbnailSamplePlanningTests.swift
+      - Benchmarks/ThumbnailSamplePlanning/**
+      - .github/workflows/thumbnail-sample-planning.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: thumbnail-sample-planning-${{ github.head_ref || github.ref_name }}
+  cancel-in-progress: true
+
+jobs:
+  native-component:
+    runs-on: macos-26
+    timeout-minutes: 15
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Compare sample planning and run focused regressions
+        run: >-
+          python3 Benchmarks/ThumbnailSamplePlanning/run.py
+          --output "$RUNNER_TEMP/thumbnail-sample-planning"
+          --pairs 10 --target-ms 250
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: thumbnail-sample-planning-macos
+          path: ${{ runner.temp }}/thumbnail-sample-planning/evidence/
+          retention-days: 14

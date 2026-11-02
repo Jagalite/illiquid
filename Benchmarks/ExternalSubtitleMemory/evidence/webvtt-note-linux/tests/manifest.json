@@ -1,0 +1,40 @@
+{
+  "baseline_commit": "ea2ff568237e2667f7b1aeee67b11a44ebe95b72",
+  "baseline_note": "Release suite used the same final test files and runner with only the converter restored from the recorded base commit in an isolated temporary tree.",
+  "baseline_source_sha256": "2a26e9951ac64921f398fc5f23c5d81c6c319952bfe02d9b2b3a0b4a765fdc28",
+  "build_coordination": "Kyoto was unavailable on this Linux host; all builds and experiments were run serially.",
+  "candidate_source_sha256": "c9ad0cec2dd7d2fa4923783c52cedca35c9c78cd903a8a1c646a94116ee919e5",
+  "commands": [
+    "bash Scripts/test-external-subtitle-regressions.sh -c debug -Xswiftc -warnings-as-errors",
+    "bash Scripts/test-external-subtitle-regressions.sh -c release -Xswiftc -warnings-as-errors"
+  ],
+  "compiler": "Swift version 6.3.2 (swift-6.3.2-RELEASE)\nTarget: x86_64-unknown-linux-gnu",
+  "log_format": "JSON preserves exact UTF-8 output, including CR newline test arguments, without literal trailing whitespace in Git diffs.",
+  "results": {
+    "baseline-release.log.json": {
+      "raw_output_sha256": "0479522f482ed90dd64bc96934f51924fb471963e818b30bf8cf55b0dd37914a",
+      "result": "passed",
+      "sha256": "33046079ca448435fcdf023e051fe496536f18b9c24baaeea96643574dd613e1",
+      "suites": 2,
+      "tests": 36
+    },
+    "final-debug.log.json": {
+      "raw_output_sha256": "b2c27071eb62d9b4c8be4e22a8f37336adc7de946446be58536f21c863708011",
+      "result": "passed",
+      "sha256": "6be85d73dfbbe5f2387bf85d9841eda5b43ec2031a044e434ea99b8544e23af5",
+      "suites": 2,
+      "tests": 36
+    },
+    "final-release.log.json": {
+      "raw_output_sha256": "0757fa89bbbf98937b324fed34ebac0195f4979497ba6230ad0f2253a85693f7",
+      "result": "passed",
+      "sha256": "d915eb558981f635e4e6501558e06167e6f1c548e0a3c611b81421c276df1408",
+      "suites": 2,
+      "tests": 36
+    }
+  },
+  "test_source_sha256": {
+    "Tests/IlliquidNativePlaybackTests/ExternalSubtitleEscapingTests.swift": "f7ed4f6586f93f310e3bee6c3e6f719c89bde9c14d9199a14979915b093fad6d",
+    "Tests/IlliquidNativePlaybackTests/ExternalTextSubtitleConverterTests.swift": "856f4ce12a2d728761e96c4345272c9c46ad8f83237e63f81844c4f988766ead"
+  }
+}

@@ -22,9 +22,9 @@ struct SourceFilesystemLifecycleTests {
         }
         var paths: [String] { lock.withLock { calls } }
         func waitUntilStarted() -> Bool { started.wait(timeout: .now() + 3) == .success }
-        func emit(_ index: Int) {
+        func emit(_ index: Int, events: [SourceFilesystemEvent] = [.init(path: "/watched/file", flags: [.created])]) {
             let callback = lock.withLock { callbacks[index] }
-            callback([.init(path: "/watched/file", flags: [.created])])
+            callback(events)
         }
     }
     private func drain(_ queue: DispatchQueue) async {
@@ -91,6 +91,103 @@ struct SourceFilesystemLifecycleTests {
         await Task { @MainActor in }.value
         #expect(deliveries == 0)
         #expect(state.first.stopCount == 1)
+    }
+
+    @Test @MainActor func blockedMainActorCoalescesWorkerCallbacksWithStartupReconciliation() async {
+        let state = State()
+        let queue = DispatchQueue(label: "test.watcher.coalesced-delivery")
+        let worker = SourceFilesystemStreamWorker(queue: queue) { paths, _, _, receive in
+            _ = state.record(paths[0], receive)
+            return state.first
+        }
+        var batches: [[SourceFilesystemEvent]] = []
+        let monitor = SourceFilesystemMonitor(worker: worker) { batches.append($0) }
+        monitor.start(watching: [URL(fileURLWithPath: "/watched")])
+        queue.async {
+            for index in 0..<1024 {
+                state.emit(0, events: [.init(path: "/watched/Film \(index).mkv", flags: [.created])])
+            }
+            state.started.signal()
+        }
+        #expect(state.waitUntilStarted())
+        #expect(batches.isEmpty)
+        let deadline = ContinuousClock.now + .seconds(5)
+        while batches.isEmpty, ContinuousClock.now < deadline {
+            try? await Task.sleep(for: .milliseconds(1))
+        }
+        let expected: [SourceFilesystemEvent] = [.init(path: "/watched", flags: [.mustScanSubdirectories])]
+            + (0..<1024).map { .init(path: "/watched/Film \($0).mkv", flags: [.created]) }
+        #expect(batches == [expected])
+        monitor.stop()
+        await drain(queue)
+        #expect(state.first.stopCount == 1)
+    }
+
+    @Test @MainActor func blockedCallbackOverflowRecoversEveryWatchedRoot() async {
+        let state = State()
+        let queue = DispatchQueue(label: "test.watcher.overflow-delivery")
+        let worker = SourceFilesystemStreamWorker(queue: queue) { paths, _, _, receive in
+            _ = state.record(paths[0], receive)
+            return state.first
+        }
+        let roots = [URL(fileURLWithPath: "/watched"), URL(fileURLWithPath: "/other")]
+        var batches: [[SourceFilesystemEvent]] = []
+        let monitor = SourceFilesystemMonitor(worker: worker) { batches.append($0) }
+        monitor.start(watching: roots)
+        queue.async {
+            for index in 0..<5000 {
+                state.emit(0, events: [.init(path: "/watched/Film \(index).mkv", flags: [.created])])
+            }
+            state.started.signal()
+        }
+        #expect(state.waitUntilStarted())
+        #expect(batches.isEmpty)
+        let deadline = ContinuousClock.now + .seconds(5)
+        while batches.isEmpty, ContinuousClock.now < deadline {
+            try? await Task.sleep(for: .milliseconds(1))
+        }
+        #expect(batches == [[.init(path: "/", flags: [.eventsDropped])]])
+        let plan = SourceFilesystemInvalidationPlanner.plan(events: batches.flatMap { $0 }, roots: roots)
+        #expect(plan == SourceFilesystemInvalidationPlan(rootsToRescan: ["/watched", "/other"]))
+        monitor.stop()
+        await drain(queue)
+    }
+
+    @Test @MainActor func replacementRejectsOldBacklogAndAcceptsNewCallbacks() async {
+        let state = State()
+        let queue = DispatchQueue(label: "test.watcher.replacement-delivery")
+        let worker = SourceFilesystemStreamWorker(queue: queue) { paths, _, _, receive in
+            let index = state.record(paths[0], receive)
+            return index == 1 ? state.first : state.second
+        }
+        var batches: [[SourceFilesystemEvent]] = []
+        let monitor = SourceFilesystemMonitor(worker: worker) { batches.append($0) }
+        monitor.start(watching: [URL(fileURLWithPath: "/old")])
+        queue.async {
+            state.emit(0, events: [.init(path: "/old/Film.mkv", flags: [.created])])
+            state.started.signal()
+        }
+        #expect(state.waitUntilStarted())
+        monitor.start(watching: [URL(fileURLWithPath: "/new")])
+        queue.async {
+            state.emit(0, events: [.init(path: "/old/Late.mkv", flags: [.created])])
+            state.emit(1, events: [.init(path: "/new/Film.mkv", flags: [.created])])
+            state.started.signal()
+        }
+        #expect(state.waitUntilStarted())
+        #expect(batches.isEmpty)
+        let deadline = ContinuousClock.now + .seconds(5)
+        while batches.isEmpty, ContinuousClock.now < deadline {
+            try? await Task.sleep(for: .milliseconds(1))
+        }
+        #expect(batches == [[
+            .init(path: "/new", flags: [.mustScanSubdirectories]),
+            .init(path: "/new/Film.mkv", flags: [.created]),
+        ]])
+        #expect(state.first.stopCount == 1)
+        monitor.stop()
+        await drain(queue)
+        #expect(state.second.stopCount == 1)
     }
 
     @Test @MainActor func startupReconcilesChangesAfterInitialSnapshotForEveryRoot() async throws {

@@ -1,0 +1,64 @@
+name: Scalar preference mutation
+
+on:
+  pull_request:
+    paths:
+      - 'Sources/IlliquidCore/Persistence/**'
+      - 'Sources/IlliquidCore/Player/MediaTrack.swift'
+      - 'Sources/IlliquidCore/Player/PlaybackModels.swift'
+      - 'Sources/IlliquidCore/Player/SubtitleFallbackEncoding.swift'
+      - 'Sources/IlliquidCore/Player/TrackSelectionPreferences.swift'
+      - 'Sources/IlliquidCore/Playlist/PlaylistMutation.swift'
+      - 'Sources/IlliquidCore/Utilities/NormalizedFileURL.swift'
+      - 'Sources/IlliquidCore/Utilities/NonDecodePerformance.swift'
+      - 'Tests/IlliquidCoreTests/PlaybackPersistenceStoreTests.swift'
+      - 'Tests/IlliquidCoreTests/IdempotentPersistenceTests.swift'
+      - 'Tests/IlliquidCoreTests/DeferredPersistenceTests.swift'
+      - 'Tests/IlliquidCoreTests/ScalarPreferenceMutationTests.swift'
+      - 'Benchmarks/ScalarPreferenceMutation/Harness.swift'
+      - 'Benchmarks/ScalarPreferenceMutation/run.py'
+      - '.github/workflows/scalar-preference-mutation.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: scalar-preference-mutation-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  native-component:
+    runs-on: macos-26
+    timeout-minutes: 30
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - name: Fetch the pinned focal baseline
+        run: git fetch --no-tags --depth=1 origin ea2ff568237e2667f7b1aeee67b11a44ebe95b72
+      - name: Test both variants and measure alternating release processes
+        run: |
+          python3 - <<'PY'
+          import os, shlex, subprocess, sys
+          from pathlib import Path
+          command = [sys.executable, 'Benchmarks/ScalarPreferenceMutation/run.py',
+                     '--output', str(Path(os.environ['RUNNER_TEMP']) / 'scalar-preference-mutation'),
+                     '--pairs', '6']
+          queue = Path('/Volumes/seed1/Projects/kyoto/kyoto.py')
+          if queue.is_file():
+              print('Kyoto is available; submit this qualification through the shared queue:')
+              print(shlex.join([sys.executable, str(queue), 'submit', '--', *command]), flush=True)
+              sys.exit(1)
+          print('The shared Kyoto queue is unavailable on this hosted runner; '
+                'running isolated component builds directly and serially.', flush=True)
+          subprocess.run(command, check=True, timeout=1500)
+          PY
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: scalar-preference-mutation-macos
+          path: ${{ runner.temp }}/scalar-preference-mutation/evidence/
+          retention-days: 14

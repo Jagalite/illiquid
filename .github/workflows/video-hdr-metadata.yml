@@ -39,9 +39,13 @@ jobs:
           python3 Scripts/install-ci-native-sdk.py
       - name: Verify exact payloads and measure paired production code
         run: |
+          mode=()
+          if [[ "${{ github.event_name }}" == "pull_request" ]]; then
+            mode+=(--current-source-regression --verify-only)
+          fi
           python3 Benchmarks/VideoHDRMetadata/run.py \
             --pairs 20 --target-ms 300 \
-            --output "$RUNNER_TEMP/video-hdr-metadata/component"
+            --output "$RUNNER_TEMP/video-hdr-metadata/component" "${mode[@]}"
       - name: Generate required native video fixtures
         if: github.event_name != 'push'
         run: |

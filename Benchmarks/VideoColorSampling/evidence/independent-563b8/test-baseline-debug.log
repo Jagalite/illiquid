@@ -1,0 +1,45 @@
+Building for debugging...
+[0/8] /Users/runner/work/_temp/video-color-sampling/sources/baseline/.build/arm64-apple-macosx/debug/VideoColorSamplingRegressionsPackageTests.derived/runner.swift
+[1/8] Write sources
+[5/8] Write swift-version-7974D3F7F03D5E95.txt
+[7/10] Emitting module IlliquidCore
+[8/10] Compiling IlliquidCore VideoColorSample.swift
+[9/12] Emitting module IlliquidNativePlayback
+[10/12] Compiling IlliquidNativePlayback PiPVideoMapping.swift
+[11/13] Compiling IlliquidNativePlayback VideoFrameColorSampler.swift
+[12/15] Emitting module IlliquidNativePlaybackTests
+[13/15] Compiling IlliquidNativePlaybackTests VideoFrameColorSamplerTests.swift
+[14/17] Emitting module VideoColorSamplingRegressionsPackageTests
+[15/17] Compiling VideoColorSamplingRegressionsPackageTests runner.swift
+[15/17] Write Objects.LinkFileList
+[16/17] Linking VideoColorSamplingRegressionsPackageTests
+Build complete! (24.33s)
+Test Suite 'All tests' started at 2026-10-28 05:06:01.822.
+Test Suite 'All tests' passed at 2026-10-28 05:06:01.829.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.007) seconds
+◇ Test run started.
+↳ Testing Library Version: 1902
+↳ Target Platform: arm64e-apple-macos14.0
+◇ Suite "Video frame color sampler" started.
+◇ Test throttlesSamplingToFourTimesPerSecond() started.
+✔ Test throttlesSamplingToFourTimesPerSecond() passed after 0.016 seconds.
+◇ Test smoothingUsesElapsedTimeAtFourHertz() started.
+✔ Test smoothingUsesElapsedTimeAtFourHertz() passed after 0.001 seconds.
+◇ Test suppressesTinyChangesButPublishesSceneCutsImmediately() started.
+✔ Test suppressesTinyChangesButPublishesSceneCutsImmediately() passed after 0.001 seconds.
+◇ Test samplesDistinctLeadingAndBottomBGRARegions() started.
+✔ Test samplesDistinctLeadingAndBottomBGRARegions() passed after 0.002 seconds.
+◇ Test samplesFullRangeBiPlanarWhite() started.
+✔ Test samplesFullRangeBiPlanarWhite() passed after 0.001 seconds.
+◇ Test samplesVideoRangeTenBitBiPlanarWhite() started.
+✔ Test samplesVideoRangeTenBitBiPlanarWhite() passed after 0.001 seconds.
+◇ Test matrixAttachmentsChangePaletteSamplesWithoutAStaleCoefficientCache() started.
+✔ Test matrixAttachmentsChangePaletteSamplesWithoutAStaleCoefficientCache() passed after 0.001 seconds.
+◇ Test samplesEveryGridPointAcrossPaddedFormatsAndSmallSizes() started.
+✔ Test samplesEveryGridPointAcrossPaddedFormatsAndSmallSizes() passed after 0.017 seconds.
+◇ Test rereadsLayoutAndPixelsWhenBuffersAreReusedOrFormatsChange() started.
+✔ Test rereadsLayoutAndPixelsWhenBuffersAreReusedOrFormatsChange() passed after 0.006 seconds.
+◇ Test rejectsUnsupportedPixelFormats() started.
+✔ Test rejectsUnsupportedPixelFormats() passed after 0.001 seconds.
+✔ Suite "Video frame color sampler" passed after 0.050 seconds.
+✔ Test run with 10 tests in 1 suite passed after 0.050 seconds.

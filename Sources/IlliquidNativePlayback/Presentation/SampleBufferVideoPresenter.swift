@@ -5,21 +5,14 @@ import Foundation
 import IOSurface
 
 final class SampleBufferVideoPresenter: @unchecked Sendable {
-    struct FrameIdentity: Sendable {
-        let surfaceID: UInt32?
-        let bufferID: UInt
-        let time: Double
-        let generation: Int
-    }
+    typealias FrameIdentity = VideoFrameIdentityHistory.Identity
     private let identityLock = NSLock()
-    private var frameIdentities: [FrameIdentity] = []
+    private let formatDescriptionCache = VideoFormatDescriptionCache()
+    private var frameIdentities = VideoFrameIdentityHistory()
 
     func adjacentTime(to frame: FrameIdentity, direction: Int) -> Double? {
         identityLock.withLock {
-            let times = frameIdentities.lazy.filter { $0.generation == frame.generation }.map(\.time)
-            return direction > 0
-                ? times.filter { $0 > frame.time + 0.000001 }.min()
-                : times.filter { $0 < frame.time - 0.000001 }.max()
+            frameIdentities.adjacentTime(to: frame, direction: direction)
         }
     }
 
@@ -27,10 +20,7 @@ final class SampleBufferVideoPresenter: @unchecked Sendable {
         let surface = CVPixelBufferGetIOSurface(buffer).map { IOSurfaceGetID($0.takeUnretainedValue()) }
         let bufferID = UInt(bitPattern: Unmanaged.passUnretained(buffer).toOpaque())
         return identityLock.withLock {
-            frameIdentities.last {
-                if let surface { return $0.surfaceID == surface }
-                return $0.bufferID == bufferID
-            }
+            frameIdentities.identity(surfaceID: surface, bufferID: bufferID)
         }
     }
 
@@ -79,19 +69,22 @@ final class SampleBufferVideoPresenter: @unchecked Sendable {
         if requiresFlushToResumeDecoding {
             throw PresentationRecoveryRequiredError.requiresFlushToResumeDecoding
         }
-        var formatDescription: CMVideoFormatDescription?
-        try withNativeVideoSignpost("VideoFormatDescriptionCreate") {
-            try checkOSStatus(
-                CMVideoFormatDescriptionCreateForImageBuffer(
-                    allocator: kCFAllocatorDefault,
-                    imageBuffer: frame.pixelBuffer,
-                    formatDescriptionOut: &formatDescription
-                ),
-                operation: "Create video format description"
-            )
-        }
-        guard let formatDescription else {
-            throw PresentationError("Video format description was not created")
+        let formatDescription = try formatDescriptionCache.description(for: frame.pixelBuffer) {
+            var formatDescription: CMVideoFormatDescription?
+            try withNativeVideoSignpost("VideoFormatDescriptionCreate") {
+                try checkOSStatus(
+                    CMVideoFormatDescriptionCreateForImageBuffer(
+                        allocator: kCFAllocatorDefault,
+                        imageBuffer: frame.pixelBuffer,
+                        formatDescriptionOut: &formatDescription
+                    ),
+                    operation: "Create video format description"
+                )
+            }
+            guard let formatDescription else {
+                throw PresentationError("Video format description was not created")
+            }
+            return formatDescription
         }
 
         var timing = CMSampleTimingInfo(
@@ -129,7 +122,6 @@ final class SampleBufferVideoPresenter: @unchecked Sendable {
             bufferID: UInt(bitPattern: Unmanaged.passUnretained(frame.pixelBuffer).toOpaque()),
             time: frame.presentationTime.seconds, generation: frame.generation)
         identityLock.withLock {
-            if frameIdentities.count == 128 { frameIdentities.removeFirst() }
             frameIdentities.append(identity)
         }
         withNativeVideoSignpost("VideoRendererEnqueue") {
@@ -145,7 +137,8 @@ final class SampleBufferVideoPresenter: @unchecked Sendable {
         removeDisplayedImage: Bool = true,
         completion: (@Sendable () -> Void)? = nil
     ) {
-        identityLock.withLock { frameIdentities.removeAll(keepingCapacity: true) }
+        formatDescriptionCache.removeAll()
+        identityLock.withLock { frameIdentities.removeAll() }
         renderer.flush(
             removingDisplayedImage: removeDisplayedImage,
             completionHandler: completion

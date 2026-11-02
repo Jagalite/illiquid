@@ -52,8 +52,12 @@ jobs:
           python3 Scripts/install-ci-native-sdk.py
       - name: Compare output bytes and retained temporal allocations
         run: |
+          mode=()
+          if [[ "${{ github.event_name }}" == "pull_request" ]]; then
+            mode+=(--current-source-regression)
+          fi
           python3 Benchmarks/DeinterlacerEOFMemory/run.py \
-            --output "$RUNNER_TEMP/deinterlacer-eof/component" --pairs 4
+            --output "$RUNNER_TEMP/deinterlacer-eof/component" "${mode[@]}" --pairs 4
       - name: Generate required interlaced playback fixtures
         run: |
           fixtures="$RUNNER_TEMP/deinterlacer-eof/fixtures"

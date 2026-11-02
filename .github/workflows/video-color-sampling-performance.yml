@@ -1,0 +1,95 @@
+name: Video color sampling performance
+
+on:
+  push:
+    branches: ['perf/video-color-sampling-layout-20261028-f5db9f9']
+    paths:
+      - 'Sources/IlliquidNativePlayback/Presentation/VideoFrameColorSampler.swift'
+      - 'Tests/IlliquidNativePlaybackTests/VideoFrameColorSamplerTests.swift'
+      - 'Benchmarks/VideoColorSampling/**'
+      - '.github/workflows/video-color-sampling-performance.yml'
+      - '!Benchmarks/VideoColorSampling/*.md'
+      - '!Benchmarks/VideoColorSampling/evidence/**'
+  pull_request:
+    paths:
+      - 'Sources/IlliquidNativePlayback/Presentation/VideoFrameColorSampler.swift'
+      - 'Tests/IlliquidNativePlaybackTests/VideoFrameColorSamplerTests.swift'
+      - 'Benchmarks/VideoColorSampling/**'
+      - '.github/workflows/video-color-sampling-performance.yml'
+      - '!Benchmarks/VideoColorSampling/*.md'
+      - '!Benchmarks/VideoColorSampling/evidence/**'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: video-color-sampling-${{ github.head_ref || github.ref_name }}
+  cancel-in-progress: true
+
+jobs:
+  native-component:
+    runs-on: macos-26
+    timeout-minutes: 30
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+      PYTHONUNBUFFERED: '1'
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+          fetch-depth: 1
+      - name: Fetch the fixed production baseline
+        run: git fetch --no-tags --depth=1 origin ea2ff568237e2667f7b1aeee67b11a44ebe95b72
+      - name: Verify native colors and measure paired sampling
+        run: |
+          python3 - <<'PY'
+          import json, os, subprocess, sys
+          from pathlib import Path
+          command = [sys.executable, 'Benchmarks/VideoColorSampling/run.py',
+                     '--output', os.environ['RUNNER_TEMP'] + '/video-color-sampling']
+          queue = Path('/Volumes/seed1/Projects/kyoto/kyoto.py')
+          if queue.is_file():
+              cli = [sys.executable, str(queue)]
+              submitted = subprocess.check_output([*cli, 'submit', '--', *command], text=True)
+              print(submitted, flush=True)
+              job_id = str(json.loads(submitted)['id'])
+              subprocess.run([*cli, 'show', job_id], check=True)
+              result = subprocess.run([*cli, 'wait', job_id])
+              logs = subprocess.run([*cli, 'logs', job_id])
+              sys.exit(result.returncode or logs.returncode)
+          print('Shared Kyoto queue is unavailable on this hosted runner; '
+                'compiling isolated production components directly and serially.', flush=True)
+          subprocess.run(command, check=True)
+          PY
+      - name: Emit result and reproducibility records
+        if: always()
+        run: |
+          python3 - <<'PY'
+          import json, os
+          from pathlib import Path
+          root = Path(os.environ['RUNNER_TEMP']) / 'video-color-sampling'
+          for name, marker in [
+              ('summary.json', 'VIDEO_COLOR_SAMPLING_SUMMARY_JSON'),
+              ('manifest.json', 'VIDEO_COLOR_SAMPLING_MANIFEST_JSON'),
+          ]:
+              path = root / name
+              if path.is_file():
+                  print(marker + ' ' + json.dumps(json.loads(path.read_text()),
+                                                sort_keys=True, separators=(',', ':')))
+          PY
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: video-color-sampling-native
+          path: |
+            ${{ runner.temp }}/video-color-sampling/**/*.json
+            ${{ runner.temp }}/video-color-sampling/**/*.jsonl
+            ${{ runner.temp }}/video-color-sampling/**/*.log
+            ${{ runner.temp }}/video-color-sampling/**/*.txt
+            ${{ runner.temp }}/video-color-sampling/**/*.swift
+            ${{ runner.temp }}/video-color-sampling/**/*.py
+            !${{ runner.temp }}/video-color-sampling/**/.build/**
+            !${{ runner.temp }}/video-color-sampling/**/module-cache/**
+            !${{ runner.temp }}/video-color-sampling/**/binaries/**
+          retention-days: 14

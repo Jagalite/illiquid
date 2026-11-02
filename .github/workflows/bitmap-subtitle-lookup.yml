@@ -1,0 +1,91 @@
+name: Bitmap subtitle pruning performance
+
+on:
+  push:
+    branches: [perf/bitmap-subtitle-lookup-bounded-c30885af]
+    paths:
+      - Sources/IlliquidNativePlayback/Subtitles/BitmapSubtitleTimeline.swift
+      - Tests/IlliquidNativePlaybackTests/BitmapSubtitleTimelineOrderingTests.swift
+      - Benchmarks/BitmapSubtitleTimeline/Driver.swift
+      - Benchmarks/BitmapSubtitleTimeline/run.py
+      - .github/workflows/bitmap-subtitle-lookup.yml
+  pull_request:
+    paths:
+      - Sources/IlliquidNativePlayback/Subtitles/BitmapSubtitleTimeline.swift
+      - Sources/IlliquidNativePlayback/Subtitles/SubtitleMemoryBudget.swift
+      - Sources/IlliquidNativePlayback/Subtitles/LibassContext.swift
+      - Tests/IlliquidNativePlaybackTests/BitmapSubtitleTimeline*Tests.swift
+      - Tests/IlliquidNativePlaybackTests/SubtitleMemoryBudgetAccountingTests.swift
+      - Benchmarks/BitmapSubtitleTimeline/Driver.swift
+      - Benchmarks/BitmapSubtitleTimeline/run.py
+      - .github/workflows/bitmap-subtitle-lookup.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: bitmap-subtitle-lookup-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  components:
+    name: components (${{ matrix.os }})
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: macos-26
+            developer_dir: /Applications/Xcode_26.6.app/Contents/Developer
+            portable: ''
+          - os: ubuntu-24.04
+            developer_dir: ''
+            portable: --portable
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 20
+    env:
+      DEVELOPER_DIR: ${{ matrix.developer_dir }}
+      LOOKUP_BASELINE: ea2ff568237e2667f7b1aeee67b11a44ebe95b72
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Verify baseline and candidate in debug and release
+        run: |
+          if [ -f /Volumes/seed1/Projects/kyoto/kyoto.py ]; then
+            echo "Shared Kyoto queue is available; submit this benchmark through Kyoto."
+            exit 1
+          fi
+          echo "Kyoto is unavailable on this hosted runner; builds use sequential isolated workspaces."
+          python3 Benchmarks/BitmapSubtitleTimeline/run.py --tests-only ${{ matrix.portable }} \
+            --baseline-ref "$LOOKUP_BASELINE" \
+            --output "$RUNNER_TEMP/bitmap-subtitle-lookup/tests"
+      - name: Measure lookup, pruning, stream, and insertion controls
+        run: |
+          python3 Benchmarks/BitmapSubtitleTimeline/run.py ${{ matrix.portable }} \
+            --baseline-ref "$LOOKUP_BASELINE" \
+            --cases lookup-front-1,lookup-front-8,lookup-front-32,lookup-front-128,lookup-middle-8,lookup-middle-32,lookup-middle-128,lookup-penultimate-8,lookup-penultimate-32,lookup-penultimate-128,lookup-tail4-8,lookup-tail4-32,lookup-tail4-128,lookup-latest-128,lookup-before-128,lookup-after-128,lookup-mixed-128,tick-front-1,tick-front-8,tick-front-32,tick-front-128,prune-front-128,stream-8,stream-32,stream-128,stream-centered-8,stream-centered-32,stream-centered-128,fill-ascending-128 \
+            --pairs 8 --target-ms 80 --max-sample-ms 1500 \
+            --output "$RUNNER_TEMP/bitmap-subtitle-lookup/timing"
+      - name: Emit review evidence
+        if: always()
+        run: |
+          python3 - <<'PY'
+          import base64, gzip, hashlib, json, os
+          from pathlib import Path
+          root = Path(os.environ["RUNNER_TEMP"]) / "bitmap-subtitle-lookup"
+          files = {str(p.relative_to(root)): p.read_text()
+                   for p in sorted(root.rglob("*")) if p.is_file() and "build" not in p.parts}
+          review = {name: value for name, value in files.items() if "/receipts/" not in name}
+          print("LOOKUP_REVIEW_JSON " + json.dumps(review, sort_keys=True))
+          packed = gzip.compress(json.dumps(files, sort_keys=True).encode(), compresslevel=9, mtime=0)
+          print("LOOKUP_BUNDLE_SHA256 " + hashlib.sha256(packed).hexdigest())
+          print("LOOKUP_BUNDLE_BASE64 " + base64.b64encode(packed).decode())
+          PY
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: bitmap-subtitle-pruning-${{ matrix.os }}
+          path: ${{ runner.temp }}/bitmap-subtitle-lookup
+          retention-days: 14

@@ -1,0 +1,33 @@
+{
+  "commands": [
+    "bash Scripts/test-source-volume-regressions.sh --jobs 2 -Xswiftc -warnings-as-errors",
+    "bash Scripts/test-source-volume-regressions.sh -c release --jobs 2 -Xswiftc -warnings-as-errors"
+  ],
+  "compiler": "Swift 6.3.2",
+  "native_monitor_lifecycle_tests": "Not executed on Linux; the source-volume-regressions workflow executes these on macOS.",
+  "platform": "Linux-6.18.55-x86_64-with-glibc2.39",
+  "runs": {
+    "debug": {
+      "log": "tests-debug.log",
+      "passed_test_functions": 19,
+      "sha256": "ebe55c8c7afb7a16778719cdfa654ea23cea20ec68cee10e30a073cd5ff3e56f",
+      "suites": 2
+    },
+    "release": {
+      "log": "tests-release.log",
+      "passed_test_functions": 19,
+      "sha256": "f76ff3b6fcbd2a626e478e87204c8d7aa861f2d14ac780563d39edfcccad9417",
+      "suites": 2
+    }
+  },
+  "source_sha256": {
+    "Scripts/test-source-volume-regressions.sh": "27bd510be65db5a996ec1f3793277053bc4d77140f84c069471085507abd7866",
+    "Sources/IlliquidApp/UI/SourceFilesystemEventDelivery.swift": "271cff83ba210f8340748411a5cf79485f33fb70bd5756e68dffd8cfd0751d5f",
+    "Sources/IlliquidApp/UI/SourceFilesystemInvalidation.swift": "a47c4b70e6953687c0d1cbca39272959881a19e082028a5fb63d656f2e71c770",
+    "Sources/IlliquidApp/UI/SourceVolumeChangePolicy.swift": "c3f79c2b1344b1cdf14e9f690cbfbac5da6ad85f6f29dfd8e5785042a336116f",
+    "Tests/IlliquidAppTests/SourceFilesystemEventDeliveryTests.swift": "3bca49a9a18862d6e544294beefb1ad94437d177a75f3edf7e1b716d3463c3d7",
+    "Tests/IlliquidAppTests/SourceVolumeChangePolicyTests.swift": "e7559fb8dc8cfbc2f50dbf8e3d110cc2eb99307110e1061532f130734ac34360"
+  },
+  "swift_language_mode": "6",
+  "warnings_as_errors": true
+}

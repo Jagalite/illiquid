@@ -1,0 +1,1391 @@
+[
+  {
+    "argv": [
+      "/workspace/scratch/193764fb3b70/toolchains/swift-6.3.2-RELEASE-ubuntu24.04/usr/bin/clang",
+      "-O2",
+      "-I",
+      "/workspace/scratch/193764fb3b70/delivery-benchmark-final/build/heap/include",
+      "-c",
+      "/workspace/scratch/193764fb3b70/delivery-benchmark-final/build/heap/heap.c",
+      "-o",
+      "/workspace/scratch/193764fb3b70/delivery-benchmark-final/build/heap/heap.o"
+    ],
+    "elapsed_seconds": 0.044046326000170666,
+    "returncode": 0,
+    "stderr": "",
+    "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "argv": [
+      "git",
+      "rev-parse",
+      "HEAD"
+    ],
+    "elapsed_seconds": 0.0016618709998965642,
+    "returncode": 0,
+    "stderr": "",
+    "stdout_sha256": "5c6e72251e555c796ae8ec747f686aec6368fcf4ba4afe95c004397dfa781692"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/193764fb3b70/toolchains/swift-6.3.2-RELEASE-ubuntu24.04/usr/bin/swiftc",
+      "--version"
+    ],
+    "elapsed_seconds": 0.07322656999986066,
+    "returncode": 0,
+    "stderr": "",
+    "stdout_sha256": "1d762e32f31ac0d0550e913ae47faf3b2ca9c548411ab9ec48a84588438d92cf"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/193764fb3b70/toolchains/swift-6.3.2-RELEASE-ubuntu24.04/usr/bin/swiftc",
+      "-Onone",
+      "-swift-version",
+      "6",
+      "-warnings-as-errors",
+      "-parse-as-library",
+      "-module-cache-path",
+      "/workspace/scratch/193764fb3b70/delivery-benchmark-final/build/module-cache",
+      "-I",
+      "/workspace/scratch/193764fb3b70/delivery-benchmark-final/build/heap/include",
+      "/workspace/scratch/193764fb3b70/illiquid/Sources/IlliquidApp/UI/SourceFilesystemInvalidation.swift",
+      "/workspace/scratch/193764fb3b70/delivery-benchmark-final/build/BaselineDelivery.swift",
+      "/workspace/scratch/193764fb3b70/illiquid/Benchmarks/FilesystemEventDelivery/Harness.swift",
+      "/workspace/scratch/193764fb3b70/delivery-benchmark-final/build/heap/heap.o",
+      "-o",
+      "/workspace/scratch/193764fb3b70/delivery-benchmark-final/build/baseline-debug"
+    ],
+    "elapsed_seconds": 1.973793212999908,
+    "returncode": 0,
+    "stderr": "",
+    "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/193764fb3b70/toolchains/swift-6.3.2-RELEASE-ubuntu24.04/usr/bin/swiftc",
+      "-Onone",
+      "-D",
+      "CANDIDATE_DELIVERY",
+      "-swift-version",
+      "6",
+      "-warnings-as-errors",
+      "-parse-as-library",
+      "-module-cache-path",
+      "/workspace/scratch/193764fb3b70/delivery-benchmark-final/build/module-cache",
+      "-I",
+      "/workspace/scratch/193764fb3b70/delivery-benchmark-final/build/heap/include",
+      "/workspace/scratch/193764fb3b70/illiquid/Sources/IlliquidApp/UI/SourceFilesystemInvalidation.swift",
+      "/workspace/scratch/193764fb3b70/illiquid/Sources/IlliquidApp/UI/SourceFilesystemEventDelivery.swift",
+      "/workspace/scratch/193764fb3b70/delivery-benchmark-final/build/CandidateDelivery.swift",
+      "/workspace/scratch/193764fb3b70/illiquid/Benchmarks/FilesystemEventDelivery/Harness.swift",
+      "/workspace/scratch/193764fb3b70/delivery-benchmark-final/build/heap/heap.o",
+      "-o",
+      "/workspace/scratch/193764fb3b70/delivery-benchmark-final/build/candidate-debug"
+    ],
+    "elapsed_seconds": 1.0047196880000229,
+    "returncode": 0,
+    "stderr": "",
+    "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/193764fb3b70/toolchains/swift-6.3.2-RELEASE-ubuntu24.04/usr/bin/swiftc",
+      "-O",
+      "-whole-module-optimization",
+      "-swift-version",
+      "6",
+      "-warnings-as-errors",
+      "-parse-as-library",
+      "-module-cache-path",
+      "/workspace/scratch/193764fb3b70/delivery-benchmark-final/build/module-cache",
+      "-I",
+      "/workspace/scratch/193764fb3b70/delivery-benchmark-final/build/heap/include",
+      "/workspace/scratch/193764fb3b70/illiquid/Sources/IlliquidApp/UI/SourceFilesystemInvalidation.swift",
+      "/workspace/scratch/193764fb3b70/delivery-benchmark-final/build/BaselineDelivery.swift",
+      "/workspace/scratch/193764fb3b70/illiquid/Benchmarks/FilesystemEventDelivery/Harness.swift",
+      "/workspace/scratch/193764fb3b70/delivery-benchmark-final/build/heap/heap.o",
+      "-o",
+      "/workspace/scratch/193764fb3b70/delivery-benchmark-final/build/baseline-release"
+    ],
+    "elapsed_seconds": 4.1757759300001,
+    "returncode": 0,
+    "stderr": "",
+    "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/193764fb3b70/toolchains/swift-6.3.2-RELEASE-ubuntu24.04/usr/bin/swiftc",
+      "-O",
+      "-whole-module-optimization",
+      "-D",
+      "CANDIDATE_DELIVERY",
+      "-swift-version",
+      "6",
+      "-warnings-as-errors",
+      "-parse-as-library",
+      "-module-cache-path",
+      "/workspace/scratch/193764fb3b70/delivery-benchmark-final/build/module-cache",
+      "-I",
+      "/workspace/scratch/193764fb3b70/delivery-benchmark-final/build/heap/include",
+      "/workspace/scratch/193764fb3b70/illiquid/Sources/IlliquidApp/UI/SourceFilesystemInvalidation.swift",
+      "/workspace/scratch/193764fb3b70/illiquid/Sources/IlliquidApp/UI/SourceFilesystemEventDelivery.swift",
+      "/workspace/scratch/193764fb3b70/delivery-benchmark-final/build/CandidateDelivery.swift",
+      "/workspace/scratch/193764fb3b70/illiquid/Benchmarks/FilesystemEventDelivery/Harness.swift",
+      "/workspace/scratch/193764fb3b70/delivery-benchmark-final/build/heap/heap.o",
+      "-o",
+      "/workspace/scratch/193764fb3b70/delivery-benchmark-final/build/candidate-release"
+    ],
+    "elapsed_seconds": 3.227459351000107,
+    "returncode": 0,
+    "stderr": "",
+    "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/193764fb3b70/delivery-benchmark-final/build/baseline-debug",
+      "verify",
+      "1",
+      "128",
+      "ordinary"
+    ],
+    "elapsed_seconds": 0.010136346999843227,
+    "returncode": 0,
+    "stderr": "",
+    "stdout_sha256": "6cf61d3d46bc3517e3b6cd17aa9d1dce749b6d57b11d23dfa16716673b3ccbf7"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/193764fb3b70/delivery-benchmark-final/build/candidate-debug",
+      "verify",
+      "1",
+      "128",
+      "ordinary"
+    ],
+    "elapsed_seconds": 0.008907786000008855,
+    "returncode": 0,
+    "stderr": "",
+    "stdout_sha256": "430f07d564e0de02dedebb07c766a67376ee680d23bf4d568e578f3fe9886e3f"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/193764fb3b70/delivery-benchmark-final/build/baseline-debug",
+      "verify",
+      "63",
+      "7",
+      "ordinary"
+    ],
+    "elapsed_seconds": 0.014220214000033593,
+    "returncode": 0,
+    "stderr": "",
+    "stdout_sha256": "31d57ba866b97d6c8d0485e95dfccbbb48c0a6c4ca5b33baa0d8954d584bc9e8"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/193764fb3b70/delivery-benchmark-final/build/candidate-debug",
+      "verify",
+      "63",
+      "7",
+      "ordinary"
+    ],
+    "elapsed_seconds": 0.012579245000097217,
+    "returncode": 0,
+    "stderr": "",
+    "stdout_sha256": "95df237b7f1c0c5116907e23f45a3bfe0e75e31a6ed6ba614da304a03d86f058"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/193764fb3b70/delivery-benchmark-final/build/baseline-debug",
+      "verify",
+      "129",
+      "128",
+      "ordinary"
+    ],
+    "elapsed_seconds": 0.021014122999986284,
+    "returncode": 0,
+    "stderr": "",
+    "stdout_sha256": "b157a628f30f3351b68a86b7dcbd4f25844ce5cb8b449a435e78257e73ec122c"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/193764fb3b70/delivery-benchmark-final/build/candidate-debug",
+      "verify",
+      "129",
+      "128",
+      "ordinary"
+    ],
+    "elapsed_seconds": 0.016214669999953912,
+    "returncode": 0,
+    "stderr": "",
+    "stdout_sha256": "167a1b29a27e9c4b7ab5a6757da63962e6f2b2f67ef438362748b5764aeea5be"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/193764fb3b70/delivery-benchmark-final/build/baseline-debug",
+      "verify",
+      "4096",
+      "128",
+      "ordinary"
+    ],
+    "elapsed_seconds": 0.23894454000014775,
+    "returncode": 0,
+    "stderr": "",
+    "stdout_sha256": "f034b5b17bfbdfa0f898e39eab754ac639195e1cd3d14633c9a4a9fb16f0e382"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/193764fb3b70/delivery-benchmark-final/build/candidate-debug",
+      "verify",
+      "4096",
+      "128",
+      "ordinary"
+    ],
+    "elapsed_seconds": 0.22544749799999408,
+    "returncode": 0,
+    "stderr": "",
+    "stdout_sha256": "3c09245086b1600041d2448f363b812a42976e6287b88bb788b38909e7664343"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/193764fb3b70/delivery-benchmark-final/build/baseline-debug",
+      "verify",
+      "257",
+      "31",
+      "loss"
+    ],
+    "elapsed_seconds": 0.020718456999929913,
+    "returncode": 0,
+    "stderr": "",
+    "stdout_sha256": "80921b6ab7926c50445215dbc5b92e36495ee2e0e1c0e98e43aacef1f070381f"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/193764fb3b70/delivery-benchmark-final/build/candidate-debug",
+      "verify",
+      "257",
+      "31",
+      "loss"
+    ],
+    "elapsed_seconds": 0.017503260000012233,
+    "returncode": 0,
+    "stderr": "",
+    "stdout_sha256": "dfedf44092fbbbeb77a0fc0e6f7c49b45c3a270073fec422ed9760cfb2b4af07"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/193764fb3b70/delivery-benchmark-final/build/candidate-debug",
+      "verify",
+      "4097",
+      "128",
+      "ordinary"
+    ],
+    "elapsed_seconds": 0.025844911999911346,
+    "returncode": 0,
+    "stderr": "",
+    "stdout_sha256": "bbe9fad91e1d8ac4a773174316d6387933ccb4aba1b82b956ecde465b1483a06"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/193764fb3b70/delivery-benchmark-final/build/candidate-debug",
+      "verify",
+      "10000",
+      "128",
+      "ordinary"
+    ],
+    "elapsed_seconds": 0.057301968999809105,
+    "returncode": 0,
+    "stderr": "",
+    "stdout_sha256": "b3b71e6fcb0d22eb54d89b9fb339a7d147223b7fdb5036183c7a87e132364fed"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/193764fb3b70/delivery-benchmark-final/build/baseline-release",
+      "verify",
+      "1",
+      "128",
+      "ordinary"
+    ],
+    "elapsed_seconds": 0.00946657999998024,
+    "returncode": 0,
+    "stderr": "",
+    "stdout_sha256": "89629037014bea227feb3b2f786e82bc9305b1d0823c2ca1a23f51ad6e0bc49a"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/193764fb3b70/delivery-benchmark-final/build/candidate-release",
+      "verify",
+      "1",
+      "128",
+      "ordinary"
+    ],
+    "elapsed_seconds": 0.008116183999845816,
+    "returncode": 0,
+    "stderr": "",
+    "stdout_sha256": "394bfaa640883baa7cd4bad8b9636827de8f80ed48a4e0764abfe3264806fe9a"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/193764fb3b70/delivery-benchmark-final/build/baseline-release",
+      "verify",
+      "63",
+      "7",
+      "ordinary"
+    ],
+    "elapsed_seconds": 0.011969290000024557,
+    "returncode": 0,
+    "stderr": "",
+    "stdout_sha256": "4c79f6af1ee3b705b62834e509d9dd355742e199c55475f6d9d7a0eefcf333ea"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/193764fb3b70/delivery-benchmark-final/build/candidate-release",
+      "verify",
+      "63",
+      "7",
+      "ordinary"
+    ],
+    "elapsed_seconds": 0.009934610000073008,
+    "returncode": 0,
+    "stderr": "",
+    "stdout_sha256": "c4a1e79631c5e832cab42b24192112bb37a0787dc0d04e8b3dfb4323ed3b0156"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/193764fb3b70/delivery-benchmark-final/build/baseline-release",
+      "verify",
+      "129",
+      "128",
+      "ordinary"
+    ],
+    "elapsed_seconds": 0.011492656999962492,
+    "returncode": 0,
+    "stderr": "",
+    "stdout_sha256": "ed90358deeded91cd3bc69c23fa15fedab5534e01a806aaa05453d05be018880"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/193764fb3b70/delivery-benchmark-final/build/candidate-release",
+      "verify",
+      "129",
+      "128",
+      "ordinary"
+    ],
+    "elapsed_seconds": 0.016583704999902693,
+    "returncode": 0,
+    "stderr": "",
+    "stdout_sha256": "d1bf2b95d7b113d53a39d36c5aa9370295acc0b9fb022b5840fa37ae2c0d75fd"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/193764fb3b70/delivery-benchmark-final/build/baseline-release",
+      "verify",
+      "4096",
+      "128",
+      "ordinary"
+    ],
+    "elapsed_seconds": 0.17589048600007118,
+    "returncode": 0,
+    "stderr": "",
+    "stdout_sha256": "570bee0f291fc97c7672093181e690d4bbe0302d6e06cd39d8321f051db948ea"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/193764fb3b70/delivery-benchmark-final/build/candidate-release",
+      "verify",
+      "4096",
+      "128",
+      "ordinary"
+    ],
+    "elapsed_seconds": 0.23390211100013403,
+    "returncode": 0,
+    "stderr": "",
+    "stdout_sha256": "329827f48c41a72900e0086bcab3f331542f3e38154a827cacf9f40b8dbc02ec"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/193764fb3b70/delivery-benchmark-final/build/baseline-release",
+      "verify",
+      "257",
+      "31",
+      "loss"
+    ],
+    "elapsed_seconds": 0.01618195400010336,
+    "returncode": 0,
+    "stderr": "",
+    "stdout_sha256": "a250315b4cc480b6e3d4a535f713a84491c84781f541fc8441a95853b4998cc0"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/193764fb3b70/delivery-benchmark-final/build/candidate-release",
+      "verify",
+      "257",
+      "31",
+      "loss"
+    ],
+    "elapsed_seconds": 0.01041655099993477,
+    "returncode": 0,
+    "stderr": "",
+    "stdout_sha256": "14d114dc51406b60cec34d3cb0b5a71814a86d5233e7e0f18baf638dd420d74c"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/193764fb3b70/delivery-benchmark-final/build/candidate-release",
+      "verify",
+      "4097",
+      "128",
+      "ordinary"
+    ],
+    "elapsed_seconds": 0.01972257600004923,
+    "returncode": 0,
+    "stderr": "",
+    "stdout_sha256": "7f8138efd81fc74ced44ffef9526218d3f2a011a87151093e4e1c341e4ed14f8"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/193764fb3b70/delivery-benchmark-final/build/candidate-release",
+      "verify",
+      "10000",
+      "128",
+      "ordinary"
+    ],
+    "elapsed_seconds": 0.03376747799984514,
+    "returncode": 0,
+    "stderr": "",
+    "stdout_sha256": "e92c195eef03e2cb9156c3fda17305d620a69fe21c5f005dae54049ccae92f1a"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/193764fb3b70/delivery-benchmark-final/build/baseline-release",
+      "measure",
+      "64",
+      "128",
+      "ordinary"
+    ],
+    "elapsed_seconds": 0.011462989999927231,
+    "returncode": 0,
+    "stderr": "",
+    "stdout_sha256": "27a042e52e5962a912dc8fbc851f8a3998a9a8ae59706362acf7f7ccff447430"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/193764fb3b70/delivery-benchmark-final/build/candidate-release",
+      "measure",
+      "64",
+      "128",
+      "ordinary"
+    ],
+    "elapsed_seconds": 0.013258602000178143,
+    "returncode": 0,
+    "stderr": "",
+    "stdout_sha256": "17f50c2dd269ff38d6e03959bc90a542ad8542d79bfd8feccadc067c729d83d9"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/193764fb3b70/delivery-benchmark-final/build/candidate-release",
+      "measure",
+      "64",
+      "128",
+      "ordinary"
+    ],
+    "elapsed_seconds": 0.011030014999960258,
+    "returncode": 0,
+    "stderr": "",
+    "stdout_sha256": "17f50c2dd269ff38d6e03959bc90a542ad8542d79bfd8feccadc067c729d83d9"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/193764fb3b70/delivery-benchmark-final/build/baseline-release",
+      "measure",
+      "64",
+      "128",
+      "ordinary"
+    ],
+    "elapsed_seconds": 0.010450621000018145,
+    "returncode": 0,
+    "stderr": "",
+    "stdout_sha256": "27a042e52e5962a912dc8fbc851f8a3998a9a8ae59706362acf7f7ccff447430"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/193764fb3b70/delivery-benchmark-final/build/baseline-release",
+      "measure",
+      "64",
+      "128",
+      "ordinary"
+    ],
+    "elapsed_seconds": 0.011620616000072914,
+    "returncode": 0,
+    "stderr": "",
+    "stdout_sha256": "27a042e52e5962a912dc8fbc851f8a3998a9a8ae59706362acf7f7ccff447430"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/193764fb3b70/delivery-benchmark-final/build/candidate-release",
+      "measure",
+      "64",
+      "128",
+      "ordinary"
+    ],
+    "elapsed_seconds": 0.009741184999938923,
+    "returncode": 0,
+    "stderr": "",
+    "stdout_sha256": "17f50c2dd269ff38d6e03959bc90a542ad8542d79bfd8feccadc067c729d83d9"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/193764fb3b70/delivery-benchmark-final/build/candidate-release",
+      "measure",
+      "64",
+      "128",
+      "ordinary"
+    ],
+    "elapsed_seconds": 0.01023979399997188,
+    "returncode": 0,
+    "stderr": "",
+    "stdout_sha256": "17f50c2dd269ff38d6e03959bc90a542ad8542d79bfd8feccadc067c729d83d9"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/193764fb3b70/delivery-benchmark-final/build/baseline-release",
+      "measure",
+      "64",
+      "128",
+      "ordinary"
+    ],
+    "elapsed_seconds": 0.0111901109999053,
+    "returncode": 0,
+    "stderr": "",
+    "stdout_sha256": "27a042e52e5962a912dc8fbc851f8a3998a9a8ae59706362acf7f7ccff447430"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/193764fb3b70/delivery-benchmark-final/build/baseline-release",
+      "measure",
+      "512",
+      "128",
+      "ordinary"
+    ],
+    "elapsed_seconds": 0.01549522999994224,
+    "returncode": 0,
+    "stderr": "",
+    "stdout_sha256": "afedaa6fe6c62b2001472377cf29b66db37200ca0a9252ce48a577d2a9fc8421"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/193764fb3b70/delivery-benchmark-final/build/candidate-release",
+      "measure",
+      "512",
+      "128",
+      "ordinary"
+    ],
+    "elapsed_seconds": 0.020554020999952627,
+    "returncode": 0,
+    "stderr": "",
+    "stdout_sha256": "e4e40f215cb6bd833d60d015f8ce07035713cf50d34d546e3d5cebb2e304a509"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/193764fb3b70/delivery-benchmark-final/build/candidate-release",
+      "measure",
+      "512",
+      "128",
+      "ordinary"
+    ],
+    "elapsed_seconds": 0.020080872000107775,
+    "returncode": 0,
+    "stderr": "",
+    "stdout_sha256": "e4e40f215cb6bd833d60d015f8ce07035713cf50d34d546e3d5cebb2e304a509"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/193764fb3b70/delivery-benchmark-final/build/baseline-release",
+      "measure",
+      "512",
+      "128",
+      "ordinary"
+    ],
+    "elapsed_seconds": 0.017640793999817106,
+    "returncode": 0,
+    "stderr": "",
+    "stdout_sha256": "afedaa6fe6c62b2001472377cf29b66db37200ca0a9252ce48a577d2a9fc8421"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/193764fb3b70/delivery-benchmark-final/build/baseline-release",
+      "measure",
+      "512",
+      "128",
+      "ordinary"
+    ],
+    "elapsed_seconds": 0.01748141400003078,
+    "returncode": 0,
+    "stderr": "",
+    "stdout_sha256": "afedaa6fe6c62b2001472377cf29b66db37200ca0a9252ce48a577d2a9fc8421"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/193764fb3b70/delivery-benchmark-final/build/candidate-release",
+      "measure",
+      "512",
+      "128",
+      "ordinary"
+    ],
+    "elapsed_seconds": 0.017941095999958634,
+    "returncode": 0,
+    "stderr": "",
+    "stdout_sha256": "e4e40f215cb6bd833d60d015f8ce07035713cf50d34d546e3d5cebb2e304a509"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/193764fb3b70/delivery-benchmark-final/build/candidate-release",
+      "measure",
+      "512",
+      "128",
+      "ordinary"
+    ],
+    "elapsed_seconds": 0.017728723000118407,
+    "returncode": 0,
+    "stderr": "",
+    "stdout_sha256": "e4e40f215cb6bd833d60d015f8ce07035713cf50d34d546e3d5cebb2e304a509"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/193764fb3b70/delivery-benchmark-final/build/baseline-release",
+      "measure",
+      "512",
+      "128",
+      "ordinary"
+    ],
+    "elapsed_seconds": 0.017637389000128678,
+    "returncode": 0,
+    "stderr": "",
+    "stdout_sha256": "47e0c80d0bb823c0de146bfa134d518957732dfd2b179edd2b8f02321429ad93"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/193764fb3b70/delivery-benchmark-final/build/baseline-release",
+      "measure",
+      "4096",
+      "128",
+      "ordinary"
+    ],
+    "elapsed_seconds": 0.07669240399991395,
+    "returncode": 0,
+    "stderr": "",
+    "stdout_sha256": "c9d8b28979cc4eca4f3595531eb49705302397352058635c5a282ca8cdbce646"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/193764fb3b70/delivery-benchmark-final/build/candidate-release",
+      "measure",
+      "4096",
+      "128",
+      "ordinary"
+    ],
+    "elapsed_seconds": 0.07472351000001254,
+    "returncode": 0,
+    "stderr": "",
+    "stdout_sha256": "af7453d9e19832029e0ed95ea2a6e7982e8f2032925165831074fcd5055e09ff"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/193764fb3b70/delivery-benchmark-final/build/candidate-release",
+      "measure",
+      "4096",
+      "128",
+      "ordinary"
+    ],
+    "elapsed_seconds": 0.07236422600021797,
+    "returncode": 0,
+    "stderr": "",
+    "stdout_sha256": "af7453d9e19832029e0ed95ea2a6e7982e8f2032925165831074fcd5055e09ff"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/193764fb3b70/delivery-benchmark-final/build/baseline-release",
+      "measure",
+      "4096",
+      "128",
+      "ordinary"
+    ],
+    "elapsed_seconds": 0.0866152809999221,
+    "returncode": 0,
+    "stderr": "",
+    "stdout_sha256": "c9d8b28979cc4eca4f3595531eb49705302397352058635c5a282ca8cdbce646"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/193764fb3b70/delivery-benchmark-final/build/baseline-release",
+      "measure",
+      "4096",
+      "128",
+      "ordinary"
+    ],
+    "elapsed_seconds": 0.08075399800009109,
+    "returncode": 0,
+    "stderr": "",
+    "stdout_sha256": "c9d8b28979cc4eca4f3595531eb49705302397352058635c5a282ca8cdbce646"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/193764fb3b70/delivery-benchmark-final/build/candidate-release",
+      "measure",
+      "4096",
+      "128",
+      "ordinary"
+    ],
+    "elapsed_seconds": 0.08445756999981313,
+    "returncode": 0,
+    "stderr": "",
+    "stdout_sha256": "af7453d9e19832029e0ed95ea2a6e7982e8f2032925165831074fcd5055e09ff"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/193764fb3b70/delivery-benchmark-final/build/candidate-release",
+      "measure",
+      "4096",
+      "128",
+      "ordinary"
+    ],
+    "elapsed_seconds": 0.08146854699998585,
+    "returncode": 0,
+    "stderr": "",
+    "stdout_sha256": "af7453d9e19832029e0ed95ea2a6e7982e8f2032925165831074fcd5055e09ff"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/193764fb3b70/delivery-benchmark-final/build/baseline-release",
+      "measure",
+      "4096",
+      "128",
+      "ordinary"
+    ],
+    "elapsed_seconds": 0.08114690299998983,
+    "returncode": 0,
+    "stderr": "",
+    "stdout_sha256": "c9d8b28979cc4eca4f3595531eb49705302397352058635c5a282ca8cdbce646"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/193764fb3b70/delivery-benchmark-final/build/baseline-release",
+      "measure",
+      "4097",
+      "128",
+      "ordinary"
+    ],
+    "elapsed_seconds": 0.07390014599991446,
+    "returncode": 0,
+    "stderr": "",
+    "stdout_sha256": "dd645fd5a75b17422701f84b10d6df86a601b51cd086d8e013ca5f48cef821a9"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/193764fb3b70/delivery-benchmark-final/build/candidate-release",
+      "measure",
+      "4097",
+      "128",
+      "ordinary"
+    ],
+    "elapsed_seconds": 0.026887989999977435,
+    "returncode": 0,
+    "stderr": "",
+    "stdout_sha256": "2b5b150a7ccdded5f14802d00cb89a88b096fcc1fc422c61c482f38ee9c779c0"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/193764fb3b70/delivery-benchmark-final/build/candidate-release",
+      "measure",
+      "4097",
+      "128",
+      "ordinary"
+    ],
+    "elapsed_seconds": 0.033882484000059776,
+    "returncode": 0,
+    "stderr": "",
+    "stdout_sha256": "9d5a662dd8050994d8862adb3b0fd2d8cfc998359e3d5c2d16f4ee1197ea4b49"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/193764fb3b70/delivery-benchmark-final/build/baseline-release",
+      "measure",
+      "4097",
+      "128",
+      "ordinary"
+    ],
+    "elapsed_seconds": 0.08830988099998649,
+    "returncode": 0,
+    "stderr": "",
+    "stdout_sha256": "dd645fd5a75b17422701f84b10d6df86a601b51cd086d8e013ca5f48cef821a9"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/193764fb3b70/delivery-benchmark-final/build/baseline-release",
+      "measure",
+      "4097",
+      "128",
+      "ordinary"
+    ],
+    "elapsed_seconds": 0.08937583199985966,
+    "returncode": 0,
+    "stderr": "",
+    "stdout_sha256": "dd645fd5a75b17422701f84b10d6df86a601b51cd086d8e013ca5f48cef821a9"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/193764fb3b70/delivery-benchmark-final/build/candidate-release",
+      "measure",
+      "4097",
+      "128",
+      "ordinary"
+    ],
+    "elapsed_seconds": 0.029006619000028877,
+    "returncode": 0,
+    "stderr": "",
+    "stdout_sha256": "9d5a662dd8050994d8862adb3b0fd2d8cfc998359e3d5c2d16f4ee1197ea4b49"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/193764fb3b70/delivery-benchmark-final/build/candidate-release",
+      "measure",
+      "4097",
+      "128",
+      "ordinary"
+    ],
+    "elapsed_seconds": 0.02513225000006969,
+    "returncode": 0,
+    "stderr": "",
+    "stdout_sha256": "2b5b150a7ccdded5f14802d00cb89a88b096fcc1fc422c61c482f38ee9c779c0"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/193764fb3b70/delivery-benchmark-final/build/baseline-release",
+      "measure",
+      "4097",
+      "128",
+      "ordinary"
+    ],
+    "elapsed_seconds": 0.08514247900006922,
+    "returncode": 0,
+    "stderr": "",
+    "stdout_sha256": "dd645fd5a75b17422701f84b10d6df86a601b51cd086d8e013ca5f48cef821a9"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/193764fb3b70/delivery-benchmark-final/build/baseline-release",
+      "measure",
+      "100000",
+      "128",
+      "ordinary"
+    ],
+    "elapsed_seconds": 1.571714995999855,
+    "returncode": 0,
+    "stderr": "",
+    "stdout_sha256": "72167c0391fb2d7b9e2206fb142c74f200849eba8bc2cf48137a46bb2ce2c7ba"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/193764fb3b70/delivery-benchmark-final/build/candidate-release",
+      "measure",
+      "100000",
+      "128",
+      "ordinary"
+    ],
+    "elapsed_seconds": 0.2524543879999328,
+    "returncode": 0,
+    "stderr": "",
+    "stdout_sha256": "f1629a57a256919e6d9b4007e9954463722b61c0c0dc7a2b4e4a5834d90fd411"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/193764fb3b70/delivery-benchmark-final/build/candidate-release",
+      "measure",
+      "100000",
+      "128",
+      "ordinary"
+    ],
+    "elapsed_seconds": 0.32641051699988566,
+    "returncode": 0,
+    "stderr": "",
+    "stdout_sha256": "f1629a57a256919e6d9b4007e9954463722b61c0c0dc7a2b4e4a5834d90fd411"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/193764fb3b70/delivery-benchmark-final/build/baseline-release",
+      "measure",
+      "100000",
+      "128",
+      "ordinary"
+    ],
+    "elapsed_seconds": 2.0014142620000257,
+    "returncode": 0,
+    "stderr": "",
+    "stdout_sha256": "72167c0391fb2d7b9e2206fb142c74f200849eba8bc2cf48137a46bb2ce2c7ba"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/193764fb3b70/delivery-benchmark-final/build/baseline-release",
+      "measure",
+      "100000",
+      "128",
+      "ordinary"
+    ],
+    "elapsed_seconds": 1.4884290150000652,
+    "returncode": 0,
+    "stderr": "",
+    "stdout_sha256": "72167c0391fb2d7b9e2206fb142c74f200849eba8bc2cf48137a46bb2ce2c7ba"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/193764fb3b70/delivery-benchmark-final/build/candidate-release",
+      "measure",
+      "100000",
+      "128",
+      "ordinary"
+    ],
+    "elapsed_seconds": 0.253281343000026,
+    "returncode": 0,
+    "stderr": "",
+    "stdout_sha256": "f1629a57a256919e6d9b4007e9954463722b61c0c0dc7a2b4e4a5834d90fd411"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/193764fb3b70/delivery-benchmark-final/build/candidate-release",
+      "measure",
+      "100000",
+      "128",
+      "ordinary"
+    ],
+    "elapsed_seconds": 0.3032601090001208,
+    "returncode": 0,
+    "stderr": "",
+    "stdout_sha256": "f1629a57a256919e6d9b4007e9954463722b61c0c0dc7a2b4e4a5834d90fd411"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/193764fb3b70/delivery-benchmark-final/build/baseline-release",
+      "measure",
+      "100000",
+      "128",
+      "ordinary"
+    ],
+    "elapsed_seconds": 1.5930165090001083,
+    "returncode": 0,
+    "stderr": "",
+    "stdout_sha256": "72167c0391fb2d7b9e2206fb142c74f200849eba8bc2cf48137a46bb2ce2c7ba"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/193764fb3b70/delivery-benchmark-final/build/baseline-release",
+      "measure",
+      "1000000",
+      "128",
+      "ordinary"
+    ],
+    "elapsed_seconds": 15.68195761800007,
+    "returncode": 0,
+    "stderr": "",
+    "stdout_sha256": "e8b414361af9b612d7b36c3ab4bee712d312bd2ae064a84a42c138bf61d58fa8"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/193764fb3b70/delivery-benchmark-final/build/candidate-release",
+      "measure",
+      "1000000",
+      "128",
+      "ordinary"
+    ],
+    "elapsed_seconds": 2.853446085000087,
+    "returncode": 0,
+    "stderr": "",
+    "stdout_sha256": "289e81097802ce96322248a6005672b591dc41f944eff8a928c5cebdfe255858"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/193764fb3b70/delivery-benchmark-final/build/candidate-release",
+      "measure",
+      "1000000",
+      "128",
+      "ordinary"
+    ],
+    "elapsed_seconds": 2.887054760000183,
+    "returncode": 0,
+    "stderr": "",
+    "stdout_sha256": "289e81097802ce96322248a6005672b591dc41f944eff8a928c5cebdfe255858"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/193764fb3b70/delivery-benchmark-final/build/baseline-release",
+      "measure",
+      "1000000",
+      "128",
+      "ordinary"
+    ],
+    "elapsed_seconds": 14.544476596000095,
+    "returncode": 0,
+    "stderr": "",
+    "stdout_sha256": "a801c40fe8a0e5b8f2ce4be9e3bbf98b3b033f3efd4e2e7ad23ee2451ceba12b"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/193764fb3b70/delivery-benchmark-final/build/baseline-release",
+      "measure",
+      "1000000",
+      "128",
+      "ordinary"
+    ],
+    "elapsed_seconds": 14.44515153400016,
+    "returncode": 0,
+    "stderr": "",
+    "stdout_sha256": "e8b414361af9b612d7b36c3ab4bee712d312bd2ae064a84a42c138bf61d58fa8"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/193764fb3b70/delivery-benchmark-final/build/candidate-release",
+      "measure",
+      "1000000",
+      "128",
+      "ordinary"
+    ],
+    "elapsed_seconds": 2.797720502999937,
+    "returncode": 0,
+    "stderr": "",
+    "stdout_sha256": "289e81097802ce96322248a6005672b591dc41f944eff8a928c5cebdfe255858"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/193764fb3b70/delivery-benchmark-final/build/candidate-release",
+      "measure",
+      "1000000",
+      "128",
+      "ordinary"
+    ],
+    "elapsed_seconds": 3.1407745089998116,
+    "returncode": 0,
+    "stderr": "",
+    "stdout_sha256": "289e81097802ce96322248a6005672b591dc41f944eff8a928c5cebdfe255858"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/193764fb3b70/delivery-benchmark-final/build/baseline-release",
+      "measure",
+      "1000000",
+      "128",
+      "ordinary"
+    ],
+    "elapsed_seconds": 15.765956035000045,
+    "returncode": 0,
+    "stderr": "",
+    "stdout_sha256": "e8b414361af9b612d7b36c3ab4bee712d312bd2ae064a84a42c138bf61d58fa8"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/193764fb3b70/delivery-benchmark-final/build/baseline-release",
+      "measure",
+      "100000",
+      "100000",
+      "ordinary"
+    ],
+    "elapsed_seconds": 1.52942017700002,
+    "returncode": 0,
+    "stderr": "",
+    "stdout_sha256": "38cc7354fa10a5bddbd5650d8805aa365329a7f6a77880b1e342e7bfa40b8386"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/193764fb3b70/delivery-benchmark-final/build/candidate-release",
+      "measure",
+      "100000",
+      "100000",
+      "ordinary"
+    ],
+    "elapsed_seconds": 0.3039814420001221,
+    "returncode": 0,
+    "stderr": "",
+    "stdout_sha256": "7013f56a69b4598422a3582098b74f168732a26cb9865cc937c0e876e1590ebf"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/193764fb3b70/delivery-benchmark-final/build/candidate-release",
+      "measure",
+      "100000",
+      "100000",
+      "ordinary"
+    ],
+    "elapsed_seconds": 0.2970982809999896,
+    "returncode": 0,
+    "stderr": "",
+    "stdout_sha256": "7013f56a69b4598422a3582098b74f168732a26cb9865cc937c0e876e1590ebf"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/193764fb3b70/delivery-benchmark-final/build/baseline-release",
+      "measure",
+      "100000",
+      "100000",
+      "ordinary"
+    ],
+    "elapsed_seconds": 1.6351572859998669,
+    "returncode": 0,
+    "stderr": "",
+    "stdout_sha256": "38cc7354fa10a5bddbd5650d8805aa365329a7f6a77880b1e342e7bfa40b8386"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/193764fb3b70/delivery-benchmark-final/build/baseline-release",
+      "measure",
+      "100000",
+      "100000",
+      "ordinary"
+    ],
+    "elapsed_seconds": 1.5703645170001437,
+    "returncode": 0,
+    "stderr": "",
+    "stdout_sha256": "38cc7354fa10a5bddbd5650d8805aa365329a7f6a77880b1e342e7bfa40b8386"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/193764fb3b70/delivery-benchmark-final/build/candidate-release",
+      "measure",
+      "100000",
+      "100000",
+      "ordinary"
+    ],
+    "elapsed_seconds": 0.26374378000014076,
+    "returncode": 0,
+    "stderr": "",
+    "stdout_sha256": "7013f56a69b4598422a3582098b74f168732a26cb9865cc937c0e876e1590ebf"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/193764fb3b70/delivery-benchmark-final/build/candidate-release",
+      "measure",
+      "100000",
+      "100000",
+      "ordinary"
+    ],
+    "elapsed_seconds": 0.27456693399994947,
+    "returncode": 0,
+    "stderr": "",
+    "stdout_sha256": "7013f56a69b4598422a3582098b74f168732a26cb9865cc937c0e876e1590ebf"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/193764fb3b70/delivery-benchmark-final/build/baseline-release",
+      "measure",
+      "100000",
+      "100000",
+      "ordinary"
+    ],
+    "elapsed_seconds": 1.567303210999853,
+    "returncode": 0,
+    "stderr": "",
+    "stdout_sha256": "38cc7354fa10a5bddbd5650d8805aa365329a7f6a77880b1e342e7bfa40b8386"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/193764fb3b70/delivery-benchmark-final/build/baseline-release",
+      "measure",
+      "512",
+      "128",
+      "loss"
+    ],
+    "elapsed_seconds": 0.012883339999916643,
+    "returncode": 0,
+    "stderr": "",
+    "stdout_sha256": "da1855ef03f56dd1b9197de1b4ffa1b78be68c6b7b839b84768e8668cc4b06e0"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/193764fb3b70/delivery-benchmark-final/build/candidate-release",
+      "measure",
+      "512",
+      "128",
+      "loss"
+    ],
+    "elapsed_seconds": 0.010526844000196434,
+    "returncode": 0,
+    "stderr": "",
+    "stdout_sha256": "4d7efe9c3e1698f06dbf4232e833ef10183862fb261832a51ca55b520cc1713d"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/193764fb3b70/delivery-benchmark-final/build/candidate-release",
+      "measure",
+      "512",
+      "128",
+      "loss"
+    ],
+    "elapsed_seconds": 0.010458652999886908,
+    "returncode": 0,
+    "stderr": "",
+    "stdout_sha256": "4d7efe9c3e1698f06dbf4232e833ef10183862fb261832a51ca55b520cc1713d"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/193764fb3b70/delivery-benchmark-final/build/baseline-release",
+      "measure",
+      "512",
+      "128",
+      "loss"
+    ],
+    "elapsed_seconds": 0.011144896000132576,
+    "returncode": 0,
+    "stderr": "",
+    "stdout_sha256": "da1855ef03f56dd1b9197de1b4ffa1b78be68c6b7b839b84768e8668cc4b06e0"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/193764fb3b70/delivery-benchmark-final/build/baseline-release",
+      "measure",
+      "512",
+      "128",
+      "loss"
+    ],
+    "elapsed_seconds": 0.011555091999980505,
+    "returncode": 0,
+    "stderr": "",
+    "stdout_sha256": "da1855ef03f56dd1b9197de1b4ffa1b78be68c6b7b839b84768e8668cc4b06e0"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/193764fb3b70/delivery-benchmark-final/build/candidate-release",
+      "measure",
+      "512",
+      "128",
+      "loss"
+    ],
+    "elapsed_seconds": 0.010873473999936323,
+    "returncode": 0,
+    "stderr": "",
+    "stdout_sha256": "4d7efe9c3e1698f06dbf4232e833ef10183862fb261832a51ca55b520cc1713d"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/193764fb3b70/delivery-benchmark-final/build/candidate-release",
+      "measure",
+      "512",
+      "128",
+      "loss"
+    ],
+    "elapsed_seconds": 0.009616140999924028,
+    "returncode": 0,
+    "stderr": "",
+    "stdout_sha256": "4d7efe9c3e1698f06dbf4232e833ef10183862fb261832a51ca55b520cc1713d"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/193764fb3b70/delivery-benchmark-final/build/baseline-release",
+      "measure",
+      "512",
+      "128",
+      "loss"
+    ],
+    "elapsed_seconds": 0.0121122920002108,
+    "returncode": 0,
+    "stderr": "",
+    "stdout_sha256": "da1855ef03f56dd1b9197de1b4ffa1b78be68c6b7b839b84768e8668cc4b06e0"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/193764fb3b70/delivery-benchmark-final/build/baseline-release",
+      "measure-close",
+      "4096",
+      "128",
+      "ordinary"
+    ],
+    "elapsed_seconds": 0.018704233999869757,
+    "returncode": 0,
+    "stderr": "",
+    "stdout_sha256": "8cefd7526711cb12a45d82c9cd3ae136714e0305efe55dfdc3fd3039199083d3"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/193764fb3b70/delivery-benchmark-final/build/candidate-release",
+      "measure-close",
+      "4096",
+      "128",
+      "ordinary"
+    ],
+    "elapsed_seconds": 0.020112109999899985,
+    "returncode": 0,
+    "stderr": "",
+    "stdout_sha256": "f04c487832a20e9e8379e7099907e81c5ecb4583e755ab956ab9d37d0a631d77"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/193764fb3b70/delivery-benchmark-final/build/candidate-release",
+      "measure-close",
+      "4096",
+      "128",
+      "ordinary"
+    ],
+    "elapsed_seconds": 0.021646232000193777,
+    "returncode": 0,
+    "stderr": "",
+    "stdout_sha256": "f04c487832a20e9e8379e7099907e81c5ecb4583e755ab956ab9d37d0a631d77"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/193764fb3b70/delivery-benchmark-final/build/baseline-release",
+      "measure-close",
+      "4096",
+      "128",
+      "ordinary"
+    ],
+    "elapsed_seconds": 0.020280878999983543,
+    "returncode": 0,
+    "stderr": "",
+    "stdout_sha256": "8cefd7526711cb12a45d82c9cd3ae136714e0305efe55dfdc3fd3039199083d3"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/193764fb3b70/delivery-benchmark-final/build/baseline-release",
+      "measure-close",
+      "4096",
+      "128",
+      "ordinary"
+    ],
+    "elapsed_seconds": 0.021514363000051162,
+    "returncode": 0,
+    "stderr": "",
+    "stdout_sha256": "8cefd7526711cb12a45d82c9cd3ae136714e0305efe55dfdc3fd3039199083d3"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/193764fb3b70/delivery-benchmark-final/build/candidate-release",
+      "measure-close",
+      "4096",
+      "128",
+      "ordinary"
+    ],
+    "elapsed_seconds": 0.017762584000138304,
+    "returncode": 0,
+    "stderr": "",
+    "stdout_sha256": "f04c487832a20e9e8379e7099907e81c5ecb4583e755ab956ab9d37d0a631d77"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/193764fb3b70/delivery-benchmark-final/build/candidate-release",
+      "measure-close",
+      "4096",
+      "128",
+      "ordinary"
+    ],
+    "elapsed_seconds": 0.01853504900009284,
+    "returncode": 0,
+    "stderr": "",
+    "stdout_sha256": "f04c487832a20e9e8379e7099907e81c5ecb4583e755ab956ab9d37d0a631d77"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/193764fb3b70/delivery-benchmark-final/build/baseline-release",
+      "measure-close",
+      "4096",
+      "128",
+      "ordinary"
+    ],
+    "elapsed_seconds": 0.01699118700003055,
+    "returncode": 0,
+    "stderr": "",
+    "stdout_sha256": "8cefd7526711cb12a45d82c9cd3ae136714e0305efe55dfdc3fd3039199083d3"
+  }
+]

@@ -1,0 +1,98 @@
+[
+  {
+    "description": "First sidecar supplies three IDs to empty previous metadata",
+    "name": "override-first-3",
+    "operation": "overriding",
+    "outputCount": 4096,
+    "previousIDCount": 0,
+    "replacementIDCount": 3
+  },
+  {
+    "description": "Parsed Plex episode mappings inherit three shared series IDs",
+    "name": "plex-3",
+    "operation": "plex",
+    "outputCount": 4096,
+    "previousIDCount": 3,
+    "replacementIDCount": 0
+  },
+  {
+    "description": "Parsed Plex episode mappings inherit one shared series ID",
+    "name": "plex-1",
+    "operation": "plex",
+    "outputCount": 4096,
+    "previousIDCount": 1,
+    "replacementIDCount": 0
+  },
+  {
+    "description": "Episode-only hints inherit three series IDs",
+    "name": "override-inherit-3",
+    "operation": "overriding",
+    "outputCount": 4096,
+    "previousIDCount": 3,
+    "replacementIDCount": 0
+  },
+  {
+    "description": "Sidecar IDs applied to a filename without IDs",
+    "name": "apply-first-3",
+    "operation": "applying",
+    "outputCount": 4096,
+    "previousIDCount": 0,
+    "replacementIDCount": 3
+  },
+  {
+    "description": "Retained-projection stress: 16,384 Plex mapping outputs",
+    "name": "plex-3-large",
+    "operation": "plex",
+    "outputCount": 16384,
+    "previousIDCount": 3,
+    "replacementIDCount": 0
+  },
+  {
+    "description": "Control: movie transition clears inherited series IDs",
+    "name": "override-kind-change",
+    "operation": "overriding",
+    "outputCount": 4096,
+    "previousIDCount": 3,
+    "replacementIDCount": 0
+  },
+  {
+    "description": "Hints with no IDs preserve filename IDs",
+    "name": "apply-inherit-3",
+    "operation": "applying",
+    "outputCount": 4096,
+    "previousIDCount": 3,
+    "replacementIDCount": 0
+  },
+  {
+    "description": "Episode-only hints inherit one series ID",
+    "name": "override-inherit-1",
+    "operation": "overriding",
+    "outputCount": 4096,
+    "previousIDCount": 1,
+    "replacementIDCount": 0
+  },
+  {
+    "description": "Synthetic stress: 64 explicit IDs, including repeated providers",
+    "name": "override-inherit-64",
+    "operation": "overriding",
+    "outputCount": 4096,
+    "previousIDCount": 64,
+    "replacementIDCount": 0
+  },
+  {
+    "description": "Control: both sides have IDs and one provider is replaced",
+    "name": "override-replace-3",
+    "operation": "overriding",
+    "outputCount": 4096,
+    "previousIDCount": 3,
+    "replacementIDCount": 1
+  },
+  {
+    "description": "Control: both sides have no IDs",
+    "name": "override-empty",
+    "operation": "overriding",
+    "outputCount": 4096,
+    "previousIDCount": 0,
+    "replacementIDCount": 0
+  }
+]

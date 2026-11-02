@@ -1,0 +1,15 @@
+{
+  "affinity_method": "taskset -c 0 inherited by all child processes",
+  "analysis": "Retain all raw results. Report adverse controls and sample variation. No further tuning based on individual fixture outcomes.",
+  "candidate": "B, final immutable reference plan",
+  "cases": "all 26 timed cells",
+  "comparison": "Each fresh-process pair compares B against unchanged frozen main ea2ff568. No direct percentage comparison against candidate A across different cohorts.",
+  "cpu_affinity": [
+    0
+  ],
+  "pairs": 10,
+  "reason": "Test reduced aggregate-copy overhead while preserving one coherent metadata snapshot. Retain all26 cells, including single-file, no-sidecar, NFO-only, unique-parent and alternating-parent controls.",
+  "recorded_utc": "2026-10-28T05:23:28.490016+00:00",
+  "source_commit": "e34a5beb39ce24317d9b3bec0366db42c021af4d",
+  "target_ms": 300
+}

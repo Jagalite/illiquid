@@ -1,0 +1,297 @@
+{
+  "workflow_run_id": 40634599986,
+  "component_job_id": 122638536177,
+  "workflow_url": "https://github.com/Jagalite/illiquid/actions/runs/40634599986",
+  "log_url": "https://github.com/Jagalite/illiquid/actions/runs/40634599986/job/122638536177",
+  "provenance": "Parsed structured JSON records from the completed GitHub Actions job log; full traces, sources, binaries, and command logs are in the recorded artifact.",
+  "artifact": {
+    "id": 12792933938,
+    "name": "thumbnail-neighborhood-component",
+    "size_in_bytes": 413316,
+    "url": "https://api.github.com/repos/Jagalite/illiquid/actions/artifacts/12792933938",
+    "archive_download_url": "https://api.github.com/repos/Jagalite/illiquid/actions/artifacts/12792933938/zip",
+    "expired": false,
+    "created_at": "2026-10-28T05:02:38Z",
+    "expires_at": "2026-11-27T05:02:36Z",
+    "updated_at": "2026-10-28T05:02:38Z",
+    "digest": "sha256:1e5aaf391b9a175108182ebe12598cbcd427e8b8044e9536325efede2832b95b",
+    "workflow_run": {
+      "id": 40634599986,
+      "repository_id": 1402467213,
+      "head_repository_id": 1402467213,
+      "head_branch": "perf/thumbnail-neighborhood-bounded-ec593",
+      "head_sha": "2d066cacc8d8fc844dcaf6008cfdaeda61b69010"
+    }
+  },
+  "manifest": {
+    "architecture": "arm64",
+    "baseline_adapted_helper_sha256": "f256ca988322d7c3961ae346e4c1d13abb8ae46c369ecf010c503f8bcaf0f5d1",
+    "baseline_revision": "ea2ff568237e2667f7b1aeee67b11a44ebe95b72",
+    "baseline_scheduler_sha256": "24bee22ce1bc8b670af7e6a45eb49f1a2eac6425c588128af8745ee9ce5f3c9e",
+    "binary_sha256": {
+      "baseline": {
+        "harness": "ffbdffd9f0af9554e2292c2db0f3a54fff8ee4965129a5c52d6063f2b7b26a93",
+        "probe": "0d273faf75461692aabbecafa23b8d2f3753121f33a61eaf65921e71c985984b"
+      },
+      "candidate": {
+        "harness": "bd933d04a62ae512adf8a748afc55767b2127dbe90e80b24837136eb9f0cc995",
+        "probe": "02feca7108b106d019c69eb8bbd4b88729563f30b2aa2293839a4e25f1518dd0"
+      }
+    },
+    "candidate_revision": "2d066cacc8d8fc844dcaf6008cfdaeda61b69010",
+    "core_binary_sha256": "f9076c22512adae7c932fb0b7b830809171ad86e99c859a6ea95c853a2979835",
+    "cpu": "Apple M1 (Virtual)",
+    "developer_dir": "/Applications/Xcode_26.6.app/Contents/Developer",
+    "github_run_id": "40634599986",
+    "harness_sha256": "c9a45a0632e44f8ce0ea9ba6327a81809be6afa8d78161a5c6400f22e34aff62",
+    "iteration_policy": "calibrated separately per variant, then fixed for all retained pairs",
+    "macos": "ProductName:\t\tmacOS\nProductVersion:\t\t26.6.2\nBuildVersion:\t\t25G83",
+    "memory_scope": "no RSS/allocation-counter claim; URL stride and eliminated full projection are structural",
+    "pairs": 8,
+    "probe_sha256": "6f7a1423e004dd9d7c0dd15792484477d06359aea27418bf110f432bb3c1b72e",
+    "process_policy": "fresh process per observation; alternating AB/BA pairs",
+    "runner_sha256": "82d038357d04a0574207944e337a62f01f2fc42e34469eb56ae1b3d830e58f9b",
+    "sdk": "26.5",
+    "source_receipts": [
+      {
+        "path": "Sources/IlliquidCore/Playlist/FolderPlaylist.swift",
+        "sha256": "8a3c017132f0e79cb8280551ff686066b9a3005c49bd7833efc54bb11dfe75fe"
+      },
+      {
+        "path": "Sources/IlliquidCore/Utilities/NaturalFilenameOrdering.swift",
+        "sha256": "d167212f90dd5cd6d8e0e73c208d8e9b4648cc7f4dd21212d51c85a693a263e7"
+      },
+      {
+        "path": "Sources/IlliquidCore/Utilities/NormalizedFileURL.swift",
+        "sha256": "3b65c98b88722ca4d51c315a7fd5e2fde0e40c846071b6b1e34cd1f1eddb3fd2"
+      },
+      {
+        "path": "Sources/IlliquidApp/App/ThumbnailPlaylistNeighborhood.swift",
+        "sha256": "63eacf728ec2dc1e048dad0a1fbec804d81603fa16b2cfe789ac9cc956997e77"
+      },
+      {
+        "path": "Sources/IlliquidApp/App/ThumbnailBackgroundScheduler.swift",
+        "sha256": "656a81c6b07c3ba36d732b845bf86d61762f70464ea02a686deb984ea9400da0"
+      },
+      {
+        "path": "Tests/IlliquidAppTests/ThumbnailPlaylistNeighborhoodTests.swift",
+        "sha256": "1e7ab205488327d52211acab6a8a2de490c6084034fc21b47d754530b2dd2b47"
+      }
+    ],
+    "started_utc": "2026-10-28T04:59:04Z",
+    "swift": "swift-driver version: 1.148.6 Apple Swift version 6.3.3 (swiftlang-6.3.3.1.3 clang-2100.1.1.101)\nTarget: arm64-apple-macosx26.0",
+    "target_ms": 30,
+    "timing_scope": "neighbor extraction plus result witness and autorelease-pool cleanup",
+    "working_tree_status": "",
+    "xcode": "Xcode 26.6\nBuild version 17F113"
+  },
+  "tests": [
+    {
+      "configuration": "debug",
+      "passed": true,
+      "test_functions_passed": 6,
+      "variant": "baseline"
+    },
+    {
+      "configuration": "release",
+      "passed": true,
+      "test_functions_passed": 6,
+      "variant": "baseline"
+    },
+    {
+      "configuration": "debug",
+      "passed": true,
+      "test_functions_passed": 6,
+      "variant": "candidate"
+    },
+    {
+      "configuration": "release",
+      "passed": true,
+      "test_functions_passed": 6,
+      "variant": "candidate"
+    }
+  ],
+  "parity": {
+    "cases": 40,
+    "equal": true,
+    "trace_sha256": "285e8a370f8aa1f7224d696efe5597def39f67599603b0a4a5c3692eab2a1ecd",
+    "url_stride": 16
+  },
+  "completion": {
+    "complete": true,
+    "measured_observations": 304,
+    "pairs": 8,
+    "workloads": 19
+  },
+  "audit": {
+    "passed": true,
+    "samples": 304,
+    "calibrations": 119,
+    "workloads": 19,
+    "test_configurations": 4,
+    "test_functions_per_configuration": 6,
+    "parity_cases": 40,
+    "short_observations": [
+      {
+        "count": 32,
+        "scenario": "middle",
+        "variant": "candidate",
+        "pair": 0,
+        "ms": 4.990917
+      },
+      {
+        "count": 32,
+        "scenario": "middle",
+        "variant": "candidate",
+        "pair": 1,
+        "ms": 4.576541
+      },
+      {
+        "count": 32,
+        "scenario": "middle",
+        "variant": "candidate",
+        "pair": 2,
+        "ms": 5.8795
+      },
+      {
+        "count": 32,
+        "scenario": "middle",
+        "variant": "candidate",
+        "pair": 4,
+        "ms": 5.017917
+      },
+      {
+        "count": 32,
+        "scenario": "middle",
+        "variant": "candidate",
+        "pair": 5,
+        "ms": 4.990333
+      },
+      {
+        "count": 32,
+        "scenario": "middle",
+        "variant": "candidate",
+        "pair": 7,
+        "ms": 4.525041
+      },
+      {
+        "count": 32,
+        "scenario": "last",
+        "variant": "candidate",
+        "pair": 1,
+        "ms": 9.090833
+      },
+      {
+        "count": 10000,
+        "scenario": "last",
+        "variant": "baseline",
+        "pair": 6,
+        "ms": 9.7635
+      },
+      {
+        "count": 10000,
+        "scenario": "missing",
+        "variant": "candidate",
+        "pair": 2,
+        "ms": 8.988333
+      }
+    ],
+    "checks": [
+      {
+        "count": 0,
+        "scenario": "nil",
+        "passed": true
+      },
+      {
+        "count": 1,
+        "scenario": "first",
+        "passed": true
+      },
+      {
+        "count": 32,
+        "scenario": "first",
+        "passed": true
+      },
+      {
+        "count": 32,
+        "scenario": "middle",
+        "passed": true
+      },
+      {
+        "count": 32,
+        "scenario": "last",
+        "passed": true
+      },
+      {
+        "count": 32,
+        "scenario": "missing",
+        "passed": true
+      },
+      {
+        "count": 32,
+        "scenario": "nil",
+        "passed": true
+      },
+      {
+        "count": 10000,
+        "scenario": "first",
+        "passed": true
+      },
+      {
+        "count": 10000,
+        "scenario": "middle",
+        "passed": true
+      },
+      {
+        "count": 10000,
+        "scenario": "last",
+        "passed": true
+      },
+      {
+        "count": 10000,
+        "scenario": "missing",
+        "passed": true
+      },
+      {
+        "count": 10000,
+        "scenario": "nil",
+        "passed": true
+      },
+      {
+        "count": 100000,
+        "scenario": "first",
+        "passed": true
+      },
+      {
+        "count": 100000,
+        "scenario": "middle",
+        "passed": true
+      },
+      {
+        "count": 100000,
+        "scenario": "last",
+        "passed": true
+      },
+      {
+        "count": 100000,
+        "scenario": "missing",
+        "passed": true
+      },
+      {
+        "count": 100000,
+        "scenario": "nil",
+        "passed": true
+      },
+      {
+        "count": 1000,
+        "scenario": "middle",
+        "passed": true
+      },
+      {
+        "count": 1000,
+        "scenario": "last",
+        "passed": true
+      }
+    ]
+  }
+}

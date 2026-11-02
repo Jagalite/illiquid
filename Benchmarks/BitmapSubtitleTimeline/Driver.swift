@@ -25,6 +25,9 @@ private enum Operation: String, Encodable {
     case replace
     case stream
     case reject
+    case lookup
+    case tick
+    case prune
 }
 
 private enum Order {
@@ -51,10 +54,24 @@ private struct BenchmarkCase {
         case "fill-shuffled-128": configuration = (.fill, 128, .shuffled)
         case "replace-32": configuration = (.replace, 32, .shuffled)
         case "replace-128": configuration = (.replace, 128, .shuffled)
-        case "stream-8": configuration = (.stream, 8, .ascending)
-        case "stream-32": configuration = (.stream, 32, .ascending)
-        case "stream-128": configuration = (.stream, 128, .ascending)
+        case "stream-8", "stream-centered-8": configuration = (.stream, 8, .ascending)
+        case "stream-32", "stream-centered-32": configuration = (.stream, 32, .ascending)
+        case "stream-128", "stream-centered-128": configuration = (.stream, 128, .ascending)
         case "reject-full-128": configuration = (.reject, 128, .shuffled)
+        case "lookup-front-1": configuration = (.lookup, 1, .ascending)
+        case "lookup-front-8", "lookup-middle-8", "lookup-penultimate-8", "lookup-tail4-8":
+            configuration = (.lookup, 8, .ascending)
+        case "lookup-front-32", "lookup-middle-32", "lookup-penultimate-32", "lookup-tail4-32":
+            configuration = (.lookup, 32, .ascending)
+        case "lookup-front-128", "lookup-middle-128", "lookup-latest-128",
+             "lookup-before-128", "lookup-after-128", "lookup-mixed-128",
+             "lookup-penultimate-128", "lookup-tail4-128":
+            configuration = (.lookup, 128, .ascending)
+        case "tick-front-1": configuration = (.tick, 1, .ascending)
+        case "tick-front-8": configuration = (.tick, 8, .ascending)
+        case "tick-front-32": configuration = (.tick, 32, .ascending)
+        case "tick-front-128": configuration = (.tick, 128, .ascending)
+        case "prune-front-128": configuration = (.prune, 128, .ascending)
         default: throw DriverError.unknownCase(name)
         }
         operation = configuration.0
@@ -206,8 +223,9 @@ private struct ExpectedState {
 private struct Counts: Equatable {
     var acceptedInsertions: UInt64 = 0
     var presentQueries: UInt64 = 0
+    var queryChecksum: UInt64 = 0
 
-    var checksum: UInt64 { acceptedInsertions &+ presentQueries }
+    var checksum: UInt64 { acceptedInsertions &+ presentQueries &+ queryChecksum }
 }
 
 private struct Fixture {
@@ -215,6 +233,7 @@ private struct Fixture {
     let generation = 7
     let maximumBytes = 32 * 1_024 * 1_024
     let order: [Int]
+    let lookupSeconds: [Double]
     let primary: [NativeBitmapSubtitleComposition]
     let alternate: [NativeBitmapSubtitleComposition]
 
@@ -229,11 +248,39 @@ private struct Fixture {
             shuffle.apply(to: &order)
         }
         self.order = order
+        lookupSeconds = Self.makeLookupSeconds(benchmark: benchmark, seed: seed)
         // Small immutable pixel buffers are prepared once. Insertion retains
         // existing Data; this harness does not measure bitmap decoding/rendering.
         let poolCount = max(4, benchmark.count)
         primary = (0..<poolCount).map { Self.composition(index: $0, alternate: false, seed: seed) }
         alternate = (0..<poolCount).map { Self.composition(index: $0, alternate: true, seed: seed) }
+    }
+
+    private static func makeLookupSeconds(benchmark: BenchmarkCase, seed: UInt64) -> [Double] {
+        // Advance through distinct render timestamps while the active display
+        // remains at the front of a read-ahead window. Preparation is untimed.
+        let offsets = (0..<16).map { Double($0) / 64 }
+        switch benchmark.name {
+        case "lookup-before-128":
+            return offsets.map { $0 - 1 }
+        case "lookup-after-128":
+            return offsets.map { $0 + Double(benchmark.count) * 2 }
+        case let name where name.hasPrefix("lookup-middle-"):
+            return offsets.map { $0 + Double(benchmark.count / 2) * 2 }
+        case let name where name.hasPrefix("lookup-penultimate-"):
+            return offsets.map { $0 + Double(benchmark.count - 2) * 2 }
+        case let name where name.hasPrefix("lookup-tail4-"):
+            return offsets.map { $0 + Double(benchmark.count - 4) * 2 }
+        case "lookup-latest-128":
+            return offsets.map { $0 + Double(benchmark.count - 1) * 2 }
+        case "lookup-mixed-128":
+            var indices = Array(0..<(benchmark.count * 2))
+            var shuffle = Shuffle(state: seed)
+            shuffle.apply(to: &indices)
+            return indices.map { Double($0 / 2) * 2 + ($0 % 2 == 0 ? 0.5 : 1.5) }
+        default:
+            return offsets
+        }
     }
 
     private static func composition(index: Int, alternate: Bool, seed: UInt64) -> NativeBitmapSubtitleComposition {
@@ -311,7 +358,7 @@ private struct Fixture {
                 ExpectedEntry(start: Double($0) * 2, composition: primary[$0 % primary.count])
             }
             revision = 1 &+ UInt64(benchmark.count) &+ UInt64(total)
-        case .reject:
+        case .reject, .lookup, .tick, .prune:
             entries = (0..<benchmark.count).map {
                 ExpectedEntry(start: Double($0) * 2, composition: primary[$0])
             }
@@ -328,9 +375,29 @@ private struct Fixture {
         case .stream:
             // Queries visit ordinal 1...total at +0.5 seconds. Only every
             // fourth composition (ordinal % 4 == 1) has already expired.
+            // Centered queries offset ordinals by count/2 (a multiple of four),
+            // so the same duration phase and expected count apply.
             return Counts(acceptedInsertions: total, presentQueries: total - (total + 3) / 4)
         case .reject:
             return Counts()
+        case .lookup, .tick:
+            var perIteration = Counts()
+            for seconds in lookupSeconds {
+                // Fixture starts are exactly 2 * ordinal. This closed-form
+                // oracle does not repeat production's predecessor search.
+                let ordinal = Int(floor(seconds / 2))
+                guard (0..<benchmark.count).contains(ordinal) else { continue }
+                let start = Double(ordinal) * 2
+                let value = primary[ordinal]
+                if let duration = value.duration, seconds >= start + duration { continue }
+                perIteration.presentQueries &+= 1
+                perIteration.queryChecksum &+= start.bitPattern &+ UInt64(value.regions.count)
+            }
+            return Counts(presentQueries: perIteration.presentQueries &* UInt64(iterations),
+                          queryChecksum: perIteration.queryChecksum &* UInt64(iterations))
+        case .prune:
+            let bytes = primary.prefix(benchmark.count).reduce(0) { $0 + $1.byteCount }
+            return Counts(queryChecksum: UInt64(bytes) &* UInt64(lookupSeconds.count) &* UInt64(iterations))
         }
     }
 
@@ -368,6 +435,8 @@ private func exercise(_ timeline: inout BitmapSubtitleTimeline, fixture: Fixture
         }
     case .stream:
         var next = fixture.benchmark.count
+        let queryOffset = fixture.benchmark.name.hasPrefix("stream-centered-")
+            ? Double(fixture.benchmark.count / 2) * 2 : 0
         for _ in 0..<iterations {
             for _ in 0..<fixture.benchmark.count {
                 let current = Double(next - fixture.benchmark.count + 1) * 2
@@ -378,10 +447,27 @@ private func exercise(_ timeline: inout BitmapSubtitleTimeline, fixture: Fixture
                                    at: Double(next) * 2, generation: fixture.generation) {
                     counts.acceptedInsertions &+= 1
                 }
-                if timeline.composition(at: current + 0.5) != nil {
+                if timeline.composition(at: current + queryOffset + 0.5) != nil {
                     counts.presentQueries &+= 1
                 }
                 next += 1
+            }
+        }
+    case .lookup, .tick:
+        for _ in 0..<iterations {
+            for seconds in fixture.lookupSeconds {
+                if fixture.benchmark.operation == .tick { timeline.prune(before: seconds) }
+                if let entry = timeline.composition(at: seconds) {
+                    counts.presentQueries &+= 1
+                    counts.queryChecksum &+= entry.start.bitPattern &+ UInt64(entry.value.regions.count)
+                }
+            }
+        }
+    case .prune:
+        for _ in 0..<iterations {
+            for seconds in fixture.lookupSeconds {
+                timeline.prune(before: seconds)
+                counts.queryChecksum &+= UInt64(timeline.retainedBytes)
             }
         }
     case .reject:
@@ -419,6 +505,7 @@ private struct Output: Encodable {
     let checksum: UInt64
     let acceptedInsertions: UInt64
     let presentQueries: UInt64
+    let queryChecksum: UInt64
     let operationsPerIteration: Int
     let queriesPerIteration: Int
     let prunesPerIteration: Int
@@ -431,6 +518,7 @@ private struct Output: Encodable {
         case elapsedNanoseconds = "elapsed_ns"
         case acceptedInsertions = "accepted_insertions"
         case presentQueries = "present_queries"
+        case queryChecksum = "query_checksum"
         case operationsPerIteration = "operations_per_iteration"
         case queriesPerIteration = "queries_per_iteration"
         case prunesPerIteration = "prunes_per_iteration"
@@ -466,15 +554,29 @@ private struct Driver {
             throw DriverError.mismatch("timed insertion/query counts")
         }
         let receipt = try fixture.verify(timeline, iterations: iterations, phase: "timed final state")
+        let operationsPerIteration: Int
+        let queriesPerIteration: Int
+        let prunesPerIteration: Int
+        switch benchmark.operation {
+        case .lookup, .tick, .prune:
+            operationsPerIteration = fixture.lookupSeconds.count
+            queriesPerIteration = benchmark.operation == .prune ? 0 : operationsPerIteration
+            prunesPerIteration = benchmark.operation == .lookup ? 0 : operationsPerIteration
+        default:
+            operationsPerIteration = benchmark.count
+            queriesPerIteration = benchmark.operation == .stream ? benchmark.count : 0
+            prunesPerIteration = queriesPerIteration
+        }
         let output = Output(
             caseName: benchmark.name, iterations: iterations, seed: seed,
             operation: benchmark.operation, elapsedNanoseconds: measurement.elapsedNanoseconds,
             checksum: measurement.counts.checksum,
             acceptedInsertions: measurement.counts.acceptedInsertions,
             presentQueries: measurement.counts.presentQueries,
-            operationsPerIteration: benchmark.count,
-            queriesPerIteration: benchmark.operation == .stream ? benchmark.count : 0,
-            prunesPerIteration: benchmark.operation == .stream ? benchmark.count : 0,
+            queryChecksum: measurement.counts.queryChecksum,
+            operationsPerIteration: operationsPerIteration,
+            queriesPerIteration: queriesPerIteration,
+            prunesPerIteration: prunesPerIteration,
             resetsPerIteration: benchmark.operation == .fill ? 1 : 0,
             receipt: receipt
         )

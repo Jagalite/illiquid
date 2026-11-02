@@ -316,6 +316,7 @@ final class PiPSubtitleCompositor: @unchecked Sendable {
 
     private let device: any MTLDevice
     private let commandQueue: any MTLCommandQueue
+    private let beforeSubmissionForTesting: (@Sendable () -> Void)?
     private let textureCache: CVMetalTextureCache
     private let bgraPipeline: any MTLRenderPipelineState
     private let nv12Pipeline: any MTLRenderPipelineState
@@ -376,8 +377,10 @@ final class PiPSubtitleCompositor: @unchecked Sendable {
 
     init(
         subtitles: SubtitlePipeline? = nil,
-        memoryBudget: SubtitleMemoryBudget? = nil
+        memoryBudget: SubtitleMemoryBudget? = nil,
+        beforeSubmissionForTesting: (@Sendable () -> Void)? = nil
     ) throws {
+        self.beforeSubmissionForTesting = beforeSubmissionForTesting
         guard let device = MTLCreateSystemDefaultDevice(),
               let commandQueue = device.makeCommandQueue()
         else {
@@ -626,8 +629,27 @@ final class PiPSubtitleCompositor: @unchecked Sendable {
         workQueue.async { [weak self] in
             guard let self else { return }
             presenter.flush(removeDisplayedImage: true)
+            retireVideoWorkingStorageIfInactive()
             emitMetrics()
         }
+    }
+
+    /// Work-queue confined. Keep the latest source frame and caption uploads
+    /// for paused reentry, but release video-sized storage between PiP sessions.
+    private func retireVideoWorkingStorageIfInactive() {
+        guard stateLock.withLock({ !active }) else { return }
+        if let outputPoolObserver {
+            NotificationCenter.default.removeObserver(outputPoolObserver)
+            self.outputPoolObserver = nil
+        }
+        outputPool = nil
+        outputPoolSize = .zero
+        outputPoolPixelFormat = kCVPixelFormatType_32BGRA
+        observedOutputBuffers.removeAll(keepingCapacity: false)
+        hdrLinearTexture = nil
+        // Submitted command buffers and MetalFrameResources retain what the
+        // GPU still needs. This retires cache ownership without waiting on it.
+        CVMetalTextureCacheFlush(textureCache, 0)
     }
 
     func invalidatePendingFrames() {
@@ -664,6 +686,36 @@ final class PiPSubtitleCompositor: @unchecked Sendable {
 
     func metricsSnapshot() -> PiPSubtitleCompositionMetrics {
         stateLock.withLock { metrics }
+    }
+
+    struct VideoWorkingStorageSnapshot: Sendable {
+        let hasOutputPool: Bool
+        let hasOutputPoolObserver: Bool
+        let hasHDRTexture: Bool
+        let hdrTextureAllocatedBytes: Int
+        let observedOutputBufferCount: Int
+        let hasPreparedSubtitleFrame: Bool
+        let latestFrameSeconds: Double?
+    }
+
+    /// Queue barrier and scalar ownership snapshot; retains no GPU resources.
+    func videoWorkingStorageSnapshotForTesting() async -> VideoWorkingStorageSnapshot {
+        await withCheckedContinuation { continuation in
+            workQueue.async {
+                let latestFrameSeconds = self.stateLock.withLock {
+                    self.latestFrame?.presentationTime.seconds
+                }
+                continuation.resume(returning: VideoWorkingStorageSnapshot(
+                    hasOutputPool: self.outputPool != nil,
+                    hasOutputPoolObserver: self.outputPoolObserver != nil,
+                    hasHDRTexture: self.hdrLinearTexture != nil,
+                    hdrTextureAllocatedBytes: self.hdrLinearTexture?.allocatedSize ?? 0,
+                    observedOutputBufferCount: self.observedOutputBuffers.count,
+                    hasPreparedSubtitleFrame: self.preparedSubtitleFrame != nil,
+                    latestFrameSeconds: latestFrameSeconds
+                ))
+            }
+        }
     }
 
     func composedPixelBufferForTesting(
@@ -1165,6 +1217,7 @@ final class PiPSubtitleCompositor: @unchecked Sendable {
                 completion(.success((resources.outputPixelBuffer, gpuNanoseconds)))
             }
         }
+        beforeSubmissionForTesting?()
         commandBuffer.commit()
     }
 

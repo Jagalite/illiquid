@@ -1,0 +1,102 @@
+name: Subtitle timestamp preprocessing performance
+
+on:
+  push:
+    branches: ['perf/subtitle-timestamp-preprocessing']
+    paths:
+      - 'Sources/IlliquidNativePlayback/Subtitles/ExternalTextSubtitleConverter.swift'
+      - 'Tests/IlliquidNativePlaybackTests/ExternalTextSubtitleConverterTests.swift'
+      - 'Tests/IlliquidNativePlaybackTests/ExternalSubtitleEscapingTests.swift'
+      - 'Benchmarks/ExternalSubtitleConversion/Driver.swift'
+      - 'Benchmarks/ExternalSubtitleConversion/run.py'
+      - 'Benchmarks/SubtitleTimestampPreprocessing/run.py'
+      - '.github/workflows/subtitle-timestamp-preprocessing.yml'
+  pull_request:
+    paths:
+      - 'Sources/IlliquidNativePlayback/Subtitles/ExternalTextSubtitleConverter.swift'
+      - 'Tests/IlliquidNativePlaybackTests/ExternalTextSubtitleConverterTests.swift'
+      - 'Tests/IlliquidNativePlaybackTests/ExternalSubtitleEscapingTests.swift'
+      - 'Benchmarks/ExternalSubtitleConversion/Driver.swift'
+      - 'Benchmarks/ExternalSubtitleConversion/run.py'
+      - 'Benchmarks/SubtitleTimestampPreprocessing/run.py'
+      - '.github/workflows/subtitle-timestamp-preprocessing.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: subtitle-preprocessing-${{ github.head_ref || github.ref_name }}
+  cancel-in-progress: true
+
+jobs:
+  component:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-24.04, macos-26]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Select native Xcode
+        if: runner.os == 'macOS'
+        run: echo 'DEVELOPER_DIR=/Applications/Xcode_26.6.app/Contents/Developer' >> "$GITHUB_ENV"
+      - name: Verify semantics and measure complete subtitle conversion
+        run: |
+          python3 - <<'PY'
+          import json, os, subprocess, sys
+          from pathlib import Path
+          command = [sys.executable, 'Benchmarks/SubtitleTimestampPreprocessing/run.py',
+                     '--output', str(Path(os.environ['RUNNER_TEMP']) / 'subtitle-preprocessing'),
+                     '--pairs', '10', '--target-ms', '350']
+          queue = Path('/Volumes/seed1/Projects/kyoto/kyoto.py')
+          if queue.is_file():
+              cli = [sys.executable, str(queue)]
+              submitted = subprocess.check_output([*cli, 'submit', '--', *command], text=True)
+              print(submitted, flush=True)
+              job_id = str(json.loads(submitted)['id'])
+              subprocess.run([*cli, 'show', job_id], check=True)
+              result = subprocess.run([*cli, 'wait', job_id])
+              subprocess.run([*cli, 'logs', job_id], check=True)
+              sys.exit(result.returncode)
+          print('The shared Kyoto queue is unavailable on this hosted runner; '
+                'running serial component builds in this isolated checkout.', flush=True)
+          subprocess.run(command, check=True)
+          PY
+      - name: Emit compact evidence for review
+        if: always()
+        run: |
+          python3 - <<'PY'
+          import hashlib, json, os
+          from pathlib import Path
+          root = Path(os.environ['RUNNER_TEMP']) / 'subtitle-preprocessing'
+          names = ['environment.json', 'tests.json', 'completion.json', 'commands.json',
+                   'verification-receipt.json',
+                   'release/manifest.json', 'release/summary.json', 'release/benchmark.json',
+                   'release/calibration.json', 'release/measurements.jsonl']
+          for name in names:
+              path = root / name
+              if path.is_file():
+                  text = path.read_text()
+                  print('TIMESTAMP_EVIDENCE ' + json.dumps({
+                      'path': name, 'sha256': hashlib.sha256(text.encode()).hexdigest(),
+                      'content': text}, sort_keys=True), flush=True)
+          for path in sorted(root.glob('tests-*.log')):
+              print(path.name + '\n' + path.read_text()[-3500:], flush=True)
+          PY
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: subtitle-preprocessing-${{ matrix.os }}
+          path: |
+            ${{ runner.temp }}/subtitle-preprocessing/
+            !${{ runner.temp }}/subtitle-preprocessing/**/.build/**
+            !${{ runner.temp }}/subtitle-preprocessing/**/module-cache/**
+            !${{ runner.temp }}/subtitle-preprocessing/**/converter-benchmark
+            !${{ runner.temp }}/subtitle-preprocessing/**/*.dylib
+            !${{ runner.temp }}/subtitle-preprocessing/**/*.swiftmodule
+          retention-days: 14

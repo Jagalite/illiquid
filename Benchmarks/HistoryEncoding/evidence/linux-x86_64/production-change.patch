@@ -1,0 +1,19 @@
+diff --git a/Sources/IlliquidCore/Persistence/PlaybackPersistenceStore.swift b/Sources/IlliquidCore/Persistence/PlaybackPersistenceStore.swift
+index cb68306..6e8d074 100644
+--- a/Sources/IlliquidCore/Persistence/PlaybackPersistenceStore.swift
++++ b/Sources/IlliquidCore/Persistence/PlaybackPersistenceStore.swift
+@@ -164,7 +164,13 @@ public final class PlaybackPersistenceStore: @unchecked Sendable {
+         let preferencesStatus = preferencesWriteStatus
+         historyWriter = CoalescingPersistenceWriter(label: "com.illiquid.history-writer") { snapshot in
+             try historyStatus.perform {
+-                let data = try NonDecodePerformance.measure("HistoryEncode") { try JSONEncoder().encode(snapshot) }
++                let data = try NonDecodePerformance.measure("HistoryEncode") {
++                    let encoder = JSONEncoder()
++                    // History is standalone JSON Data, so paths do not need the
++                    // optional slash escapes used when embedding JSON in HTML.
++                    encoder.outputFormatting = [.withoutEscapingSlashes]
++                    return try encoder.encode(snapshot)
++                }
+                 NonDecodePerformance.historyPayload(bytes: data.count)
+                 NonDecodePerformance.measure("HistoryDefaultsSet") {
+                     destination.defaults.set(data, forKey: historyKey)

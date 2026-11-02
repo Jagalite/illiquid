@@ -1,0 +1,58 @@
+{
+  "baseline_commit": "ea2ff568237e2667f7b1aeee67b11a44ebe95b72",
+  "binaries": {
+    "baseline": {
+      "executable": "3b606d4523ac212fe673c9ed5ed46b0a6f0e5d742584bd937fd02d4a8b625e50",
+      "library": "5d3645a7e5cd1518f430cd68eb4b5890d34bdfeccbfc83c3015a7e2374ca756e"
+    },
+    "candidate": {
+      "executable": "a75c2eca84196d359006b51630a662d8aafea2cef7b735ee6d275a45a4f6229b",
+      "library": "b81f103a17218243fce68bcec60b53646129c683d3748f69d30e97ab992f8146"
+    }
+  },
+  "candidate_commit": "035abc66a4226ec2913d949035d3568d1943b74f",
+  "candidate_status": "",
+  "created_utc": "2026-10-28T05:23:31.914723+00:00",
+  "cross_module_optimization": false,
+  "flags": [
+    "-O",
+    "-whole-module-optimization",
+    "-swift-version",
+    "6",
+    "-warnings-as-errors"
+  ],
+  "harness_sha256": "75639d92944bdde1372742001b469772768c63162e075727090e0a25b3eb4017",
+  "machine": "x86_64",
+  "pairs": 10,
+  "platform": "Linux-6.17.0-1022-azure-x86_64-with-glibc2.39",
+  "runner_sha256": "9128a0319d3562a083e817b71de885dc607353fcda96fd9ae21f19337c96e182",
+  "scope": "Warmed file-key generation and complete in-memory playlist operations; input construction/sorting excluded.",
+  "sources": {
+    "baseline/Sources/IlliquidCore/Player/MediaSource.swift": "d3e776abaa9bdae73a6a656114eee1bc761ddbea78017a6b710ed22895f6d254",
+    "baseline/Sources/IlliquidCore/Playlist/FolderPlaylist.swift": "8a3c017132f0e79cb8280551ff686066b9a3005c49bd7833efc54bb11dfe75fe",
+    "baseline/Sources/IlliquidCore/Playlist/PlaylistMutation.swift": "b38441770551ab48f9c5db544479156656494588296c1777ac81caa768796ec8",
+    "baseline/Sources/IlliquidCore/Utilities/MediaFileSupport.swift": "85680a02f22355e0c7514fe00c12ba253c88d26be3eb2b5ee1149b212e047a00",
+    "baseline/Sources/IlliquidCore/Utilities/NaturalFilenameOrdering.swift": "d167212f90dd5cd6d8e0e73c208d8e9b4648cc7f4dd21212d51c85a693a263e7",
+    "baseline/Sources/IlliquidCore/Utilities/NormalizedFileURL.swift": "3b65c98b88722ca4d51c315a7fd5e2fde0e40c846071b6b1e34cd1f1eddb3fd2",
+    "candidate/Sources/IlliquidCore/Player/MediaSource.swift": "d3e776abaa9bdae73a6a656114eee1bc761ddbea78017a6b710ed22895f6d254",
+    "candidate/Sources/IlliquidCore/Playlist/FolderPlaylist.swift": "8a3c017132f0e79cb8280551ff686066b9a3005c49bd7833efc54bb11dfe75fe",
+    "candidate/Sources/IlliquidCore/Playlist/PlaylistMutation.swift": "b38441770551ab48f9c5db544479156656494588296c1777ac81caa768796ec8",
+    "candidate/Sources/IlliquidCore/Utilities/MediaFileSupport.swift": "85680a02f22355e0c7514fe00c12ba253c88d26be3eb2b5ee1149b212e047a00",
+    "candidate/Sources/IlliquidCore/Utilities/NaturalFilenameOrdering.swift": "d167212f90dd5cd6d8e0e73c208d8e9b4648cc7f4dd21212d51c85a693a263e7",
+    "candidate/Sources/IlliquidCore/Utilities/NormalizedFileURL.swift": "fadf5ec4d1008e1385658cb1fdd4f27ddad20b0f34cd0e21ae474883118dd656"
+  },
+  "swift": "Swift version 6.4 (swift-6.4-RELEASE)\nTarget: x86_64-unknown-linux-gnu",
+  "target_ms": 150,
+  "tests": {
+    "FolderPlaylistTests.swift": "4788f003238a7f8bac174e2bf37db415efb46ec0a38b65313b46e51b87ee779d",
+    "LocalMediaSourceValidationTests.swift": "de649a8675b3b61501b80306beff1d551b0107638990d88e69f4288fca03378f",
+    "NaturalFilenameOrderingTests.swift": "ba6e040919bdae7f7d4748d95ab6bc39da3547d0add10020dd2261908810f776",
+    "NormalizedFileIdentityTests.swift": "f6a9c3509187ee462ec15a24faa1cdf387ca4d1f05e3166bfc72cd57f9b482a0",
+    "PlaylistDeduplicationTests.swift": "c7861f7dc25c6246ccc260ecaffc5f240ad8be6169947ebe9183d251524798b8",
+    "PlaylistIdentityLookupTests.swift": "3f2d477093a9d481632ef497c0a4c2af3b51b4d336a826f5d2e2ffdd434d7146",
+    "PlaylistMutationTests.swift": "08b3ea822f18722007b7c32e5316911949a4198767e6bade300c8f88b2d0147f",
+    "PlaylistOrderRestorationTests.swift": "79a1d9de1abef31e1168ce0b2cb49775c8c653b9a8d298fc3894846efd129045",
+    "PlaylistSortingTests.swift": "656d516cde359598ea5cc15574e6d825842504cf22e8502ec2f40003f590ed74",
+    "UtilitiesTests.swift": "659d0a915e34411e754eaa1c23f5fafef9ab2aa7967849a3a6620c866aca88f9"
+  }
+}

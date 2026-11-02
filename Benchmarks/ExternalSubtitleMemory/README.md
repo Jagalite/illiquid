@@ -2,8 +2,10 @@
 
 This component study compares the complete production
 `ExternalTextSubtitleConverter` with the frozen source from `main` at
-`af1c1ad`. The baseline manifest records its full Git revision, original path,
-Git blob, and SHA-256; the runner rejects an altered snapshot. Each variant
+`af1c1ad` by default. `--baseline-ref` selects the converter at another locally
+available Git commit/ref and resolves it once to an immutable commit and blob.
+The baseline manifest records its full Git revision, original path, Git blob,
+and SHA-256; the runner verifies the source against that manifest. Each variant
 is a separately optimized Swift module. An identical driver imports it with
 `@testable import`; no replacement parser or cross-module optimization is used.
 
@@ -21,6 +23,35 @@ Foundation only; it does not require the native playback SDK. macOS builds use
 the repository's macOS 26 deployment target. `benchmark` requires a new/empty
 output directory; `summarize` rechecks an existing completed cohort. For a
 short smoke check use `--rounds 2 --case srt-2000 --case vtt-malformed`.
+
+## Ignored WebVTT NOTE blocks
+
+See [the NOTE research report](../../Documentation/WEBVTT_NOTE_MEMORY_RESEARCH.md)
+for measured results, controls, and qualification limits.
+
+The six opt-in NOTE cases compare early comment rejection against the converter
+immediately before that change. The original frozen baseline and sixteen default
+cases remain available. Fetch the pinned commit first if using a shallow checkout:
+
+```sh
+python3 Benchmarks/ExternalSubtitleMemory/run.py benchmark \
+  --baseline-ref ea2ff568237e2667f7b1aeee67b11a44ebe95b72 \
+  --rounds 6 --case vtt-note-512k --case vtt-note-8m \
+  --case vtt-note-near-limit --case vtt-note-only \
+  --case vtt-note-interleaved --case vtt-note-control \
+  --case vtt-2000 --case srt-2000 \
+  --output /tmp/webvtt-note-memory
+```
+
+`vtt-note-512k`, `vtt-note-8m`, and `vtt-note-near-limit` contain one comment
+with nonblank 16-byte lines followed by the same valid cue. Complete input sizes
+are exactly 512 KiB, 8 MiB, and 32 MiB minus 1 KiB. The runner writes at most
+64 KiB per chunk and compares the output receipts across these cases and the
+single-cue `vtt-note-control`. `vtt-note-only` is an 8 MiB comment without a cue
+and must report `noValidCues(webVTT)`. `vtt-note-interleaved` inserts a small
+comment before each of 2,000 ordinary cues, checking overhead outside a single
+large block. The plain WebVTT and SRT cases serve as unchanged-work controls.
+These synthetic comment sizes are stress cases, not typical subtitle sizes.
 
 ## Fixtures and measurement
 

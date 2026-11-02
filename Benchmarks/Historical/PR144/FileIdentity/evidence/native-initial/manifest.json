@@ -1,0 +1,169 @@
+{
+  "baseline": {
+    "commit": "ea2ff568237e2667f7b1aeee67b11a44ebe95b72",
+    "git_blob_sha1": "d90e4fc199eabfa4e554c3c8d01a1ed48277ae20",
+    "path": "Sources/IlliquidCore/Utilities/NormalizedFileURL.swift"
+  },
+  "binary_hashes": {
+    "baseline": {
+      "driver": {
+        "git_blob_sha1": "e0939be7ba4901c8ee6f8148cfea25a6f91932dc",
+        "sha256": "fc62172c277f0e8978307dffc2763897a4431f4f951c8ad6a9d4ae98d78eb0cb"
+      },
+      "library": {
+        "git_blob_sha1": "aa0d054e4b48c59d0219bdc227826b82dbb2ca53",
+        "sha256": "05be26c073848a9002c34c3fc07b8b80f97ff882d5e9732cb528ccdf5ac4e3c6"
+      }
+    },
+    "candidate": {
+      "driver": {
+        "git_blob_sha1": "4aa175458626f65105ab0ca15bac15eec0cde54a",
+        "sha256": "f699dc39961d5270d61c83ec41b4b3e24b38cfb4587fba1a4835f212d7ca568f"
+      },
+      "library": {
+        "git_blob_sha1": "f88bd823403e5669bda1ea140c64deb5d49c92bc",
+        "sha256": "b371d2f2847db9acce88061323f7296ff1e9b14ba5269eaddbcf194712b6bb44"
+      }
+    }
+  },
+  "cases": [
+    "key-ascii",
+    "key-unicode",
+    "key-relative",
+    "key-escaped",
+    "key-long",
+    "key-rejected",
+    "same-file",
+    "lookup-100",
+    "lookup-1000",
+    "lookup-10000",
+    "deduplicate-1000",
+    "deduplicate-10000",
+    "normalize-control"
+  ],
+  "compiler_flags": [
+    "-O",
+    "-whole-module-optimization",
+    "-swift-version",
+    "6"
+  ],
+  "cpu": "Apple M1 (Virtual)",
+  "created_utc": "2026-10-28T04:58:32.549999+00:00",
+  "environment": {
+    "DEVELOPER_DIR": "/Applications/Xcode_26.6.app/Contents/Developer",
+    "LANG": "en_US.UTF-8",
+    "LC_ALL": "en_US.UTF-8",
+    "SWIFT_DETERMINISTIC_HASHING": null
+  },
+  "git_status": "",
+  "head": "6b0b45aa1c5d3efece3bed7defa6245a79ac617b",
+  "machine": "arm64",
+  "macos": "ProductName:\t\tmacOS\nProductVersion:\t\t26.6.2\nBuildVersion:\t\t25G83",
+  "method": "Separate optimized production module; fresh process per case/variant/pair; balanced AB/BA order; shared calibrated iterations.",
+  "pairs": 8,
+  "platform": "macOS-26.6.2-arm64-arm-64bit-Mach-O",
+  "python": "3.15.0",
+  "schema_version": 1,
+  "scope": "In-memory key lookup and playlist component wall/CPU time; no disk, UI, decode or whole-player claims.",
+  "source_hashes": {
+    "baseline/Player/MediaSource.swift": {
+      "git_blob_sha1": "6de812c0efdc7929c79e4efd1e77cbcebcc30a86",
+      "sha256": "d3e776abaa9bdae73a6a656114eee1bc761ddbea78017a6b710ed22895f6d254"
+    },
+    "baseline/Playlist/FolderPlaylist.swift": {
+      "git_blob_sha1": "3ff5f3c2abccf3a26bcc170a7806aa857f45b37f",
+      "sha256": "8a3c017132f0e79cb8280551ff686066b9a3005c49bd7833efc54bb11dfe75fe"
+    },
+    "baseline/Playlist/PlaylistMutation.swift": {
+      "git_blob_sha1": "ff86a4830377c695df8ac700cd0fdff194b4f778",
+      "sha256": "b38441770551ab48f9c5db544479156656494588296c1777ac81caa768796ec8"
+    },
+    "baseline/Utilities/MediaFileSupport.swift": {
+      "git_blob_sha1": "7826ec75f3febc25b3e901ce5955a79771ef4082",
+      "sha256": "85680a02f22355e0c7514fe00c12ba253c88d26be3eb2b5ee1149b212e047a00"
+    },
+    "baseline/Utilities/NaturalFilenameOrdering.swift": {
+      "git_blob_sha1": "d116171a69648d2bd6ce5ea5fb00b7fc6a2cb12a",
+      "sha256": "d167212f90dd5cd6d8e0e73c208d8e9b4648cc7f4dd21212d51c85a693a263e7"
+    },
+    "baseline/Utilities/NormalizedFileURL.swift": {
+      "git_blob_sha1": "d90e4fc199eabfa4e554c3c8d01a1ed48277ae20",
+      "sha256": "3b65c98b88722ca4d51c315a7fd5e2fde0e40c846071b6b1e34cd1f1eddb3fd2"
+    },
+    "candidate/Player/MediaSource.swift": {
+      "git_blob_sha1": "6de812c0efdc7929c79e4efd1e77cbcebcc30a86",
+      "sha256": "d3e776abaa9bdae73a6a656114eee1bc761ddbea78017a6b710ed22895f6d254"
+    },
+    "candidate/Playlist/FolderPlaylist.swift": {
+      "git_blob_sha1": "3ff5f3c2abccf3a26bcc170a7806aa857f45b37f",
+      "sha256": "8a3c017132f0e79cb8280551ff686066b9a3005c49bd7833efc54bb11dfe75fe"
+    },
+    "candidate/Playlist/PlaylistMutation.swift": {
+      "git_blob_sha1": "ff86a4830377c695df8ac700cd0fdff194b4f778",
+      "sha256": "b38441770551ab48f9c5db544479156656494588296c1777ac81caa768796ec8"
+    },
+    "candidate/Utilities/MediaFileSupport.swift": {
+      "git_blob_sha1": "7826ec75f3febc25b3e901ce5955a79771ef4082",
+      "sha256": "85680a02f22355e0c7514fe00c12ba253c88d26be3eb2b5ee1149b212e047a00"
+    },
+    "candidate/Utilities/NaturalFilenameOrdering.swift": {
+      "git_blob_sha1": "d116171a69648d2bd6ce5ea5fb00b7fc6a2cb12a",
+      "sha256": "d167212f90dd5cd6d8e0e73c208d8e9b4648cc7f4dd21212d51c85a693a263e7"
+    },
+    "candidate/Utilities/NormalizedFileURL.swift": {
+      "git_blob_sha1": "4e6867e927aaef29d9746244570e338f17884182",
+      "sha256": "bb34064bfa3c15ab0ce9ddebd59920c17ab252ea48069ca9d4f66dff424c92aa"
+    },
+    "support/FolderPlaylistLookupTests.swift": {
+      "git_blob_sha1": "35db5cab17ebd21939eda42730bc4e5598355505",
+      "sha256": "f3becac9488c2b12890933ab74c188098aa1fc5fee6870e4a646db3a64a1880f"
+    },
+    "support/FolderPlaylistTests.swift": {
+      "git_blob_sha1": "2342edd66ef57ae549e83637d15a4e7429c990f1",
+      "sha256": "4788f003238a7f8bac174e2bf37db415efb46ec0a38b65313b46e51b87ee779d"
+    },
+    "support/Harness.swift": {
+      "git_blob_sha1": "3c278fe1f6b5f7ecb19f3abb399d7ff36f08c405",
+      "sha256": "e5d896fe8d1fcbd4245b1afd0cf7a8a376644ef99f29fa15be2cd2c3e6f4057a"
+    },
+    "support/LocalMediaSourceValidationTests.swift": {
+      "git_blob_sha1": "ed49d620f90426d7941b33b8133b2fc5d3f5681a",
+      "sha256": "f1a3fc0a42fe826b223bc32e2df6c1983d03592dd5d92a952373be29196d6604"
+    },
+    "support/NaturalFilenameOrderingTests.swift": {
+      "git_blob_sha1": "1775981ce68d93230cdb1106547b93b3b758a023",
+      "sha256": "ba6e040919bdae7f7d4748d95ab6bc39da3547d0add10020dd2261908810f776"
+    },
+    "support/PlaylistDeduplicationTests.swift": {
+      "git_blob_sha1": "a72b04407bd75315ecec142f828b4ae2b2b3e3bc",
+      "sha256": "c7861f7dc25c6246ccc260ecaffc5f240ad8be6169947ebe9183d251524798b8"
+    },
+    "support/PlaylistIdentityLookupTests.swift": {
+      "git_blob_sha1": "395213c26b1d16f813f491b5c628e9042e094a08",
+      "sha256": "3f2d477093a9d481632ef497c0a4c2af3b51b4d336a826f5d2e2ffdd434d7146"
+    },
+    "support/PlaylistMutationTests.swift": {
+      "git_blob_sha1": "9e611546bb55ea8124aa6222b53319410f7096ae",
+      "sha256": "08b3ea822f18722007b7c32e5316911949a4198767e6bade300c8f88b2d0147f"
+    },
+    "support/PlaylistOrderRestorationTests.swift": {
+      "git_blob_sha1": "bdbfd5522dfb8f1adc006c4ac2f67564c6f3d82b",
+      "sha256": "79a1d9de1abef31e1168ce0b2cb49775c8c653b9a8d298fc3894846efd129045"
+    },
+    "support/UtilitiesTests.swift": {
+      "git_blob_sha1": "b663d1128e3098dba03b4a2756fd5e05d4cf167a",
+      "sha256": "659d0a915e34411e754eaa1c23f5fafef9ab2aa7967849a3a6620c866aca88f9"
+    },
+    "support/manifest.json": {
+      "git_blob_sha1": "7783fab719b5e7d996be5150315b46f6c47ace8d",
+      "sha256": "9f0d9e138dd3977a9319b018bab0f3c431fe8404bf9d3523b5a094f5a9c30b6b"
+    },
+    "support/run.py": {
+      "git_blob_sha1": "2db252b8a529ef521ece7946be8006451b666765",
+      "sha256": "cbce7cc7fe17f0f05addea28c9554e82f1a90e01c162efbd8740a48a0a706f63"
+    }
+  },
+  "swift": "swift-driver version: 1.148.6 Apple Swift version 6.3.3 (swiftlang-6.3.3.1.3 clang-2100.1.1.101)\nTarget: arm64-apple-macosx26.0",
+  "target_ms": 75,
+  "xcode": "Xcode 26.6\nBuild version 17F113"
+}

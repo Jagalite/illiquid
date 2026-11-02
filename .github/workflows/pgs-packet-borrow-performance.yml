@@ -53,7 +53,11 @@ jobs:
           python3 Scripts/install-ci-native-sdk.py
       - name: Check parser parity and measure packet intake
         run: |
-          python3 Benchmarks/PGSPacketBorrow/run.py \
+          regression=()
+          if [[ "${{ github.event_name }}" != workflow_dispatch ]]; then
+            regression+=(--current-support-regression)
+          fi
+          python3 Benchmarks/PGSPacketBorrow/run.py "${regression[@]}" \
             --pairs 8 --target-ms 240 \
             --output "$RUNNER_TEMP/pgs-packet-borrow/benchmark"
       - name: Build the app graph and test native subtitle ownership and output
@@ -68,7 +72,7 @@ jobs:
           export ILLIQUID_BITMAP_FIXTURE_DIR="$fixture_dir"
           export ILLIQUID_PACKET_OWNERSHIP_FIXTURE="$fixture_dir/generated-pgs.mkv"
           set -o pipefail
-          swift test --force-resolved-versions -c release --jobs 2 --no-parallel --filter \
+          bash Scripts/tests/run-native-swift-tests.sh --build --jobs 2 --filter \
             'PGSSubtitlePacketBorrowTests|PGSSubtitleCropTests|BitmapSubtitleTests|PacketOwnershipTests' \
             2>&1 | tee "$RUNNER_TEMP/pgs-packet-borrow/native-tests.log"
       - name: Emit reviewable measurement receipts

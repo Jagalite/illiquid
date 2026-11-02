@@ -92,6 +92,7 @@ actor SourceBrowserFilter {
         revealsRulePreview: Bool
     ) -> SourceBrowserProjection? {
         let matcher = SourceVisibilityMatcher(configuration: configuration, roots: roots)
+        var ancestorEvaluator = matcher.makeAncestorEvaluator()
         let evaluatesVisibility =
             !configuration.manuallyHiddenPaths.isEmpty
             || !configuration.alwaysShownPaths.isEmpty
@@ -128,13 +129,13 @@ actor SourceBrowserFilter {
                                 let visibilityPath = row.visibilityPath
             {
                 configuration.viewMode.scansRecursively
-                    ? matcher.evaluateIncludingAncestors(
+                    ? ancestorEvaluator.evaluate(
                         normalizedPath: visibilityPath
                     )
                     : matcher.evaluate(normalizedPath: visibilityPath)
             } else if evaluatesVisibility {
                 configuration.viewMode.scansRecursively
-                    ? matcher.evaluateIncludingAncestors(row.url)
+                    ? ancestorEvaluator.evaluate(row.url)
                     : matcher.evaluate(row.url)
             } else {
                 SourceVisibilityEvaluation(
@@ -257,22 +258,27 @@ actor SourceBrowserFilter {
     static func search(_ rows: [SourceTreeDisplayRow], query: String) -> [SourceTreeDisplayRow] {
         let query = query.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !query.isEmpty else { return rows }
-        let matchingRows = rows.filter {
+        // Only identities and ancestors are needed before the final projection.
+        // Keep offsets into the immutable input instead of copying complete rows
+        // (including recognized media and visibility metadata) for every match.
+        let matchingIndices = rows.indices.filter { index in
             guard !Task.isCancelled else { return false }
-            switch $0.kind {
+            let row = rows[index]
+            switch row.kind {
             case .folder, .media:
-                if $0.displayName.localizedCaseInsensitiveContains(query) { return true }
-                guard let media = $0.recognizedMedia else { return false }
-                return $0.url.lastPathComponent.localizedCaseInsensitiveContains(query)
+                if row.displayName.localizedCaseInsensitiveContains(query) { return true }
+                guard let media = row.recognizedMedia else { return false }
+                return row.url.lastPathComponent.localizedCaseInsensitiveContains(query)
                     || media.section.localizedCaseInsensitiveContains(query)
                     || media.catalogIDs.contains { $0.localizedCaseInsensitiveContains(query) }
-                    || ($0.contextLabel?.localizedCaseInsensitiveContains(query) ?? false)
+                    || (row.contextLabel?.localizedCaseInsensitiveContains(query) ?? false)
             case .message, .mediaSection:
                 return false
             }
         }
-        var visibleIDs = Set<String>(minimumCapacity: matchingRows.count)
-        for row in matchingRows {
+        var visibleIDs = Set<String>(minimumCapacity: matchingIndices.count)
+        for index in matchingIndices {
+            let row = rows[index]
             visibleIDs.insert(row.id)
             visibleIDs.formUnion(row.ancestorIDs)
         }

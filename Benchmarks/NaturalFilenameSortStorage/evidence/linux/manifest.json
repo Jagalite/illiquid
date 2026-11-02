@@ -1,0 +1,118 @@
+{
+  "allocation_meter": "glibc successful requests, measured thread only",
+  "baseline": "ea2ff568237e2667f7b1aeee67b11a44ebe95b72",
+  "binaries": {
+    "baseline/bin/IlliquidCore.swiftdoc": "089150ab8bd7306ecc5b39e7f240e5c523fdc42239afab57ecce0a9557ad49ae",
+    "baseline/bin/IlliquidCore.swiftmodule": "22825aac95b6fe4c90433edb21f25bacba1e1882bd2b1aa4adecd782d359fd83",
+    "baseline/bin/IlliquidCore.swiftsourceinfo": "b66f981fcd2551d5964c53b31dc9ed2648ab88c7b57fcdb5ac60488e74669cad",
+    "baseline/bin/allocations": "498d834dd8b10dd1b4475a85fc32322988a99fc3bbc376fe28a1d870c0bae6dc",
+    "baseline/bin/latency": "f985851ee15566f785342bd4ad5105542ea94e7a2e8dce4c15ea2b2b5f963a09",
+    "baseline/bin/libIlliquidCore.so": "75086ad33a450e62af383001d1e9e33adeca8e5f7fc69b99c273569ed4683f9d",
+    "candidate/bin/IlliquidCore.swiftdoc": "089150ab8bd7306ecc5b39e7f240e5c523fdc42239afab57ecce0a9557ad49ae",
+    "candidate/bin/IlliquidCore.swiftmodule": "22825aac95b6fe4c90433edb21f25bacba1e1882bd2b1aa4adecd782d359fd83",
+    "candidate/bin/IlliquidCore.swiftsourceinfo": "87c471d27b4d224d5ac0ae4c608c1c5b00bb6632468329cd4c3c26c454682d61",
+    "candidate/bin/allocations": "146d8daa016e1e4f0971b14dc371089f04dfe03e5df649eeb90c1621eb4c108a",
+    "candidate/bin/latency": "23c778adcec2fba090ed47ca4fd893cf050dd79bc50169dbc01e46354b54e287",
+    "candidate/bin/libIlliquidCore.so": "dde077c97e725d30941c45c09767dcd6ef58dc707b30ddda19e9feae8810f001",
+    "drivers/liballocmeter.so": "3b2d64fb09863cb942e43ae85ff25e2d9ab7b7d83b236e2586ee7670be299032",
+    "drivers/meter-check": "fc8e1e958e5d78f354527529b072d4cc2bab11b5d3c5f317b87f51ccb1284cc2"
+  },
+  "compiler": "Swift version 6.3.2 (swift-6.3.2-RELEASE)\nTarget: x86_64-unknown-linux-gnu",
+  "created_at_utc": "2026-10-28T05:47:34.378341+00:00",
+  "drivers": {
+    "Harness.swift": "f3b8594e894d1fe97cb6ac3f47d36e06e3e066d04df12a6ce37d026bfdd06934",
+    "MeterCheck.c": "92b6f4f4d50dd24eb2ccc3e43512fda70e7898b4ac2065352c956bc612c38b0e",
+    "allocmeter.c": "474ce2f85e9ea122c52626a86507c7923b910499ab646b41182b3959bdea1d13",
+    "run.py": "541d3654ba28cc7fc052628721d034a41ad71dc59780f3475f232da0b5af9f35"
+  },
+  "environment": {
+    "CLANG_MODULE_CACHE_PATH": "/workspace/scratch/663a3fdba62e/research/sort-full/module-cache",
+    "LANG": "C.UTF-8",
+    "LC_ALL": "C.UTF-8",
+    "LC_COLLATE": null,
+    "LC_CTYPE": "C.UTF-8",
+    "SWIFTPM_MODULECACHE_OVERRIDE": "/workspace/scratch/663a3fdba62e/research/sort-full/module-cache"
+  },
+  "git_status": " M Sources/IlliquidCore/Utilities/NaturalFilenameOrdering.swift\n M Tests/IlliquidCoreTests/NaturalFilenameOrderingTests.swift\n?? .github/workflows/natural-filename-sort-storage.yml\n?? Benchmarks/NaturalFilenameSortStorage/\n",
+  "head": "ea2ff568237e2667f7b1aeee67b11a44ebe95b72",
+  "host": {
+    "libc": [
+      "glibc",
+      "2.39"
+    ],
+    "machine": "x86_64",
+    "python": "3.12.14",
+    "release": "6.18.55",
+    "system": "Linux"
+  },
+  "invocation": [
+    "Benchmarks/NaturalFilenameSortStorage/run.py",
+    "--swift",
+    "/workspace/scratch/663a3fdba62e/swift-toolchain/usr/bin/swift",
+    "--pairs",
+    "6",
+    "--sizes",
+    "1000,10000",
+    "--output",
+    "/workspace/scratch/663a3fdba62e/research/sort-full"
+  ],
+  "notes": [
+    "Whole production files, separate optimized module and unchanged driver.",
+    "Only the two focused test files; not a full player/macOS qualification.",
+    "Allocation requests are cumulative, not live heap, peak memory, or RSS.",
+    "No timing threshold; per-pair percentage changes retain negative/positive signs."
+  ],
+  "options": {
+    "jobs": 2,
+    "output": "/workspace/scratch/663a3fdba62e/research/sort-full",
+    "pairs": 6,
+    "quick": false,
+    "resolved_sizes": [
+      1000,
+      10000
+    ],
+    "sizes": "1000,10000",
+    "skip_tests": false,
+    "swift": "/workspace/scratch/663a3fdba62e/swift-toolchain/usr/bin/swift",
+    "tests_only": false
+  },
+  "sources": {
+    "baseline": {
+      "Sources/IlliquidCore/Playlist/FolderPlaylist.swift": "8a3c017132f0e79cb8280551ff686066b9a3005c49bd7833efc54bb11dfe75fe",
+      "Sources/IlliquidCore/Utilities/NaturalFilenameOrdering.swift": "d167212f90dd5cd6d8e0e73c208d8e9b4648cc7f4dd21212d51c85a693a263e7",
+      "Sources/IlliquidCore/Utilities/NormalizedFileURL.swift": "3b65c98b88722ca4d51c315a7fd5e2fde0e40c846071b6b1e34cd1f1eddb3fd2"
+    },
+    "candidate": {
+      "Sources/IlliquidCore/Playlist/FolderPlaylist.swift": "8a3c017132f0e79cb8280551ff686066b9a3005c49bd7833efc54bb11dfe75fe",
+      "Sources/IlliquidCore/Utilities/NaturalFilenameOrdering.swift": "c09072130b113b90faa49b17ff95ce8983668734e69dddf6244572f5de80de62",
+      "Sources/IlliquidCore/Utilities/NormalizedFileURL.swift": "3b65c98b88722ca4d51c315a7fd5e2fde0e40c846071b6b1e34cd1f1eddb3fd2"
+    }
+  },
+  "swift": "/workspace/scratch/663a3fdba62e/swift-toolchain/usr/bin/swift",
+  "swiftc": "/workspace/scratch/663a3fdba62e/swift-toolchain/usr/bin/swiftc",
+  "tests": {
+    "Tests/IlliquidCoreTests/FolderPlaylistTests.swift": "4788f003238a7f8bac174e2bf37db415efb46ec0a38b65313b46e51b87ee779d",
+    "Tests/IlliquidCoreTests/NaturalFilenameOrderingTests.swift": "d76300e962a93d4ba339e32d655c5a826c70783d5eb53c282944bdb070293d22"
+  },
+  "tests_run": [
+    {
+      "configuration": "release",
+      "passed": true,
+      "variant": "baseline"
+    },
+    {
+      "configuration": "debug",
+      "passed": true,
+      "variant": "candidate"
+    },
+    {
+      "configuration": "release",
+      "passed": true,
+      "variant": "candidate"
+    }
+  ],
+  "unchanged_sources_verified": [
+    "Sources/IlliquidCore/Playlist/FolderPlaylist.swift",
+    "Sources/IlliquidCore/Utilities/NormalizedFileURL.swift"
+  ]
+}

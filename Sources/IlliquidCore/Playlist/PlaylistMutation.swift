@@ -51,6 +51,43 @@ public enum PlaylistMutation {
         return restored
     }
 
+    /// Reconcile the saved base order when a checkpoint needs only identities.
+    /// Keep the first current spelling of each identity, then append additions
+    /// in current order without constructing a reordered array of full items.
+    public static func restoringIDs(
+        _ items: [FolderPlaylistItem],
+        ids: [FolderPlaylistItem.ID]
+    ) -> [FolderPlaylistItem.ID] {
+        guard !items.isEmpty else { return [] }
+        guard items.count > 1 else { return [items[0].id] }
+
+        var remaining: Set<FolderPlaylistItem.ID> = []
+        var currentOrder: [FolderPlaylistItem.ID] = []
+        for item in items {
+            let identity = item.id
+            if remaining.insert(identity).inserted {
+                currentOrder.append(identity)
+            }
+        }
+        guard !ids.isEmpty else { return currentOrder }
+
+        var restored: [FolderPlaylistItem.ID] = []
+        restored.reserveCapacity(currentOrder.count)
+        for identity in ids {
+            // Return the stored current identity, not the saved spelling:
+            // canonically equal Swift strings can have different UTF-8 bytes.
+            if let currentIdentity = remaining.remove(identity) {
+                restored.append(currentIdentity)
+            }
+        }
+        for identity in currentOrder {
+            if let currentIdentity = remaining.remove(identity) {
+                restored.append(currentIdentity)
+            }
+        }
+        return restored
+    }
+
     public static func deduplicatedSubtitleURLs(_ urls: [URL]) -> [URL] {
         var seen: Set<String> = []
         return urls.filter { url in

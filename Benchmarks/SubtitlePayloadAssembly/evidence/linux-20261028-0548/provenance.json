@@ -1,0 +1,40 @@
+{
+  "repository": "Jagalite/illiquid",
+  "baseline_revision": "ea2ff568237e2667f7b1aeee67b11a44ebe95b72",
+  "candidate_revision": "3fab422b5832bcd8dd44655a78b3f72df7568b06",
+  "run_id": 40639731826,
+  "linux_job_id": 122654818114,
+  "linux_job_conclusion": "success",
+  "job_url": "https://github.com/Jagalite/illiquid/actions/runs/40639731826/job/122654818114",
+  "timing_evidence": "Extracted from EVIDENCE_BEGIN/EVIDENCE_END blocks in the decoded successful Linux job log; timestamps removed, JSON values unchanged.",
+  "verification": {
+    "source": "Successful runner verification and VERIFICATION receipt in the Linux job log",
+    "cases": 1722,
+    "sha256": "fe4321224252244c9b9ef8387e8c326ed494018e7660b111fcbcd4609ed321e5",
+    "full_verification_files_retained": false,
+    "limitation": "The original artifact upload resolved runner.temp differently from the container's RUNNER_TEMP and retained only the test logs. Full verification output vectors and the verification index were not recovered for this cohort. The workflow now stages evidence relative to the workspace for subsequent runs."
+  },
+  "test_artifact": {
+    "id": 12795535382,
+    "name": "subtitle-payload-linux",
+    "size_in_bytes": 11087,
+    "url": "https://api.github.com/repos/Jagalite/illiquid/actions/artifacts/12795535382",
+    "archive_download_url": "https://api.github.com/repos/Jagalite/illiquid/actions/artifacts/12795535382/zip",
+    "expired": false,
+    "created_at": "2026-10-28T05:50:39Z",
+    "expires_at": "2026-11-11T05:50:38Z",
+    "updated_at": "2026-10-28T05:50:39Z",
+    "digest": "sha256:05ed8eb7e6ddfa1cbd08f42bac82455c6a6ac5e8d65de43efdb826756ff3932a",
+    "workflow_run": {
+      "id": 40639731826,
+      "repository_id": 1402467213,
+      "head_repository_id": 1402467213,
+      "head_branch": "perf/subtitle-payload-assembly-20261028-2cf67a",
+      "head_sha": "3fab422b5832bcd8dd44655a78b3f72df7568b06"
+    }
+  },
+  "samples": 256,
+  "samples_removed": 0,
+  "native_validation": "Not completed; native job remained queued and was superseded by the evidence-upload fix.",
+  "initial_attempt": "Run 40639353808 completed the four test runs but benchmark setup failed because Python was absent. No timing cohort was produced; the Linux container now installs Python."
+}

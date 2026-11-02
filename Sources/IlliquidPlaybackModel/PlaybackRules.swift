@@ -1588,9 +1588,18 @@ extension PlaybackDomainState {
   }
 
   mutating func settleEffects(for authority: PlaybackAuthority) {
-    let settled = self.outstandingEffects
-      .filter { $0.value.effect.context.authority == authority }
-      .map(\.key)
+    // Collect IDs before mutation, avoiding a filtered dictionary of records.
+    // Keep a known-size key copy when every effect belongs to this authority.
+    let settled: [PlaybackEffectID]
+    if self.outstandingEffects.values.allSatisfy({
+      $0.effect.context.authority == authority
+    }) {
+      settled = self.outstandingEffects.map(\.key)
+    } else {
+      settled = self.outstandingEffects.compactMap { effectID, record in
+        record.effect.context.authority == authority ? effectID : nil
+      }
+    }
     for effectID in settled {
       self.outstandingEffects.removeValue(forKey: effectID)
       self.recordCompletedEffect(effectID)

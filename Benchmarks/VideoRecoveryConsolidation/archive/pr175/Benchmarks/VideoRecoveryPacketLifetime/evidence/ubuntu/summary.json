@@ -1,0 +1,49 @@
+{
+  "all_tracked_allocations_released_exactly_once": true,
+  "configurations": [
+    "debug",
+    "release"
+  ],
+  "controls": [
+    "borrowed-native-packet",
+    "decoder-error",
+    "fresh-GOP-after-seek",
+    "seek-during-drain",
+    "stale-generation-EOF",
+    "throwing-cancellation"
+  ],
+  "limitations": [
+    "Does not execute MediaSession, decode video, or qualify macOS playback",
+    "Requested tracked native payload/storage bytes, not RSS or allocator overhead",
+    "Cancellation control throws CancellationError; silent early-return cancellation is not modeled"
+  ],
+  "scope": "Synthetic drain boundary; exact production packet/recovery owner and real FFmpeg AVBuffer callbacks",
+  "status": "passed",
+  "success_cases": [
+    {
+      "baseline_live_payload_bytes_after_drain": 4096,
+      "baseline_live_storage_bytes_after_drain": 4352,
+      "candidate_live_payload_bytes_after_drain": 0,
+      "candidate_live_storage_bytes_after_drain": 0,
+      "name": "4KiB-final-GOP",
+      "payload_bytes": 4096
+    },
+    {
+      "baseline_live_payload_bytes_after_drain": 1048576,
+      "baseline_live_storage_bytes_after_drain": 1049600,
+      "candidate_live_payload_bytes_after_drain": 0,
+      "candidate_live_storage_bytes_after_drain": 0,
+      "name": "1MiB-final-GOP",
+      "payload_bytes": 1048576
+    },
+    {
+      "baseline_live_payload_bytes_after_drain": 33554432,
+      "baseline_live_storage_bytes_after_drain": 33587200,
+      "candidate_live_payload_bytes_after_drain": 0,
+      "candidate_live_storage_bytes_after_drain": 0,
+      "name": "32MiB-final-GOP",
+      "payload_bytes": 33554432
+    }
+  ],
+  "timing_claim": null
+}

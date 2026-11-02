@@ -18,8 +18,11 @@ python3 Benchmarks/SourceVisibilityStorage/run.py \
 ```
 
 Use a new or empty output directory. The component package has no downloaded
-dependencies. `--tests-only` runs correctness checks and the baseline negative
-control; `--skip-tests` skips tests for an explicitly separate measurement run.
+dependencies. `--tests-only` runs the Swift correctness suites and baseline
+negative control without building the benchmark, verifying workload bytes, or
+measuring. It uses the historical filter with current support sources for both
+variants; its receipt labels this adapted baseline as tests-only, not historical
+performance qualification. `--skip-tests` skips tests for a separate measurement run.
 For a quick exploratory check use `--pairs 2 --sizes 1000 --smoke`.
 
 ## Production-code boundary
@@ -27,8 +30,9 @@ For a quick exploratory check use `--pairs 2 --sizes 1000 --smoke`.
 The runner reuses the guarded source-extraction helper from
 `Benchmarks/SourceTreeVisibility/run.py`. It compiles the complete filter and
 tree-input files, actual core dependencies, and verbatim app value, matcher,
-sorter, and row declarations. Baseline and candidate supporting source bytes
-must agree. Only `SourceBrowserFilter.swift` may differ. No replacement row
+sorter, and row declarations. For performance measurement, historical baseline
+and current candidate supporting source bytes must agree. Only
+`SourceBrowserFilter.swift` may differ. No replacement row
 types, actor, matcher, or projection implementation is measured.
 
 Each receipt records the baseline commit, checkout HEAD, worktree state,

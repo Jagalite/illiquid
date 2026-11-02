@@ -11,7 +11,12 @@ on:
       - 'Sources/IlliquidCore/Persistence/PlaybackSessionStore.swift'
       - 'Tests/IlliquidCoreTests/PlaylistDeduplicationTests.swift'
       - 'Tests/IlliquidCoreTests/PlaylistSessionRecordTests.swift'
+      - 'Tests/IlliquidCoreTests/PlaylistMutationTests.swift'
+      - 'Tests/IlliquidCoreTests/PlaylistOrderRestorationTests.swift'
+      - 'Tests/IlliquidCoreTests/FolderPlaylistTests.swift'
+      - 'Tests/IlliquidCoreTests/NaturalFilenameOrderingTests.swift'
       - 'Benchmarks/PlaylistDeduplication/**'
+      - 'Scripts/tests/benchmark-source-policy-tests.py'
       - '.github/workflows/playlist-deduplication-memory.yml'
   workflow_dispatch:
 
@@ -33,10 +38,17 @@ jobs:
         with:
           persist-credentials: false
           fetch-depth: 0
-      - name: Verify behavior and measure playlist array sharing
+      - name: Check source policies and rejection controls without compiling
+        run: python3 Scripts/tests/benchmark-source-policy-tests.py
+      - name: Qualify regressions or run strict historical measurements
+        shell: bash
         run: |
+          mode=()
+          if test "$GITHUB_EVENT_NAME" = 'pull_request'; then
+            mode=(--regression-only)
+          fi
           python3 Benchmarks/PlaylistDeduplication/run.py \
-            --pairs 6 --target-ms 40 \
+            "${mode[@]}" --pairs 6 --target-ms 40 \
             --output "$RUNNER_TEMP/playlist-deduplication"
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         if: always()

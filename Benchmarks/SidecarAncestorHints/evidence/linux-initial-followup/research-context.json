@@ -1,0 +1,38 @@
+{
+  "affinity_method": "taskset -c 0 inherited by runner, compiler and all sample processes",
+  "cases": [
+    "rich-depth4-1000-cold",
+    "missing-depth4-1000-cold",
+    "nfo-depth4-1000-cold",
+    "nfo-depth4-1000-warm"
+  ],
+  "cpu_affinity": [
+    0
+  ],
+  "host_before_run": {
+    "allowed_cpus": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8
+    ],
+    "cpu": "AMD EPYC 9V74 80-Core Processor",
+    "load_average_1_5_15min": [
+      6.02685546875,
+      5.55224609375,
+      5.26904296875
+    ]
+  },
+  "interpretation": "This is a targeted diagnostic follow-up, not a replacement for the original complete matrix. Report all four cases and all original controls.",
+  "reason": "Investigate NFO-only slowdown observed in the original 520-observation campaign; preserve original results.",
+  "recorded_utc": "2026-10-28T05:15:23.138492+00:00",
+  "sample_pairs": 10,
+  "selection": "CPU 0 and these four cases selected before any follow-up result. No code tuning.",
+  "target_ms": 1000,
+  "unchanged_inputs": "Same production sources, test sources, Harness.swift and run.py as linux-full; original and compiled hashes retained."
+}

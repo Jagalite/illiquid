@@ -178,6 +178,8 @@ def main() -> int:
                    "--config-path", str(Path(temporary) / "package-config"),
                    "--security-path", str(Path(temporary) / "package-security"),
                    "--configuration", args.configuration, "--no-parallel"]
+        if platform.system() == "Linux":
+            command.append("--use-integrated-swift-driver")
         result = subprocess.run(command, text=True, stdout=subprocess.PIPE,
                                 stderr=subprocess.STDOUT, env=environment)
         print(result.stdout, end="", flush=True)

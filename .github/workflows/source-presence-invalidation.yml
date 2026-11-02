@@ -1,0 +1,213 @@
+name: Source presence invalidation performance
+
+on:
+  push:
+    branches: ['perf/source-presence-invalidation-20261028*']
+    paths:
+      - 'Sources/IlliquidApp/UI/SourceMediaPresence*.swift'
+      - 'Tests/IlliquidAppTests/SourceMediaPresence*Tests.swift'
+      - 'Benchmarks/SourcePresenceInvalidation/**'
+      - '.github/workflows/source-presence-invalidation.yml'
+      - '!Benchmarks/SourcePresenceInvalidation/*.md'
+      - '!Benchmarks/SourcePresenceInvalidation/evidence/**'
+  pull_request:
+    paths:
+      - 'Sources/IlliquidApp/UI/SourceMediaPresence*.swift'
+      - 'Tests/IlliquidAppTests/SourceMediaPresence*Tests.swift'
+      - 'Benchmarks/SourcePresenceInvalidation/**'
+      - '.github/workflows/source-presence-invalidation.yml'
+      - '!Benchmarks/SourcePresenceInvalidation/*.md'
+      - '!Benchmarks/SourcePresenceInvalidation/evidence/**'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: source-presence-invalidation-${{ github.head_ref || github.ref_name }}
+  cancel-in-progress: true
+
+jobs:
+  native-component:
+    runs-on: macos-26
+    timeout-minutes: 25
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Test exact outputs and measure native invalidation costs
+        run: |
+          set -o pipefail
+          python3 - <<'PY' 2>&1 | tee "$RUNNER_TEMP/presence-invalidation-component.log"
+          import json, os, subprocess, sys
+          from pathlib import Path
+          output = Path(os.environ['RUNNER_TEMP']) / 'presence-invalidation'
+          command = [sys.executable, 'Benchmarks/SourcePresenceInvalidation/run.py',
+                     '--output', str(output), '--pairs', '10', '--target-ms', '100']
+          queue = Path('/Volumes/seed1/Projects/kyoto/kyoto.py')
+          if queue.is_file():
+              cli = [sys.executable, str(queue)]
+              submitted = subprocess.check_output(
+                  [*cli, 'submit', '--resource', str(output), '--', *command], text=True)
+              print(submitted, flush=True)
+              job_id = json.loads(submitted)['id']
+              subprocess.run([*cli, 'show', job_id], check=True)
+              result = subprocess.run([*cli, 'wait', job_id])
+              subprocess.run([*cli, 'logs', job_id], check=True)
+              sys.exit(result.returncode)
+          print('The shared Kyoto queue is unavailable on this hosted runner; '
+                'running the component builds serially in this isolated checkout.', flush=True)
+          subprocess.run(command, check=True)
+          PY
+      - name: Emit compact component evidence
+        if: always()
+        run: |
+          python3 - <<'PY'
+          import base64, gzip, hashlib, json, os, shutil
+          from pathlib import Path
+          temporary = Path(os.environ['RUNNER_TEMP'])
+          root = temporary / 'presence-invalidation'
+          root.mkdir(parents=True, exist_ok=True)
+          outer_log = temporary / 'presence-invalidation-component.log'
+          if outer_log.is_file():
+              shutil.copyfile(outer_log, root / 'component.log')
+          excluded = {'build', '.build', 'cache', 'module-cache', 'package-cache',
+                      'package-config', 'package-security', 'fixtures', 'fixture'}
+          files, compressed = {}, {}
+          for path in sorted(root.rglob('*')):
+              relative = path.relative_to(root)
+              if not path.is_file() or any(part in excluded for part in relative.parts):
+                  continue
+              # Complete shared traces are retained once in state-traces.json.gz;
+              # the artifact still contains every verify stdout and its hash.
+              if path.name.endswith('-verify.stdout.log'):
+                  continue
+              if (path.suffix in {'.json', '.jsonl', '.log', '.txt', '.xml', '.csv'}
+                      or relative.parts[0] == 'sources' and path.suffix in {'.swift', '.py'}):
+                  files[str(relative)] = path.read_text()
+              elif path.name.endswith(('.json.gz', '.jsonl.gz', '.log.gz', '.txt.gz')):
+                  compressed[str(relative)] = base64.b64encode(path.read_bytes()).decode()
+          for name, content in files.items():
+              if name.endswith(('summary.json', 'parity.json', 'verification.json', 'completion.json')):
+                  print(name + '\n' + content)
+          bundle = {'text_files': files, 'compressed_files_base64': compressed}
+          packed = gzip.compress(json.dumps(bundle, sort_keys=True).encode(), compresslevel=9, mtime=0)
+          if len(packed) > 2 * 1024 * 1024:
+              raise SystemExit('Component evidence exceeds the 2 MiB log bundle limit; use the uploaded artifact')
+          print('PRESENCE_INVALIDATION_COMPONENT_SHA256 ' + hashlib.sha256(packed).hexdigest())
+          print('PRESENCE_INVALIDATION_COMPONENT_BASE64 ' + base64.b64encode(packed).decode())
+          PY
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: source-presence-invalidation-component
+          path: |
+            ${{ runner.temp }}/presence-invalidation/**/*.json
+            ${{ runner.temp }}/presence-invalidation/**/*.jsonl
+            ${{ runner.temp }}/presence-invalidation/**/*.log
+            ${{ runner.temp }}/presence-invalidation/**/*.txt
+            ${{ runner.temp }}/presence-invalidation/**/*.xml
+            ${{ runner.temp }}/presence-invalidation/**/*.csv
+            ${{ runner.temp }}/presence-invalidation/**/*.json.gz
+            ${{ runner.temp }}/presence-invalidation/**/*.jsonl.gz
+            ${{ runner.temp }}/presence-invalidation/**/*.log.gz
+            ${{ runner.temp }}/presence-invalidation/**/*.txt.gz
+            ${{ runner.temp }}/presence-invalidation/sources/**
+            !${{ runner.temp }}/presence-invalidation/**/build/**
+            !${{ runner.temp }}/presence-invalidation/**/.build/**
+            !${{ runner.temp }}/presence-invalidation/**/cache/**
+            !${{ runner.temp }}/presence-invalidation/**/module-cache/**
+            !${{ runner.temp }}/presence-invalidation/**/package-cache/**
+            !${{ runner.temp }}/presence-invalidation/**/package-config/**
+            !${{ runner.temp }}/presence-invalidation/**/package-security/**
+            !${{ runner.temp }}/presence-invalidation/**/fixtures/**
+            !${{ runner.temp }}/presence-invalidation/**/fixture/**
+          retention-days: 14
+
+  native-scanner:
+    runs-on: macos-26
+    timeout-minutes: 40
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - name: Prepare pinned native dependencies
+        run: |
+          if ! xcrun -sdk macosx metal --version; then
+            xcodebuild -downloadComponent MetalToolchain
+          fi
+          python3 Scripts/verify-corresponding-source.py DependencySources
+          python3 Scripts/install-ci-native-sdk.py
+      - name: Build the app graph and execute source presence regressions
+        run: |
+          mkdir -p "$RUNNER_TEMP/presence-invalidation-native"
+          sw_vers > "$RUNNER_TEMP/presence-invalidation-native/host.txt"
+          swift --version >> "$RUNNER_TEMP/presence-invalidation-native/host.txt"
+          git rev-parse HEAD > "$RUNNER_TEMP/presence-invalidation-native/revision.txt"
+          set -o pipefail
+          python3 - <<'PY' 2>&1 | tee "$RUNNER_TEMP/presence-invalidation-native/tests.log"
+          import json, subprocess, sys
+          from pathlib import Path
+          command = ['swift', 'test', '--force-resolved-versions', '-c', 'release',
+                     '--jobs', '2', '--no-parallel', '--filter',
+                     'SourceMediaPresenceScannerTests|SourceMediaPresenceReuseTests|'
+                     'SourceMediaPresenceRecomputationTests|SourceMediaPresenceInvalidationTests']
+          queue = Path('/Volumes/seed1/Projects/kyoto/kyoto.py')
+          if queue.is_file():
+              cli = [sys.executable, str(queue)]
+              submitted = subprocess.check_output(
+                  [*cli, 'submit', '--resource', str(Path.cwd() / '.build'), '--', *command], text=True)
+              print(submitted, flush=True)
+              job_id = json.loads(submitted)['id']
+              subprocess.run([*cli, 'show', job_id], check=True)
+              result = subprocess.run([*cli, 'wait', job_id])
+              subprocess.run([*cli, 'logs', job_id], check=True)
+              sys.exit(result.returncode)
+          print('The shared Kyoto queue is unavailable on this hosted runner; '
+                'building and testing serially in this isolated checkout.', flush=True)
+          subprocess.run(command, check=True)
+          PY
+          python3 - <<'PY'
+          import json, os, re
+          from pathlib import Path
+          root = Path(os.environ['RUNNER_TEMP']) / 'presence-invalidation-native'
+          log = (root / 'tests.log').read_text()
+          counts = re.findall(r'Test run with (\d+) tests?\b', log)
+          completed = int(counts[-1]) if counts else 0
+          if completed == 0:
+              raise SystemExit('No completed Swift Testing tests were reported')
+          (root / 'completion.json').write_text(json.dumps({
+              'passed': True, 'completed_tests': completed,
+              'configuration': 'release', 'ui_qualified': False,
+          }, indent=2) + '\n')
+          PY
+      - name: Emit compact native test evidence
+        if: always()
+        run: |
+          python3 - <<'PY'
+          import base64, gzip, hashlib, json, os
+          from pathlib import Path
+          root = Path(os.environ['RUNNER_TEMP']) / 'presence-invalidation-native'
+          files = {str(path.relative_to(root)): path.read_text()
+                   for path in sorted(root.rglob('*'))
+                   if path.is_file() and path.suffix in {'.json', '.jsonl', '.log', '.txt', '.xml'}}
+          if 'completion.json' in files:
+              print('completion.json\n' + files['completion.json'])
+          packed = gzip.compress(json.dumps({'text_files': files}, sort_keys=True).encode(),
+                                 compresslevel=9, mtime=0)
+          if len(packed) > 2 * 1024 * 1024:
+              raise SystemExit('Native evidence exceeds the 2 MiB log bundle limit; use the uploaded artifact')
+          print('PRESENCE_INVALIDATION_NATIVE_SHA256 ' + hashlib.sha256(packed).hexdigest())
+          print('PRESENCE_INVALIDATION_NATIVE_BASE64 ' + base64.b64encode(packed).decode())
+          PY
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: source-presence-invalidation-native-scanner
+          path: ${{ runner.temp }}/presence-invalidation-native/
+          retention-days: 14

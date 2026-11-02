@@ -1,0 +1,18 @@
+    static func isSubtitleAcquisition(
+        _ packet: FFmpegPacket,
+        isPGS: Bool,
+        compositionPageID: UInt16?
+    ) -> Bool {
+        guard let pointer = packet.pointer,
+              let bytes = pointer.pointee.data,
+              pointer.pointee.size > 0 else { return false }
+        return withExtendedLifetime(packet) {
+            let data = Data(
+                bytesNoCopy: UnsafeMutableRawPointer(bytes),
+                count: Int(pointer.pointee.size),
+                deallocator: .none
+            )
+            return isPGS ? PGSSubtitlePacket.isAcquisition(data)
+                : DVBSubtitlePacket.isAcquisition(data, compositionPageID: compositionPageID)
+        }
+    }

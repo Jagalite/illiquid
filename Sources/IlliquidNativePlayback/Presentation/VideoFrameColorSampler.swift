@@ -103,30 +103,74 @@ final class VideoFrameColorSampler: @unchecked Sendable {
         let matrixID: Int32? = matrix == (kCVImageBufferYCbCrMatrix_ITU_R_601_4 as String) ? 6
             : matrix == (kCVImageBufferYCbCrMatrix_ITU_R_2020 as String) ? 9 : nil
         let coefficients = PiPVideoMapping.colorCoefficients(matrix: matrixID)
+
+        // Layout is stable for this lock's lifetime. Resolve it once instead of
+        // querying CoreVideo for every point in the 12-by-8 grid. sampleGrid's
+        // closure is nonescaping, so these addresses never outlive the lock.
+        switch pixelFormat {
+        case kCVPixelFormatType_32BGRA:
+            guard let baseAddress = CVPixelBufferGetBaseAddress(pixelBuffer) else {
+                return nil
+            }
+            let bytesPerRow = CVPixelBufferGetBytesPerRow(pixelBuffer)
+            return sampleGrid(width: width, height: height) { x, y in
+                bgraColor(atX: x, y: y, baseAddress: baseAddress, bytesPerRow: bytesPerRow)
+            }
+        case kCVPixelFormatType_420YpCbCr8BiPlanarVideoRange,
+             kCVPixelFormatType_420YpCbCr8BiPlanarFullRange:
+            guard CVPixelBufferGetPlaneCount(pixelBuffer) >= 2,
+                  let lumaBase = CVPixelBufferGetBaseAddressOfPlane(pixelBuffer, 0),
+                  let chromaBase = CVPixelBufferGetBaseAddressOfPlane(pixelBuffer, 1)
+            else { return nil }
+            let lumaBytesPerRow = CVPixelBufferGetBytesPerRowOfPlane(pixelBuffer, 0)
+            let chromaBytesPerRow = CVPixelBufferGetBytesPerRowOfPlane(pixelBuffer, 1)
+            let isFullRange = pixelFormat == kCVPixelFormatType_420YpCbCr8BiPlanarFullRange
+            return sampleGrid(width: width, height: height) { x, y in
+                biPlanar8Color(
+                    atX: x, y: y,
+                    lumaBase: lumaBase, chromaBase: chromaBase,
+                    lumaBytesPerRow: lumaBytesPerRow, chromaBytesPerRow: chromaBytesPerRow,
+                    isFullRange: isFullRange, coefficients: coefficients
+                )
+            }
+        case kCVPixelFormatType_420YpCbCr10BiPlanarVideoRange,
+             kCVPixelFormatType_420YpCbCr10BiPlanarFullRange:
+            guard CVPixelBufferGetPlaneCount(pixelBuffer) >= 2,
+                  let lumaBase = CVPixelBufferGetBaseAddressOfPlane(pixelBuffer, 0),
+                  let chromaBase = CVPixelBufferGetBaseAddressOfPlane(pixelBuffer, 1)
+            else { return nil }
+            let lumaBytesPerRow = CVPixelBufferGetBytesPerRowOfPlane(pixelBuffer, 0)
+            let chromaBytesPerRow = CVPixelBufferGetBytesPerRowOfPlane(pixelBuffer, 1)
+            let isFullRange = pixelFormat == kCVPixelFormatType_420YpCbCr10BiPlanarFullRange
+            return sampleGrid(width: width, height: height) { x, y in
+                biPlanar10Color(
+                    atX: x, y: y,
+                    lumaBase: lumaBase, chromaBase: chromaBase,
+                    lumaBytesPerRow: lumaBytesPerRow, chromaBytesPerRow: chromaBytesPerRow,
+                    isFullRange: isFullRange, coefficients: coefficients
+                )
+            }
+        default:
+            return nil
+        }
+    }
+
+    private static func sampleGrid(
+        width: Int,
+        height: Int,
+        colorAt: (Int, Int) -> SampledVideoColor
+    ) -> VideoColorSample {
         var colors: [SampledVideoColor] = []
         colors.reserveCapacity(sampleColumns * sampleRows)
-
         for row in 0..<sampleRows {
             let normalizedY = (Double(row) + 0.5) / Double(sampleRows)
             let y = min(height - 1, Int(normalizedY * Double(height)))
-
             for column in 0..<sampleColumns {
                 let normalizedX = (Double(column) + 0.5) / Double(sampleColumns)
                 let x = min(width - 1, Int(normalizedX * Double(width)))
-                guard let color = color(
-                    atX: x,
-                    y: y,
-                    pixelBuffer: pixelBuffer,
-                    pixelFormat: pixelFormat,
-                    coefficients: coefficients
-                ) else {
-                    return nil
-                }
-
-                colors.append(color)
+                colors.append(colorAt(x, y))
             }
         }
-
         return VideoColorSample(
             columns: sampleColumns,
             rows: sampleRows,
@@ -134,62 +178,12 @@ final class VideoFrameColorSampler: @unchecked Sendable {
         )
     }
 
-    private static func color(
-        atX x: Int,
-        y: Int,
-        pixelBuffer: CVPixelBuffer,
-        pixelFormat: OSType,
-        coefficients: SIMD4<Float>
-    ) -> SampledVideoColor? {
-        switch pixelFormat {
-        case kCVPixelFormatType_32BGRA:
-            bgraColor(atX: x, y: y, pixelBuffer: pixelBuffer)
-        case kCVPixelFormatType_420YpCbCr8BiPlanarVideoRange:
-            biPlanar8Color(
-                atX: x,
-                y: y,
-                pixelBuffer: pixelBuffer,
-                isFullRange: false,
-                coefficients: coefficients
-            )
-        case kCVPixelFormatType_420YpCbCr8BiPlanarFullRange:
-            biPlanar8Color(
-                atX: x,
-                y: y,
-                pixelBuffer: pixelBuffer,
-                isFullRange: true,
-                coefficients: coefficients
-            )
-        case kCVPixelFormatType_420YpCbCr10BiPlanarVideoRange:
-            biPlanar10Color(
-                atX: x,
-                y: y,
-                pixelBuffer: pixelBuffer,
-                isFullRange: false,
-                coefficients: coefficients
-            )
-        case kCVPixelFormatType_420YpCbCr10BiPlanarFullRange:
-            biPlanar10Color(
-                atX: x,
-                y: y,
-                pixelBuffer: pixelBuffer,
-                isFullRange: true,
-                coefficients: coefficients
-            )
-        default:
-            nil
-        }
-    }
-
     private static func bgraColor(
         atX x: Int,
         y: Int,
-        pixelBuffer: CVPixelBuffer
-    ) -> SampledVideoColor? {
-        guard let baseAddress = CVPixelBufferGetBaseAddress(pixelBuffer) else {
-            return nil
-        }
-        let bytesPerRow = CVPixelBufferGetBytesPerRow(pixelBuffer)
+        baseAddress: UnsafeMutableRawPointer,
+        bytesPerRow: Int
+    ) -> SampledVideoColor {
         let pixel = baseAddress
             .advanced(by: y * bytesPerRow + x * 4)
             .assumingMemoryBound(to: UInt8.self)
@@ -203,26 +197,19 @@ final class VideoFrameColorSampler: @unchecked Sendable {
     private static func biPlanar8Color(
         atX x: Int,
         y: Int,
-        pixelBuffer: CVPixelBuffer,
+        lumaBase: UnsafeMutableRawPointer,
+        chromaBase: UnsafeMutableRawPointer,
+        lumaBytesPerRow: Int,
+        chromaBytesPerRow: Int,
         isFullRange: Bool,
         coefficients: SIMD4<Float>
-    ) -> SampledVideoColor? {
-        guard CVPixelBufferGetPlaneCount(pixelBuffer) >= 2,
-              let lumaBase = CVPixelBufferGetBaseAddressOfPlane(pixelBuffer, 0),
-              let chromaBase = CVPixelBufferGetBaseAddressOfPlane(pixelBuffer, 1)
-        else { return nil }
-
+    ) -> SampledVideoColor {
         let luma = lumaBase
-            .advanced(
-                by: y * CVPixelBufferGetBytesPerRowOfPlane(pixelBuffer, 0) + x
-            )
+            .advanced(by: y * lumaBytesPerRow + x)
             .assumingMemoryBound(to: UInt8.self)
             .pointee
         let chroma = chromaBase
-            .advanced(
-                by: (y / 2) * CVPixelBufferGetBytesPerRowOfPlane(pixelBuffer, 1)
-                    + (x / 2) * 2
-            )
+            .advanced(by: (y / 2) * chromaBytesPerRow + (x / 2) * 2)
             .assumingMemoryBound(to: UInt8.self)
         return yCbCrColor(
             y: Double(luma),
@@ -238,26 +225,19 @@ final class VideoFrameColorSampler: @unchecked Sendable {
     private static func biPlanar10Color(
         atX x: Int,
         y: Int,
-        pixelBuffer: CVPixelBuffer,
+        lumaBase: UnsafeMutableRawPointer,
+        chromaBase: UnsafeMutableRawPointer,
+        lumaBytesPerRow: Int,
+        chromaBytesPerRow: Int,
         isFullRange: Bool,
         coefficients: SIMD4<Float>
-    ) -> SampledVideoColor? {
-        guard CVPixelBufferGetPlaneCount(pixelBuffer) >= 2,
-              let lumaBase = CVPixelBufferGetBaseAddressOfPlane(pixelBuffer, 0),
-              let chromaBase = CVPixelBufferGetBaseAddressOfPlane(pixelBuffer, 1)
-        else { return nil }
-
+    ) -> SampledVideoColor {
         let luma = lumaBase
-            .advanced(
-                by: y * CVPixelBufferGetBytesPerRowOfPlane(pixelBuffer, 0) + x * 2
-            )
+            .advanced(by: y * lumaBytesPerRow + x * 2)
             .assumingMemoryBound(to: UInt16.self)
             .pointee >> 6
         let chroma = chromaBase
-            .advanced(
-                by: (y / 2) * CVPixelBufferGetBytesPerRowOfPlane(pixelBuffer, 1)
-                    + (x / 2) * 4
-            )
+            .advanced(by: (y / 2) * chromaBytesPerRow + (x / 2) * 4)
             .assumingMemoryBound(to: UInt16.self)
         let cb = chroma[0] >> 6
         let cr = chroma[1] >> 6

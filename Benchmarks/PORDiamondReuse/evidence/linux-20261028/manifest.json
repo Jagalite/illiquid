@@ -1,0 +1,406 @@
+{
+  "architecture": "x86_64",
+  "baseline_commit": "ea2ff568237e2667f7b1aeee67b11a44ebe95b72",
+  "binaries": {
+    "baseline-debug": {
+      "bytes": 12318992,
+      "sha256": "479f4d15670c6c20c3bdff9c1c98a4ff2f31d2f3974361393b88e3215b91d80d"
+    },
+    "baseline-release": {
+      "bytes": 9372488,
+      "sha256": "9a963787fa6e4e80b423d70f14cc40a51fa7b059b757e333df5d4c1dad86b291"
+    },
+    "candidate-debug": {
+      "bytes": 12335360,
+      "sha256": "874416d54594ca45a075efce595a85203c501a4fd1f7fe3177d9a280dd6919a5"
+    },
+    "candidate-release": {
+      "bytes": 9412160,
+      "sha256": "59c4845eb10d8d1661341125e8f076ae465036f9d74c2f09a010e3cdb2bf6b22"
+    }
+  },
+  "candidate_commit": "28f9f053b79337ef738f7f72baaff489ee97781f",
+  "candidate_status": [],
+  "cases": [
+    "seek_8",
+    "eof_7",
+    "preroll_5",
+    "two",
+    "one",
+    "zero",
+    "validation_disabled",
+    "search_seek_d3",
+    "search_preroll_d3"
+  ],
+  "cpu_description": "AMD EPYC 7763 64-Core Processor",
+  "harness_sha256": "c95f7634c8f22b0a810df52bc409956a10b1a103f25addc1b95673f355fb2729",
+  "limitations": [
+    "Portable Swift measurements on one hosted machine, not macOS application qualification.",
+    "No decoding, rendering, playback FPS, UI latency, energy or RSS claim.",
+    "First-step reuse retains O(n) temporary successor states for n>2 candidates.",
+    "Search workloads disable wall cutoffs and retain fixed depth/state/edge bounds.",
+    "The isolated package uses toolchain Testing; application dependencies are not built.",
+    "Bootstrap intervals describe these paired observations, not all devices."
+  ],
+  "logical_cpus": 4,
+  "method": "full exact production modules; optimized release; fresh balanced AB/BA processes",
+  "package_manifest_sha256": "b9279c2d720dbba1e3243a2906f29607ebdfc448b8a34c4db9864a2833bb5ce4",
+  "pairs": 10,
+  "platform": "Linux-6.17.0-1022-azure-x86_64-with-glibc2.39",
+  "processor": "x86_64",
+  "runner": {
+    "GITHUB_RUN_ATTEMPT": "1",
+    "GITHUB_RUN_ID": "40640741259",
+    "GITHUB_SHA": "28f9f053b79337ef738f7f72baaff489ee97781f",
+    "RUNNER_ARCH": "X64",
+    "RUNNER_OS": "Linux"
+  },
+  "runner_sha256": "fa7699248b518f903ddc95c067fa1b82cf5b1bf38abdee21595e47f63d6e9b15",
+  "schema": 1,
+  "scope": "partial-order diamond validation and bounded state-space search",
+  "sources": {
+    "baseline": {
+      "Benchmarks/PORDiamondReuse/Harness.swift": {
+        "destination": "Sources/DiamondBenchmark/Harness.swift",
+        "sha256": "c95f7634c8f22b0a810df52bc409956a10b1a103f25addc1b95673f355fb2729",
+        "source": "current worktree",
+        "transformation": "none"
+      },
+      "Sources/IlliquidCore/Player/MediaTrack.swift": {
+        "destination": "Sources/IlliquidCore/MediaTrack.swift",
+        "sha256": "02a2d581f70eb7a18b2a520571999384abe5911e43d4b7e26022f48c1c57a441",
+        "source": "ea2ff568237e2667f7b1aeee67b11a44ebe95b72",
+        "transformation": "none"
+      },
+      "Sources/IlliquidPlaybackCore/CompletedPlaybackEffectHistory.swift": {
+        "destination": "Sources/IlliquidPlaybackCore/CompletedPlaybackEffectHistory.swift",
+        "sha256": "bdcf2f3a283de51150cf03f1b982dd9b3f7861acdb90a470947f84d6f8cda339",
+        "source": "ea2ff568237e2667f7b1aeee67b11a44ebe95b72",
+        "transformation": "none"
+      },
+      "Sources/IlliquidPlaybackCore/EventsAndEffects.swift": {
+        "destination": "Sources/IlliquidPlaybackCore/EventsAndEffects.swift",
+        "sha256": "a297b5e21f05fe7a44b0e3a24939df8a8f5b5ec22bc988e1671ba5247348c46e",
+        "source": "ea2ff568237e2667f7b1aeee67b11a44ebe95b72",
+        "transformation": "none"
+      },
+      "Sources/IlliquidPlaybackCore/IdentityAndTime.swift": {
+        "destination": "Sources/IlliquidPlaybackCore/IdentityAndTime.swift",
+        "sha256": "c1c1ee83d7cfbfb909e30fccba6d239ddc412a9f1138015b431b7cda3df723bb",
+        "source": "ea2ff568237e2667f7b1aeee67b11a44ebe95b72",
+        "transformation": "none"
+      },
+      "Sources/IlliquidPlaybackCore/LoadingAndDrainCore.swift": {
+        "destination": "Sources/IlliquidPlaybackCore/LoadingAndDrainCore.swift",
+        "sha256": "da35a412ca1a6919c9aa73a1c2eb06e7296ffa4643e27a9506b9294976ffffc4",
+        "source": "ea2ff568237e2667f7b1aeee67b11a44ebe95b72",
+        "transformation": "none"
+      },
+      "Sources/IlliquidPlaybackCore/PlaybackCore.swift": {
+        "destination": "Sources/IlliquidPlaybackCore/PlaybackCore.swift",
+        "sha256": "59faf4ba801d6d1e2d937302a19b45aa7c15eec263aebef987521a879d930fa0",
+        "source": "ea2ff568237e2667f7b1aeee67b11a44ebe95b72",
+        "transformation": "none"
+      },
+      "Sources/IlliquidPlaybackCore/PlaybackCoreState.swift": {
+        "destination": "Sources/IlliquidPlaybackCore/PlaybackCoreState.swift",
+        "sha256": "4832bd64d67568c5ebdc641dc67c64d1f681ba07a7902887fa8ee81e04d1b59f",
+        "source": "ea2ff568237e2667f7b1aeee67b11a44ebe95b72",
+        "transformation": "none"
+      },
+      "Sources/IlliquidPlaybackCore/PlaybackInvariants.swift": {
+        "destination": "Sources/IlliquidPlaybackCore/PlaybackInvariants.swift",
+        "sha256": "d25bb7de8f1871781bc8ee035a4b58dc00446f2dfe7491799a8315822a3c173e",
+        "source": "ea2ff568237e2667f7b1aeee67b11a44ebe95b72",
+        "transformation": "none"
+      },
+      "Sources/IlliquidPlaybackCore/PlaybackModelRuntime.swift": {
+        "destination": "Sources/IlliquidPlaybackCore/PlaybackModelRuntime.swift",
+        "sha256": "54a12cac94e739f0ca681b262283c125b3df291be0e3f1a7d1e0eb1b496d2ffb",
+        "source": "ea2ff568237e2667f7b1aeee67b11a44ebe95b72",
+        "transformation": "none"
+      },
+      "Sources/IlliquidPlaybackCore/PlaybackReplay.swift": {
+        "destination": "Sources/IlliquidPlaybackCore/PlaybackReplay.swift",
+        "sha256": "a5a94109b548bf12148b3e49b93570fbf2b63efffd97ef56d8deb6ee997279e3",
+        "source": "ea2ff568237e2667f7b1aeee67b11a44ebe95b72",
+        "transformation": "none"
+      },
+      "Sources/IlliquidPlaybackCore/RecoveryCore.swift": {
+        "destination": "Sources/IlliquidPlaybackCore/RecoveryCore.swift",
+        "sha256": "569ceffa207ba7dfdbd10f07d7f6ffc4d44fef37eefef2315959dcbb56b80f9a",
+        "source": "ea2ff568237e2667f7b1aeee67b11a44ebe95b72",
+        "transformation": "none"
+      },
+      "Sources/IlliquidPlaybackCore/SeekCore.swift": {
+        "destination": "Sources/IlliquidPlaybackCore/SeekCore.swift",
+        "sha256": "08e138ead38382839cb27a2a923247ec2716a2ea8b036bc8045df38feb78eb4b",
+        "source": "ea2ff568237e2667f7b1aeee67b11a44ebe95b72",
+        "transformation": "none"
+      },
+      "Sources/IlliquidPlaybackCore/SubtitleCore.swift": {
+        "destination": "Sources/IlliquidPlaybackCore/SubtitleCore.swift",
+        "sha256": "87e13ceedada39f64dd80c40b98040b9102db55bbe59784ec01b2111db12311b",
+        "source": "ea2ff568237e2667f7b1aeee67b11a44ebe95b72",
+        "transformation": "none"
+      },
+      "Sources/IlliquidPlaybackCore/SynchronizationCore.swift": {
+        "destination": "Sources/IlliquidPlaybackCore/SynchronizationCore.swift",
+        "sha256": "9337d8cc2936e9155a61d8fdd0dd4d2e2c9312ede2f9047c2d9bd83629459e20",
+        "source": "ea2ff568237e2667f7b1aeee67b11a44ebe95b72",
+        "transformation": "none"
+      },
+      "Sources/IlliquidPlaybackCore/TrackSelectionCore.swift": {
+        "destination": "Sources/IlliquidPlaybackCore/TrackSelectionCore.swift",
+        "sha256": "18f1e2274b9d6eb9e78a8916913f2bd538896363437089e16a3f81f49cf92f8d",
+        "source": "ea2ff568237e2667f7b1aeee67b11a44ebe95b72",
+        "transformation": "none"
+      },
+      "Sources/IlliquidPlaybackStateSpace/PlaybackPartialOrderReducer.swift": {
+        "destination": "Sources/IlliquidPlaybackStateSpace/PlaybackPartialOrderReducer.swift",
+        "sha256": "2d112d1c718a54e1aa9eb70313c1d63cb34b4844d3dec98a5d32bde4b9e81800",
+        "source": "ea2ff568237e2667f7b1aeee67b11a44ebe95b72",
+        "transformation": "none"
+      },
+      "Sources/IlliquidPlaybackStateSpace/PlaybackProgressAnalyzer.swift": {
+        "destination": "Sources/IlliquidPlaybackStateSpace/PlaybackProgressAnalyzer.swift",
+        "sha256": "46d26cc02e031d601e11078bef1336db071a91b30771537e8d74df6edf25d875",
+        "source": "ea2ff568237e2667f7b1aeee67b11a44ebe95b72",
+        "transformation": "none"
+      },
+      "Sources/IlliquidPlaybackStateSpace/PlaybackSearchArtifact.swift": {
+        "destination": "Sources/IlliquidPlaybackStateSpace/PlaybackSearchArtifact.swift",
+        "sha256": "8c528492cee44ab51fe5ec3f41b80e28c2ed560111c173974d3e742f0893bc12",
+        "source": "ea2ff568237e2667f7b1aeee67b11a44ebe95b72",
+        "transformation": "none"
+      },
+      "Sources/IlliquidPlaybackStateSpace/PlaybackSearchCanonicalizer.swift": {
+        "destination": "Sources/IlliquidPlaybackStateSpace/PlaybackSearchCanonicalizer.swift",
+        "sha256": "9c31b9f5c823a72cc6929c3cdf604330ea02f287c33da6451fd63711b11e2801",
+        "source": "ea2ff568237e2667f7b1aeee67b11a44ebe95b72",
+        "transformation": "none"
+      },
+      "Sources/IlliquidPlaybackStateSpace/PlaybackSearchModel.swift": {
+        "destination": "Sources/IlliquidPlaybackStateSpace/PlaybackSearchModel.swift",
+        "sha256": "ff7bae02bac4c03311afc379f202ce5ea369ea852126d2ccadc0a8659f59493b",
+        "source": "ea2ff568237e2667f7b1aeee67b11a44ebe95b72",
+        "transformation": "none"
+      },
+      "Sources/IlliquidPlaybackStateSpace/PlaybackSearchModels.swift": {
+        "destination": "Sources/IlliquidPlaybackStateSpace/PlaybackSearchModels.swift",
+        "sha256": "ce6f3a3acbd29499a700dd333dc49281f8caaebd35f8b83cf3526cbad3c3fb87",
+        "source": "ea2ff568237e2667f7b1aeee67b11a44ebe95b72",
+        "transformation": "none"
+      },
+      "Sources/IlliquidPlaybackStateSpace/PlaybackSearchTrend.swift": {
+        "destination": "Sources/IlliquidPlaybackStateSpace/PlaybackSearchTrend.swift",
+        "sha256": "1b5673c40a13b4ad778f33d1ab667e4794a754088457f7fa55a02ce864b32b32",
+        "source": "ea2ff568237e2667f7b1aeee67b11a44ebe95b72",
+        "transformation": "none"
+      },
+      "Sources/IlliquidPlaybackStateSpace/PlaybackSearchTypes.swift": {
+        "destination": "Sources/IlliquidPlaybackStateSpace/PlaybackSearchTypes.swift",
+        "sha256": "7d6587900a9bc2db6dba0362758229f00d9bc85b3c912aaa22708ec9a51a8e83",
+        "source": "ea2ff568237e2667f7b1aeee67b11a44ebe95b72",
+        "transformation": "none"
+      },
+      "Sources/IlliquidPlaybackStateSpace/PlaybackStateSpaceExplorer.swift": {
+        "destination": "Sources/IlliquidPlaybackStateSpace/PlaybackStateSpaceExplorer.swift",
+        "sha256": "a6519fc2997b60f3457999f32c22102d204f8a04d50071d55de981d75616be0f",
+        "source": "ea2ff568237e2667f7b1aeee67b11a44ebe95b72",
+        "transformation": "none"
+      },
+      "Sources/IlliquidPlaybackStateSpace/SearchAction.swift": {
+        "destination": "Sources/IlliquidPlaybackStateSpace/SearchAction.swift",
+        "sha256": "7ffea198f7c55ce6bf78245885fe09d3b30e79de6b2bbec8e20bdf40dff29e7a",
+        "source": "ea2ff568237e2667f7b1aeee67b11a44ebe95b72",
+        "transformation": "none"
+      },
+      "Tests/IlliquidPlaybackStateSpaceTests/PlaybackDiamondReuseTests.swift": {
+        "destination": "Tests/IlliquidPlaybackStateSpaceTests/PlaybackDiamondReuseTests.swift",
+        "sha256": "187429ee8509215c8c659fd33caaca2b86e06699284f6f9b2748a753516c90d4",
+        "source": "current worktree",
+        "transformation": "none"
+      },
+      "Tests/IlliquidPlaybackStateSpaceTests/PlaybackStateSpaceTests.swift": {
+        "destination": "Tests/IlliquidPlaybackStateSpaceTests/PlaybackStateSpaceTests.swift",
+        "sha256": "e0078810e194d3972d460f5d917f766fb9e90401e3ba8dffd38c2fde97a04648",
+        "source": "current worktree",
+        "transformation": "none"
+      }
+    },
+    "candidate": {
+      "Benchmarks/PORDiamondReuse/Harness.swift": {
+        "destination": "Sources/DiamondBenchmark/Harness.swift",
+        "sha256": "c95f7634c8f22b0a810df52bc409956a10b1a103f25addc1b95673f355fb2729",
+        "source": "current worktree",
+        "transformation": "none"
+      },
+      "Sources/IlliquidCore/Player/MediaTrack.swift": {
+        "destination": "Sources/IlliquidCore/MediaTrack.swift",
+        "sha256": "02a2d581f70eb7a18b2a520571999384abe5911e43d4b7e26022f48c1c57a441",
+        "source": "current worktree",
+        "transformation": "none"
+      },
+      "Sources/IlliquidPlaybackCore/CompletedPlaybackEffectHistory.swift": {
+        "destination": "Sources/IlliquidPlaybackCore/CompletedPlaybackEffectHistory.swift",
+        "sha256": "bdcf2f3a283de51150cf03f1b982dd9b3f7861acdb90a470947f84d6f8cda339",
+        "source": "current worktree",
+        "transformation": "none"
+      },
+      "Sources/IlliquidPlaybackCore/EventsAndEffects.swift": {
+        "destination": "Sources/IlliquidPlaybackCore/EventsAndEffects.swift",
+        "sha256": "a297b5e21f05fe7a44b0e3a24939df8a8f5b5ec22bc988e1671ba5247348c46e",
+        "source": "current worktree",
+        "transformation": "none"
+      },
+      "Sources/IlliquidPlaybackCore/IdentityAndTime.swift": {
+        "destination": "Sources/IlliquidPlaybackCore/IdentityAndTime.swift",
+        "sha256": "c1c1ee83d7cfbfb909e30fccba6d239ddc412a9f1138015b431b7cda3df723bb",
+        "source": "current worktree",
+        "transformation": "none"
+      },
+      "Sources/IlliquidPlaybackCore/LoadingAndDrainCore.swift": {
+        "destination": "Sources/IlliquidPlaybackCore/LoadingAndDrainCore.swift",
+        "sha256": "da35a412ca1a6919c9aa73a1c2eb06e7296ffa4643e27a9506b9294976ffffc4",
+        "source": "current worktree",
+        "transformation": "none"
+      },
+      "Sources/IlliquidPlaybackCore/PlaybackCore.swift": {
+        "destination": "Sources/IlliquidPlaybackCore/PlaybackCore.swift",
+        "sha256": "59faf4ba801d6d1e2d937302a19b45aa7c15eec263aebef987521a879d930fa0",
+        "source": "current worktree",
+        "transformation": "none"
+      },
+      "Sources/IlliquidPlaybackCore/PlaybackCoreState.swift": {
+        "destination": "Sources/IlliquidPlaybackCore/PlaybackCoreState.swift",
+        "sha256": "4832bd64d67568c5ebdc641dc67c64d1f681ba07a7902887fa8ee81e04d1b59f",
+        "source": "current worktree",
+        "transformation": "none"
+      },
+      "Sources/IlliquidPlaybackCore/PlaybackInvariants.swift": {
+        "destination": "Sources/IlliquidPlaybackCore/PlaybackInvariants.swift",
+        "sha256": "d25bb7de8f1871781bc8ee035a4b58dc00446f2dfe7491799a8315822a3c173e",
+        "source": "current worktree",
+        "transformation": "none"
+      },
+      "Sources/IlliquidPlaybackCore/PlaybackModelRuntime.swift": {
+        "destination": "Sources/IlliquidPlaybackCore/PlaybackModelRuntime.swift",
+        "sha256": "54a12cac94e739f0ca681b262283c125b3df291be0e3f1a7d1e0eb1b496d2ffb",
+        "source": "current worktree",
+        "transformation": "none"
+      },
+      "Sources/IlliquidPlaybackCore/PlaybackReplay.swift": {
+        "destination": "Sources/IlliquidPlaybackCore/PlaybackReplay.swift",
+        "sha256": "a5a94109b548bf12148b3e49b93570fbf2b63efffd97ef56d8deb6ee997279e3",
+        "source": "current worktree",
+        "transformation": "none"
+      },
+      "Sources/IlliquidPlaybackCore/RecoveryCore.swift": {
+        "destination": "Sources/IlliquidPlaybackCore/RecoveryCore.swift",
+        "sha256": "569ceffa207ba7dfdbd10f07d7f6ffc4d44fef37eefef2315959dcbb56b80f9a",
+        "source": "current worktree",
+        "transformation": "none"
+      },
+      "Sources/IlliquidPlaybackCore/SeekCore.swift": {
+        "destination": "Sources/IlliquidPlaybackCore/SeekCore.swift",
+        "sha256": "08e138ead38382839cb27a2a923247ec2716a2ea8b036bc8045df38feb78eb4b",
+        "source": "current worktree",
+        "transformation": "none"
+      },
+      "Sources/IlliquidPlaybackCore/SubtitleCore.swift": {
+        "destination": "Sources/IlliquidPlaybackCore/SubtitleCore.swift",
+        "sha256": "87e13ceedada39f64dd80c40b98040b9102db55bbe59784ec01b2111db12311b",
+        "source": "current worktree",
+        "transformation": "none"
+      },
+      "Sources/IlliquidPlaybackCore/SynchronizationCore.swift": {
+        "destination": "Sources/IlliquidPlaybackCore/SynchronizationCore.swift",
+        "sha256": "9337d8cc2936e9155a61d8fdd0dd4d2e2c9312ede2f9047c2d9bd83629459e20",
+        "source": "current worktree",
+        "transformation": "none"
+      },
+      "Sources/IlliquidPlaybackCore/TrackSelectionCore.swift": {
+        "destination": "Sources/IlliquidPlaybackCore/TrackSelectionCore.swift",
+        "sha256": "18f1e2274b9d6eb9e78a8916913f2bd538896363437089e16a3f81f49cf92f8d",
+        "source": "current worktree",
+        "transformation": "none"
+      },
+      "Sources/IlliquidPlaybackStateSpace/PlaybackPartialOrderReducer.swift": {
+        "destination": "Sources/IlliquidPlaybackStateSpace/PlaybackPartialOrderReducer.swift",
+        "sha256": "a3a4f5010135e55ef6564365aa7bb42a203033baae1c4fd9ed39d81dcabfaf3a",
+        "source": "current worktree",
+        "transformation": "none"
+      },
+      "Sources/IlliquidPlaybackStateSpace/PlaybackProgressAnalyzer.swift": {
+        "destination": "Sources/IlliquidPlaybackStateSpace/PlaybackProgressAnalyzer.swift",
+        "sha256": "46d26cc02e031d601e11078bef1336db071a91b30771537e8d74df6edf25d875",
+        "source": "current worktree",
+        "transformation": "none"
+      },
+      "Sources/IlliquidPlaybackStateSpace/PlaybackSearchArtifact.swift": {
+        "destination": "Sources/IlliquidPlaybackStateSpace/PlaybackSearchArtifact.swift",
+        "sha256": "8c528492cee44ab51fe5ec3f41b80e28c2ed560111c173974d3e742f0893bc12",
+        "source": "current worktree",
+        "transformation": "none"
+      },
+      "Sources/IlliquidPlaybackStateSpace/PlaybackSearchCanonicalizer.swift": {
+        "destination": "Sources/IlliquidPlaybackStateSpace/PlaybackSearchCanonicalizer.swift",
+        "sha256": "9c31b9f5c823a72cc6929c3cdf604330ea02f287c33da6451fd63711b11e2801",
+        "source": "current worktree",
+        "transformation": "none"
+      },
+      "Sources/IlliquidPlaybackStateSpace/PlaybackSearchModel.swift": {
+        "destination": "Sources/IlliquidPlaybackStateSpace/PlaybackSearchModel.swift",
+        "sha256": "ff7bae02bac4c03311afc379f202ce5ea369ea852126d2ccadc0a8659f59493b",
+        "source": "current worktree",
+        "transformation": "none"
+      },
+      "Sources/IlliquidPlaybackStateSpace/PlaybackSearchModels.swift": {
+        "destination": "Sources/IlliquidPlaybackStateSpace/PlaybackSearchModels.swift",
+        "sha256": "ce6f3a3acbd29499a700dd333dc49281f8caaebd35f8b83cf3526cbad3c3fb87",
+        "source": "current worktree",
+        "transformation": "none"
+      },
+      "Sources/IlliquidPlaybackStateSpace/PlaybackSearchTrend.swift": {
+        "destination": "Sources/IlliquidPlaybackStateSpace/PlaybackSearchTrend.swift",
+        "sha256": "1b5673c40a13b4ad778f33d1ab667e4794a754088457f7fa55a02ce864b32b32",
+        "source": "current worktree",
+        "transformation": "none"
+      },
+      "Sources/IlliquidPlaybackStateSpace/PlaybackSearchTypes.swift": {
+        "destination": "Sources/IlliquidPlaybackStateSpace/PlaybackSearchTypes.swift",
+        "sha256": "7d6587900a9bc2db6dba0362758229f00d9bc85b3c912aaa22708ec9a51a8e83",
+        "source": "current worktree",
+        "transformation": "none"
+      },
+      "Sources/IlliquidPlaybackStateSpace/PlaybackStateSpaceExplorer.swift": {
+        "destination": "Sources/IlliquidPlaybackStateSpace/PlaybackStateSpaceExplorer.swift",
+        "sha256": "a6519fc2997b60f3457999f32c22102d204f8a04d50071d55de981d75616be0f",
+        "source": "current worktree",
+        "transformation": "none"
+      },
+      "Sources/IlliquidPlaybackStateSpace/SearchAction.swift": {
+        "destination": "Sources/IlliquidPlaybackStateSpace/SearchAction.swift",
+        "sha256": "7ffea198f7c55ce6bf78245885fe09d3b30e79de6b2bbec8e20bdf40dff29e7a",
+        "source": "current worktree",
+        "transformation": "none"
+      },
+      "Tests/IlliquidPlaybackStateSpaceTests/PlaybackDiamondReuseTests.swift": {
+        "destination": "Tests/IlliquidPlaybackStateSpaceTests/PlaybackDiamondReuseTests.swift",
+        "sha256": "187429ee8509215c8c659fd33caaca2b86e06699284f6f9b2748a753516c90d4",
+        "source": "current worktree",
+        "transformation": "none"
+      },
+      "Tests/IlliquidPlaybackStateSpaceTests/PlaybackStateSpaceTests.swift": {
+        "destination": "Tests/IlliquidPlaybackStateSpaceTests/PlaybackStateSpaceTests.swift",
+        "sha256": "e0078810e194d3972d460f5d917f766fb9e90401e3ba8dffd38c2fde97a04648",
+        "source": "current worktree",
+        "transformation": "none"
+      }
+    }
+  },
+  "started_utc": "2026-10-28T06:00:46Z",
+  "swift": "Swift version 6.2.1 (swift-6.2.1-RELEASE)\nTarget: x86_64-unknown-linux-gnu",
+  "target_ms": 250.0
+}

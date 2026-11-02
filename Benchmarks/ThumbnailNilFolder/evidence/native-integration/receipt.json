@@ -1,0 +1,28 @@
+{
+  "repository": "Jagalite/illiquid",
+  "tested_commit": "5095f4f03ef535ad194e10ac7de45b11e83739e4",
+  "run_id": 40633988090,
+  "job_id": 122636618439,
+  "job_url": "https://github.com/Jagalite/illiquid/actions/runs/40633988090/job/122636618439",
+  "conclusion": "success",
+  "command": "swift test --force-resolved-versions -c release --jobs 2 --no-parallel --filter 'ThumbnailPolicyTests|ThumbnailSchedulingPolicyRegressionTests|ThumbnailBackgroundSchedulerTests'",
+  "build_seconds": 507.83,
+  "framework_reported_tests": 23,
+  "framework_reported_suites": 3,
+  "framework_reported_test_seconds": 18.379,
+  "fixture_or_ui_cases_not_qualified": [
+    {
+      "test": "currentVideoPreparationUsesRealPlaybackAndSharedCache",
+      "required_environment": "ILLIQUID_PROGRESSIVE_PREVIEW_FIXTURE"
+    },
+    {
+      "test": "nativeIdlePassPreparesDiscoveredVideosWithoutStartingPlayback",
+      "required_environment": "ILLIQUID_THUMBNAIL_IDLE_FIXTURES"
+    },
+    {
+      "test": "renderSettingsControls",
+      "required_environment": "ILLIQUID_THUMBNAIL_SETTINGS_IMAGE"
+    }
+  ],
+  "scope": "Full app graph release compilation and existing policy/cursor/scheduler regressions. The three listed cases return early without optional inputs that this workflow does not supply; no decoded-media or live UI qualification."
+}

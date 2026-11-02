@@ -2038,13 +2038,25 @@ struct SourceRowVisibility: Equatable, Sendable {
 }
 
 struct SourceVisibilityMatcher {
+    private struct RootPath {
+        let path: String
+        let descendantPrefix: String
+        let characterCount: Int
+
+        init(_ path: String) {
+            self.path = path
+            descendantPrefix = path == "/" ? "/" : path + "/"
+            characterCount = path.count
+        }
+    }
+
     private struct CompiledRule {
         let match: SourceVisibilityRegexMatch
         let expression: NSRegularExpression
     }
 
     private let configuration: SourceVisibilityConfiguration
-    private let rootPaths: [String]
+    private let rootPaths: [RootPath]
     private let compiledRules: [CompiledRule]
     private let rootEvaluations: [String: SourceVisibilityEvaluation]
 
@@ -2069,7 +2081,7 @@ struct SourceVisibilityMatcher {
                 expression: expression
             )
         }
-        self.rootPaths = rootPaths
+        self.rootPaths = rootPaths.map(RootPath.init)
         self.compiledRules = compiledRules
         rootEvaluations = Dictionary(uniqueKeysWithValues: rootPaths.map { path in
             (
@@ -2108,10 +2120,19 @@ struct SourceVisibilityMatcher {
 
     private static func evaluate(
         normalizedPath: String,
-        candidate: String,
+        candidate: @autoclosure () -> String,
         configuration: SourceVisibilityConfiguration,
         compiledRules: [CompiledRule]
     ) -> SourceVisibilityEvaluation {
+        // Manual-only visibility needs no relative path or UTF-16 regex range.
+        // Keep the candidate lazy for both row and cached root evaluations.
+        guard !compiledRules.isEmpty else {
+            return SourceVisibilityEvaluation(
+                hiddenMatches: configuration.manuallyHiddenPaths.contains(normalizedPath) ? [.manual] : [],
+                regexMatches: []
+            )
+        }
+        let candidate = candidate()
         let range = NSRange(candidate.startIndex..., in: candidate)
         let regexMatches = compiledRules.compactMap { rule in
             var matched = false
@@ -2167,19 +2188,103 @@ struct SourceVisibilityMatcher {
 
     private func evaluateIncludingAncestors(
         normalizedPath: String,
-        rootPath: String
+        rootPath: RootPath
     ) -> SourceVisibilityEvaluation {
         let direct = evaluate(normalizedPath: normalizedPath)
-
-        var regexMatches = direct.regexMatches
-        var ancestorPath = URL(fileURLWithPath: normalizedPath, isDirectory: false)
+        let parentPath = URL(fileURLWithPath: normalizedPath, isDirectory: false)
             .deletingLastPathComponent()
             .path
-        while ancestorPath.count >= rootPath.count,
-              SourceTreeIdentity.contains(ancestorPath, within: rootPath)
+        return evaluateAncestors(
+            parentPath: parentPath, rootPath: rootPath, direct: direct
+        )
+    }
+
+    /// A projection owns this mutable evaluator. Its immutable matcher binds the
+    /// cache to one rule/root snapshot; copying the evaluator copies its state.
+    /// Only one parent's ancestry is retained, regardless of library size.
+    func makeAncestorEvaluator() -> AncestorEvaluator {
+        AncestorEvaluator(matcher: self)
+    }
+
+    struct AncestorEvaluator {
+        private let matcher: SourceVisibilityMatcher
+        private var cached: (
+            parent: String, root: String, evaluation: SourceVisibilityEvaluation
+        )?
+
+        fileprivate init(matcher: SourceVisibilityMatcher) {
+            self.matcher = matcher
+        }
+
+        mutating func evaluate(_ url: URL) -> SourceVisibilityEvaluation {
+            guard let path = SourceVisibilityPath.normalized(url) else {
+                return SourceVisibilityEvaluation(hiddenMatches: [], regexMatches: [])
+            }
+            return evaluate(normalizedPath: path)
+        }
+
+        mutating func evaluate(normalizedPath: String) -> SourceVisibilityEvaluation {
+            guard let rootPath = matcher.matchingRootPath(for: normalizedPath) else {
+                return matcher.evaluate(normalizedPath: normalizedPath)
+            }
+            // File-specific matches and overrides are never cached.
+            let direct = matcher.evaluate(normalizedPath: normalizedPath)
+            let parentPath = URL(fileURLWithPath: normalizedPath, isDirectory: false)
+                .deletingLastPathComponent().path
+            if parentPath == rootPath.path {
+                // Root evaluations already belong to the immutable matcher.
+                return SourceVisibilityMatcher.combining(direct, ancestors:
+                    matcher.rootEvaluations[rootPath.path]
+                        ?? matcher.evaluate(normalizedPath: rootPath.path))
+            }
+            let ancestors: SourceVisibilityEvaluation
+            if !Task.isCancelled, let cached,
+               cached.parent.utf8.elementsEqual(parentPath.utf8),
+               cached.root.utf8.elementsEqual(rootPath.path.utf8) {
+                // Swift String equality folds canonical Unicode spellings,
+                // whereas Foundation regexes inspect the original input bytes.
+                ancestors = cached.evaluation
+            } else {
+                ancestors = matcher.evaluateAncestors(
+                    parentPath: parentPath, rootPath: rootPath
+                )
+                // A cancelled regex enumeration may contain partial results.
+                // Never publish those results or reuse a hit while cancelled.
+                if !Task.isCancelled {
+                    cached = (parentPath, rootPath.path, ancestors)
+                }
+            }
+            return SourceVisibilityMatcher.combining(direct, ancestors: ancestors)
+        }
+    }
+
+    private static func combining(
+        _ direct: SourceVisibilityEvaluation,
+        ancestors: SourceVisibilityEvaluation
+    ) -> SourceVisibilityEvaluation {
+        var regexMatches = direct.regexMatches
+        for match in ancestors.regexMatches where !regexMatches.contains(match) {
+            regexMatches.append(match)
+        }
+        return SourceVisibilityEvaluation(
+            hiddenMatches: ancestors.hiddenMatches.isEmpty
+                ? direct.hiddenMatches : ancestors.hiddenMatches,
+            regexMatches: regexMatches
+        )
+    }
+
+    private func evaluateAncestors(
+        parentPath: String,
+        rootPath: RootPath,
+        direct: SourceVisibilityEvaluation = .init(hiddenMatches: [], regexMatches: [])
+    ) -> SourceVisibilityEvaluation {
+        var regexMatches = direct.regexMatches
+        var ancestorPath = parentPath
+        while ancestorPath.count >= rootPath.characterCount,
+              ancestorPath == rootPath.path || ancestorPath.hasPrefix(rootPath.descendantPrefix)
         {
-            let ancestor = ancestorPath == rootPath
-                ? rootEvaluations[rootPath] ?? evaluate(
+            let ancestor = ancestorPath == rootPath.path
+                ? rootEvaluations[rootPath.path] ?? evaluate(
                     normalizedPath: ancestorPath
                 )
                 : evaluate(normalizedPath: ancestorPath)
@@ -2192,7 +2297,7 @@ struct SourceVisibilityMatcher {
                     regexMatches: regexMatches
                 )
             }
-            if ancestorPath == rootPath {
+            if ancestorPath == rootPath.path {
                 break
             }
             ancestorPath = URL(fileURLWithPath: ancestorPath, isDirectory: false)
@@ -2220,18 +2325,29 @@ struct SourceVisibilityMatcher {
         guard let matchingRoot else {
             return URL(fileURLWithPath: normalizedPath, isDirectory: false).lastPathComponent
         }
-        guard normalizedPath != matchingRoot else {
-            return URL(fileURLWithPath: matchingRoot, isDirectory: false).lastPathComponent
+        guard normalizedPath != matchingRoot.path else {
+            return URL(fileURLWithPath: matchingRoot.path, isDirectory: false).lastPathComponent
         }
-        return String(normalizedPath.dropFirst(matchingRoot == "/" ? 1 : matchingRoot.count + 1))
+        return String(normalizedPath.dropFirst(matchingRoot.path == "/" ? 1 : matchingRoot.characterCount + 1))
     }
 
-    private func matchingRootPath(for normalizedPath: String) -> String? {
-        rootPaths
-            .filter { rootPath in
-                SourceTreeIdentity.contains(normalizedPath, within: rootPath)
+    private func matchingRootPath(for normalizedPath: String) -> RootPath? {
+        // Single-root containment uses the same prepared fields as the ordered scan.
+        if rootPaths.count == 1 {
+            let root = rootPaths[0]
+            return normalizedPath == root.path || normalizedPath.hasPrefix(root.descendantPrefix) ? root : nil
+        }
+        var result: RootPath?
+        var longestCount = -1
+        // Keep the first longest match, as filter(...).max(by:) did. Prefixes
+        // and grapheme counts are invariant across this projection's lookups.
+        for root in rootPaths where root.characterCount > longestCount {
+            if normalizedPath == root.path || normalizedPath.hasPrefix(root.descendantPrefix) {
+                result = root
+                longestCount = root.characterCount
             }
-            .max { $0.count < $1.count }
+        }
+        return result
     }
 }
 
@@ -2347,11 +2463,22 @@ enum SourceTreeSorting {
         _ entries: [SourceTreeEntry],
         using configuration: SourceTreeSortConfiguration
     ) -> [SourceTreeEntry] {
+        guard let indices = sortedIndicesIfNeeded(entries, using: configuration)
+        else { return entries }
+        return indices.map { entries[$0] }
+    }
+
+    /// Nil keeps input order without allocating a permutation for unsorted,
+    /// empty, or singleton inputs. Callers can project directly from positions.
+    static func sortedIndicesIfNeeded(
+        _ entries: [SourceTreeEntry],
+        using configuration: SourceTreeSortConfiguration
+    ) -> [Int]? {
         guard entries.count > 1,
               configuration.type != .off
                 || configuration.dateCreated != .off
                 || configuration.name != .off
-        else { return entries }
+        else { return nil }
 
         // Resolve a filename only if earlier criteria tie, and at most once
         // per entry. A date sort with distinct dates need not read any names.
@@ -2398,7 +2525,7 @@ enum SourceTreeSorting {
                 }
             }
             return leftIndex < rightIndex
-        }.map { entries[$0] }
+        }
     }
 }
 

@@ -201,8 +201,9 @@ func apply(
       ))
   }
   if case .stale = transition.disposition {
-    // The search key excludes depth, so the unmodified input yields the
-    // pre-transition key; it is derived only for stale transitions.
+    // Only stale transitions need the pre-state invariant. The immutable input
+    // retains the same production state as the former eager key; depth and
+    // environment bookkeeping do not participate in the fields compared below.
     let preKey = PlaybackSearchCanonicalizer.key(for: input)
     let postKey = PlaybackSearchCanonicalizer.key(for: node)
     if preKey.lifecycle != postKey.lifecycle || preKey.externalWait != postKey.externalWait

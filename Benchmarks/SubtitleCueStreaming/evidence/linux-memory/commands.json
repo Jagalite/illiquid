@@ -1,0 +1,5604 @@
+[
+  {
+    "command": [
+      "git",
+      "merge-base",
+      "--is-ancestor",
+      "ea2ff568237e2667f7b1aeee67b11a44ebe95b72",
+      "HEAD"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "baseline-ancestor",
+    "log": "baseline-ancestor.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "show",
+      "ea2ff568237e2667f7b1aeee67b11a44ebe95b72:Sources/IlliquidNativePlayback/Subtitles/ExternalTextSubtitleConverter.swift"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "baseline-source",
+    "log": "baseline-source.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "2a26e9951ac64921f398fc5f23c5d81c6c319952bfe02d9b2b3a0b4a765fdc28"
+  },
+  {
+    "command": [
+      "<PYTHON>",
+      "<OUTPUT>/sources/test_memory_launcher.py"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "test-memory-launcher",
+    "log": "test-memory-launcher.log",
+    "stderr_sha256": "d55ee33faafa904ed6ed6d356fd036c761fd9a532705e42c06fe4407348e1808",
+    "stdout_sha256": "15a7229f8d56ea1cff6f11b34000b34b2fa7b1ebef7df85feb905dcf26224693"
+  },
+  {
+    "command": [
+      "git",
+      "rev-parse",
+      "HEAD"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "head",
+    "log": "head.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "a025f7ff3e90e8400122562a3e49aa2629b4b7daf8e9bff5e1576c02a16f62db"
+  },
+  {
+    "command": [
+      "swiftc",
+      "--version"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "swift-version",
+    "log": "swift-version.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "d7df78b37cc23138e1c65ac3cc35f9bd0db2caf1df39880130951b36a7d039f1"
+  },
+  {
+    "command": [
+      "lscpu"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "hardware",
+    "log": "hardware.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "0535bb1480e83c69fe356e41634e13a277dab7414cf5d563975b02388982cb37"
+  },
+  {
+    "command": [
+      "swiftc",
+      "-swift-version",
+      "6",
+      "-parse-as-library",
+      "-Onone",
+      "<OUTPUT>/sources/baseline.swift",
+      "<OUTPUT>/sources/Driver.swift",
+      "-o",
+      "<OUTPUT>/baseline-debug"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "build-baseline-debug",
+    "log": "build-baseline-debug.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "<OUTPUT>/baseline-debug",
+      "verify"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "verify-baseline-debug",
+    "log": "verify-baseline-debug.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "7a57b99cd47b5c964ab88ca9736bd276ae96cd738bacd03863bb6aa55cd98a8e"
+  },
+  {
+    "command": [
+      "swiftc",
+      "-swift-version",
+      "6",
+      "-parse-as-library",
+      "-Onone",
+      "<OUTPUT>/sources/candidate.swift",
+      "<OUTPUT>/sources/Driver.swift",
+      "-o",
+      "<OUTPUT>/candidate-debug"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "build-candidate-debug",
+    "log": "build-candidate-debug.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "<OUTPUT>/candidate-debug",
+      "verify"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "verify-candidate-debug",
+    "log": "verify-candidate-debug.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "7a57b99cd47b5c964ab88ca9736bd276ae96cd738bacd03863bb6aa55cd98a8e"
+  },
+  {
+    "command": [
+      "swiftc",
+      "-swift-version",
+      "6",
+      "-parse-as-library",
+      "-O",
+      "-whole-module-optimization",
+      "<OUTPUT>/sources/baseline.swift",
+      "<OUTPUT>/sources/Driver.swift",
+      "-o",
+      "<OUTPUT>/baseline-release"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "build-baseline-release",
+    "log": "build-baseline-release.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "<OUTPUT>/baseline-release",
+      "verify"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "verify-baseline-release",
+    "log": "verify-baseline-release.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "7a57b99cd47b5c964ab88ca9736bd276ae96cd738bacd03863bb6aa55cd98a8e"
+  },
+  {
+    "command": [
+      "swiftc",
+      "-swift-version",
+      "6",
+      "-parse-as-library",
+      "-O",
+      "-whole-module-optimization",
+      "<OUTPUT>/sources/candidate.swift",
+      "<OUTPUT>/sources/Driver.swift",
+      "-o",
+      "<OUTPUT>/candidate-release"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "build-candidate-release",
+    "log": "build-candidate-release.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "<OUTPUT>/candidate-release",
+      "verify"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "verify-candidate-release",
+    "log": "verify-candidate-release.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "7a57b99cd47b5c964ab88ca9736bd276ae96cd738bacd03863bb6aa55cd98a8e"
+  },
+  {
+    "command": [
+      "<OUTPUT>/candidate-release",
+      "list-memory"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "list-memory",
+    "log": "list-memory.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "529b409a74ffb164b16151f8188eddba3e33523ef4e2dffd04ff7a111d442ed0"
+  },
+  {
+    "command": [
+      "swift",
+      "test",
+      "--package-path",
+      "<OUTPUT>/tests-baseline",
+      "--configuration",
+      "debug",
+      "--jobs",
+      "2",
+      "--no-parallel"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "tests-baseline-debug",
+    "log": "tests-baseline-debug.log",
+    "stderr_sha256": "7a8519ca662a2aad381ab6a2db7f73d1d36f5af9d90c2f61ad313a9455285e4b",
+    "stdout_sha256": "386608df138a88f38b10588b14d9ec32f5a81635dece227b62c67003b4681abb"
+  },
+  {
+    "command": [
+      "swift",
+      "test",
+      "--package-path",
+      "<OUTPUT>/tests-baseline",
+      "--configuration",
+      "release",
+      "--jobs",
+      "2",
+      "--no-parallel"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "tests-baseline-release",
+    "log": "tests-baseline-release.log",
+    "stderr_sha256": "a9a505ae742bbc88d7e22eafb8a8314edb73a36f77e6db2a12842b6edc2f363f",
+    "stdout_sha256": "b52a5eb9d2e38016076ceef298ff5e8e8669466ef804b06421719c07169bd01f"
+  },
+  {
+    "command": [
+      "swift",
+      "test",
+      "--package-path",
+      "<OUTPUT>/tests-candidate",
+      "--configuration",
+      "debug",
+      "--jobs",
+      "2",
+      "--no-parallel"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "tests-candidate-debug",
+    "log": "tests-candidate-debug.log",
+    "stderr_sha256": "30223c325fa92944029f42125d202526dd57554d008e73e3c93453aad7b89f74",
+    "stdout_sha256": "ae682e6eb1ce26f11224135f0ccd303938102a6c0482a3a4e501b3cbd57f4f83"
+  },
+  {
+    "command": [
+      "swift",
+      "test",
+      "--package-path",
+      "<OUTPUT>/tests-candidate",
+      "--configuration",
+      "release",
+      "--jobs",
+      "2",
+      "--no-parallel"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "tests-candidate-release",
+    "log": "tests-candidate-release.log",
+    "stderr_sha256": "648e1a20b89db9cd930284af661bbf520fc1bcef8d8e3fe6c62d1054ea021496",
+    "stdout_sha256": "67a2088175082904a5ff9bff2ffcb1258afac75a6ab3026f378e2e7267340683"
+  },
+  {
+    "command": [
+      "<OUTPUT>/baseline-release",
+      "measure",
+      "srt-short",
+      "1"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "pilot-srt-short-baseline-0",
+    "log": "pilot-srt-short-baseline-0.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "bce1e390fc43a4296f82481225687773f5a6cf6427a61903b0f6cd582f02456d"
+  },
+  {
+    "command": [
+      "<OUTPUT>/baseline-release",
+      "measure",
+      "srt-short",
+      "190"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "pilot-srt-short-baseline-1",
+    "log": "pilot-srt-short-baseline-1.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "6fa18dc419c15e03fe6c3d893158ac646c099ab8ff921fbbc5d24cd035f9ead4"
+  },
+  {
+    "command": [
+      "<OUTPUT>/candidate-release",
+      "measure",
+      "srt-short",
+      "1"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "pilot-srt-short-candidate-0",
+    "log": "pilot-srt-short-candidate-0.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "c479fd26a6411306babf33a88be6ce526d8115f35e0d3c2c27bdb80b73f77965"
+  },
+  {
+    "command": [
+      "<OUTPUT>/candidate-release",
+      "measure",
+      "srt-short",
+      "243"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "pilot-srt-short-candidate-1",
+    "log": "pilot-srt-short-candidate-1.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "8d1605e7050eedad5c8cb2b9632087b00b9b6c6a9153d13409b8d60e54c00bf0"
+  },
+  {
+    "command": [
+      "<OUTPUT>/baseline-release",
+      "measure",
+      "vtt-short",
+      "1"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "pilot-vtt-short-baseline-0",
+    "log": "pilot-vtt-short-baseline-0.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "2f0a16e5be6cd4b49003e539fafca4ad9a0d90e87e482f26b3661b336e7532f1"
+  },
+  {
+    "command": [
+      "<OUTPUT>/baseline-release",
+      "measure",
+      "vtt-short",
+      "111"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "pilot-vtt-short-baseline-1",
+    "log": "pilot-vtt-short-baseline-1.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "8f13e500edd1c7a065fd5a1eb3ff7a9282d453a942072590904aecc10e166b52"
+  },
+  {
+    "command": [
+      "<OUTPUT>/candidate-release",
+      "measure",
+      "vtt-short",
+      "1"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "pilot-vtt-short-candidate-0",
+    "log": "pilot-vtt-short-candidate-0.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "6b7cf4cf4de2dc0b44e7162bcbe1cd9c0f7591e3ba672b44f561d21e5677bf52"
+  },
+  {
+    "command": [
+      "<OUTPUT>/candidate-release",
+      "measure",
+      "vtt-short",
+      "147"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "pilot-vtt-short-candidate-1",
+    "log": "pilot-vtt-short-candidate-1.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "b7c0b0354e9b88e94140809ef35d0a6480945c29e1f6df53a6f69b7d687d6423"
+  },
+  {
+    "command": [
+      "<OUTPUT>/baseline-release",
+      "measure",
+      "srt-crlf",
+      "1"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "pilot-srt-crlf-baseline-0",
+    "log": "pilot-srt-crlf-baseline-0.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "0db1a36340f3efbb895a4b092cd65fc8a26c279a373188e2c9b2ad31f775b7e7"
+  },
+  {
+    "command": [
+      "<OUTPUT>/baseline-release",
+      "measure",
+      "srt-crlf",
+      "136"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "pilot-srt-crlf-baseline-1",
+    "log": "pilot-srt-crlf-baseline-1.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "a0610f7fcead4376796d61ea0c37972b5da2335735c3e77936929b71ca30fc56"
+  },
+  {
+    "command": [
+      "<OUTPUT>/candidate-release",
+      "measure",
+      "srt-crlf",
+      "1"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "pilot-srt-crlf-candidate-0",
+    "log": "pilot-srt-crlf-candidate-0.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "d414890951e52270aa468380fce0b960fca106cbfb8abdf897b3c4158e873f34"
+  },
+  {
+    "command": [
+      "<OUTPUT>/candidate-release",
+      "measure",
+      "srt-crlf",
+      "157"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "pilot-srt-crlf-candidate-1",
+    "log": "pilot-srt-crlf-candidate-1.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "cd7f179add10e021dfb5931311021639ea9d65d60932ea3b1c49c2062988e327"
+  },
+  {
+    "command": [
+      "<OUTPUT>/baseline-release",
+      "measure",
+      "vtt-crlf",
+      "1"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "pilot-vtt-crlf-baseline-0",
+    "log": "pilot-vtt-crlf-baseline-0.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "7a94160507fc40d04e58a78ce22b090496248d0ddd30bf842bb6e173aa907b3f"
+  },
+  {
+    "command": [
+      "<OUTPUT>/baseline-release",
+      "measure",
+      "vtt-crlf",
+      "71"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "pilot-vtt-crlf-baseline-1",
+    "log": "pilot-vtt-crlf-baseline-1.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "f45060406369f89c37eecbe66f6a9911f86922cc3748964842a63a9cded740ea"
+  },
+  {
+    "command": [
+      "<OUTPUT>/candidate-release",
+      "measure",
+      "vtt-crlf",
+      "1"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "pilot-vtt-crlf-candidate-0",
+    "log": "pilot-vtt-crlf-candidate-0.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "ab9b792a27d55a597cac3a15f4933e41e1cce4e791c994d2888cc4cf8ff07c97"
+  },
+  {
+    "command": [
+      "<OUTPUT>/candidate-release",
+      "measure",
+      "vtt-crlf",
+      "85"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "pilot-vtt-crlf-candidate-1",
+    "log": "pilot-vtt-crlf-candidate-1.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "569d1f08d02053f647def74a4591285bb02fbb23790cb4d5b6820aa98a14298b"
+  },
+  {
+    "command": [
+      "<OUTPUT>/baseline-release",
+      "measure",
+      "srt-multiline",
+      "1"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "pilot-srt-multiline-baseline-0",
+    "log": "pilot-srt-multiline-baseline-0.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "044a83817f00d6f0c72ff3f0900175c0fb1f3a5b4f58901f6eab881441e113f7"
+  },
+  {
+    "command": [
+      "<OUTPUT>/baseline-release",
+      "measure",
+      "srt-multiline",
+      "11"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "pilot-srt-multiline-baseline-1",
+    "log": "pilot-srt-multiline-baseline-1.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "0f4f8813163db6c77be24258f6f79fb786bbafa9e118eb69ffdfa892de6d2cae"
+  },
+  {
+    "command": [
+      "<OUTPUT>/candidate-release",
+      "measure",
+      "srt-multiline",
+      "1"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "pilot-srt-multiline-candidate-0",
+    "log": "pilot-srt-multiline-candidate-0.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "eedad53dbc4b21c558e0ecc8e4f47224b62981854d6859c198364e27407eae19"
+  },
+  {
+    "command": [
+      "<OUTPUT>/candidate-release",
+      "measure",
+      "srt-multiline",
+      "12"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "pilot-srt-multiline-candidate-1",
+    "log": "pilot-srt-multiline-candidate-1.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "2713e2c8b33b54a844a2d974622233fa5bf8b7af142df7f1cba9c0b57c26defc"
+  },
+  {
+    "command": [
+      "<OUTPUT>/baseline-release",
+      "measure",
+      "srt-dense",
+      "1"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "pilot-srt-dense-baseline-0",
+    "log": "pilot-srt-dense-baseline-0.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "21f3194545ae8782a65ad05f2c6e77a18e29c88916f9de1b607fe787f5491d42"
+  },
+  {
+    "command": [
+      "<OUTPUT>/baseline-release",
+      "measure",
+      "srt-dense",
+      "13"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "pilot-srt-dense-baseline-1",
+    "log": "pilot-srt-dense-baseline-1.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "8409390a6bf3b0475ca2281d9cb91f3e236d7d235f1e1721d5bca939939b42b3"
+  },
+  {
+    "command": [
+      "<OUTPUT>/candidate-release",
+      "measure",
+      "srt-dense",
+      "1"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "pilot-srt-dense-candidate-0",
+    "log": "pilot-srt-dense-candidate-0.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "cff8b339b5309a4d6192e1536a51b3f678dcce04a632edfa36416662b66e9b20"
+  },
+  {
+    "command": [
+      "<OUTPUT>/candidate-release",
+      "measure",
+      "srt-dense",
+      "24"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "pilot-srt-dense-candidate-1",
+    "log": "pilot-srt-dense-candidate-1.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "31496400530a60602d4e8b0c1a4f596b95079702436e39235e83a50df8a606f6"
+  },
+  {
+    "command": [
+      "<OUTPUT>/baseline-release",
+      "measure",
+      "srt-long-line",
+      "1"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "pilot-srt-long-line-baseline-0",
+    "log": "pilot-srt-long-line-baseline-0.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "702eedac928cc6ee851cf4709589d261ccf18321c0f01488f0f3fc2cbab9a786"
+  },
+  {
+    "command": [
+      "<OUTPUT>/baseline-release",
+      "measure",
+      "srt-long-line",
+      "9"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "pilot-srt-long-line-baseline-1",
+    "log": "pilot-srt-long-line-baseline-1.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "151915883a04ddb97b8a538c92c64ca6d93177b41986e65ba988c7d521944b3e"
+  },
+  {
+    "command": [
+      "<OUTPUT>/candidate-release",
+      "measure",
+      "srt-long-line",
+      "1"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "pilot-srt-long-line-candidate-0",
+    "log": "pilot-srt-long-line-candidate-0.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "d8ef4f17dbbe34e613f0de5995a23689fad9ec81065adbef84a7582aa4e7d733"
+  },
+  {
+    "command": [
+      "<OUTPUT>/candidate-release",
+      "measure",
+      "srt-long-line",
+      "25"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "pilot-srt-long-line-candidate-1",
+    "log": "pilot-srt-long-line-candidate-1.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "7fe1e57df38217bb057e5cd1f65aaedf3112082cb62e440afb41b15bae5d5266"
+  },
+  {
+    "command": [
+      "<OUTPUT>/baseline-release",
+      "measure",
+      "invalid-preamble",
+      "1"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "pilot-invalid-preamble-baseline-0",
+    "log": "pilot-invalid-preamble-baseline-0.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "1af54f7dcad2b18ff3ac1f7f56dca28b6d618f094b0079f91d5a5184f6031489"
+  },
+  {
+    "command": [
+      "<OUTPUT>/baseline-release",
+      "measure",
+      "invalid-preamble",
+      "18"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "pilot-invalid-preamble-baseline-1",
+    "log": "pilot-invalid-preamble-baseline-1.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "12bb83173b9af88c663ded613d4b28c588a8a60480eeeeecb59a8f5a490b086a"
+  },
+  {
+    "command": [
+      "<OUTPUT>/candidate-release",
+      "measure",
+      "invalid-preamble",
+      "1"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "pilot-invalid-preamble-candidate-0",
+    "log": "pilot-invalid-preamble-candidate-0.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "d668f2a0dd0f23b821f02fb77916605a68ae24168511c1e473ca3d64e9944ac9"
+  },
+  {
+    "command": [
+      "<OUTPUT>/candidate-release",
+      "measure",
+      "invalid-preamble",
+      "30"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "pilot-invalid-preamble-candidate-1",
+    "log": "pilot-invalid-preamble-candidate-1.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "aa3538e0dffb27a4ba569246ae6e0eca32876ff936a5bd20960bddd2abbf6ce5"
+  },
+  {
+    "command": [
+      "<OUTPUT>/baseline-release",
+      "measure",
+      "srt-short",
+      "190"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "measure-srt-short-0-baseline",
+    "log": "measure-srt-short-0-baseline.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "ef043a10f8376cce27803a9c75a406feb69edeac7f4828604a1a1d9f84cbabe6"
+  },
+  {
+    "command": [
+      "<OUTPUT>/candidate-release",
+      "measure",
+      "srt-short",
+      "243"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "measure-srt-short-0-candidate",
+    "log": "measure-srt-short-0-candidate.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "484de15613d28bffd2932505531c81821c04c0c575c92df95c3f00ae074a3068"
+  },
+  {
+    "command": [
+      "<OUTPUT>/candidate-release",
+      "measure",
+      "srt-short",
+      "243"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "measure-srt-short-1-candidate",
+    "log": "measure-srt-short-1-candidate.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "03d63b46d381a7eb4052bb284985b41b053f0aeb57a12e8d9e2d12c7a8aa6f1a"
+  },
+  {
+    "command": [
+      "<OUTPUT>/baseline-release",
+      "measure",
+      "srt-short",
+      "190"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "measure-srt-short-1-baseline",
+    "log": "measure-srt-short-1-baseline.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "65ab8160f03851b11b3c27cb7a615744bd1b5899264941ef218a148eede496a4"
+  },
+  {
+    "command": [
+      "<OUTPUT>/baseline-release",
+      "measure",
+      "srt-short",
+      "190"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "measure-srt-short-2-baseline",
+    "log": "measure-srt-short-2-baseline.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "9c9b5793a70eba1c20f0a6f1a24774c2db902c6809f2a999325e298b9e49f5d3"
+  },
+  {
+    "command": [
+      "<OUTPUT>/candidate-release",
+      "measure",
+      "srt-short",
+      "243"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "measure-srt-short-2-candidate",
+    "log": "measure-srt-short-2-candidate.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "fa0fc8b8836eddeba100a7ea4efc232636e6f3555cb5f7485faa923c79edf45f"
+  },
+  {
+    "command": [
+      "<OUTPUT>/candidate-release",
+      "measure",
+      "srt-short",
+      "243"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "measure-srt-short-3-candidate",
+    "log": "measure-srt-short-3-candidate.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "ad24d5dbc3f4b019128db36bef27418d1504965d16c0f1907d352f4077b3fb4e"
+  },
+  {
+    "command": [
+      "<OUTPUT>/baseline-release",
+      "measure",
+      "srt-short",
+      "190"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "measure-srt-short-3-baseline",
+    "log": "measure-srt-short-3-baseline.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "61bdf65e123f1a15fe2e08ac4ca7f8ec79b17e4b9dea8f727af557b355c55dca"
+  },
+  {
+    "command": [
+      "<OUTPUT>/baseline-release",
+      "measure",
+      "srt-short",
+      "190"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "measure-srt-short-4-baseline",
+    "log": "measure-srt-short-4-baseline.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "417dfefe6867015d533f63b4ae8bdb4ffb9ea507b6d4ad8f7e344e7b62a7761b"
+  },
+  {
+    "command": [
+      "<OUTPUT>/candidate-release",
+      "measure",
+      "srt-short",
+      "243"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "measure-srt-short-4-candidate",
+    "log": "measure-srt-short-4-candidate.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "003f7b439496565934b23b55a9e812f3d6e299e8ea7d19c31a9a6ab984090773"
+  },
+  {
+    "command": [
+      "<OUTPUT>/candidate-release",
+      "measure",
+      "srt-short",
+      "243"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "measure-srt-short-5-candidate",
+    "log": "measure-srt-short-5-candidate.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "d696bf7530c30f1d50d6e3f9a06352fba6699895cc8efe6649879540524e10ef"
+  },
+  {
+    "command": [
+      "<OUTPUT>/baseline-release",
+      "measure",
+      "srt-short",
+      "190"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "measure-srt-short-5-baseline",
+    "log": "measure-srt-short-5-baseline.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "5d6cf0e6e086e6d8de18a54884852eb4613968e8254e0a8b23fd6c95a36ed1e2"
+  },
+  {
+    "command": [
+      "<OUTPUT>/baseline-release",
+      "measure",
+      "srt-short",
+      "190"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "measure-srt-short-6-baseline",
+    "log": "measure-srt-short-6-baseline.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "b9a848b0908fd93eea6bcdad438b22d7703cac69c0cfd8e4d132b6174954a04c"
+  },
+  {
+    "command": [
+      "<OUTPUT>/candidate-release",
+      "measure",
+      "srt-short",
+      "243"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "measure-srt-short-6-candidate",
+    "log": "measure-srt-short-6-candidate.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "1591f591a33d93eaf93715c1d8335d27a52a3c3d640a5f35c9523f6b574fccf4"
+  },
+  {
+    "command": [
+      "<OUTPUT>/candidate-release",
+      "measure",
+      "srt-short",
+      "243"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "measure-srt-short-7-candidate",
+    "log": "measure-srt-short-7-candidate.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "e30656197ca4773252006242ebeacbc69d195196b8a9bd84b7c59afb38f9b66e"
+  },
+  {
+    "command": [
+      "<OUTPUT>/baseline-release",
+      "measure",
+      "srt-short",
+      "190"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "measure-srt-short-7-baseline",
+    "log": "measure-srt-short-7-baseline.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "1d2cbab1577322c1c4ef161fb0d134f3f86c0157d5cb71eeac08d5e0a8a18a66"
+  },
+  {
+    "command": [
+      "<OUTPUT>/baseline-release",
+      "measure",
+      "vtt-short",
+      "111"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "measure-vtt-short-0-baseline",
+    "log": "measure-vtt-short-0-baseline.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "c8d31ff75b417b7346cc994fad930c0503c5e84a139d0c9c74ade12a8f073e2b"
+  },
+  {
+    "command": [
+      "<OUTPUT>/candidate-release",
+      "measure",
+      "vtt-short",
+      "147"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "measure-vtt-short-0-candidate",
+    "log": "measure-vtt-short-0-candidate.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "1fd1d641d16ea66c81bce8e1cc74ea96780439faf192edec5441258b505a3755"
+  },
+  {
+    "command": [
+      "<OUTPUT>/candidate-release",
+      "measure",
+      "vtt-short",
+      "147"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "measure-vtt-short-1-candidate",
+    "log": "measure-vtt-short-1-candidate.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "e01647f518cbeaeefb452cad594cfac8031d1d2d18c7c9b8a09ab7f32ac9c324"
+  },
+  {
+    "command": [
+      "<OUTPUT>/baseline-release",
+      "measure",
+      "vtt-short",
+      "111"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "measure-vtt-short-1-baseline",
+    "log": "measure-vtt-short-1-baseline.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "f45c04dad755494df0a54530223106467071a99cae2e76bc0940bea6aba8b8a7"
+  },
+  {
+    "command": [
+      "<OUTPUT>/baseline-release",
+      "measure",
+      "vtt-short",
+      "111"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "measure-vtt-short-2-baseline",
+    "log": "measure-vtt-short-2-baseline.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "82de1ceffa62de384ff752dafbf875617f82c9521b45d383f9d90f9308c342aa"
+  },
+  {
+    "command": [
+      "<OUTPUT>/candidate-release",
+      "measure",
+      "vtt-short",
+      "147"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "measure-vtt-short-2-candidate",
+    "log": "measure-vtt-short-2-candidate.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "54581b862f8909cde2590176bd083f3a24a4bb7c7281f94965503365fc4ae39b"
+  },
+  {
+    "command": [
+      "<OUTPUT>/candidate-release",
+      "measure",
+      "vtt-short",
+      "147"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "measure-vtt-short-3-candidate",
+    "log": "measure-vtt-short-3-candidate.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "03f768203da0207191c515214d20e9bb1aeda9ffd34f8457dee982a38c98bd38"
+  },
+  {
+    "command": [
+      "<OUTPUT>/baseline-release",
+      "measure",
+      "vtt-short",
+      "111"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "measure-vtt-short-3-baseline",
+    "log": "measure-vtt-short-3-baseline.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "215e34ba3f17501903301b01b7795364d7ff59323e89b86ac062e362b3397125"
+  },
+  {
+    "command": [
+      "<OUTPUT>/baseline-release",
+      "measure",
+      "vtt-short",
+      "111"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "measure-vtt-short-4-baseline",
+    "log": "measure-vtt-short-4-baseline.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "369b02f75c0f08220183b1e67cde7dcf8fb38b8f672fae814b9f1c5bec5a6035"
+  },
+  {
+    "command": [
+      "<OUTPUT>/candidate-release",
+      "measure",
+      "vtt-short",
+      "147"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "measure-vtt-short-4-candidate",
+    "log": "measure-vtt-short-4-candidate.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "2414164cfb5e256e36478c98318e61660519d75b39b9b6134bc5617d5068eafd"
+  },
+  {
+    "command": [
+      "<OUTPUT>/candidate-release",
+      "measure",
+      "vtt-short",
+      "147"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "measure-vtt-short-5-candidate",
+    "log": "measure-vtt-short-5-candidate.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "1437d9dfdb3164560ed85904237ed7f5eae409d8c0c0247c52feea7828ceaaa5"
+  },
+  {
+    "command": [
+      "<OUTPUT>/baseline-release",
+      "measure",
+      "vtt-short",
+      "111"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "measure-vtt-short-5-baseline",
+    "log": "measure-vtt-short-5-baseline.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "47543081938e234538af3d0b6b73d2b2b6899419143c76700004fedff3454664"
+  },
+  {
+    "command": [
+      "<OUTPUT>/baseline-release",
+      "measure",
+      "vtt-short",
+      "111"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "measure-vtt-short-6-baseline",
+    "log": "measure-vtt-short-6-baseline.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "d3da87e0cb0d3b75e3ad2640e63a0e449ce997cc5a2cab04e61c60774f8de332"
+  },
+  {
+    "command": [
+      "<OUTPUT>/candidate-release",
+      "measure",
+      "vtt-short",
+      "147"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "measure-vtt-short-6-candidate",
+    "log": "measure-vtt-short-6-candidate.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "b45b464ffa80955b0389e22ba79e5e440561ec5bfbe03f2f4ccf475fbaa2c5b6"
+  },
+  {
+    "command": [
+      "<OUTPUT>/candidate-release",
+      "measure",
+      "vtt-short",
+      "147"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "measure-vtt-short-7-candidate",
+    "log": "measure-vtt-short-7-candidate.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "51b9c4d0e26bcb0d24d1deea0a38fcac4e2b8ced3acc72860e4794a2bb56a56c"
+  },
+  {
+    "command": [
+      "<OUTPUT>/baseline-release",
+      "measure",
+      "vtt-short",
+      "111"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "measure-vtt-short-7-baseline",
+    "log": "measure-vtt-short-7-baseline.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "270a91751f1f8deb2bb23d7895496fa18a084bcf99e764eb78f265fd1f3de1e2"
+  },
+  {
+    "command": [
+      "<OUTPUT>/baseline-release",
+      "measure",
+      "srt-crlf",
+      "136"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "measure-srt-crlf-0-baseline",
+    "log": "measure-srt-crlf-0-baseline.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "aa9b3cccbaaf13a062f483197150edbc7cbbe0b8b79dd8b975d50cd3d36335c1"
+  },
+  {
+    "command": [
+      "<OUTPUT>/candidate-release",
+      "measure",
+      "srt-crlf",
+      "157"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "measure-srt-crlf-0-candidate",
+    "log": "measure-srt-crlf-0-candidate.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "fdff6bc8263f818ddca5fb325014bdb7b2d1825acc46a25794fac57d0bb8eab6"
+  },
+  {
+    "command": [
+      "<OUTPUT>/candidate-release",
+      "measure",
+      "srt-crlf",
+      "157"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "measure-srt-crlf-1-candidate",
+    "log": "measure-srt-crlf-1-candidate.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "172fc89bd24934915ffca359bcaaf09cc224ae065eeb757b6dbcb88699460c7b"
+  },
+  {
+    "command": [
+      "<OUTPUT>/baseline-release",
+      "measure",
+      "srt-crlf",
+      "136"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "measure-srt-crlf-1-baseline",
+    "log": "measure-srt-crlf-1-baseline.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "445ecf6184079c5949ccdcaae056c1e6e33e1fbf307594e3b2fbea52d5e30ec7"
+  },
+  {
+    "command": [
+      "<OUTPUT>/baseline-release",
+      "measure",
+      "srt-crlf",
+      "136"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "measure-srt-crlf-2-baseline",
+    "log": "measure-srt-crlf-2-baseline.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "92a595f0086a93e3a13332f0b539fce1e39926061b465d3f00589b314656937f"
+  },
+  {
+    "command": [
+      "<OUTPUT>/candidate-release",
+      "measure",
+      "srt-crlf",
+      "157"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "measure-srt-crlf-2-candidate",
+    "log": "measure-srt-crlf-2-candidate.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "a2c4317cfe3d57f553ab7f5d3490c75c733a1b6a779ccb73fa680474a461ae23"
+  },
+  {
+    "command": [
+      "<OUTPUT>/candidate-release",
+      "measure",
+      "srt-crlf",
+      "157"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "measure-srt-crlf-3-candidate",
+    "log": "measure-srt-crlf-3-candidate.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "5d24a91ebb1b3a9798192736ef79ecd2277aa699ede65cb02724be491eb353bc"
+  },
+  {
+    "command": [
+      "<OUTPUT>/baseline-release",
+      "measure",
+      "srt-crlf",
+      "136"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "measure-srt-crlf-3-baseline",
+    "log": "measure-srt-crlf-3-baseline.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "aa18b5adf326c6caddb50af35d9632655574c809ef4c437485baac32c0f3f099"
+  },
+  {
+    "command": [
+      "<OUTPUT>/baseline-release",
+      "measure",
+      "srt-crlf",
+      "136"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "measure-srt-crlf-4-baseline",
+    "log": "measure-srt-crlf-4-baseline.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "5e58168142ad84245effb87ec3979ec7e9f1db8516c43289eab773c53f4feb9b"
+  },
+  {
+    "command": [
+      "<OUTPUT>/candidate-release",
+      "measure",
+      "srt-crlf",
+      "157"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "measure-srt-crlf-4-candidate",
+    "log": "measure-srt-crlf-4-candidate.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "98cbf431af315105106983829b06552ecb46ecbe9b0d7da9ac871c97d7971314"
+  },
+  {
+    "command": [
+      "<OUTPUT>/candidate-release",
+      "measure",
+      "srt-crlf",
+      "157"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "measure-srt-crlf-5-candidate",
+    "log": "measure-srt-crlf-5-candidate.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "b55b3cdd17cd33f9d8ddb6c3cc3925e0222727e254f0a205094d5272174e9320"
+  },
+  {
+    "command": [
+      "<OUTPUT>/baseline-release",
+      "measure",
+      "srt-crlf",
+      "136"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "measure-srt-crlf-5-baseline",
+    "log": "measure-srt-crlf-5-baseline.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "e49e591776443e50b7e10d495af4472c614a14d7b6e915dd9ce44f8b81d8a6bf"
+  },
+  {
+    "command": [
+      "<OUTPUT>/baseline-release",
+      "measure",
+      "srt-crlf",
+      "136"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "measure-srt-crlf-6-baseline",
+    "log": "measure-srt-crlf-6-baseline.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "218bccffca48a1f535ab90d99b0f1d6d3fbacd332d94e96200aa6f3e95ba1aa7"
+  },
+  {
+    "command": [
+      "<OUTPUT>/candidate-release",
+      "measure",
+      "srt-crlf",
+      "157"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "measure-srt-crlf-6-candidate",
+    "log": "measure-srt-crlf-6-candidate.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "0888f90ab0c8921a9da9593ea99136be5b9008aea97b697843004c99601b8d67"
+  },
+  {
+    "command": [
+      "<OUTPUT>/candidate-release",
+      "measure",
+      "srt-crlf",
+      "157"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "measure-srt-crlf-7-candidate",
+    "log": "measure-srt-crlf-7-candidate.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "4abd398b345863c96a0356ce355d89ce650c69f5f5ba52d343a245826624cc17"
+  },
+  {
+    "command": [
+      "<OUTPUT>/baseline-release",
+      "measure",
+      "srt-crlf",
+      "136"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "measure-srt-crlf-7-baseline",
+    "log": "measure-srt-crlf-7-baseline.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "3f6fd23f1133b31988f0466d5eb9c5aa1afc34034155ec5231d25eb7e73bf07b"
+  },
+  {
+    "command": [
+      "<OUTPUT>/baseline-release",
+      "measure",
+      "vtt-crlf",
+      "71"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "measure-vtt-crlf-0-baseline",
+    "log": "measure-vtt-crlf-0-baseline.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "e7ed5d737acd4b24bff2937fc65ed5053dfaefe8c7b6260fe024ce418e27fc81"
+  },
+  {
+    "command": [
+      "<OUTPUT>/candidate-release",
+      "measure",
+      "vtt-crlf",
+      "85"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "measure-vtt-crlf-0-candidate",
+    "log": "measure-vtt-crlf-0-candidate.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "4a76d4e1aa51e4c25ade2bca073a474cf2edc0041a487871836b5408a8c4e755"
+  },
+  {
+    "command": [
+      "<OUTPUT>/candidate-release",
+      "measure",
+      "vtt-crlf",
+      "85"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "measure-vtt-crlf-1-candidate",
+    "log": "measure-vtt-crlf-1-candidate.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "3ecdfad1482d35a0162963f39e6eea12bc2968765e7e9749ac7d73525c311d95"
+  },
+  {
+    "command": [
+      "<OUTPUT>/baseline-release",
+      "measure",
+      "vtt-crlf",
+      "71"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "measure-vtt-crlf-1-baseline",
+    "log": "measure-vtt-crlf-1-baseline.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "b9ce976578b2251c568c793cec811cbe3c77a451aa41dd1a1ecd766112d74bf8"
+  },
+  {
+    "command": [
+      "<OUTPUT>/baseline-release",
+      "measure",
+      "vtt-crlf",
+      "71"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "measure-vtt-crlf-2-baseline",
+    "log": "measure-vtt-crlf-2-baseline.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "c16701dec2e6ead339751d50e486daa6307b4139bb9c2309daedba17acd2f15a"
+  },
+  {
+    "command": [
+      "<OUTPUT>/candidate-release",
+      "measure",
+      "vtt-crlf",
+      "85"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "measure-vtt-crlf-2-candidate",
+    "log": "measure-vtt-crlf-2-candidate.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "9ac841f9625c865a979a247a9058bffbe195a80ab69aa1cac994b1d4ec6d6368"
+  },
+  {
+    "command": [
+      "<OUTPUT>/candidate-release",
+      "measure",
+      "vtt-crlf",
+      "85"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "measure-vtt-crlf-3-candidate",
+    "log": "measure-vtt-crlf-3-candidate.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "3f4983b715b47f200a707bc138041fbfa4fcd5680602f408ebf4ff0a56293911"
+  },
+  {
+    "command": [
+      "<OUTPUT>/baseline-release",
+      "measure",
+      "vtt-crlf",
+      "71"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "measure-vtt-crlf-3-baseline",
+    "log": "measure-vtt-crlf-3-baseline.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "6be4b4c737564a63a5622c51d36321b60a34ff117c403a5378b2b0e398928f5f"
+  },
+  {
+    "command": [
+      "<OUTPUT>/baseline-release",
+      "measure",
+      "vtt-crlf",
+      "71"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "measure-vtt-crlf-4-baseline",
+    "log": "measure-vtt-crlf-4-baseline.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "13dede74570205db7f3c52d2a27e5c31e74ed53d6e42baff32952365544479d5"
+  },
+  {
+    "command": [
+      "<OUTPUT>/candidate-release",
+      "measure",
+      "vtt-crlf",
+      "85"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "measure-vtt-crlf-4-candidate",
+    "log": "measure-vtt-crlf-4-candidate.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "47d2c1a48e551c7ecfccebb0684f8a0b4de3cb2fb052f800673fb20b7cc4dcb8"
+  },
+  {
+    "command": [
+      "<OUTPUT>/candidate-release",
+      "measure",
+      "vtt-crlf",
+      "85"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "measure-vtt-crlf-5-candidate",
+    "log": "measure-vtt-crlf-5-candidate.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "2f51f03cc0cb7da94365842ef838bedbdbd20e56635deec603cf360a53157bfb"
+  },
+  {
+    "command": [
+      "<OUTPUT>/baseline-release",
+      "measure",
+      "vtt-crlf",
+      "71"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "measure-vtt-crlf-5-baseline",
+    "log": "measure-vtt-crlf-5-baseline.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "597a707950952f98236432a2a51c134fe43f0c02a532de3ec51d8408c7b7a5d4"
+  },
+  {
+    "command": [
+      "<OUTPUT>/baseline-release",
+      "measure",
+      "vtt-crlf",
+      "71"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "measure-vtt-crlf-6-baseline",
+    "log": "measure-vtt-crlf-6-baseline.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "e6505ee9a29a35d7242756ab5b9f9f7e776d3989ffba75e89ad74f83bd04d183"
+  },
+  {
+    "command": [
+      "<OUTPUT>/candidate-release",
+      "measure",
+      "vtt-crlf",
+      "85"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "measure-vtt-crlf-6-candidate",
+    "log": "measure-vtt-crlf-6-candidate.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "bcf7e9cb3fa8f8a54f37978a66e996b48ac6aeee3cfa727253b246904f33418d"
+  },
+  {
+    "command": [
+      "<OUTPUT>/candidate-release",
+      "measure",
+      "vtt-crlf",
+      "85"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "measure-vtt-crlf-7-candidate",
+    "log": "measure-vtt-crlf-7-candidate.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "25bd4f446a324a51ee28f84ebff27909352a89e8f27ff84a371a58fcfd6edc30"
+  },
+  {
+    "command": [
+      "<OUTPUT>/baseline-release",
+      "measure",
+      "vtt-crlf",
+      "71"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "measure-vtt-crlf-7-baseline",
+    "log": "measure-vtt-crlf-7-baseline.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "118f53237663830365486595233e5a1e4853237357e0ce58cc51112abc1599e9"
+  },
+  {
+    "command": [
+      "<OUTPUT>/baseline-release",
+      "measure",
+      "srt-multiline",
+      "11"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "measure-srt-multiline-0-baseline",
+    "log": "measure-srt-multiline-0-baseline.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "e048967bdc5daf509a78c8aaf7e142ab2b705f08f684855de4b905373dfb92ba"
+  },
+  {
+    "command": [
+      "<OUTPUT>/candidate-release",
+      "measure",
+      "srt-multiline",
+      "12"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "measure-srt-multiline-0-candidate",
+    "log": "measure-srt-multiline-0-candidate.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "5dcdecf7c3ac91fbf938d729a28119212757a34efd6f1ba51b8f7e3ca9a620d0"
+  },
+  {
+    "command": [
+      "<OUTPUT>/candidate-release",
+      "measure",
+      "srt-multiline",
+      "12"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "measure-srt-multiline-1-candidate",
+    "log": "measure-srt-multiline-1-candidate.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "7e6f5969b3905f51b787b18ab7b6e6f71250fa31d02c1437d89226ade3b77263"
+  },
+  {
+    "command": [
+      "<OUTPUT>/baseline-release",
+      "measure",
+      "srt-multiline",
+      "11"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "measure-srt-multiline-1-baseline",
+    "log": "measure-srt-multiline-1-baseline.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "e702b15af0db6f9c07e6ed892517ff3a08f530d2857db1bd80e7e4a5b07d0d54"
+  },
+  {
+    "command": [
+      "<OUTPUT>/baseline-release",
+      "measure",
+      "srt-multiline",
+      "11"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "measure-srt-multiline-2-baseline",
+    "log": "measure-srt-multiline-2-baseline.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "e229dcc10241dc0257e43707f77686e9de89e646024a54dc4cee6d3ad46691b7"
+  },
+  {
+    "command": [
+      "<OUTPUT>/candidate-release",
+      "measure",
+      "srt-multiline",
+      "12"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "measure-srt-multiline-2-candidate",
+    "log": "measure-srt-multiline-2-candidate.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "c22186546e8485cb1fd8511d484e9c18407f353cba0757551657407298885b5a"
+  },
+  {
+    "command": [
+      "<OUTPUT>/candidate-release",
+      "measure",
+      "srt-multiline",
+      "12"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "measure-srt-multiline-3-candidate",
+    "log": "measure-srt-multiline-3-candidate.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "5424e37d160ffa125d9d3c2cde5c12040ae41a9b6345f27a98c95fb42385186e"
+  },
+  {
+    "command": [
+      "<OUTPUT>/baseline-release",
+      "measure",
+      "srt-multiline",
+      "11"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "measure-srt-multiline-3-baseline",
+    "log": "measure-srt-multiline-3-baseline.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "9e43bb930eddd9ace4253fd7d9d98d5eb5364690acfc57bbeae9781faace8118"
+  },
+  {
+    "command": [
+      "<OUTPUT>/baseline-release",
+      "measure",
+      "srt-multiline",
+      "11"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "measure-srt-multiline-4-baseline",
+    "log": "measure-srt-multiline-4-baseline.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "73db7d08fdc4cddfd73c8024677333bafe97034158578ac4cbe0f7ebf9fdbdbd"
+  },
+  {
+    "command": [
+      "<OUTPUT>/candidate-release",
+      "measure",
+      "srt-multiline",
+      "12"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "measure-srt-multiline-4-candidate",
+    "log": "measure-srt-multiline-4-candidate.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "1978de821f61d228c9f84c94cb8f11e5429bae2b24d413ecf18a5cc8cec43e4c"
+  },
+  {
+    "command": [
+      "<OUTPUT>/candidate-release",
+      "measure",
+      "srt-multiline",
+      "12"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "measure-srt-multiline-5-candidate",
+    "log": "measure-srt-multiline-5-candidate.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "93fe0bb0fdf3826607db6d54a80ed2c42a08dc475ccd2961ac69c88964d67c77"
+  },
+  {
+    "command": [
+      "<OUTPUT>/baseline-release",
+      "measure",
+      "srt-multiline",
+      "11"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "measure-srt-multiline-5-baseline",
+    "log": "measure-srt-multiline-5-baseline.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "338152a5911c0829743a21f888934496ffda49a911e20972f565db4b664f5d08"
+  },
+  {
+    "command": [
+      "<OUTPUT>/baseline-release",
+      "measure",
+      "srt-multiline",
+      "11"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "measure-srt-multiline-6-baseline",
+    "log": "measure-srt-multiline-6-baseline.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "153fe147d344ed2844f39a23a5579bb5ff859c6ab0d330387c8711e16832c123"
+  },
+  {
+    "command": [
+      "<OUTPUT>/candidate-release",
+      "measure",
+      "srt-multiline",
+      "12"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "measure-srt-multiline-6-candidate",
+    "log": "measure-srt-multiline-6-candidate.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "85376fb79aabbe69aea16f5a0b207ef892db8585140653592b44fe8c80937edb"
+  },
+  {
+    "command": [
+      "<OUTPUT>/candidate-release",
+      "measure",
+      "srt-multiline",
+      "12"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "measure-srt-multiline-7-candidate",
+    "log": "measure-srt-multiline-7-candidate.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "4c84a9a9486925a214c7a3cae74b20b108b85a53fbf99e54809e6beb896b288a"
+  },
+  {
+    "command": [
+      "<OUTPUT>/baseline-release",
+      "measure",
+      "srt-multiline",
+      "11"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "measure-srt-multiline-7-baseline",
+    "log": "measure-srt-multiline-7-baseline.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "074072b8ded3db58ed317b3cea79ff3e1afdcae9f52dffeb133ac7e727816ebf"
+  },
+  {
+    "command": [
+      "<OUTPUT>/baseline-release",
+      "measure",
+      "srt-dense",
+      "13"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "measure-srt-dense-0-baseline",
+    "log": "measure-srt-dense-0-baseline.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "cb8cae8558b37931ee78ee36d8b20ac61ec6c08e078020f8592f6ea3aa41aa47"
+  },
+  {
+    "command": [
+      "<OUTPUT>/candidate-release",
+      "measure",
+      "srt-dense",
+      "24"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "measure-srt-dense-0-candidate",
+    "log": "measure-srt-dense-0-candidate.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "be1adf9254b4e1629aa81c7cd18fc1f12e88e88b96f6d84395b7b7fbb0f1ed82"
+  },
+  {
+    "command": [
+      "<OUTPUT>/candidate-release",
+      "measure",
+      "srt-dense",
+      "24"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "measure-srt-dense-1-candidate",
+    "log": "measure-srt-dense-1-candidate.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "e8b219dc6f6e8e2e954431018736eaf03a79a30664ddc119fd28cc9eb70d0553"
+  },
+  {
+    "command": [
+      "<OUTPUT>/baseline-release",
+      "measure",
+      "srt-dense",
+      "13"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "measure-srt-dense-1-baseline",
+    "log": "measure-srt-dense-1-baseline.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "91b53cc1a13d4e6f18b721386adba2fcaf61dd38ab4d82037d04439246f18b54"
+  },
+  {
+    "command": [
+      "<OUTPUT>/baseline-release",
+      "measure",
+      "srt-dense",
+      "13"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "measure-srt-dense-2-baseline",
+    "log": "measure-srt-dense-2-baseline.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "4977d4fd20621fbb9028eb37742ac83c0e932b30a98942b221c915bec378ce09"
+  },
+  {
+    "command": [
+      "<OUTPUT>/candidate-release",
+      "measure",
+      "srt-dense",
+      "24"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "measure-srt-dense-2-candidate",
+    "log": "measure-srt-dense-2-candidate.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "a1ed6dabd6104daa6aa6e68a575f9d7b26171a710c0b81161a608f1aeab4582e"
+  },
+  {
+    "command": [
+      "<OUTPUT>/candidate-release",
+      "measure",
+      "srt-dense",
+      "24"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "measure-srt-dense-3-candidate",
+    "log": "measure-srt-dense-3-candidate.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "b879f57288e56218ecc595458102d9724e0e90db4695a3c9796d307a90d12cc9"
+  },
+  {
+    "command": [
+      "<OUTPUT>/baseline-release",
+      "measure",
+      "srt-dense",
+      "13"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "measure-srt-dense-3-baseline",
+    "log": "measure-srt-dense-3-baseline.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "f9372dd677dfec2eb392f0b56bde574c27b483a4db9d1e28ff22b401dca86e64"
+  },
+  {
+    "command": [
+      "<OUTPUT>/baseline-release",
+      "measure",
+      "srt-dense",
+      "13"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "measure-srt-dense-4-baseline",
+    "log": "measure-srt-dense-4-baseline.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "c3a530c5b24464e52d363b7c18b40e707d26a0c0f6a6fffaa94b0e64900f251c"
+  },
+  {
+    "command": [
+      "<OUTPUT>/candidate-release",
+      "measure",
+      "srt-dense",
+      "24"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "measure-srt-dense-4-candidate",
+    "log": "measure-srt-dense-4-candidate.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "dd471ac8cc954aaf5313e9765783b6f009161bd4714b6a3b0d93adcfbfc42e4c"
+  },
+  {
+    "command": [
+      "<OUTPUT>/candidate-release",
+      "measure",
+      "srt-dense",
+      "24"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "measure-srt-dense-5-candidate",
+    "log": "measure-srt-dense-5-candidate.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "95c82519decf2ac56aa9ee389ef138739b1428fce5c2856d6636c381cc83924b"
+  },
+  {
+    "command": [
+      "<OUTPUT>/baseline-release",
+      "measure",
+      "srt-dense",
+      "13"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "measure-srt-dense-5-baseline",
+    "log": "measure-srt-dense-5-baseline.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "ff8d3433a78e21e3f97442ee0b142336a1494826f5392a777de810cd085c1b83"
+  },
+  {
+    "command": [
+      "<OUTPUT>/baseline-release",
+      "measure",
+      "srt-dense",
+      "13"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "measure-srt-dense-6-baseline",
+    "log": "measure-srt-dense-6-baseline.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "1a716e0180f2b73b469eb28d7ae63602f142856c742bda1624826c403c916c13"
+  },
+  {
+    "command": [
+      "<OUTPUT>/candidate-release",
+      "measure",
+      "srt-dense",
+      "24"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "measure-srt-dense-6-candidate",
+    "log": "measure-srt-dense-6-candidate.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "19076d1e5f436fba2dab6bba0179759a7af9c7e6d1d4e7310fb2b425f1f46932"
+  },
+  {
+    "command": [
+      "<OUTPUT>/candidate-release",
+      "measure",
+      "srt-dense",
+      "24"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "measure-srt-dense-7-candidate",
+    "log": "measure-srt-dense-7-candidate.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "71f276064376ef0caa294bcecfe461dadb1660364ce3952fdc0d37ca61e32403"
+  },
+  {
+    "command": [
+      "<OUTPUT>/baseline-release",
+      "measure",
+      "srt-dense",
+      "13"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "measure-srt-dense-7-baseline",
+    "log": "measure-srt-dense-7-baseline.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "551279490aa0f8e11d9bff6a4d6bdf67ee029f924dc31230565233a7fae7b291"
+  },
+  {
+    "command": [
+      "<OUTPUT>/baseline-release",
+      "measure",
+      "srt-long-line",
+      "9"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "measure-srt-long-line-0-baseline",
+    "log": "measure-srt-long-line-0-baseline.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "47ed59fb269a70cfd709ec156a86e39ca0eef1e9067d359c75e587b6041c5fe9"
+  },
+  {
+    "command": [
+      "<OUTPUT>/candidate-release",
+      "measure",
+      "srt-long-line",
+      "25"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "measure-srt-long-line-0-candidate",
+    "log": "measure-srt-long-line-0-candidate.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "20c1ec82fc5e3101ff8174ed8ca7384071c244012476e28b56dead42e76be79c"
+  },
+  {
+    "command": [
+      "<OUTPUT>/candidate-release",
+      "measure",
+      "srt-long-line",
+      "25"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "measure-srt-long-line-1-candidate",
+    "log": "measure-srt-long-line-1-candidate.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "2d69880fe9aeaeab2c09269c7130357d7f4e3513525f0bff3cbbe585a6024eef"
+  },
+  {
+    "command": [
+      "<OUTPUT>/baseline-release",
+      "measure",
+      "srt-long-line",
+      "9"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "measure-srt-long-line-1-baseline",
+    "log": "measure-srt-long-line-1-baseline.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "ec44028aafd692d56e70ea06740199329cc757640f2e4be40483e5762ff17108"
+  },
+  {
+    "command": [
+      "<OUTPUT>/baseline-release",
+      "measure",
+      "srt-long-line",
+      "9"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "measure-srt-long-line-2-baseline",
+    "log": "measure-srt-long-line-2-baseline.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "862f2f21c7663aa8cb4ff9f90d7a107f8d44db230a70c9f0b149cd22e2d2da50"
+  },
+  {
+    "command": [
+      "<OUTPUT>/candidate-release",
+      "measure",
+      "srt-long-line",
+      "25"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "measure-srt-long-line-2-candidate",
+    "log": "measure-srt-long-line-2-candidate.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "d90d4b5103e961f7a2fed4845f2c6e7c8d00b9b20881e5ad7f7230c3efc252bc"
+  },
+  {
+    "command": [
+      "<OUTPUT>/candidate-release",
+      "measure",
+      "srt-long-line",
+      "25"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "measure-srt-long-line-3-candidate",
+    "log": "measure-srt-long-line-3-candidate.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "84deb6126ceea44e5c9e5815cd8195a7d1a267bea47cf978e681f8b9c688e663"
+  },
+  {
+    "command": [
+      "<OUTPUT>/baseline-release",
+      "measure",
+      "srt-long-line",
+      "9"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "measure-srt-long-line-3-baseline",
+    "log": "measure-srt-long-line-3-baseline.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "03d5915e5afbc77c1f7055fda1f6f9aaeefdf79f601768213e26fc4f49a2ab6d"
+  },
+  {
+    "command": [
+      "<OUTPUT>/baseline-release",
+      "measure",
+      "srt-long-line",
+      "9"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "measure-srt-long-line-4-baseline",
+    "log": "measure-srt-long-line-4-baseline.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "a07db6c7bace5a0789d2fd18c0d62de54b921f20de9f9328a4bfc5e633b6160a"
+  },
+  {
+    "command": [
+      "<OUTPUT>/candidate-release",
+      "measure",
+      "srt-long-line",
+      "25"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "measure-srt-long-line-4-candidate",
+    "log": "measure-srt-long-line-4-candidate.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "ef438ccbf980586fad644b8d3ff3762afa35641da9371458cf23a96f78f27d32"
+  },
+  {
+    "command": [
+      "<OUTPUT>/candidate-release",
+      "measure",
+      "srt-long-line",
+      "25"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "measure-srt-long-line-5-candidate",
+    "log": "measure-srt-long-line-5-candidate.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "1166a47421cb728fd573a7f0840e506934b046da763b619f43320227898d1ede"
+  },
+  {
+    "command": [
+      "<OUTPUT>/baseline-release",
+      "measure",
+      "srt-long-line",
+      "9"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "measure-srt-long-line-5-baseline",
+    "log": "measure-srt-long-line-5-baseline.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "d50fda65efc4a14c426ccf6a1f7b94b50f2153ae4f05b2b168161f7f7c296905"
+  },
+  {
+    "command": [
+      "<OUTPUT>/baseline-release",
+      "measure",
+      "srt-long-line",
+      "9"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "measure-srt-long-line-6-baseline",
+    "log": "measure-srt-long-line-6-baseline.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "2f4d37baa5100a7b2ed51b14b051d48c18600936b99ff47a2cca5f9fe6d974fa"
+  },
+  {
+    "command": [
+      "<OUTPUT>/candidate-release",
+      "measure",
+      "srt-long-line",
+      "25"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "measure-srt-long-line-6-candidate",
+    "log": "measure-srt-long-line-6-candidate.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "e7b1b369c71ec378bb8a46f477647d75985d4521dc915164a3296f092b43d1a2"
+  },
+  {
+    "command": [
+      "<OUTPUT>/candidate-release",
+      "measure",
+      "srt-long-line",
+      "25"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "measure-srt-long-line-7-candidate",
+    "log": "measure-srt-long-line-7-candidate.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "c37901dc5d92ea34c7c163839259c2a1fc087fa21f72027236525b190a35162e"
+  },
+  {
+    "command": [
+      "<OUTPUT>/baseline-release",
+      "measure",
+      "srt-long-line",
+      "9"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "measure-srt-long-line-7-baseline",
+    "log": "measure-srt-long-line-7-baseline.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "74c386ff98a49b88a40bf8dbc4f12a59f43b482f4f64e14dc96f21f9ed75d0f0"
+  },
+  {
+    "command": [
+      "<OUTPUT>/baseline-release",
+      "measure",
+      "invalid-preamble",
+      "18"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "measure-invalid-preamble-0-baseline",
+    "log": "measure-invalid-preamble-0-baseline.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "85a4d24728188f8bdc2471b793fad4413223e916e8c021c6668f7872360c082b"
+  },
+  {
+    "command": [
+      "<OUTPUT>/candidate-release",
+      "measure",
+      "invalid-preamble",
+      "30"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "measure-invalid-preamble-0-candidate",
+    "log": "measure-invalid-preamble-0-candidate.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "02fc93d5905f0a239d359e3026d9c409c3871dba6b0a672b3b9a217110a18de5"
+  },
+  {
+    "command": [
+      "<OUTPUT>/candidate-release",
+      "measure",
+      "invalid-preamble",
+      "30"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "measure-invalid-preamble-1-candidate",
+    "log": "measure-invalid-preamble-1-candidate.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "cbe3860840544db613a14837def9a1e11033c5ef86b774c5bd62bdfcaddfd215"
+  },
+  {
+    "command": [
+      "<OUTPUT>/baseline-release",
+      "measure",
+      "invalid-preamble",
+      "18"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "measure-invalid-preamble-1-baseline",
+    "log": "measure-invalid-preamble-1-baseline.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "110d465d427af176b5df7d38d8e1d73ff1fc5fc029ac515d73d3a44956f1585c"
+  },
+  {
+    "command": [
+      "<OUTPUT>/baseline-release",
+      "measure",
+      "invalid-preamble",
+      "18"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "measure-invalid-preamble-2-baseline",
+    "log": "measure-invalid-preamble-2-baseline.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "d0dea0c4cdff92775c0c73fde30ac3bec3a20996c0f9220e5cc6d4a67fa39448"
+  },
+  {
+    "command": [
+      "<OUTPUT>/candidate-release",
+      "measure",
+      "invalid-preamble",
+      "30"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "measure-invalid-preamble-2-candidate",
+    "log": "measure-invalid-preamble-2-candidate.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "03b07e40ba181f49168fd9fa2c175031dafa12f7e774b3568c11d6f6de4f82a2"
+  },
+  {
+    "command": [
+      "<OUTPUT>/candidate-release",
+      "measure",
+      "invalid-preamble",
+      "30"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "measure-invalid-preamble-3-candidate",
+    "log": "measure-invalid-preamble-3-candidate.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "8bec94dd51e6ddd2e4a3498744eaa09e9cfc91efa9bc105bf4cf09f6359cc88e"
+  },
+  {
+    "command": [
+      "<OUTPUT>/baseline-release",
+      "measure",
+      "invalid-preamble",
+      "18"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "measure-invalid-preamble-3-baseline",
+    "log": "measure-invalid-preamble-3-baseline.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "950a8134f0e02f24a94353c6ab18d0fd8e2fbb5b5c6febda6fd33c54412b1710"
+  },
+  {
+    "command": [
+      "<OUTPUT>/baseline-release",
+      "measure",
+      "invalid-preamble",
+      "18"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "measure-invalid-preamble-4-baseline",
+    "log": "measure-invalid-preamble-4-baseline.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "a1d277e77e9244331b3a27b11bcfb8de7472febaade7b349c2977921608cb6a1"
+  },
+  {
+    "command": [
+      "<OUTPUT>/candidate-release",
+      "measure",
+      "invalid-preamble",
+      "30"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "measure-invalid-preamble-4-candidate",
+    "log": "measure-invalid-preamble-4-candidate.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "17b99c5c9d08c0a15467693185f1dc44bd2e12fee994d686770ecb74b6bbb06c"
+  },
+  {
+    "command": [
+      "<OUTPUT>/candidate-release",
+      "measure",
+      "invalid-preamble",
+      "30"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "measure-invalid-preamble-5-candidate",
+    "log": "measure-invalid-preamble-5-candidate.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "f55fb8571c6eb63567d2628c143c19f610888535d922beda8e80c4b994bb2fae"
+  },
+  {
+    "command": [
+      "<OUTPUT>/baseline-release",
+      "measure",
+      "invalid-preamble",
+      "18"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "measure-invalid-preamble-5-baseline",
+    "log": "measure-invalid-preamble-5-baseline.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "3b7b4e18461449ea2612ccb8bb032d73c9ab66258799d226691e10b2cc887b08"
+  },
+  {
+    "command": [
+      "<OUTPUT>/baseline-release",
+      "measure",
+      "invalid-preamble",
+      "18"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "measure-invalid-preamble-6-baseline",
+    "log": "measure-invalid-preamble-6-baseline.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "40fb0c1f77de07014fceb1e143adea817decb7a1ca76d6bac971312b368f7f34"
+  },
+  {
+    "command": [
+      "<OUTPUT>/candidate-release",
+      "measure",
+      "invalid-preamble",
+      "30"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "measure-invalid-preamble-6-candidate",
+    "log": "measure-invalid-preamble-6-candidate.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "fffeca3bea350392ad2d0b2731728da3d48dbe67b248dbdca65c432daf103ef8"
+  },
+  {
+    "command": [
+      "<OUTPUT>/candidate-release",
+      "measure",
+      "invalid-preamble",
+      "30"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "measure-invalid-preamble-7-candidate",
+    "log": "measure-invalid-preamble-7-candidate.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "d6a143f2d1977fb4fbc2c4670c7112fa4d1410c59625b88d576927b237842414"
+  },
+  {
+    "command": [
+      "<OUTPUT>/baseline-release",
+      "measure",
+      "invalid-preamble",
+      "18"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "measure-invalid-preamble-7-baseline",
+    "log": "measure-invalid-preamble-7-baseline.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "9f02ef77fd0bf9ab92f60b575eaaf9b62a2a7db6868d47da80f1d1155b357cfd"
+  },
+  {
+    "command": [
+      "<PYTHON>",
+      "-I",
+      "<OUTPUT>/sources/fresh_process.py",
+      "<OUTPUT>/baseline-release",
+      "memory",
+      "srt-short"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "memory-srt-short-0-baseline",
+    "log": "memory-srt-short-0-baseline.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "099630569a35b9594c550eb5a0f5a4a08a946fc16772dff427ad322cc6432ab5"
+  },
+  {
+    "command": [
+      "<PYTHON>",
+      "-I",
+      "<OUTPUT>/sources/fresh_process.py",
+      "<OUTPUT>/candidate-release",
+      "memory",
+      "srt-short"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "memory-srt-short-0-candidate",
+    "log": "memory-srt-short-0-candidate.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "881c83672fe056c388c8041982edfc820fb069c24bec363c0790e5d7e385755d"
+  },
+  {
+    "command": [
+      "<PYTHON>",
+      "-I",
+      "<OUTPUT>/sources/fresh_process.py",
+      "<OUTPUT>/candidate-release",
+      "memory",
+      "srt-short"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "memory-srt-short-1-candidate",
+    "log": "memory-srt-short-1-candidate.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "281aa2379d38d63477e664265a495a9bf3e597ba2fad18eaa8014db2f8a76a53"
+  },
+  {
+    "command": [
+      "<PYTHON>",
+      "-I",
+      "<OUTPUT>/sources/fresh_process.py",
+      "<OUTPUT>/baseline-release",
+      "memory",
+      "srt-short"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "memory-srt-short-1-baseline",
+    "log": "memory-srt-short-1-baseline.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "eeb1c5590dddc0ff04d8dc9d2730dcde3d00e974c9748b6325ac13ddf068a894"
+  },
+  {
+    "command": [
+      "<PYTHON>",
+      "-I",
+      "<OUTPUT>/sources/fresh_process.py",
+      "<OUTPUT>/baseline-release",
+      "memory",
+      "srt-short"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "memory-srt-short-2-baseline",
+    "log": "memory-srt-short-2-baseline.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "50fdf8223e1ee9d0ee9aa97fb12040b18335fd14ae16b06bbecddaccc08556b6"
+  },
+  {
+    "command": [
+      "<PYTHON>",
+      "-I",
+      "<OUTPUT>/sources/fresh_process.py",
+      "<OUTPUT>/candidate-release",
+      "memory",
+      "srt-short"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "memory-srt-short-2-candidate",
+    "log": "memory-srt-short-2-candidate.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "afd2a491386622485ba14652b481cb5ab49373783686a560719208a8a1ade354"
+  },
+  {
+    "command": [
+      "<PYTHON>",
+      "-I",
+      "<OUTPUT>/sources/fresh_process.py",
+      "<OUTPUT>/candidate-release",
+      "memory",
+      "srt-short"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "memory-srt-short-3-candidate",
+    "log": "memory-srt-short-3-candidate.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "bb7a00fdc5373cdabca30e5e10755a69107e5858130252c5a13b25341c352505"
+  },
+  {
+    "command": [
+      "<PYTHON>",
+      "-I",
+      "<OUTPUT>/sources/fresh_process.py",
+      "<OUTPUT>/baseline-release",
+      "memory",
+      "srt-short"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "memory-srt-short-3-baseline",
+    "log": "memory-srt-short-3-baseline.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "91bea2e687220301b12593301414274f4d4eece46ffd1b88a74279c75617ba89"
+  },
+  {
+    "command": [
+      "<PYTHON>",
+      "-I",
+      "<OUTPUT>/sources/fresh_process.py",
+      "<OUTPUT>/baseline-release",
+      "memory",
+      "srt-short"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "memory-srt-short-4-baseline",
+    "log": "memory-srt-short-4-baseline.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "2a5de142d8dbfa7c41f9bc72753198725f106affafbb1f8dcfc2b75ccf758a1b"
+  },
+  {
+    "command": [
+      "<PYTHON>",
+      "-I",
+      "<OUTPUT>/sources/fresh_process.py",
+      "<OUTPUT>/candidate-release",
+      "memory",
+      "srt-short"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "memory-srt-short-4-candidate",
+    "log": "memory-srt-short-4-candidate.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "801477fe0007948118c0b348d8f4192e609a9e04e087bfcbecd32734435a84e3"
+  },
+  {
+    "command": [
+      "<PYTHON>",
+      "-I",
+      "<OUTPUT>/sources/fresh_process.py",
+      "<OUTPUT>/candidate-release",
+      "memory",
+      "srt-short"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "memory-srt-short-5-candidate",
+    "log": "memory-srt-short-5-candidate.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "a1cc64d3bf75ea40a0b9546b50d84109db31d61fe94f131adbe8867b10cabeca"
+  },
+  {
+    "command": [
+      "<PYTHON>",
+      "-I",
+      "<OUTPUT>/sources/fresh_process.py",
+      "<OUTPUT>/baseline-release",
+      "memory",
+      "srt-short"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "memory-srt-short-5-baseline",
+    "log": "memory-srt-short-5-baseline.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "1dd7be455e2843aaabe2e0218ab46418b26a90bcde9e86ef0727a069dbebda80"
+  },
+  {
+    "command": [
+      "<PYTHON>",
+      "-I",
+      "<OUTPUT>/sources/fresh_process.py",
+      "<OUTPUT>/baseline-release",
+      "memory",
+      "srt-short"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "memory-srt-short-6-baseline",
+    "log": "memory-srt-short-6-baseline.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "a3a6fe4048e3609d9dbf1bd70fec8a26ac33b60c9834f5f2af3e673a51ad5165"
+  },
+  {
+    "command": [
+      "<PYTHON>",
+      "-I",
+      "<OUTPUT>/sources/fresh_process.py",
+      "<OUTPUT>/candidate-release",
+      "memory",
+      "srt-short"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "memory-srt-short-6-candidate",
+    "log": "memory-srt-short-6-candidate.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "6146c2ba86121863abcbafe726dff4bcddf6901aa0be93bbb06fc7c1d24d5d56"
+  },
+  {
+    "command": [
+      "<PYTHON>",
+      "-I",
+      "<OUTPUT>/sources/fresh_process.py",
+      "<OUTPUT>/candidate-release",
+      "memory",
+      "srt-short"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "memory-srt-short-7-candidate",
+    "log": "memory-srt-short-7-candidate.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "f3f39287f0842f875b4e416d0ed3b67d561e27bbbc5e7c3d0ab8fb4dba6ead2d"
+  },
+  {
+    "command": [
+      "<PYTHON>",
+      "-I",
+      "<OUTPUT>/sources/fresh_process.py",
+      "<OUTPUT>/baseline-release",
+      "memory",
+      "srt-short"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "memory-srt-short-7-baseline",
+    "log": "memory-srt-short-7-baseline.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "3ede87079ae96fe9a5e440dfd1f5b766f1f81ecbecb4033f0b9dd25f379c1f02"
+  },
+  {
+    "command": [
+      "<PYTHON>",
+      "-I",
+      "<OUTPUT>/sources/fresh_process.py",
+      "<OUTPUT>/baseline-release",
+      "memory",
+      "vtt-short"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "memory-vtt-short-0-baseline",
+    "log": "memory-vtt-short-0-baseline.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "db4d395ded5d0bcfcf601a1e022c7bdbd0da0987fe7c9fec7e6fa907fd8b6f0b"
+  },
+  {
+    "command": [
+      "<PYTHON>",
+      "-I",
+      "<OUTPUT>/sources/fresh_process.py",
+      "<OUTPUT>/candidate-release",
+      "memory",
+      "vtt-short"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "memory-vtt-short-0-candidate",
+    "log": "memory-vtt-short-0-candidate.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "b83df4566e951a824d7780016266015d05e0a36e240828f6aabe2f72bb4fddb6"
+  },
+  {
+    "command": [
+      "<PYTHON>",
+      "-I",
+      "<OUTPUT>/sources/fresh_process.py",
+      "<OUTPUT>/candidate-release",
+      "memory",
+      "vtt-short"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "memory-vtt-short-1-candidate",
+    "log": "memory-vtt-short-1-candidate.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "b3679abb100295ae2228d75793e4fa692e380d9298d6c83d062f5ab66b01715c"
+  },
+  {
+    "command": [
+      "<PYTHON>",
+      "-I",
+      "<OUTPUT>/sources/fresh_process.py",
+      "<OUTPUT>/baseline-release",
+      "memory",
+      "vtt-short"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "memory-vtt-short-1-baseline",
+    "log": "memory-vtt-short-1-baseline.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "081f3b8e2488c0d8fcbff0d610e904516a0f315094f92d817c64abbc76b421e8"
+  },
+  {
+    "command": [
+      "<PYTHON>",
+      "-I",
+      "<OUTPUT>/sources/fresh_process.py",
+      "<OUTPUT>/baseline-release",
+      "memory",
+      "vtt-short"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "memory-vtt-short-2-baseline",
+    "log": "memory-vtt-short-2-baseline.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "1e4aa97c2af31d5b9ccedf7ba9924851741a020d3b1f0e80099614d54b3f46b7"
+  },
+  {
+    "command": [
+      "<PYTHON>",
+      "-I",
+      "<OUTPUT>/sources/fresh_process.py",
+      "<OUTPUT>/candidate-release",
+      "memory",
+      "vtt-short"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "memory-vtt-short-2-candidate",
+    "log": "memory-vtt-short-2-candidate.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "20b045ab35a0c2013b50944da1b8c95665ea179d8e22a0b1cc4b8536fb303547"
+  },
+  {
+    "command": [
+      "<PYTHON>",
+      "-I",
+      "<OUTPUT>/sources/fresh_process.py",
+      "<OUTPUT>/candidate-release",
+      "memory",
+      "vtt-short"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "memory-vtt-short-3-candidate",
+    "log": "memory-vtt-short-3-candidate.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "dd3691a5582855b61975b33b209f8dc8d6a13c7263bb1626837d3037af79e5c6"
+  },
+  {
+    "command": [
+      "<PYTHON>",
+      "-I",
+      "<OUTPUT>/sources/fresh_process.py",
+      "<OUTPUT>/baseline-release",
+      "memory",
+      "vtt-short"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "memory-vtt-short-3-baseline",
+    "log": "memory-vtt-short-3-baseline.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "ec3978b38516f5905655e321f94d43db9a19138b95ff9b58f16c657a04067195"
+  },
+  {
+    "command": [
+      "<PYTHON>",
+      "-I",
+      "<OUTPUT>/sources/fresh_process.py",
+      "<OUTPUT>/baseline-release",
+      "memory",
+      "vtt-short"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "memory-vtt-short-4-baseline",
+    "log": "memory-vtt-short-4-baseline.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "f46d928d425dbe7ad63c207d5779ca6c52f96c50edeae60c0a24f2fc0b272651"
+  },
+  {
+    "command": [
+      "<PYTHON>",
+      "-I",
+      "<OUTPUT>/sources/fresh_process.py",
+      "<OUTPUT>/candidate-release",
+      "memory",
+      "vtt-short"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "memory-vtt-short-4-candidate",
+    "log": "memory-vtt-short-4-candidate.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "0fa7c14014c0a23e4c3d8ba49e8bba9dda5a22decef67b52d9d023e1b16aa17e"
+  },
+  {
+    "command": [
+      "<PYTHON>",
+      "-I",
+      "<OUTPUT>/sources/fresh_process.py",
+      "<OUTPUT>/candidate-release",
+      "memory",
+      "vtt-short"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "memory-vtt-short-5-candidate",
+    "log": "memory-vtt-short-5-candidate.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "3aec7a79c4201082d6156f2c855692e17d11f8a9cc5333dbac5d7b0dd6ab3a29"
+  },
+  {
+    "command": [
+      "<PYTHON>",
+      "-I",
+      "<OUTPUT>/sources/fresh_process.py",
+      "<OUTPUT>/baseline-release",
+      "memory",
+      "vtt-short"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "memory-vtt-short-5-baseline",
+    "log": "memory-vtt-short-5-baseline.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "28383fe5b647d7824cc08a65fe2b3c2dc57b76b3cdeb4380c300a6e274b66e66"
+  },
+  {
+    "command": [
+      "<PYTHON>",
+      "-I",
+      "<OUTPUT>/sources/fresh_process.py",
+      "<OUTPUT>/baseline-release",
+      "memory",
+      "vtt-short"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "memory-vtt-short-6-baseline",
+    "log": "memory-vtt-short-6-baseline.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "5325477023704965ba3985e82f2abbae4c9f4dbeb21352cac9c0c3ad205a6c01"
+  },
+  {
+    "command": [
+      "<PYTHON>",
+      "-I",
+      "<OUTPUT>/sources/fresh_process.py",
+      "<OUTPUT>/candidate-release",
+      "memory",
+      "vtt-short"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "memory-vtt-short-6-candidate",
+    "log": "memory-vtt-short-6-candidate.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "56bc03d668f60fea37ba164bb6a5896c65a603b80352471661458f882b2de8ab"
+  },
+  {
+    "command": [
+      "<PYTHON>",
+      "-I",
+      "<OUTPUT>/sources/fresh_process.py",
+      "<OUTPUT>/candidate-release",
+      "memory",
+      "vtt-short"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "memory-vtt-short-7-candidate",
+    "log": "memory-vtt-short-7-candidate.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "db330a55ee940665855332844372d601c7586e23af867543578eda52f158386c"
+  },
+  {
+    "command": [
+      "<PYTHON>",
+      "-I",
+      "<OUTPUT>/sources/fresh_process.py",
+      "<OUTPUT>/baseline-release",
+      "memory",
+      "vtt-short"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "memory-vtt-short-7-baseline",
+    "log": "memory-vtt-short-7-baseline.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "4a24065ea9e63dbffdd369879077d677e85c9e46e1d1f047e821d67988881484"
+  },
+  {
+    "command": [
+      "<PYTHON>",
+      "-I",
+      "<OUTPUT>/sources/fresh_process.py",
+      "<OUTPUT>/baseline-release",
+      "memory",
+      "srt-ordinary-2000"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "memory-srt-ordinary-2000-0-baseline",
+    "log": "memory-srt-ordinary-2000-0-baseline.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "f2543e0cdd0820c04451b8f9106dc075591806f66cb26fb4b4993412cbaa9936"
+  },
+  {
+    "command": [
+      "<PYTHON>",
+      "-I",
+      "<OUTPUT>/sources/fresh_process.py",
+      "<OUTPUT>/candidate-release",
+      "memory",
+      "srt-ordinary-2000"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "memory-srt-ordinary-2000-0-candidate",
+    "log": "memory-srt-ordinary-2000-0-candidate.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "3e1ec52b65349742ad82054a677bae9e83f57a15832d945478163f409959769a"
+  },
+  {
+    "command": [
+      "<PYTHON>",
+      "-I",
+      "<OUTPUT>/sources/fresh_process.py",
+      "<OUTPUT>/candidate-release",
+      "memory",
+      "srt-ordinary-2000"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "memory-srt-ordinary-2000-1-candidate",
+    "log": "memory-srt-ordinary-2000-1-candidate.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "c971276fcca38733830ba2ddb2fdfa4446fe0516b3b928a238a888a2963f81a4"
+  },
+  {
+    "command": [
+      "<PYTHON>",
+      "-I",
+      "<OUTPUT>/sources/fresh_process.py",
+      "<OUTPUT>/baseline-release",
+      "memory",
+      "srt-ordinary-2000"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "memory-srt-ordinary-2000-1-baseline",
+    "log": "memory-srt-ordinary-2000-1-baseline.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "84237adcb058e2af825b3d09a8453d5e8cb48844ab5d0154b74d9932ef90cf25"
+  },
+  {
+    "command": [
+      "<PYTHON>",
+      "-I",
+      "<OUTPUT>/sources/fresh_process.py",
+      "<OUTPUT>/baseline-release",
+      "memory",
+      "srt-ordinary-2000"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "memory-srt-ordinary-2000-2-baseline",
+    "log": "memory-srt-ordinary-2000-2-baseline.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "8cbb7a8ffab1e3a079e9269e34e2e41ff2dc0ea1f58cadbe282e2722ddb4a500"
+  },
+  {
+    "command": [
+      "<PYTHON>",
+      "-I",
+      "<OUTPUT>/sources/fresh_process.py",
+      "<OUTPUT>/candidate-release",
+      "memory",
+      "srt-ordinary-2000"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "memory-srt-ordinary-2000-2-candidate",
+    "log": "memory-srt-ordinary-2000-2-candidate.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "e02eada4dca691b5e688883754f7aeffc5f752f33d5b346d84b682f418c55994"
+  },
+  {
+    "command": [
+      "<PYTHON>",
+      "-I",
+      "<OUTPUT>/sources/fresh_process.py",
+      "<OUTPUT>/candidate-release",
+      "memory",
+      "srt-ordinary-2000"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "memory-srt-ordinary-2000-3-candidate",
+    "log": "memory-srt-ordinary-2000-3-candidate.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "bd29321247498ca1d64b340adf93f4240c598fc2619c09d668b1e2547760b608"
+  },
+  {
+    "command": [
+      "<PYTHON>",
+      "-I",
+      "<OUTPUT>/sources/fresh_process.py",
+      "<OUTPUT>/baseline-release",
+      "memory",
+      "srt-ordinary-2000"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "memory-srt-ordinary-2000-3-baseline",
+    "log": "memory-srt-ordinary-2000-3-baseline.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "50bd09327187ec21535ac899714fa6f0eaeeee896679437e5e6d95276246e94d"
+  },
+  {
+    "command": [
+      "<PYTHON>",
+      "-I",
+      "<OUTPUT>/sources/fresh_process.py",
+      "<OUTPUT>/baseline-release",
+      "memory",
+      "srt-ordinary-2000"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "memory-srt-ordinary-2000-4-baseline",
+    "log": "memory-srt-ordinary-2000-4-baseline.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "936a1f0caf6da933787b0180e613bb2484b330ba311780d80747d3d17d6c1960"
+  },
+  {
+    "command": [
+      "<PYTHON>",
+      "-I",
+      "<OUTPUT>/sources/fresh_process.py",
+      "<OUTPUT>/candidate-release",
+      "memory",
+      "srt-ordinary-2000"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "memory-srt-ordinary-2000-4-candidate",
+    "log": "memory-srt-ordinary-2000-4-candidate.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "43ced3de2d97c6371477330455603a1d7fb7665e3fa99022de6d66eab999eb62"
+  },
+  {
+    "command": [
+      "<PYTHON>",
+      "-I",
+      "<OUTPUT>/sources/fresh_process.py",
+      "<OUTPUT>/candidate-release",
+      "memory",
+      "srt-ordinary-2000"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "memory-srt-ordinary-2000-5-candidate",
+    "log": "memory-srt-ordinary-2000-5-candidate.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "3fc33a6bc7a2da8314fee4d618c91acc118f0f5f43496b1a64218c56b024f4da"
+  },
+  {
+    "command": [
+      "<PYTHON>",
+      "-I",
+      "<OUTPUT>/sources/fresh_process.py",
+      "<OUTPUT>/baseline-release",
+      "memory",
+      "srt-ordinary-2000"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "memory-srt-ordinary-2000-5-baseline",
+    "log": "memory-srt-ordinary-2000-5-baseline.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "79f785968dfb308c7d6648904e7e417a6efb82618370f1c92df9fb84b32e7bb4"
+  },
+  {
+    "command": [
+      "<PYTHON>",
+      "-I",
+      "<OUTPUT>/sources/fresh_process.py",
+      "<OUTPUT>/baseline-release",
+      "memory",
+      "srt-ordinary-2000"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "memory-srt-ordinary-2000-6-baseline",
+    "log": "memory-srt-ordinary-2000-6-baseline.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "0f33906744f5e9e97774a0bdfadacba3758a2e6b818faac68788c23f2c35bf9c"
+  },
+  {
+    "command": [
+      "<PYTHON>",
+      "-I",
+      "<OUTPUT>/sources/fresh_process.py",
+      "<OUTPUT>/candidate-release",
+      "memory",
+      "srt-ordinary-2000"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "memory-srt-ordinary-2000-6-candidate",
+    "log": "memory-srt-ordinary-2000-6-candidate.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "b4f548f5ff0fe4f1ac3ba142513269ea8e0ca3b2d8c90895ecf199cc952fdb93"
+  },
+  {
+    "command": [
+      "<PYTHON>",
+      "-I",
+      "<OUTPUT>/sources/fresh_process.py",
+      "<OUTPUT>/candidate-release",
+      "memory",
+      "srt-ordinary-2000"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "memory-srt-ordinary-2000-7-candidate",
+    "log": "memory-srt-ordinary-2000-7-candidate.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "038f85b139e9e79a59866fe97f351b6d1d19074eb0f1cd933abf4783a6accbf6"
+  },
+  {
+    "command": [
+      "<PYTHON>",
+      "-I",
+      "<OUTPUT>/sources/fresh_process.py",
+      "<OUTPUT>/baseline-release",
+      "memory",
+      "srt-ordinary-2000"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "memory-srt-ordinary-2000-7-baseline",
+    "log": "memory-srt-ordinary-2000-7-baseline.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "8ee04dbb5c24fc861b39fa55c8a03d893a24469a3327c0ce1ddcedd5fa71dd0d"
+  },
+  {
+    "command": [
+      "<PYTHON>",
+      "-I",
+      "<OUTPUT>/sources/fresh_process.py",
+      "<OUTPUT>/baseline-release",
+      "memory",
+      "vtt-ordinary-2000"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "memory-vtt-ordinary-2000-0-baseline",
+    "log": "memory-vtt-ordinary-2000-0-baseline.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "510d9a5ec95269919f0ea03c12c205727e45a117fddcc074a27df0807341b098"
+  },
+  {
+    "command": [
+      "<PYTHON>",
+      "-I",
+      "<OUTPUT>/sources/fresh_process.py",
+      "<OUTPUT>/candidate-release",
+      "memory",
+      "vtt-ordinary-2000"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "memory-vtt-ordinary-2000-0-candidate",
+    "log": "memory-vtt-ordinary-2000-0-candidate.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "ff338d27a32d9870dffd2bfa9999b61f6d79ebdfd72b07368db9842fad00999e"
+  },
+  {
+    "command": [
+      "<PYTHON>",
+      "-I",
+      "<OUTPUT>/sources/fresh_process.py",
+      "<OUTPUT>/candidate-release",
+      "memory",
+      "vtt-ordinary-2000"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "memory-vtt-ordinary-2000-1-candidate",
+    "log": "memory-vtt-ordinary-2000-1-candidate.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "254f0ce1296997c166137b4eb96e30bd0f8b59fb6ec9c3043feaf7fd5085941d"
+  },
+  {
+    "command": [
+      "<PYTHON>",
+      "-I",
+      "<OUTPUT>/sources/fresh_process.py",
+      "<OUTPUT>/baseline-release",
+      "memory",
+      "vtt-ordinary-2000"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "memory-vtt-ordinary-2000-1-baseline",
+    "log": "memory-vtt-ordinary-2000-1-baseline.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "994d68975c3e3d6eb3abcdfaed744cda71c5257c5ef5817b1f02c78affb83710"
+  },
+  {
+    "command": [
+      "<PYTHON>",
+      "-I",
+      "<OUTPUT>/sources/fresh_process.py",
+      "<OUTPUT>/baseline-release",
+      "memory",
+      "vtt-ordinary-2000"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "memory-vtt-ordinary-2000-2-baseline",
+    "log": "memory-vtt-ordinary-2000-2-baseline.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "154afe68fdbe71b8230728b32554b66eaa4afb9594683c926e389b1520bf2b16"
+  },
+  {
+    "command": [
+      "<PYTHON>",
+      "-I",
+      "<OUTPUT>/sources/fresh_process.py",
+      "<OUTPUT>/candidate-release",
+      "memory",
+      "vtt-ordinary-2000"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "memory-vtt-ordinary-2000-2-candidate",
+    "log": "memory-vtt-ordinary-2000-2-candidate.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "b6668aaf19b278d52a7886d2c4b57bbbe21df3d6bca7c428b1bd94114aa1d4a0"
+  },
+  {
+    "command": [
+      "<PYTHON>",
+      "-I",
+      "<OUTPUT>/sources/fresh_process.py",
+      "<OUTPUT>/candidate-release",
+      "memory",
+      "vtt-ordinary-2000"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "memory-vtt-ordinary-2000-3-candidate",
+    "log": "memory-vtt-ordinary-2000-3-candidate.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "c0a0c91d2a27e307a773ca6600f1afe8ceeb8a7725714217882d61b13307fe33"
+  },
+  {
+    "command": [
+      "<PYTHON>",
+      "-I",
+      "<OUTPUT>/sources/fresh_process.py",
+      "<OUTPUT>/baseline-release",
+      "memory",
+      "vtt-ordinary-2000"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "memory-vtt-ordinary-2000-3-baseline",
+    "log": "memory-vtt-ordinary-2000-3-baseline.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "0151d007c482b2a5760f0ae2afaec868a814d0d6acf06553a88fdc068e9133ee"
+  },
+  {
+    "command": [
+      "<PYTHON>",
+      "-I",
+      "<OUTPUT>/sources/fresh_process.py",
+      "<OUTPUT>/baseline-release",
+      "memory",
+      "vtt-ordinary-2000"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "memory-vtt-ordinary-2000-4-baseline",
+    "log": "memory-vtt-ordinary-2000-4-baseline.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "76bca5f2562efa2bcc05144e8e005b26db76cbea7652b72a04122f1239d9e5b4"
+  },
+  {
+    "command": [
+      "<PYTHON>",
+      "-I",
+      "<OUTPUT>/sources/fresh_process.py",
+      "<OUTPUT>/candidate-release",
+      "memory",
+      "vtt-ordinary-2000"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "memory-vtt-ordinary-2000-4-candidate",
+    "log": "memory-vtt-ordinary-2000-4-candidate.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "946152e2b28ae862049432c55f29f6206cda65aaf28fcf6f813ab85212d58696"
+  },
+  {
+    "command": [
+      "<PYTHON>",
+      "-I",
+      "<OUTPUT>/sources/fresh_process.py",
+      "<OUTPUT>/candidate-release",
+      "memory",
+      "vtt-ordinary-2000"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "memory-vtt-ordinary-2000-5-candidate",
+    "log": "memory-vtt-ordinary-2000-5-candidate.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "881f591e334b654b865dce7807c7d5f1244007592daaf191fa204c4a404bd9ca"
+  },
+  {
+    "command": [
+      "<PYTHON>",
+      "-I",
+      "<OUTPUT>/sources/fresh_process.py",
+      "<OUTPUT>/baseline-release",
+      "memory",
+      "vtt-ordinary-2000"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "memory-vtt-ordinary-2000-5-baseline",
+    "log": "memory-vtt-ordinary-2000-5-baseline.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "1519662aca0f8a43cdcdc7956caa71328aeb2b4fdd8b9b5f376675d6e0630a23"
+  },
+  {
+    "command": [
+      "<PYTHON>",
+      "-I",
+      "<OUTPUT>/sources/fresh_process.py",
+      "<OUTPUT>/baseline-release",
+      "memory",
+      "vtt-ordinary-2000"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "memory-vtt-ordinary-2000-6-baseline",
+    "log": "memory-vtt-ordinary-2000-6-baseline.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "d66ff8c1c99ace3a9360a1ff7338ea48af67b4b6365d965ade659a172f98fda1"
+  },
+  {
+    "command": [
+      "<PYTHON>",
+      "-I",
+      "<OUTPUT>/sources/fresh_process.py",
+      "<OUTPUT>/candidate-release",
+      "memory",
+      "vtt-ordinary-2000"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "memory-vtt-ordinary-2000-6-candidate",
+    "log": "memory-vtt-ordinary-2000-6-candidate.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "aabb3f7752fea78c5feb5457b27cf0137c17121615b087966d0dd8972ff19746"
+  },
+  {
+    "command": [
+      "<PYTHON>",
+      "-I",
+      "<OUTPUT>/sources/fresh_process.py",
+      "<OUTPUT>/candidate-release",
+      "memory",
+      "vtt-ordinary-2000"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "memory-vtt-ordinary-2000-7-candidate",
+    "log": "memory-vtt-ordinary-2000-7-candidate.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "7e3d853fa9a88a13e7f211a16a616d85aa87075df705ca6bd8c775bb17678fe1"
+  },
+  {
+    "command": [
+      "<PYTHON>",
+      "-I",
+      "<OUTPUT>/sources/fresh_process.py",
+      "<OUTPUT>/baseline-release",
+      "memory",
+      "vtt-ordinary-2000"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "memory-vtt-ordinary-2000-7-baseline",
+    "log": "memory-vtt-ordinary-2000-7-baseline.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "18444bcd875b48e82ff9a88d956f4dc5923650e2ca39ef74d25bf02843da8d46"
+  },
+  {
+    "command": [
+      "<PYTHON>",
+      "-I",
+      "<OUTPUT>/sources/fresh_process.py",
+      "<OUTPUT>/baseline-release",
+      "memory",
+      "srt-dense-64k"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "memory-srt-dense-64k-0-baseline",
+    "log": "memory-srt-dense-64k-0-baseline.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "4590ca9f684ba14b9b9e212810a66363084a65ec0b7a0cedaba25699658e721e"
+  },
+  {
+    "command": [
+      "<PYTHON>",
+      "-I",
+      "<OUTPUT>/sources/fresh_process.py",
+      "<OUTPUT>/candidate-release",
+      "memory",
+      "srt-dense-64k"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "memory-srt-dense-64k-0-candidate",
+    "log": "memory-srt-dense-64k-0-candidate.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "9330c94edd89d79f46d5d9ffd561c4ec4c2988b41adc805bc867ece690b7c455"
+  },
+  {
+    "command": [
+      "<PYTHON>",
+      "-I",
+      "<OUTPUT>/sources/fresh_process.py",
+      "<OUTPUT>/candidate-release",
+      "memory",
+      "srt-dense-64k"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "memory-srt-dense-64k-1-candidate",
+    "log": "memory-srt-dense-64k-1-candidate.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "d5af78e2531ed9b65a39d5d7aaeb72e558e9677c91a7cd937023f883713da71c"
+  },
+  {
+    "command": [
+      "<PYTHON>",
+      "-I",
+      "<OUTPUT>/sources/fresh_process.py",
+      "<OUTPUT>/baseline-release",
+      "memory",
+      "srt-dense-64k"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "memory-srt-dense-64k-1-baseline",
+    "log": "memory-srt-dense-64k-1-baseline.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "6f902922e3ffd17285e04ef5de76ce409fb77b9960f1bfa6210166fa6f9cf079"
+  },
+  {
+    "command": [
+      "<PYTHON>",
+      "-I",
+      "<OUTPUT>/sources/fresh_process.py",
+      "<OUTPUT>/baseline-release",
+      "memory",
+      "srt-dense-64k"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "memory-srt-dense-64k-2-baseline",
+    "log": "memory-srt-dense-64k-2-baseline.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "07efdda1945db7be18691e9c8c8af28dce621a2e7c3076023288b9b9c8b8ed11"
+  },
+  {
+    "command": [
+      "<PYTHON>",
+      "-I",
+      "<OUTPUT>/sources/fresh_process.py",
+      "<OUTPUT>/candidate-release",
+      "memory",
+      "srt-dense-64k"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "memory-srt-dense-64k-2-candidate",
+    "log": "memory-srt-dense-64k-2-candidate.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "3378f43a4f92b3a4f044fa7f61a3fa99f2c112476508d29079467d7cff4a36c6"
+  },
+  {
+    "command": [
+      "<PYTHON>",
+      "-I",
+      "<OUTPUT>/sources/fresh_process.py",
+      "<OUTPUT>/candidate-release",
+      "memory",
+      "srt-dense-64k"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "memory-srt-dense-64k-3-candidate",
+    "log": "memory-srt-dense-64k-3-candidate.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "4b052ef6e692e53e76b43bbc9b1843e52cefae502f43b05d724de89be989f9f0"
+  },
+  {
+    "command": [
+      "<PYTHON>",
+      "-I",
+      "<OUTPUT>/sources/fresh_process.py",
+      "<OUTPUT>/baseline-release",
+      "memory",
+      "srt-dense-64k"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "memory-srt-dense-64k-3-baseline",
+    "log": "memory-srt-dense-64k-3-baseline.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "1ecfde33f46e0373530f3a9a1e6a3baa10ff9ba7fd36e10d3ab2dca3fc65fd07"
+  },
+  {
+    "command": [
+      "<PYTHON>",
+      "-I",
+      "<OUTPUT>/sources/fresh_process.py",
+      "<OUTPUT>/baseline-release",
+      "memory",
+      "srt-dense-64k"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "memory-srt-dense-64k-4-baseline",
+    "log": "memory-srt-dense-64k-4-baseline.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "e47ab547426b47c65a78dda72775980aa6ecccd7f8d3561209a5ac1be8207abf"
+  },
+  {
+    "command": [
+      "<PYTHON>",
+      "-I",
+      "<OUTPUT>/sources/fresh_process.py",
+      "<OUTPUT>/candidate-release",
+      "memory",
+      "srt-dense-64k"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "memory-srt-dense-64k-4-candidate",
+    "log": "memory-srt-dense-64k-4-candidate.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "4c28a63bdbe29eab4318b7d68afe508a92aebc6d28dc8b179c11e51cdf107171"
+  },
+  {
+    "command": [
+      "<PYTHON>",
+      "-I",
+      "<OUTPUT>/sources/fresh_process.py",
+      "<OUTPUT>/candidate-release",
+      "memory",
+      "srt-dense-64k"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "memory-srt-dense-64k-5-candidate",
+    "log": "memory-srt-dense-64k-5-candidate.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "1b04854ba3645c3deeb16e254b2e65e05b9923954bba99eda0886be33c1a7ace"
+  },
+  {
+    "command": [
+      "<PYTHON>",
+      "-I",
+      "<OUTPUT>/sources/fresh_process.py",
+      "<OUTPUT>/baseline-release",
+      "memory",
+      "srt-dense-64k"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "memory-srt-dense-64k-5-baseline",
+    "log": "memory-srt-dense-64k-5-baseline.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "f2639408c15926ec325c89ec0e6ce19738e35dd763845f53d13e67108525adef"
+  },
+  {
+    "command": [
+      "<PYTHON>",
+      "-I",
+      "<OUTPUT>/sources/fresh_process.py",
+      "<OUTPUT>/baseline-release",
+      "memory",
+      "srt-dense-64k"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "memory-srt-dense-64k-6-baseline",
+    "log": "memory-srt-dense-64k-6-baseline.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "1a1843dac604016995be89820cc48c8e6e787430ba4225453d1053098d6b785a"
+  },
+  {
+    "command": [
+      "<PYTHON>",
+      "-I",
+      "<OUTPUT>/sources/fresh_process.py",
+      "<OUTPUT>/candidate-release",
+      "memory",
+      "srt-dense-64k"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "memory-srt-dense-64k-6-candidate",
+    "log": "memory-srt-dense-64k-6-candidate.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "b9e0fca37430bf3b68d267eb2c81c3ba0136be536976b8fb7063bc3d120f1eca"
+  },
+  {
+    "command": [
+      "<PYTHON>",
+      "-I",
+      "<OUTPUT>/sources/fresh_process.py",
+      "<OUTPUT>/candidate-release",
+      "memory",
+      "srt-dense-64k"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "memory-srt-dense-64k-7-candidate",
+    "log": "memory-srt-dense-64k-7-candidate.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "5705c1711bde3e1151e4d0fa599b0f3b1c45db6948605bb55913929e38292654"
+  },
+  {
+    "command": [
+      "<PYTHON>",
+      "-I",
+      "<OUTPUT>/sources/fresh_process.py",
+      "<OUTPUT>/baseline-release",
+      "memory",
+      "srt-dense-64k"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "memory-srt-dense-64k-7-baseline",
+    "log": "memory-srt-dense-64k-7-baseline.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "3278ba91fd7ece8aade9debe24057fe5eb08bbb06111a8b821f36fab57650127"
+  },
+  {
+    "command": [
+      "<PYTHON>",
+      "-I",
+      "<OUTPUT>/sources/fresh_process.py",
+      "<OUTPUT>/baseline-release",
+      "memory",
+      "vtt-dense-64k"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "memory-vtt-dense-64k-0-baseline",
+    "log": "memory-vtt-dense-64k-0-baseline.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "b1108aa953d7f10dd381a0e2225a41433da20b295fbacfc5243ab4f66750662a"
+  },
+  {
+    "command": [
+      "<PYTHON>",
+      "-I",
+      "<OUTPUT>/sources/fresh_process.py",
+      "<OUTPUT>/candidate-release",
+      "memory",
+      "vtt-dense-64k"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "memory-vtt-dense-64k-0-candidate",
+    "log": "memory-vtt-dense-64k-0-candidate.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "a012f38fa14d07541c35f044ce39dc7a2747ca0103b19feb9d41f93efbc3f5d0"
+  },
+  {
+    "command": [
+      "<PYTHON>",
+      "-I",
+      "<OUTPUT>/sources/fresh_process.py",
+      "<OUTPUT>/candidate-release",
+      "memory",
+      "vtt-dense-64k"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "memory-vtt-dense-64k-1-candidate",
+    "log": "memory-vtt-dense-64k-1-candidate.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "1c91769bb91dbf3c633022b4471cbbaecff04207c27721df169032df26323434"
+  },
+  {
+    "command": [
+      "<PYTHON>",
+      "-I",
+      "<OUTPUT>/sources/fresh_process.py",
+      "<OUTPUT>/baseline-release",
+      "memory",
+      "vtt-dense-64k"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "memory-vtt-dense-64k-1-baseline",
+    "log": "memory-vtt-dense-64k-1-baseline.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "bef63205d15e79ed5f53750719dd768807cbb41f5dd8efd3a66d6f89421cc9b0"
+  },
+  {
+    "command": [
+      "<PYTHON>",
+      "-I",
+      "<OUTPUT>/sources/fresh_process.py",
+      "<OUTPUT>/baseline-release",
+      "memory",
+      "vtt-dense-64k"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "memory-vtt-dense-64k-2-baseline",
+    "log": "memory-vtt-dense-64k-2-baseline.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "05ae8f5b6e0eeb7e42466931b35c0cc4dc98e09451299eed499e842a4ce8e1d5"
+  },
+  {
+    "command": [
+      "<PYTHON>",
+      "-I",
+      "<OUTPUT>/sources/fresh_process.py",
+      "<OUTPUT>/candidate-release",
+      "memory",
+      "vtt-dense-64k"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "memory-vtt-dense-64k-2-candidate",
+    "log": "memory-vtt-dense-64k-2-candidate.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "324724350fc28ee8b0948a9b14151f34df78b78867281560d1d4c04b216eb1f2"
+  },
+  {
+    "command": [
+      "<PYTHON>",
+      "-I",
+      "<OUTPUT>/sources/fresh_process.py",
+      "<OUTPUT>/candidate-release",
+      "memory",
+      "vtt-dense-64k"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "memory-vtt-dense-64k-3-candidate",
+    "log": "memory-vtt-dense-64k-3-candidate.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "5634302d28aa8c69dc14c97ca5183d4ff5f0025e86775733a89b2378ecffdd2e"
+  },
+  {
+    "command": [
+      "<PYTHON>",
+      "-I",
+      "<OUTPUT>/sources/fresh_process.py",
+      "<OUTPUT>/baseline-release",
+      "memory",
+      "vtt-dense-64k"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "memory-vtt-dense-64k-3-baseline",
+    "log": "memory-vtt-dense-64k-3-baseline.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "e5100399d33edf283d64b4636a1791506bbbc35788a83dc36d750da313959df6"
+  },
+  {
+    "command": [
+      "<PYTHON>",
+      "-I",
+      "<OUTPUT>/sources/fresh_process.py",
+      "<OUTPUT>/baseline-release",
+      "memory",
+      "vtt-dense-64k"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "memory-vtt-dense-64k-4-baseline",
+    "log": "memory-vtt-dense-64k-4-baseline.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "7adcdd5fb6b0cb970c66805abc3c83333f0be955dc37956d19fd7ff7e83b8d7b"
+  },
+  {
+    "command": [
+      "<PYTHON>",
+      "-I",
+      "<OUTPUT>/sources/fresh_process.py",
+      "<OUTPUT>/candidate-release",
+      "memory",
+      "vtt-dense-64k"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "memory-vtt-dense-64k-4-candidate",
+    "log": "memory-vtt-dense-64k-4-candidate.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "0d93b904a679ebc60286343c03052e5022c5c892a30f397efe94a20f25bcab34"
+  },
+  {
+    "command": [
+      "<PYTHON>",
+      "-I",
+      "<OUTPUT>/sources/fresh_process.py",
+      "<OUTPUT>/candidate-release",
+      "memory",
+      "vtt-dense-64k"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "memory-vtt-dense-64k-5-candidate",
+    "log": "memory-vtt-dense-64k-5-candidate.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "912fb7d12ee188dfdb0fa8c337d2ec7d8d724bc071ba360b75eecdeba8b63da7"
+  },
+  {
+    "command": [
+      "<PYTHON>",
+      "-I",
+      "<OUTPUT>/sources/fresh_process.py",
+      "<OUTPUT>/baseline-release",
+      "memory",
+      "vtt-dense-64k"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "memory-vtt-dense-64k-5-baseline",
+    "log": "memory-vtt-dense-64k-5-baseline.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "34353e01b37b00217d0caef7e9bfb0c30605a2464f2bc0d5532e1397d938f969"
+  },
+  {
+    "command": [
+      "<PYTHON>",
+      "-I",
+      "<OUTPUT>/sources/fresh_process.py",
+      "<OUTPUT>/baseline-release",
+      "memory",
+      "vtt-dense-64k"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "memory-vtt-dense-64k-6-baseline",
+    "log": "memory-vtt-dense-64k-6-baseline.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "bce115f1501c3ed7c1bcbe16fb0c91d6eee7568dbf8d6209d9cb06b6274d3fbe"
+  },
+  {
+    "command": [
+      "<PYTHON>",
+      "-I",
+      "<OUTPUT>/sources/fresh_process.py",
+      "<OUTPUT>/candidate-release",
+      "memory",
+      "vtt-dense-64k"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "memory-vtt-dense-64k-6-candidate",
+    "log": "memory-vtt-dense-64k-6-candidate.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "a695a5503ba9ffe186ee76ceea68acbf51ee62e4d319ddb24976af0e03b75ecb"
+  },
+  {
+    "command": [
+      "<PYTHON>",
+      "-I",
+      "<OUTPUT>/sources/fresh_process.py",
+      "<OUTPUT>/candidate-release",
+      "memory",
+      "vtt-dense-64k"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "memory-vtt-dense-64k-7-candidate",
+    "log": "memory-vtt-dense-64k-7-candidate.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "7441836ff19982917d82806710642c6739e7e0bbdeccf3a6988281b4394449e3"
+  },
+  {
+    "command": [
+      "<PYTHON>",
+      "-I",
+      "<OUTPUT>/sources/fresh_process.py",
+      "<OUTPUT>/baseline-release",
+      "memory",
+      "vtt-dense-64k"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "memory-vtt-dense-64k-7-baseline",
+    "log": "memory-vtt-dense-64k-7-baseline.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "e5100399d33edf283d64b4636a1791506bbbc35788a83dc36d750da313959df6"
+  },
+  {
+    "command": [
+      "<PYTHON>",
+      "-I",
+      "<OUTPUT>/sources/fresh_process.py",
+      "<OUTPUT>/baseline-release",
+      "memory",
+      "srt-dense-256k"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "memory-srt-dense-256k-0-baseline",
+    "log": "memory-srt-dense-256k-0-baseline.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "cb483e981a6efecb6f2672a0877e89fcf6ae19939e42beb59ae1dd694752151c"
+  },
+  {
+    "command": [
+      "<PYTHON>",
+      "-I",
+      "<OUTPUT>/sources/fresh_process.py",
+      "<OUTPUT>/candidate-release",
+      "memory",
+      "srt-dense-256k"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "memory-srt-dense-256k-0-candidate",
+    "log": "memory-srt-dense-256k-0-candidate.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "0f92e992e9d8149d74e78d8d282f26f093f1cc5e437ed639db4ea9a79eb7bf92"
+  },
+  {
+    "command": [
+      "<PYTHON>",
+      "-I",
+      "<OUTPUT>/sources/fresh_process.py",
+      "<OUTPUT>/candidate-release",
+      "memory",
+      "srt-dense-256k"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "memory-srt-dense-256k-1-candidate",
+    "log": "memory-srt-dense-256k-1-candidate.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "5866dabf53c55a2049c09e3483c2f9ec5149cea6cc4056da36e44f7ced40213e"
+  },
+  {
+    "command": [
+      "<PYTHON>",
+      "-I",
+      "<OUTPUT>/sources/fresh_process.py",
+      "<OUTPUT>/baseline-release",
+      "memory",
+      "srt-dense-256k"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "memory-srt-dense-256k-1-baseline",
+    "log": "memory-srt-dense-256k-1-baseline.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "934c1d15056aa6934e6187f32b63d0b771284a4a7931b0e65951c29cc5ba7d4a"
+  },
+  {
+    "command": [
+      "<PYTHON>",
+      "-I",
+      "<OUTPUT>/sources/fresh_process.py",
+      "<OUTPUT>/baseline-release",
+      "memory",
+      "srt-dense-256k"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "memory-srt-dense-256k-2-baseline",
+    "log": "memory-srt-dense-256k-2-baseline.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "87c6b9aa9ce4667343ef785446e118af6361ebf47934daeb5bb3f1dc7ab05fc9"
+  },
+  {
+    "command": [
+      "<PYTHON>",
+      "-I",
+      "<OUTPUT>/sources/fresh_process.py",
+      "<OUTPUT>/candidate-release",
+      "memory",
+      "srt-dense-256k"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "memory-srt-dense-256k-2-candidate",
+    "log": "memory-srt-dense-256k-2-candidate.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "79cf436fcf82ab5eeb3cb073c0835befb6594b90e2023d5d99ff2effc1aeef53"
+  },
+  {
+    "command": [
+      "<PYTHON>",
+      "-I",
+      "<OUTPUT>/sources/fresh_process.py",
+      "<OUTPUT>/candidate-release",
+      "memory",
+      "srt-dense-256k"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "memory-srt-dense-256k-3-candidate",
+    "log": "memory-srt-dense-256k-3-candidate.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "b00f7581db730b40417b4f20994567cc501d425d5a9062c25a47135507342008"
+  },
+  {
+    "command": [
+      "<PYTHON>",
+      "-I",
+      "<OUTPUT>/sources/fresh_process.py",
+      "<OUTPUT>/baseline-release",
+      "memory",
+      "srt-dense-256k"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "memory-srt-dense-256k-3-baseline",
+    "log": "memory-srt-dense-256k-3-baseline.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "75417b3ba9754088cd2f50c86250f592721461e2b35afedf062cba8c27e154d2"
+  },
+  {
+    "command": [
+      "<PYTHON>",
+      "-I",
+      "<OUTPUT>/sources/fresh_process.py",
+      "<OUTPUT>/baseline-release",
+      "memory",
+      "srt-dense-256k"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "memory-srt-dense-256k-4-baseline",
+    "log": "memory-srt-dense-256k-4-baseline.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "79f073457fc765435b64553161b127691986ba7fbf675451aedc05457dac15db"
+  },
+  {
+    "command": [
+      "<PYTHON>",
+      "-I",
+      "<OUTPUT>/sources/fresh_process.py",
+      "<OUTPUT>/candidate-release",
+      "memory",
+      "srt-dense-256k"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "memory-srt-dense-256k-4-candidate",
+    "log": "memory-srt-dense-256k-4-candidate.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "2ef5b5ee75a179d9bd28cc72106a3d76d5ec14abcb30eba494d457246c168f48"
+  },
+  {
+    "command": [
+      "<PYTHON>",
+      "-I",
+      "<OUTPUT>/sources/fresh_process.py",
+      "<OUTPUT>/candidate-release",
+      "memory",
+      "srt-dense-256k"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "memory-srt-dense-256k-5-candidate",
+    "log": "memory-srt-dense-256k-5-candidate.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "82c84afe17da8f133f482c05b8bad6f0a10c295a1ac8b57c22a2fea639bfeca1"
+  },
+  {
+    "command": [
+      "<PYTHON>",
+      "-I",
+      "<OUTPUT>/sources/fresh_process.py",
+      "<OUTPUT>/baseline-release",
+      "memory",
+      "srt-dense-256k"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "memory-srt-dense-256k-5-baseline",
+    "log": "memory-srt-dense-256k-5-baseline.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "dae0334b2464fb08f853cc0aaad10baaca8926b09bc60fe895a05b9fecf7f0bc"
+  },
+  {
+    "command": [
+      "<PYTHON>",
+      "-I",
+      "<OUTPUT>/sources/fresh_process.py",
+      "<OUTPUT>/baseline-release",
+      "memory",
+      "srt-dense-256k"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "memory-srt-dense-256k-6-baseline",
+    "log": "memory-srt-dense-256k-6-baseline.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "00886b65ddca6f940792c1fcacdf6e5ccd3b7c72ca192bdca856b3349e80e616"
+  },
+  {
+    "command": [
+      "<PYTHON>",
+      "-I",
+      "<OUTPUT>/sources/fresh_process.py",
+      "<OUTPUT>/candidate-release",
+      "memory",
+      "srt-dense-256k"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "memory-srt-dense-256k-6-candidate",
+    "log": "memory-srt-dense-256k-6-candidate.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "7f4a408c5cd81fbbd2043ceb3fe8c1e4a16da4c73b30e6a367b436264af7ec75"
+  },
+  {
+    "command": [
+      "<PYTHON>",
+      "-I",
+      "<OUTPUT>/sources/fresh_process.py",
+      "<OUTPUT>/candidate-release",
+      "memory",
+      "srt-dense-256k"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "memory-srt-dense-256k-7-candidate",
+    "log": "memory-srt-dense-256k-7-candidate.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "22f2970474e2ffd2efec82d4a638940f1bf0e4a20248dd9a78d4f6a091c31f24"
+  },
+  {
+    "command": [
+      "<PYTHON>",
+      "-I",
+      "<OUTPUT>/sources/fresh_process.py",
+      "<OUTPUT>/baseline-release",
+      "memory",
+      "srt-dense-256k"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "memory-srt-dense-256k-7-baseline",
+    "log": "memory-srt-dense-256k-7-baseline.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "1d69879d31c1e54e4caff32f443c481f3c0b4b2ddb857b90a016f88d14f9e06b"
+  },
+  {
+    "command": [
+      "<PYTHON>",
+      "-I",
+      "<OUTPUT>/sources/fresh_process.py",
+      "<OUTPUT>/baseline-release",
+      "memory",
+      "vtt-dense-256k"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "memory-vtt-dense-256k-0-baseline",
+    "log": "memory-vtt-dense-256k-0-baseline.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "d3222af1dc019287645bf497355f9b07a85a52b0fcd378d919baa8bf00725cf6"
+  },
+  {
+    "command": [
+      "<PYTHON>",
+      "-I",
+      "<OUTPUT>/sources/fresh_process.py",
+      "<OUTPUT>/candidate-release",
+      "memory",
+      "vtt-dense-256k"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "memory-vtt-dense-256k-0-candidate",
+    "log": "memory-vtt-dense-256k-0-candidate.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "78832b475d54226829330a9ea003a09072c42a16c68275ccfbfd94205144e376"
+  },
+  {
+    "command": [
+      "<PYTHON>",
+      "-I",
+      "<OUTPUT>/sources/fresh_process.py",
+      "<OUTPUT>/candidate-release",
+      "memory",
+      "vtt-dense-256k"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "memory-vtt-dense-256k-1-candidate",
+    "log": "memory-vtt-dense-256k-1-candidate.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "ed16d8704f31a2f705509e38b113aaac348bff31690af0b323608c81e6430cc8"
+  },
+  {
+    "command": [
+      "<PYTHON>",
+      "-I",
+      "<OUTPUT>/sources/fresh_process.py",
+      "<OUTPUT>/baseline-release",
+      "memory",
+      "vtt-dense-256k"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "memory-vtt-dense-256k-1-baseline",
+    "log": "memory-vtt-dense-256k-1-baseline.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "d07ea0a4118b29b37fc160aa079c2cc734957fc777db9551df0381d19e5d4786"
+  },
+  {
+    "command": [
+      "<PYTHON>",
+      "-I",
+      "<OUTPUT>/sources/fresh_process.py",
+      "<OUTPUT>/baseline-release",
+      "memory",
+      "vtt-dense-256k"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "memory-vtt-dense-256k-2-baseline",
+    "log": "memory-vtt-dense-256k-2-baseline.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "9cdf0a579fcd68578162476a3d64fad40c1d28f5b013cad7a9107299bfd74e65"
+  },
+  {
+    "command": [
+      "<PYTHON>",
+      "-I",
+      "<OUTPUT>/sources/fresh_process.py",
+      "<OUTPUT>/candidate-release",
+      "memory",
+      "vtt-dense-256k"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "memory-vtt-dense-256k-2-candidate",
+    "log": "memory-vtt-dense-256k-2-candidate.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "9842c0c25831cc06220f9e4b2a305cf12830bfc930de7027ba879b0e070612a6"
+  },
+  {
+    "command": [
+      "<PYTHON>",
+      "-I",
+      "<OUTPUT>/sources/fresh_process.py",
+      "<OUTPUT>/candidate-release",
+      "memory",
+      "vtt-dense-256k"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "memory-vtt-dense-256k-3-candidate",
+    "log": "memory-vtt-dense-256k-3-candidate.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "0fdbdbcfff3ab2fa29daa770ef250e40dd18af11ad7d39f1d336acf7bd236ef7"
+  },
+  {
+    "command": [
+      "<PYTHON>",
+      "-I",
+      "<OUTPUT>/sources/fresh_process.py",
+      "<OUTPUT>/baseline-release",
+      "memory",
+      "vtt-dense-256k"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "memory-vtt-dense-256k-3-baseline",
+    "log": "memory-vtt-dense-256k-3-baseline.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "36e4303893802c189d1cd1b6baf77599af486c330bd13a0eed8dcad7acf0fd7a"
+  },
+  {
+    "command": [
+      "<PYTHON>",
+      "-I",
+      "<OUTPUT>/sources/fresh_process.py",
+      "<OUTPUT>/baseline-release",
+      "memory",
+      "vtt-dense-256k"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "memory-vtt-dense-256k-4-baseline",
+    "log": "memory-vtt-dense-256k-4-baseline.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "2fe8d1a0ad0348a5e926465a475226728dd557ffa6e6a3a6d63fd5182a6b4d24"
+  },
+  {
+    "command": [
+      "<PYTHON>",
+      "-I",
+      "<OUTPUT>/sources/fresh_process.py",
+      "<OUTPUT>/candidate-release",
+      "memory",
+      "vtt-dense-256k"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "memory-vtt-dense-256k-4-candidate",
+    "log": "memory-vtt-dense-256k-4-candidate.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "48e3107ffbcaf44d3d6b913239a85b64178cdeaf71e6e7d8e6ccf5046670ba0e"
+  },
+  {
+    "command": [
+      "<PYTHON>",
+      "-I",
+      "<OUTPUT>/sources/fresh_process.py",
+      "<OUTPUT>/candidate-release",
+      "memory",
+      "vtt-dense-256k"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "memory-vtt-dense-256k-5-candidate",
+    "log": "memory-vtt-dense-256k-5-candidate.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "58ab434ea2aa3fde3c4904fa492df341a8b011e1236a1df052c91cc6402635c6"
+  },
+  {
+    "command": [
+      "<PYTHON>",
+      "-I",
+      "<OUTPUT>/sources/fresh_process.py",
+      "<OUTPUT>/baseline-release",
+      "memory",
+      "vtt-dense-256k"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "memory-vtt-dense-256k-5-baseline",
+    "log": "memory-vtt-dense-256k-5-baseline.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "6cd2392bbafdc667eff95c46facf355babe72f0a90de344b3c4fdc1261ae0eca"
+  },
+  {
+    "command": [
+      "<PYTHON>",
+      "-I",
+      "<OUTPUT>/sources/fresh_process.py",
+      "<OUTPUT>/baseline-release",
+      "memory",
+      "vtt-dense-256k"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "memory-vtt-dense-256k-6-baseline",
+    "log": "memory-vtt-dense-256k-6-baseline.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "04ea3ce741dac38294ab4332e1cead8927afd772f2a71b5e5c0ae69a86effb76"
+  },
+  {
+    "command": [
+      "<PYTHON>",
+      "-I",
+      "<OUTPUT>/sources/fresh_process.py",
+      "<OUTPUT>/candidate-release",
+      "memory",
+      "vtt-dense-256k"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "memory-vtt-dense-256k-6-candidate",
+    "log": "memory-vtt-dense-256k-6-candidate.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "0ee9fb5f91e9f97b5a93198d472fa6c519d1bec0a23b63f857c79830d8978fc8"
+  },
+  {
+    "command": [
+      "<PYTHON>",
+      "-I",
+      "<OUTPUT>/sources/fresh_process.py",
+      "<OUTPUT>/candidate-release",
+      "memory",
+      "vtt-dense-256k"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "memory-vtt-dense-256k-7-candidate",
+    "log": "memory-vtt-dense-256k-7-candidate.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "490e207d7c800ef74980cb15e4da7391729cdd5921d4b1d66f39127bfe402369"
+  },
+  {
+    "command": [
+      "<PYTHON>",
+      "-I",
+      "<OUTPUT>/sources/fresh_process.py",
+      "<OUTPUT>/baseline-release",
+      "memory",
+      "vtt-dense-256k"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "memory-vtt-dense-256k-7-baseline",
+    "log": "memory-vtt-dense-256k-7-baseline.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "9bd2f432262c9036c8a6677f440debb939acc34c3df9fdd1839ba505117d3a19"
+  },
+  {
+    "command": [
+      "<PYTHON>",
+      "-I",
+      "<OUTPUT>/sources/fresh_process.py",
+      "<OUTPUT>/baseline-release",
+      "memory",
+      "vtt-note-64k"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "memory-vtt-note-64k-0-baseline",
+    "log": "memory-vtt-note-64k-0-baseline.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "d5fad944e0f7b49fd2ae3651c298107c6324fa6c8d870c701887f24128cb98e9"
+  },
+  {
+    "command": [
+      "<PYTHON>",
+      "-I",
+      "<OUTPUT>/sources/fresh_process.py",
+      "<OUTPUT>/candidate-release",
+      "memory",
+      "vtt-note-64k"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "memory-vtt-note-64k-0-candidate",
+    "log": "memory-vtt-note-64k-0-candidate.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "aabd264d36b95493ccc0d86f7d2c7f0af5378ca8e8a67bab4d7f20e87367aaaa"
+  },
+  {
+    "command": [
+      "<PYTHON>",
+      "-I",
+      "<OUTPUT>/sources/fresh_process.py",
+      "<OUTPUT>/candidate-release",
+      "memory",
+      "vtt-note-64k"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "memory-vtt-note-64k-1-candidate",
+    "log": "memory-vtt-note-64k-1-candidate.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "2e841721691138ecde61a1fde3e459541c83878e6ea4830657a6bebd86e3ec62"
+  },
+  {
+    "command": [
+      "<PYTHON>",
+      "-I",
+      "<OUTPUT>/sources/fresh_process.py",
+      "<OUTPUT>/baseline-release",
+      "memory",
+      "vtt-note-64k"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "memory-vtt-note-64k-1-baseline",
+    "log": "memory-vtt-note-64k-1-baseline.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "935c2740ddfceaaeedebbf990ed0ad8b7739005f3a15c7392c8d9a1ad65e8540"
+  },
+  {
+    "command": [
+      "<PYTHON>",
+      "-I",
+      "<OUTPUT>/sources/fresh_process.py",
+      "<OUTPUT>/baseline-release",
+      "memory",
+      "vtt-note-64k"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "memory-vtt-note-64k-2-baseline",
+    "log": "memory-vtt-note-64k-2-baseline.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "d5fad944e0f7b49fd2ae3651c298107c6324fa6c8d870c701887f24128cb98e9"
+  },
+  {
+    "command": [
+      "<PYTHON>",
+      "-I",
+      "<OUTPUT>/sources/fresh_process.py",
+      "<OUTPUT>/candidate-release",
+      "memory",
+      "vtt-note-64k"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "memory-vtt-note-64k-2-candidate",
+    "log": "memory-vtt-note-64k-2-candidate.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "41384c22eaf45bfa3218f4d54500b5a12f057fe0addee2fc8460230de2d05c0d"
+  },
+  {
+    "command": [
+      "<PYTHON>",
+      "-I",
+      "<OUTPUT>/sources/fresh_process.py",
+      "<OUTPUT>/candidate-release",
+      "memory",
+      "vtt-note-64k"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "memory-vtt-note-64k-3-candidate",
+    "log": "memory-vtt-note-64k-3-candidate.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "2d97088865d61174bb97c3d769d445ab2144ca0b0bd4b4168cd8c9f9acd816b2"
+  },
+  {
+    "command": [
+      "<PYTHON>",
+      "-I",
+      "<OUTPUT>/sources/fresh_process.py",
+      "<OUTPUT>/baseline-release",
+      "memory",
+      "vtt-note-64k"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "memory-vtt-note-64k-3-baseline",
+    "log": "memory-vtt-note-64k-3-baseline.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "0b0be2fdc48fc91de9ba83257cc9920daab3dda33a3efa3da40f98639a7e7f44"
+  },
+  {
+    "command": [
+      "<PYTHON>",
+      "-I",
+      "<OUTPUT>/sources/fresh_process.py",
+      "<OUTPUT>/baseline-release",
+      "memory",
+      "vtt-note-64k"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "memory-vtt-note-64k-4-baseline",
+    "log": "memory-vtt-note-64k-4-baseline.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "0f80e3f04df35a906220cedcb92d9340d4c4d15729e9f97e4a0cf93a9be4d813"
+  },
+  {
+    "command": [
+      "<PYTHON>",
+      "-I",
+      "<OUTPUT>/sources/fresh_process.py",
+      "<OUTPUT>/candidate-release",
+      "memory",
+      "vtt-note-64k"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "memory-vtt-note-64k-4-candidate",
+    "log": "memory-vtt-note-64k-4-candidate.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "35584f3b575cf0ce57d3b014fd9615869152d931b74bc106bdcc076e1b55894e"
+  },
+  {
+    "command": [
+      "<PYTHON>",
+      "-I",
+      "<OUTPUT>/sources/fresh_process.py",
+      "<OUTPUT>/candidate-release",
+      "memory",
+      "vtt-note-64k"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "memory-vtt-note-64k-5-candidate",
+    "log": "memory-vtt-note-64k-5-candidate.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "3d9620ac08eda6cc2eafe3c18cf683aa7df73040012e88ab2cae5a3c5a94c55c"
+  },
+  {
+    "command": [
+      "<PYTHON>",
+      "-I",
+      "<OUTPUT>/sources/fresh_process.py",
+      "<OUTPUT>/baseline-release",
+      "memory",
+      "vtt-note-64k"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "memory-vtt-note-64k-5-baseline",
+    "log": "memory-vtt-note-64k-5-baseline.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "bb185ea4b0a736b957a979f6d4944164c026a98b7334663f02191403b70488ea"
+  },
+  {
+    "command": [
+      "<PYTHON>",
+      "-I",
+      "<OUTPUT>/sources/fresh_process.py",
+      "<OUTPUT>/baseline-release",
+      "memory",
+      "vtt-note-64k"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "memory-vtt-note-64k-6-baseline",
+    "log": "memory-vtt-note-64k-6-baseline.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "90cfbcdb71a56d653907f0ccb1f159d16ca918a56b38daaf8b8989b4cf372f86"
+  },
+  {
+    "command": [
+      "<PYTHON>",
+      "-I",
+      "<OUTPUT>/sources/fresh_process.py",
+      "<OUTPUT>/candidate-release",
+      "memory",
+      "vtt-note-64k"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "memory-vtt-note-64k-6-candidate",
+    "log": "memory-vtt-note-64k-6-candidate.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "2b8ac728b5fb653ad64e3be411fc83dba1f7a30d4615d226a0ee2133a28a20fb"
+  },
+  {
+    "command": [
+      "<PYTHON>",
+      "-I",
+      "<OUTPUT>/sources/fresh_process.py",
+      "<OUTPUT>/candidate-release",
+      "memory",
+      "vtt-note-64k"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "memory-vtt-note-64k-7-candidate",
+    "log": "memory-vtt-note-64k-7-candidate.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "85beccb1d16e3a74caeef142bae47a7bd6d93290d072bc52bf24a1c31530f727"
+  },
+  {
+    "command": [
+      "<PYTHON>",
+      "-I",
+      "<OUTPUT>/sources/fresh_process.py",
+      "<OUTPUT>/baseline-release",
+      "memory",
+      "vtt-note-64k"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "memory-vtt-note-64k-7-baseline",
+    "log": "memory-vtt-note-64k-7-baseline.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "f543882f51c85b2c3dc95cd619fefa67b3240c05d18386fc3ecb6a4406f91a51"
+  },
+  {
+    "command": [
+      "<PYTHON>",
+      "-I",
+      "<OUTPUT>/sources/fresh_process.py",
+      "<OUTPUT>/baseline-release",
+      "memory",
+      "vtt-note-256k"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "memory-vtt-note-256k-0-baseline",
+    "log": "memory-vtt-note-256k-0-baseline.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "88ae335f3c9c6cf4cf7d979aab96ec76c1545f9ecf0765d2034f7644bf52a79b"
+  },
+  {
+    "command": [
+      "<PYTHON>",
+      "-I",
+      "<OUTPUT>/sources/fresh_process.py",
+      "<OUTPUT>/candidate-release",
+      "memory",
+      "vtt-note-256k"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "memory-vtt-note-256k-0-candidate",
+    "log": "memory-vtt-note-256k-0-candidate.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "b41856cf6b4b098f750ad7bec7ef96539375c70850870d14c7f75e9cff5a289d"
+  },
+  {
+    "command": [
+      "<PYTHON>",
+      "-I",
+      "<OUTPUT>/sources/fresh_process.py",
+      "<OUTPUT>/candidate-release",
+      "memory",
+      "vtt-note-256k"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "memory-vtt-note-256k-1-candidate",
+    "log": "memory-vtt-note-256k-1-candidate.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "c73da030888f464e07a81a1db4e45f0ea318f7dd33df9ba02f6030ce9c2fcc04"
+  },
+  {
+    "command": [
+      "<PYTHON>",
+      "-I",
+      "<OUTPUT>/sources/fresh_process.py",
+      "<OUTPUT>/baseline-release",
+      "memory",
+      "vtt-note-256k"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "memory-vtt-note-256k-1-baseline",
+    "log": "memory-vtt-note-256k-1-baseline.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "c87e6dfcc886b7bde751c00c1907c970cb2af725d316cc4d4f76e4e0acd8a670"
+  },
+  {
+    "command": [
+      "<PYTHON>",
+      "-I",
+      "<OUTPUT>/sources/fresh_process.py",
+      "<OUTPUT>/baseline-release",
+      "memory",
+      "vtt-note-256k"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "memory-vtt-note-256k-2-baseline",
+    "log": "memory-vtt-note-256k-2-baseline.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "be28ede5cf484c2ac151f90ae7d3d4f6e4fe9f63f7dfb2d73c9b9d0c145a0d96"
+  },
+  {
+    "command": [
+      "<PYTHON>",
+      "-I",
+      "<OUTPUT>/sources/fresh_process.py",
+      "<OUTPUT>/candidate-release",
+      "memory",
+      "vtt-note-256k"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "memory-vtt-note-256k-2-candidate",
+    "log": "memory-vtt-note-256k-2-candidate.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "7e8b90c0bc9838bfa60eeaba04d4eef8671fa9e0a29cb174bd7689a44f234426"
+  },
+  {
+    "command": [
+      "<PYTHON>",
+      "-I",
+      "<OUTPUT>/sources/fresh_process.py",
+      "<OUTPUT>/candidate-release",
+      "memory",
+      "vtt-note-256k"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "memory-vtt-note-256k-3-candidate",
+    "log": "memory-vtt-note-256k-3-candidate.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "ce9f4140fca01163b744d5c881b8be88478c81d210b2518b94e32955fec0850f"
+  },
+  {
+    "command": [
+      "<PYTHON>",
+      "-I",
+      "<OUTPUT>/sources/fresh_process.py",
+      "<OUTPUT>/baseline-release",
+      "memory",
+      "vtt-note-256k"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "memory-vtt-note-256k-3-baseline",
+    "log": "memory-vtt-note-256k-3-baseline.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "560ae10161eed7874dd00bd65c9549c13f3918a51478f9c38fa87b360d9bcde1"
+  },
+  {
+    "command": [
+      "<PYTHON>",
+      "-I",
+      "<OUTPUT>/sources/fresh_process.py",
+      "<OUTPUT>/baseline-release",
+      "memory",
+      "vtt-note-256k"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "memory-vtt-note-256k-4-baseline",
+    "log": "memory-vtt-note-256k-4-baseline.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "f9f81c97fbe5bff29e01851e3238534b3bc27e48320e0d5308a30f9131c83745"
+  },
+  {
+    "command": [
+      "<PYTHON>",
+      "-I",
+      "<OUTPUT>/sources/fresh_process.py",
+      "<OUTPUT>/candidate-release",
+      "memory",
+      "vtt-note-256k"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "memory-vtt-note-256k-4-candidate",
+    "log": "memory-vtt-note-256k-4-candidate.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "12bc098872836d1b614553415e828ae4bf6606f9c60449a06ae03b9b8c56deb3"
+  },
+  {
+    "command": [
+      "<PYTHON>",
+      "-I",
+      "<OUTPUT>/sources/fresh_process.py",
+      "<OUTPUT>/candidate-release",
+      "memory",
+      "vtt-note-256k"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "memory-vtt-note-256k-5-candidate",
+    "log": "memory-vtt-note-256k-5-candidate.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "111a5dc96031873cfdc9ce5eec6959798af103b4a10b6d93c14efb2359c3226a"
+  },
+  {
+    "command": [
+      "<PYTHON>",
+      "-I",
+      "<OUTPUT>/sources/fresh_process.py",
+      "<OUTPUT>/baseline-release",
+      "memory",
+      "vtt-note-256k"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "memory-vtt-note-256k-5-baseline",
+    "log": "memory-vtt-note-256k-5-baseline.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "a83958841124882d9887a5d81d1d97733ddd3e31a887f91c28b2625bc534f888"
+  },
+  {
+    "command": [
+      "<PYTHON>",
+      "-I",
+      "<OUTPUT>/sources/fresh_process.py",
+      "<OUTPUT>/baseline-release",
+      "memory",
+      "vtt-note-256k"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "memory-vtt-note-256k-6-baseline",
+    "log": "memory-vtt-note-256k-6-baseline.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "5f66ed12695358843189b8904dca8086b5ed7c8f69a951ebaf4d14d9cf1b4366"
+  },
+  {
+    "command": [
+      "<PYTHON>",
+      "-I",
+      "<OUTPUT>/sources/fresh_process.py",
+      "<OUTPUT>/candidate-release",
+      "memory",
+      "vtt-note-256k"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "memory-vtt-note-256k-6-candidate",
+    "log": "memory-vtt-note-256k-6-candidate.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "05a393da5663ce2fb3b00dc02cb7cbca965efdf68288bb6ce97e36a42d5ce194"
+  },
+  {
+    "command": [
+      "<PYTHON>",
+      "-I",
+      "<OUTPUT>/sources/fresh_process.py",
+      "<OUTPUT>/candidate-release",
+      "memory",
+      "vtt-note-256k"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "memory-vtt-note-256k-7-candidate",
+    "log": "memory-vtt-note-256k-7-candidate.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "3f8f3752f94aae755b82d8dc5dab353d4248d28901f03c9017309a6d9eb2fddb"
+  },
+  {
+    "command": [
+      "<PYTHON>",
+      "-I",
+      "<OUTPUT>/sources/fresh_process.py",
+      "<OUTPUT>/baseline-release",
+      "memory",
+      "vtt-note-256k"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "memory-vtt-note-256k-7-baseline",
+    "log": "memory-vtt-note-256k-7-baseline.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "5ff163a2f35533ec98376c920f2a741daf3203c97bdb768d299e75cfc288bfbc"
+  },
+  {
+    "command": [
+      "<PYTHON>",
+      "-I",
+      "<OUTPUT>/sources/fresh_process.py",
+      "<OUTPUT>/baseline-release",
+      "memory",
+      "srt-long-line-4mib"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "memory-srt-long-line-4mib-0-baseline",
+    "log": "memory-srt-long-line-4mib-0-baseline.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "9f7ff0906a1977093862ade8843bc2744877252afe4879b5a7ca4126609797b1"
+  },
+  {
+    "command": [
+      "<PYTHON>",
+      "-I",
+      "<OUTPUT>/sources/fresh_process.py",
+      "<OUTPUT>/candidate-release",
+      "memory",
+      "srt-long-line-4mib"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "memory-srt-long-line-4mib-0-candidate",
+    "log": "memory-srt-long-line-4mib-0-candidate.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "6106574f660e91d81e8cb9d42bc68aa5ba20328770aa154bc23ed1a9a6c24cdd"
+  },
+  {
+    "command": [
+      "<PYTHON>",
+      "-I",
+      "<OUTPUT>/sources/fresh_process.py",
+      "<OUTPUT>/candidate-release",
+      "memory",
+      "srt-long-line-4mib"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "memory-srt-long-line-4mib-1-candidate",
+    "log": "memory-srt-long-line-4mib-1-candidate.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "b8afa7cd9de7eb24685fafd485577ea9b44854a97232e7f38899e62924067f2f"
+  },
+  {
+    "command": [
+      "<PYTHON>",
+      "-I",
+      "<OUTPUT>/sources/fresh_process.py",
+      "<OUTPUT>/baseline-release",
+      "memory",
+      "srt-long-line-4mib"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "memory-srt-long-line-4mib-1-baseline",
+    "log": "memory-srt-long-line-4mib-1-baseline.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "639145a1164c632fb35f22eae1dd3f424e65a4f880e6033f08878a80c74ba5df"
+  },
+  {
+    "command": [
+      "<PYTHON>",
+      "-I",
+      "<OUTPUT>/sources/fresh_process.py",
+      "<OUTPUT>/baseline-release",
+      "memory",
+      "srt-long-line-4mib"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "memory-srt-long-line-4mib-2-baseline",
+    "log": "memory-srt-long-line-4mib-2-baseline.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "eb0875b94bafac457ff9f090e7946bef9d3572e9aaae7d7c2140a077ef352ebf"
+  },
+  {
+    "command": [
+      "<PYTHON>",
+      "-I",
+      "<OUTPUT>/sources/fresh_process.py",
+      "<OUTPUT>/candidate-release",
+      "memory",
+      "srt-long-line-4mib"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "memory-srt-long-line-4mib-2-candidate",
+    "log": "memory-srt-long-line-4mib-2-candidate.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "76ad79646d229069fe68a8a90a147e54268170b897da7f9886d8002d23f7fc85"
+  },
+  {
+    "command": [
+      "<PYTHON>",
+      "-I",
+      "<OUTPUT>/sources/fresh_process.py",
+      "<OUTPUT>/candidate-release",
+      "memory",
+      "srt-long-line-4mib"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "memory-srt-long-line-4mib-3-candidate",
+    "log": "memory-srt-long-line-4mib-3-candidate.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "a65ea208572218f881890f59fb945cefefd081995702a6bf0a3514aede1d796c"
+  },
+  {
+    "command": [
+      "<PYTHON>",
+      "-I",
+      "<OUTPUT>/sources/fresh_process.py",
+      "<OUTPUT>/baseline-release",
+      "memory",
+      "srt-long-line-4mib"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "memory-srt-long-line-4mib-3-baseline",
+    "log": "memory-srt-long-line-4mib-3-baseline.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "77f3924ddb0da1b3c4af5963be99f30ec2fa036ac3b47d7a8718a32b00c0e72e"
+  },
+  {
+    "command": [
+      "<PYTHON>",
+      "-I",
+      "<OUTPUT>/sources/fresh_process.py",
+      "<OUTPUT>/baseline-release",
+      "memory",
+      "srt-long-line-4mib"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "memory-srt-long-line-4mib-4-baseline",
+    "log": "memory-srt-long-line-4mib-4-baseline.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "be5ba0d2612b46ce049128ac5e09399e2ad0355c041c578a6e01585ebcd9a3be"
+  },
+  {
+    "command": [
+      "<PYTHON>",
+      "-I",
+      "<OUTPUT>/sources/fresh_process.py",
+      "<OUTPUT>/candidate-release",
+      "memory",
+      "srt-long-line-4mib"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "memory-srt-long-line-4mib-4-candidate",
+    "log": "memory-srt-long-line-4mib-4-candidate.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "7f462def0d706e78694e56bd20a1aaac4c4523d2a8d4e2e6dd43238bb4ba629c"
+  },
+  {
+    "command": [
+      "<PYTHON>",
+      "-I",
+      "<OUTPUT>/sources/fresh_process.py",
+      "<OUTPUT>/candidate-release",
+      "memory",
+      "srt-long-line-4mib"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "memory-srt-long-line-4mib-5-candidate",
+    "log": "memory-srt-long-line-4mib-5-candidate.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "e698af422464f770f816f179a2940e3de39e560e172464ce62c6f6ea66440754"
+  },
+  {
+    "command": [
+      "<PYTHON>",
+      "-I",
+      "<OUTPUT>/sources/fresh_process.py",
+      "<OUTPUT>/baseline-release",
+      "memory",
+      "srt-long-line-4mib"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "memory-srt-long-line-4mib-5-baseline",
+    "log": "memory-srt-long-line-4mib-5-baseline.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "6404a9ad15f20ba5d9f8231b3520f9d9c6d828b54ba066c071c533a778a05ca5"
+  },
+  {
+    "command": [
+      "<PYTHON>",
+      "-I",
+      "<OUTPUT>/sources/fresh_process.py",
+      "<OUTPUT>/baseline-release",
+      "memory",
+      "srt-long-line-4mib"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "memory-srt-long-line-4mib-6-baseline",
+    "log": "memory-srt-long-line-4mib-6-baseline.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "61bbdd740bf0753a9bccc98d81fd9268ee433c1c7269e7c81f154a05bf3637e4"
+  },
+  {
+    "command": [
+      "<PYTHON>",
+      "-I",
+      "<OUTPUT>/sources/fresh_process.py",
+      "<OUTPUT>/candidate-release",
+      "memory",
+      "srt-long-line-4mib"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "memory-srt-long-line-4mib-6-candidate",
+    "log": "memory-srt-long-line-4mib-6-candidate.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "43eec7101cc3fdb57a3da905ba057c7a5e8d5d2e6893142ec0cd59d581149038"
+  },
+  {
+    "command": [
+      "<PYTHON>",
+      "-I",
+      "<OUTPUT>/sources/fresh_process.py",
+      "<OUTPUT>/candidate-release",
+      "memory",
+      "srt-long-line-4mib"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "memory-srt-long-line-4mib-7-candidate",
+    "log": "memory-srt-long-line-4mib-7-candidate.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "3b3dd7630ddfdf4f827cda099ea69028c993f3ced1364432f102d9e1dc3b7857"
+  },
+  {
+    "command": [
+      "<PYTHON>",
+      "-I",
+      "<OUTPUT>/sources/fresh_process.py",
+      "<OUTPUT>/baseline-release",
+      "memory",
+      "srt-long-line-4mib"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "memory-srt-long-line-4mib-7-baseline",
+    "log": "memory-srt-long-line-4mib-7-baseline.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "5c5281f80354aa3b5ae360fa5cd1c1d5ff6f93120806fd47ba9215a09b8f8028"
+  },
+  {
+    "command": [
+      "<PYTHON>",
+      "-I",
+      "<OUTPUT>/sources/fresh_process.py",
+      "<OUTPUT>/baseline-release",
+      "memory",
+      "vtt-long-line-4mib"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "memory-vtt-long-line-4mib-0-baseline",
+    "log": "memory-vtt-long-line-4mib-0-baseline.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "bb60e1096713e43a25b1542aee49c7a52ef8d69f88a538d3bb088be0c7f824cf"
+  },
+  {
+    "command": [
+      "<PYTHON>",
+      "-I",
+      "<OUTPUT>/sources/fresh_process.py",
+      "<OUTPUT>/candidate-release",
+      "memory",
+      "vtt-long-line-4mib"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "memory-vtt-long-line-4mib-0-candidate",
+    "log": "memory-vtt-long-line-4mib-0-candidate.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "eb0458abfa691e8af8a39b29e89b509e9a1c4d1f1f415265c5312de14be9eb85"
+  },
+  {
+    "command": [
+      "<PYTHON>",
+      "-I",
+      "<OUTPUT>/sources/fresh_process.py",
+      "<OUTPUT>/candidate-release",
+      "memory",
+      "vtt-long-line-4mib"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "memory-vtt-long-line-4mib-1-candidate",
+    "log": "memory-vtt-long-line-4mib-1-candidate.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "d6018add3477547034a5b52369425917717d3ac1b522e217dd4e26c0765dcff8"
+  },
+  {
+    "command": [
+      "<PYTHON>",
+      "-I",
+      "<OUTPUT>/sources/fresh_process.py",
+      "<OUTPUT>/baseline-release",
+      "memory",
+      "vtt-long-line-4mib"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "memory-vtt-long-line-4mib-1-baseline",
+    "log": "memory-vtt-long-line-4mib-1-baseline.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "cf21bf2ad7913c200824e09310d93c299073b2be15e22589ff1a68242f5a0dba"
+  },
+  {
+    "command": [
+      "<PYTHON>",
+      "-I",
+      "<OUTPUT>/sources/fresh_process.py",
+      "<OUTPUT>/baseline-release",
+      "memory",
+      "vtt-long-line-4mib"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "memory-vtt-long-line-4mib-2-baseline",
+    "log": "memory-vtt-long-line-4mib-2-baseline.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "09dc3ae5da29764bcd8239e1d56fad27da886b38c9483cb7f79ebf5754eadce3"
+  },
+  {
+    "command": [
+      "<PYTHON>",
+      "-I",
+      "<OUTPUT>/sources/fresh_process.py",
+      "<OUTPUT>/candidate-release",
+      "memory",
+      "vtt-long-line-4mib"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "memory-vtt-long-line-4mib-2-candidate",
+    "log": "memory-vtt-long-line-4mib-2-candidate.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "2e1ad02a41c18d0b3eaa7f8b69d5413c3f377bf9644c6841b47747f67e534c01"
+  },
+  {
+    "command": [
+      "<PYTHON>",
+      "-I",
+      "<OUTPUT>/sources/fresh_process.py",
+      "<OUTPUT>/candidate-release",
+      "memory",
+      "vtt-long-line-4mib"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "memory-vtt-long-line-4mib-3-candidate",
+    "log": "memory-vtt-long-line-4mib-3-candidate.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "24739c2514054afd9e029e396aa29f93b2be90c81215128c9063f5e8e6ce7e55"
+  },
+  {
+    "command": [
+      "<PYTHON>",
+      "-I",
+      "<OUTPUT>/sources/fresh_process.py",
+      "<OUTPUT>/baseline-release",
+      "memory",
+      "vtt-long-line-4mib"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "memory-vtt-long-line-4mib-3-baseline",
+    "log": "memory-vtt-long-line-4mib-3-baseline.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "d27a4db7d20999d06789940052760b68d09da72e4bff34b7d31caadf37a5a6d0"
+  },
+  {
+    "command": [
+      "<PYTHON>",
+      "-I",
+      "<OUTPUT>/sources/fresh_process.py",
+      "<OUTPUT>/baseline-release",
+      "memory",
+      "vtt-long-line-4mib"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "memory-vtt-long-line-4mib-4-baseline",
+    "log": "memory-vtt-long-line-4mib-4-baseline.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "c9c36995658e5289f703b9ca759385bb0ba67a1b37409893cac92d305abdb805"
+  },
+  {
+    "command": [
+      "<PYTHON>",
+      "-I",
+      "<OUTPUT>/sources/fresh_process.py",
+      "<OUTPUT>/candidate-release",
+      "memory",
+      "vtt-long-line-4mib"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "memory-vtt-long-line-4mib-4-candidate",
+    "log": "memory-vtt-long-line-4mib-4-candidate.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "f5298fbf679add20c1d0141436508f2ef7c0867138bfa8b3c0411e1f14c997d0"
+  },
+  {
+    "command": [
+      "<PYTHON>",
+      "-I",
+      "<OUTPUT>/sources/fresh_process.py",
+      "<OUTPUT>/candidate-release",
+      "memory",
+      "vtt-long-line-4mib"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "memory-vtt-long-line-4mib-5-candidate",
+    "log": "memory-vtt-long-line-4mib-5-candidate.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "a931e3577780a87f9081b843e72848f0bb06aaa0fb590f37737262a8fbbf3c52"
+  },
+  {
+    "command": [
+      "<PYTHON>",
+      "-I",
+      "<OUTPUT>/sources/fresh_process.py",
+      "<OUTPUT>/baseline-release",
+      "memory",
+      "vtt-long-line-4mib"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "memory-vtt-long-line-4mib-5-baseline",
+    "log": "memory-vtt-long-line-4mib-5-baseline.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "cd92241e93ddb3a2f81bb42cbece57abc03b4203e6e8c95daa1c3f5852abf0ff"
+  },
+  {
+    "command": [
+      "<PYTHON>",
+      "-I",
+      "<OUTPUT>/sources/fresh_process.py",
+      "<OUTPUT>/baseline-release",
+      "memory",
+      "vtt-long-line-4mib"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "memory-vtt-long-line-4mib-6-baseline",
+    "log": "memory-vtt-long-line-4mib-6-baseline.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "4d76b30b31e612d7fdc20fd8ed52c016c3b48536b6151c57c2f35c72486fde4f"
+  },
+  {
+    "command": [
+      "<PYTHON>",
+      "-I",
+      "<OUTPUT>/sources/fresh_process.py",
+      "<OUTPUT>/candidate-release",
+      "memory",
+      "vtt-long-line-4mib"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "memory-vtt-long-line-4mib-6-candidate",
+    "log": "memory-vtt-long-line-4mib-6-candidate.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "0fea388abab7d53bfde4d431cf1cce1fbd68cdf7cf31fc1d2ffefee119e1e27c"
+  },
+  {
+    "command": [
+      "<PYTHON>",
+      "-I",
+      "<OUTPUT>/sources/fresh_process.py",
+      "<OUTPUT>/candidate-release",
+      "memory",
+      "vtt-long-line-4mib"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "memory-vtt-long-line-4mib-7-candidate",
+    "log": "memory-vtt-long-line-4mib-7-candidate.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "9fe33630ca51100585205ef774353bb84172f5636bc1770b1c3a34330fbc66e4"
+  },
+  {
+    "command": [
+      "<PYTHON>",
+      "-I",
+      "<OUTPUT>/sources/fresh_process.py",
+      "<OUTPUT>/baseline-release",
+      "memory",
+      "vtt-long-line-4mib"
+    ],
+    "cwd": "<REPO>",
+    "exit_code": 0,
+    "label": "memory-vtt-long-line-4mib-7-baseline",
+    "log": "memory-vtt-long-line-4mib-7-baseline.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "bbd7dce3ca7ec054d12a49b2a112a68bd2d836d69b97e12c5a35d2d8ffc570f2"
+  }
+]

@@ -1,0 +1,43 @@
+{
+  "scope": "Independent native corroboration of the same executable production change; this is not execution of PR 120 or its ScalarPreferenceMutation harness.",
+  "repository": "Jagalite/illiquid",
+  "baseline": "ea2ff568237e2667f7b1aeee67b11a44ebe95b72",
+  "independent_candidate": "b1ffc3c4d13db5ec7c7f5945aa446c829f6ea2c3",
+  "independent_branch": "perf/scalar-preference-validation-20261028",
+  "workflow_run": "https://github.com/Jagalite/illiquid/actions/runs/40634269244",
+  "workflow_job": "https://github.com/Jagalite/illiquid/actions/runs/40634269244/job/122637490947",
+  "artifact_id": 12792478839,
+  "archive": "run-40634269244.zip",
+  "archive_sha256": "1b4c682164ef09c883cb9a96bc1c20d12d8e8ea952ab2be9bc3744be62249ffe",
+  "pr120_production_commit": "aea74a5ada7dccacbc538d7a68872e533ff9fbed",
+  "production_comparison": "PlaybackPreferences.swift is byte-identical; PlaybackPersistenceStore.swift differs only in the invariant comment wording and placement. The executable production edits are identical.",
+  "production_sha256": {
+    "Sources/IlliquidCore/Persistence/PlaybackPreferences.swift": {
+      "independent": "e026deb39b04ae8b68c86c55bbb8ae786e9927d8cc92cd85bc13aec11eeb39a5",
+      "pr120": "e026deb39b04ae8b68c86c55bbb8ae786e9927d8cc92cd85bc13aec11eeb39a5"
+    },
+    "Sources/IlliquidCore/Persistence/PlaybackPersistenceStore.swift": {
+      "independent": "7a98a9fa8e95b3c251008495eb94078aa592ca3d7a37dc9241997b1703442218",
+      "pr120": "78288bab50b9223c3fa2906e7b17bcf0adb9b3ae91407b359a029b985928088b"
+    }
+  },
+  "observations": 432,
+  "workload_cells": 24,
+  "pairs_per_cell": 9,
+  "test_configurations": 4,
+  "tests_per_configuration": 41,
+  "fixture_language_counts_per_list": [
+    0,
+    4,
+    32
+  ],
+  "fixture_caveat": "All independent fixtures use a nondefault audio output device and other nondefault preferences. Zero-language fixtures are not the default configuration.",
+  "verification": [
+    "Original artifact ZIP SHA-256 matches GitHub artifact digest.",
+    "Driver, runner and test source hashes checked against the independent commit.",
+    "All four test log hashes match.",
+    "All 24 summary cells independently recomputed from all 432 observations.",
+    "All observations report successful reload comparisons; runner completed its parity guards."
+  ],
+  "qualification_limit": "PR 120 has its own separate native workflow for its exact expanded tests and benchmark. The independent run is corroborating evidence, not that workflow result."
+}
