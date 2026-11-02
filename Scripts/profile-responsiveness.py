@@ -137,6 +137,7 @@ def main():
     args.app=args.app.resolve(strict=True);args.fixture=[f.resolve(strict=True) for f in args.fixture]
     if plistlib.loads((args.app/'Contents/Info.plist').read_bytes())['CFBundleIdentifier']!=lifecycle.DOMAIN:
         parser.error('requires isolated benchmark bundle')
+    if args.mode=='navigation':parser.error('navigation needs Data-valued source-tab seeds that isolated benchmark launches cannot carry')
     if args.mode!='navigation' and not args.fixture:parser.error('fixture required')
     if args.runs<1 or args.cycles<1 or not 1<=args.source_count<=100000:parser.error('invalid workload limits')
     args.output.mkdir(parents=True,exist_ok=False)

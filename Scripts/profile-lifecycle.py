@@ -225,8 +225,12 @@ def main():
     parser.add_argument('--keep-running', action='store_true')
     parser.add_argument('--close-cycles', type=int, default=3)
     parser.add_argument('--closed-seconds', type=float, default=1)
-    parser.add_argument('--cases', nargs='+', default=['empty', 'history10k', '1080p', '4k'])
+    parser.add_argument('--cases', nargs='+', default=['empty', '1080p', '4k'])
     args = parser.parse_args()
+    # History and source-list cases need Data-valued preference seeds, which
+    # the app's isolated JSON seed cannot carry (see Run.__init__).
+    unseedable = sorted(set(args.cases) & {'history10k', 'history100k', 'sources1000'})
+    if unseedable: parser.error('cases need Data-valued preference seeds that isolated benchmark launches cannot carry: ' + ', '.join(unseedable))
     if args.repeats < 1: parser.error('repeats must be positive')
     if not 1 <= args.close_cycles <= 20: parser.error('close-cycles must be 1...20')
     if not .5 <= args.closed_seconds <= 60: parser.error('closed-seconds must be .5...60')
