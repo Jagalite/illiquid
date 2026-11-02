@@ -1,6 +1,7 @@
 # Playback bounded state-space search
 
-Illiquid verifies the production `PlaybackCore.update(_:)` transition with
+Illiquid verifies the production playback model (`PlaybackProductionModel.step`,
+the same callback the live player's Statelessness session executes) with
 the native Swift [Statelessness](https://github.com/Jagalite/statelessness)
 library, pinned to an exact revision in `Package.swift`. Illiquid owns the
 playback models, transition adapter, search identity, properties, progress

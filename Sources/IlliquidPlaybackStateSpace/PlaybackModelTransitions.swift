@@ -1,8 +1,9 @@
 import Foundation
-import IlliquidPlaybackCore
+import IlliquidPlaybackModel
 
 /// Playback model transitions: the Statelessness `step` callback applies one
-/// search action through the production `PlaybackCore.update(_:)` at most once
+/// search action through the production model's step
+/// (`PlaybackProductionModel.step`) at most once
 /// and updates the modeled environment and ghost obligations. Traversal,
 /// deduplication, reduction, progress analysis, replay and shrinking belong to
 /// Statelessness (see `PlaybackStatelessnessModels`).
@@ -10,7 +11,7 @@ struct AppliedSearchAction {
   var node: PlaybackSearchNode
   var transition: PlaybackTransition?
   var envelope: PlaybackEventEnvelope?
-  var calledProductionCore: Bool
+  var calledProductionModel: Bool
   var gateRejected: Bool
   var isFairProgress: Bool
   var violations: [PlaybackInvariantViolation]
@@ -144,20 +145,20 @@ func apply(
 
   guard !gateRejected, let event else {
     return AppliedSearchAction(
-      node: node, transition: nil, envelope: nil, calledProductionCore: false,
+      node: node, transition: nil, envelope: nil, calledProductionModel: false,
       gateRejected: gateRejected, isFairProgress: false, violations: []
     )
   }
 
-  var core = PlaybackCore(state: node.coreState)
   let envelope = PlaybackEventEnvelope(
     sequence: node.nextSequence,
     virtualTime: PlaybackInstant(ticks: node.coreState.lastVirtualTime.ticks + 1),
     event: event
   )
   node.nextSequence += 1
-  let transition = core.update(envelope)
-  node.coreState = core.state
+  let stepped = PlaybackProductionModel.step(node.coreState, envelope)
+  let transition = stepped.outputs[0]
+  node.coreState = stepped.state
   if let deliveredEffect, let deliveredResult,
     node.coreState.outstandingEffects[deliveredEffect.context.effectID] == nil,
     node.lateResults.count < configuration.lateResultLimit
@@ -215,7 +216,7 @@ func apply(
     }
   }
   return AppliedSearchAction(
-    node: node, transition: transition, envelope: envelope, calledProductionCore: true,
+    node: node, transition: transition, envelope: envelope, calledProductionModel: true,
     gateRejected: false, isFairProgress: fairProgress, violations: violations
   )
 }
@@ -225,7 +226,7 @@ func noCore(
   fair: Bool = false
 ) -> AppliedSearchAction {
   AppliedSearchAction(
-    node: node, transition: nil, envelope: nil, calledProductionCore: false,
+    node: node, transition: nil, envelope: nil, calledProductionModel: false,
     gateRejected: false, isFairProgress: fair, violations: []
   )
 }

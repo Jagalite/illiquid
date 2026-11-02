@@ -68,7 +68,7 @@ public struct PlaybackCanonicalState: Codable, Equatable, Sendable {
   public let lastPersistenceFailureCode: String?
   public let externalWaitReason: PlaybackExternalWaitReason?
 
-  public init(state: PlaybackCoreState) {
+  public init(state: PlaybackDomainState) {
     schemaVersion = state.schemaVersion
     applicationEpoch = state.applicationEpoch
     lifecycle = state.lifecycle
@@ -110,107 +110,8 @@ public struct PlaybackCanonicalState: Codable, Equatable, Sendable {
   }
 }
 
-public struct PlaybackReplayStep: Codable, Equatable, Sendable {
-  public let envelope: PlaybackEventEnvelope
-  public let disposition: EventDisposition
-  public let preState: PlaybackCanonicalState
-  public let postState: PlaybackCanonicalState
-  public let preStateDigest: String
-  public let postStateDigest: String
-  public let generatedEffects: [CanonicalPlaybackEffect]
-  public let invariantResults: [PlaybackInvariantViolation]
-
-  public init(
-    envelope: PlaybackEventEnvelope,
-    disposition: EventDisposition,
-    preState: PlaybackCanonicalState,
-    postState: PlaybackCanonicalState,
-    preStateDigest: String,
-    postStateDigest: String,
-    generatedEffects: [PlaybackEffect],
-    invariantResults: [PlaybackInvariantViolation]
-  ) {
-    self.envelope = envelope
-    self.disposition = disposition
-    self.preState = preState
-    self.postState = postState
-    self.preStateDigest = preStateDigest
-    self.postStateDigest = postStateDigest
-    self.generatedEffects = generatedEffects.map(CanonicalPlaybackEffect.init)
-    self.invariantResults = invariantResults
-  }
-}
-
-public struct PlaybackReplayFailure: Codable, Equatable, Sendable {
-  public let invariantName: String
-  public let step: UInt64
-  public let details: String
-
-  public init(invariantName: String, step: UInt64, details: String) {
-    self.invariantName = invariantName
-    self.step = step
-    self.details = details
-  }
-}
-
-public struct PlaybackReplayShrinkRecord: Codable, Equatable, Sendable {
-  public let fromSteps: Int
-  public let toSteps: Int
-
-  public init(fromSteps: Int, toSteps: Int) {
-    self.fromSteps = fromSteps
-    self.toSteps = toSteps
-  }
-}
-
-public struct PlaybackReplayDocument: Codable, Equatable, Sendable {
-  public let schemaVersion: UInt32
-  public let illiquidRevision: String
-  public let modelVersion: UInt32
-  public let seed: UInt64
-  public let initialState: PlaybackCanonicalState
-  public let steps: [PlaybackReplayStep]
-  public let finalState: PlaybackCanonicalState
-  public let rejectedStaleEvents: [UInt64]
-  public let failedInvariant: PlaybackReplayFailure?
-  public let shrinkHistory: [PlaybackReplayShrinkRecord]
-
-  public init(
-    schemaVersion: UInt32 = 1,
-    illiquidRevision: String,
-    modelVersion: UInt32 = 1,
-    seed: UInt64,
-    initialState: PlaybackCanonicalState,
-    steps: [PlaybackReplayStep],
-    finalState: PlaybackCanonicalState,
-    rejectedStaleEvents: [UInt64],
-    failedInvariant: PlaybackReplayFailure? = nil,
-    shrinkHistory: [PlaybackReplayShrinkRecord] = []
-  ) {
-    self.schemaVersion = schemaVersion
-    self.illiquidRevision = illiquidRevision
-    self.modelVersion = modelVersion
-    self.seed = seed
-    self.initialState = initialState
-    self.steps = steps
-    self.finalState = finalState
-    self.rejectedStaleEvents = rejectedStaleEvents.sorted()
-    self.failedInvariant = failedInvariant
-    self.shrinkHistory = shrinkHistory
-  }
-}
-
+/// Canonical state digest. Replay and recording use Statelessness traces.
 public enum PlaybackReplayCodec {
-  public static func encode(_ replay: PlaybackReplayDocument) throws -> Data {
-    let encoder = JSONEncoder()
-    encoder.outputFormatting = [.sortedKeys, .withoutEscapingSlashes]
-    return try encoder.encode(replay)
-  }
-
-  public static func decode(_ data: Data) throws -> PlaybackReplayDocument {
-    try JSONDecoder().decode(PlaybackReplayDocument.self, from: data)
-  }
-
   public static func digest(_ state: PlaybackCanonicalState) -> String {
     let encoder = JSONEncoder()
     encoder.outputFormatting = [.sortedKeys, .withoutEscapingSlashes]

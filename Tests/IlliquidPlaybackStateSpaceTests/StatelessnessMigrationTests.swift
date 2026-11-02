@@ -1,6 +1,6 @@
 import CryptoKit
 import Foundation
-import IlliquidPlaybackCore
+import IlliquidPlaybackModel
 import Statelessness
 import Testing
 
@@ -132,8 +132,8 @@ struct StatelessnessMigrationTests {
           let (successor, observation) = PlaybackStatelessnessModels.step(
             action: action, node: source, configuration: Self.configuration())
           let calls = successor.nextSequence - source.nextSequence
-          #expect(calls == (observation.calledProductionCore ? 1 : 0))
-          #expect((observation.envelope != nil) == observation.calledProductionCore)
+          #expect(calls == (observation.calledProductionModel ? 1 : 0))
+          #expect((observation.envelope != nil) == observation.calledProductionModel)
           switch observation.kind {
           case .production:
             production += 1

@@ -5,7 +5,7 @@ import Foundation
 import QuartzCore
 import IlliquidCore
 import IlliquidPlayback
-import IlliquidPlaybackCore
+import IlliquidPlaybackModel
 import Testing
 @testable import IlliquidNativePlayback
 

@@ -10,7 +10,7 @@ public struct PlaybackInvariantViolation: Codable, Equatable, Sendable {
 
 public enum PlaybackInvariantChecker {
   public static func check(
-    state: PlaybackCoreState,
+    state: PlaybackDomainState,
     emittedEffects: [PlaybackEffect] = []
   ) -> [PlaybackInvariantViolation] {
     var violations: [PlaybackInvariantViolation] = []

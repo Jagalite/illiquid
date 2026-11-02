@@ -1,4 +1,4 @@
-import IlliquidPlaybackCore
+import IlliquidPlaybackModel
 
 /// Statelessness graph search is breadth-first. No other algorithm is offered.
 public enum PlaybackSearchAlgorithm: String, Codable, Hashable, Sendable {
@@ -291,7 +291,7 @@ public struct PlaybackSearchGhost: Codable, Hashable, Sendable {
 public struct PlaybackSearchNode: Sendable {
   public let model: PlaybackSearchModel
   public let seedProfile: String
-  public var coreState: PlaybackCoreState
+  public var coreState: PlaybackDomainState
   public var environment: PlaybackModelEnvironment
   public var lateResults: [RetainedEffectResult]
   public var ghost: PlaybackSearchGhost
@@ -301,7 +301,7 @@ public struct PlaybackSearchNode: Sendable {
   public init(
     model: PlaybackSearchModel,
     seedProfile: String = "manual",
-    coreState: PlaybackCoreState,
+    coreState: PlaybackDomainState,
     environment: PlaybackModelEnvironment,
     lateResults: [RetainedEffectResult] = [],
     ghost: PlaybackSearchGhost = PlaybackSearchGhost(),

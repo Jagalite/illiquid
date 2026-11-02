@@ -1,5 +1,5 @@
 import Foundation
-import IlliquidPlaybackCore
+import IlliquidPlaybackModel
 
 public struct PlaybackSearchStateKey: Codable, Hashable, Sendable {
   public let model: PlaybackSearchModel

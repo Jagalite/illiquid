@@ -1,4 +1,4 @@
-import IlliquidPlaybackCore
+import IlliquidPlaybackModel
 import Statelessness
 
 /// A playback search node paired with its canonical search identity.
@@ -23,7 +23,7 @@ public struct PlaybackModelState: Sendable {
 
 /// How one model step reached (or did not reach) the production core.
 public enum PlaybackModelStepKind: String, Codable, Hashable, Sendable {
-  /// A command or accepted ingress called `PlaybackCore.update(_:)` once.
+  /// A command or accepted ingress called the production model's step once.
   case production
   /// Ingress from a previous or unrelated authority was rejected at the gate.
   case ingressRejected
@@ -55,7 +55,7 @@ public struct PlaybackModelObservation: Codable, Equatable, Sendable {
     self.isFairProgress = isFairProgress
   }
 
-  public var calledProductionCore: Bool { kind == .production }
+  public var calledProductionModel: Bool { kind == .production }
 }
 
 public typealias PlaybackStatelessnessModel = Model<
@@ -81,7 +81,7 @@ public enum PlaybackStatelessnessModels {
   /// Builds the Statelessness model for one model family and seed.
   ///
   /// `step` calls the playback transition adapter `apply` exactly once per
-  /// input, and therefore `PlaybackCore.update(_:)` at most once.
+  /// input, and therefore the production model's step at most once.
   /// `checkTransition` reads the step's observation and never reruns it.
   public static func make(
     model: PlaybackSearchModel,
@@ -179,7 +179,7 @@ public enum PlaybackStatelessnessModels {
   ) -> (node: PlaybackSearchNode, observation: PlaybackModelObservation) {
     let applied = apply(action: action, to: node, configuration: configuration)
     let kind: PlaybackModelStepKind =
-      if applied.calledProductionCore {
+      if applied.calledProductionModel {
         .production
       } else if applied.gateRejected {
         .ingressRejected

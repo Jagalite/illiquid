@@ -1,5 +1,5 @@
 import Foundation
-import IlliquidPlaybackCore
+import IlliquidPlaybackModel
 import Statelessness
 
 /// The Statelessness engine identity recorded in every summary and artifact.
@@ -129,7 +129,7 @@ public enum PlaybackVerifier {
     var production = 0
     var gate = 0
     for edge in report.edges {
-      if edge.outputs.first?.calledProductionCore == true { production += 1 }
+      if edge.outputs.first?.calledProductionModel == true { production += 1 }
       if edge.outputs.first?.kind == .ingressRejected { gate += 1 }
     }
     let complete: Bool

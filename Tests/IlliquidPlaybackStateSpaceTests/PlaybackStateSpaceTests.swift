@@ -1,4 +1,4 @@
-import IlliquidPlaybackCore
+import IlliquidPlaybackModel
 import Statelessness
 import Testing
 
@@ -462,7 +462,7 @@ struct PlaybackStateSpaceTests {
       kind: .applyRate(milliRate: 1_000),
       exclusiveKey: "presentation.rate.\(session).7"
     )
-    var state = PlaybackCoreState(activeSession: active)
+    var state = PlaybackDomainState(activeSession: active)
     state.outstandingEffects[effectID] = OutstandingEffectRecord(effect: pending)
     state.allocator = PlaybackIDAllocator(
       nextSession: session + 1,

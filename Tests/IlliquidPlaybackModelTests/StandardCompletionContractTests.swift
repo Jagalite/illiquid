@@ -1,13 +1,14 @@
 import Foundation
 import Testing
 
-@testable import IlliquidPlaybackCore
+@testable import IlliquidPlaybackModel
+import Statelessness
 
 @Suite("Standard effect completion contracts")
 struct StandardCompletionContractTests {
   @Test(arguments: [EffectResultKind.succeeded, .failed, .cancelled])
   func defaultEffectsAcceptEachStandardOutcomeOnce(kind: EffectResultKind) throws {
-    var runtime = PlaybackModelRuntime()
+    var runtime = PlaybackSessionHost()
     let load = runtime.send(
       .command(.load(source: .init(rawValue: "fixture/contract.mkv"), autoplay: false)))
     let effect = try #require(load.effects.first)
@@ -16,14 +17,14 @@ struct StandardCompletionContractTests {
     let rejected = runtime.send(.effectResult(.init(
       context: effect.context, token: .init(kind: kind, component: "unexpected"))))
     #expect(rejected.disposition == .invalid(reason: "undeclaredEffectResultToken"))
-    #expect(runtime.core.state.outstandingEffects[effect.context.effectID] != nil)
+    #expect(runtime.state.outstandingEffects[effect.context.effectID] != nil)
 
     let result = PlaybackEffectResult(context: effect.context, token: .init(kind: kind))
     let completed = runtime.send(.effectResult(result))
     #expect(completed.disposition == .accepted)
     #expect(completed.invariantViolations.isEmpty)
-    #expect(runtime.core.state.outstandingEffects[effect.context.effectID] == nil)
-    #expect(runtime.core.state.containsCompletedEffect(effect.context.effectID))
+    #expect(runtime.state.outstandingEffects[effect.context.effectID] == nil)
+    #expect(runtime.state.containsCompletedEffect(effect.context.effectID))
     #expect(runtime.send(.effectResult(result)).disposition == .duplicate(
       effectID: effect.context.effectID))
   }
@@ -133,20 +134,26 @@ struct StandardCompletionContractTests {
     let explicitEffect = makeEffect(completion: .oneShot(terminals: independentlyBuilt))
 
     for kind in [EffectResultKind.succeeded, .failed, .cancelled] {
-      var shared = makeRuntime(for: defaultEffect)
-      var independent = makeRuntime(for: explicitEffect)
+      let (shared, sharedRecorder) = try makeRecordedRuntime(for: defaultEffect)
+      let (independent, independentRecorder) = try makeRecordedRuntime(for: explicitEffect)
       let result = PlaybackEffectResult(context: defaultEffect.context, token: .init(kind: kind))
       #expect(shared.send(.effectResult(result)).disposition == .accepted)
       #expect(independent.send(.effectResult(result)).disposition == .accepted)
-      let sharedReplay = shared.replayDocument(illiquidRevision: "contract-test", seed: 42)
-      let independentReplay = independent.replayDocument(illiquidRevision: "contract-test", seed: 42)
-      #expect(sharedReplay == independentReplay)
-      let encoded = try PlaybackReplayCodec.encode(sharedReplay)
-      let independentEncoding = try PlaybackReplayCodec.encode(independentReplay)
-      let decoded = try PlaybackReplayCodec.decode(encoded)
+      let encoded = try encodeAuditTrace(sharedRecorder.snapshot())
+      let independentEncoding = try encodeAuditTrace(independentRecorder.snapshot())
       #expect(encoded == independentEncoding)
-      #expect(decoded == sharedReplay)
+      #expect(try encodeAuditTrace(decodeAuditTrace(encoded)) == encoded)
     }
+  }
+
+  private func makeRecordedRuntime(
+    for effect: PlaybackEffect
+  ) throws -> (PlaybackSessionHost, Recorder) {
+    let state = makeRuntime(for: effect).state
+    let recorder = try Recorder(
+      checkedInitial: checkInitial(PlaybackProductionModel.make(), state: state),
+      config: RunConfig(strategy: "contract-test", seed: 42))
+    return (PlaybackSessionHost(state: state, recorder: recorder), recorder)
   }
 
   private func makeDefaultEffect(id: UInt64 = 1) -> PlaybackEffect {
@@ -165,8 +172,8 @@ struct StandardCompletionContractTests {
       executor: base.executor, context: base.context, kind: base.kind, completion: completion)
   }
 
-  private func makeRuntime(for effect: PlaybackEffect) -> PlaybackModelRuntime {
-    PlaybackModelRuntime(state: .init(
+  private func makeRuntime(for effect: PlaybackEffect) -> PlaybackSessionHost {
+    PlaybackSessionHost(state: .init(
       outstandingEffects: [effect.context.effectID: .init(effect: effect)],
       allocator: .init(nextOperation: 2, nextEffect: effect.context.effectID.rawValue + 1)))
   }
@@ -182,14 +189,14 @@ struct StandardCompletionContractTests {
       let transition = runtime.send(.effectResult(.init(context: effect.context, token: token)))
       #expect(transition.disposition == .accepted)
       #expect(transition.invariantViolations.isEmpty)
-      #expect(runtime.core.state.outstandingEffects[effect.context.effectID] == nil)
+      #expect(runtime.state.outstandingEffects[effect.context.effectID] == nil)
     }
     for token in rejected {
       var runtime = makeRuntime(for: effect)
       let transition = runtime.send(.effectResult(.init(context: effect.context, token: token)))
       #expect(transition.disposition == .invalid(reason: "undeclaredEffectResultToken"))
       #expect(transition.invariantViolations.isEmpty)
-      #expect(runtime.core.state.outstandingEffects[effect.context.effectID] != nil)
+      #expect(runtime.state.outstandingEffects[effect.context.effectID] != nil)
     }
   }
 }

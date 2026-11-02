@@ -3,7 +3,7 @@ import CoreMedia
 import Foundation
 import OSLog
 import IlliquidCore
-import IlliquidPlaybackCore
+import IlliquidPlaybackModel
 
 struct MediaSessionSnapshot: Equatable, Sendable {
     var videoPacketDepth = 0

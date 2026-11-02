@@ -1,6 +1,5 @@
 import Darwin
 import Foundation
-import IlliquidPlaybackCore
 import IlliquidPlayer
 
 @main
@@ -8,7 +7,8 @@ struct IlliquidArchitectureCheck {
   @MainActor
   static func main() {
     let failures = ArchitectureValidation.run()
-      + playbackCoreBoundaryFailures()
+      + playbackModelBoundaryFailures()
+      + legacyPlaybackEngineFailures()
       + nativeOnlyProductionFailures()
     if failures.isEmpty {
       print("Illiquid architecture checks passed")
@@ -21,16 +21,18 @@ struct IlliquidArchitectureCheck {
     exit(1)
   }
 
-  private static func playbackCoreBoundaryFailures() -> [String] {
+  /// The production model is deterministic value code consumed by
+  /// Statelessness: no media frameworks, clocks, threads or UI.
+  private static func playbackModelBoundaryFailures() -> [String] {
     let root = URL(fileURLWithPath: FileManager.default.currentDirectoryPath)
-    let sourceRoot = root.appendingPathComponent("Sources/IlliquidPlaybackCore")
+    let sourceRoot = root.appendingPathComponent("Sources/IlliquidPlaybackModel")
     guard
       let enumerator = FileManager.default.enumerator(
         at: sourceRoot,
         includingPropertiesForKeys: nil
       )
     else {
-      return ["playback core source directory is unavailable"]
+      return ["playback model source directory is unavailable"]
     }
 
     let forbiddenImports = [
@@ -47,24 +49,58 @@ struct IlliquidArchitectureCheck {
 
     for case let fileURL as URL in enumerator where fileURL.pathExtension == "swift" {
       guard let source = try? String(contentsOf: fileURL, encoding: .utf8) else {
-        failures.append("playback core source unreadable: \(fileURL.lastPathComponent)")
+        failures.append("playback model source unreadable: \(fileURL.lastPathComponent)")
         continue
       }
       for module in forbiddenImports where source.contains("import \(module)") {
         failures.append(
-          "playback core imports forbidden module \(module): \(fileURL.lastPathComponent)"
+          "playback model imports forbidden module \(module): \(fileURL.lastPathComponent)"
         )
       }
-      if source.contains("import Foundation"), fileURL.lastPathComponent != "PlaybackReplay.swift" {
+      let serialization = ["PlaybackReplay.swift", "CanonicalJSON.swift", "PlaybackProductionCodec.swift"]
+      if source.contains("import Foundation"), !serialization.contains(fileURL.lastPathComponent) {
         failures.append(
-          "Foundation is restricted to replay serialization: \(fileURL.lastPathComponent)"
+          "Foundation is restricted to model serialization: \(fileURL.lastPathComponent)"
         )
       }
       for api in forbiddenAPIs where source.contains(api) {
         failures.append(
-          "playback core uses forbidden runtime API \(api): \(fileURL.lastPathComponent)"
+          "playback model uses forbidden runtime API \(api): \(fileURL.lastPathComponent)"
         )
       }
+    }
+    return failures.sorted()
+  }
+
+  /// Statelessness owns production execution. The legacy engine, its runtime
+  /// wrapper and its module must not return to active sources or the package.
+  private static func legacyPlaybackEngineFailures() -> [String] {
+    let root = URL(fileURLWithPath: FileManager.default.currentDirectoryPath)
+    var failures: [String] = []
+    let legacySymbols = ["PlaybackModelRuntime", "IlliquidPlaybackCore", "PlaybackCore(", "PlaybackCore.update", ": PlaybackCore", "struct PlaybackCore"]
+    if let package = try? String(contentsOf: root.appendingPathComponent("Package.swift"), encoding: .utf8),
+      package.contains("IlliquidPlaybackCore")
+    {
+      failures.append("package retains the legacy playback core target")
+    }
+    for directory in ["Sources", "Tests", "Validation"] {
+      guard
+        let enumerator = FileManager.default.enumerator(
+          at: root.appendingPathComponent(directory), includingPropertiesForKeys: nil)
+      else { continue }
+      for case let fileURL as URL in enumerator where fileURL.pathExtension == "swift" {
+        if fileURL.lastPathComponent == "main.swift", fileURL.path.contains("IlliquidArchitectureCheck") {
+          continue
+        }
+        guard let source = try? String(contentsOf: fileURL, encoding: .utf8) else { continue }
+        for symbol in legacySymbols where source.contains(symbol) {
+          failures.append("legacy playback engine symbol \(symbol): \(fileURL.path.replacingOccurrences(of: root.path + "/", with: ""))")
+        }
+      }
+    }
+    let model = root.appendingPathComponent("Sources/IlliquidPlaybackModel/PlaybackProductionModel.swift")
+    if let source = try? String(contentsOf: model, encoding: .utf8), !source.contains("import Statelessness") {
+      failures.append("production model is not defined on Statelessness")
     }
     return failures.sorted()
   }

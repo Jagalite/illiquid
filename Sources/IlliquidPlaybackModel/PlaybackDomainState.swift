@@ -226,7 +226,7 @@ public final class PendingPlaybackSession: Codable, Equatable, Sendable {
   }
 }
 
-public struct PlaybackCoreState: Codable, Equatable, Sendable {
+public struct PlaybackDomainState: Codable, Equatable, Sendable {
   public var loopRange: PlaybackLoopRange?
   public var preferredPlaybackMilliRate: Int32?
   public var playbackMilliRate: Int32 { preferredPlaybackMilliRate ?? 1_000 }
@@ -323,7 +323,7 @@ public struct PlaybackUISnapshot: Codable, Equatable, Sendable {
   public let subtitleDelayMicroseconds: Int64
   public let failureCode: String?
 
-  public init(state: PlaybackCoreState) {
+  public init(state: PlaybackDomainState) {
     sessionID = state.activeSession?.id
     revision = state.snapshotRevision
     lifecycle = state.lifecycle

@@ -1,4 +1,4 @@
-import IlliquidPlaybackCore
+import IlliquidPlaybackModel
 import Statelessness
 
 /// Progress summary recorded in qualification records.

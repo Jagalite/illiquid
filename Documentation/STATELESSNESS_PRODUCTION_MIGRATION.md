@@ -1,6 +1,10 @@
 # Production migration to Statelessness
 
-Status: proposed implementation plan, 2026-11-01. No production changes are made by this document.
+Status: implemented on branch `statelessness/production-migration` (2026-11-02).
+Phase evidence, the boundary ledger and the discrepancy register are in
+[StatelessnessProduction/STATUS.md](StatelessnessProduction/STATUS.md). This
+document remains the plan of record; its source references describe the
+pre-migration code at `935604b6`. Prepared 2026-11-01.
 
 ## Objective and completion boundary
 

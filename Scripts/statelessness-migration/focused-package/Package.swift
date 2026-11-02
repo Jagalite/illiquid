@@ -9,15 +9,19 @@ let package = Package(
     dependencies: [
         .package(
             url: "https://github.com/Jagalite/statelessness.git",
-            revision: "3fbdca7c49be3cf32da613f887a7f149e0b97087"
+            revision: "20fc035ec3c91a69934657909b3c044cec86a07e"
         ),
     ],
     targets: [
         .target(name: "IlliquidCore", path: "Sources/IlliquidCore"),
-        .target(name: "IlliquidPlaybackCore", dependencies: ["IlliquidCore"], path: "Sources/IlliquidPlaybackCore"),
+        .target(
+            name: "IlliquidPlaybackModel",
+            dependencies: ["IlliquidCore", .product(name: "Statelessness", package: "statelessness")],
+            path: "Sources/IlliquidPlaybackModel"
+        ),
         .target(
             name: "IlliquidPlaybackStateSpace",
-            dependencies: ["IlliquidPlaybackCore", .product(name: "Statelessness", package: "statelessness")],
+            dependencies: ["IlliquidPlaybackModel", .product(name: "Statelessness", package: "statelessness")],
             path: "Sources/IlliquidPlaybackStateSpace"
         ),
         .testTarget(

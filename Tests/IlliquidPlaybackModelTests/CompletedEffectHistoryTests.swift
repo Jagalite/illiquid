@@ -1,7 +1,7 @@
 import Foundation
 import Testing
 
-@testable import IlliquidPlaybackCore
+@testable import IlliquidPlaybackModel
 
 @Suite("Compact completed-effect history")
 struct CompletedEffectHistoryTests {
@@ -156,7 +156,7 @@ struct CompletedEffectHistoryTests {
 
   @Test
   func publicSetMutationsAndValueCopiesKeepTheirOriginalSemantics() {
-    let original = PlaybackCoreState(completedEffectIDs: [id(1), id(3)])
+    let original = PlaybackDomainState(completedEffectIDs: [id(1), id(3)])
     var changed = original
     changed.completedEffectIDs.insert(id(2))
     #expect(changed.completedEffectIDs == Set([id(1), id(2), id(3)]))
@@ -186,7 +186,7 @@ struct CompletedEffectHistoryTests {
   func stateCodablePreservesLegacySetFieldAndCanonicalReplay() throws {
     struct LegacyHistory: Decodable { let completedEffectIDs: Set<PlaybackEffectID> }
     let expected = Set([id(1), id(2), id(3), id(7), id(9)])
-    let state = PlaybackCoreState(completedEffectIDs: expected)
+    let state = PlaybackDomainState(completedEffectIDs: expected)
     let encoded = try JSONEncoder().encode(state)
     let legacy = try JSONDecoder().decode(LegacyHistory.self, from: encoded)
     #expect(legacy.completedEffectIDs == expected)
@@ -197,7 +197,7 @@ struct CompletedEffectHistoryTests {
     let unordered = try JSONEncoder().encode([id(9), id(3), id(7), id(1), id(2), id(3)])
     object["completedEffectIDs"] = try JSONSerialization.jsonObject(with: unordered)
     let legacyBytes = try JSONSerialization.data(withJSONObject: object)
-    let decoded = try JSONDecoder().decode(PlaybackCoreState.self, from: legacyBytes)
+    let decoded = try JSONDecoder().decode(PlaybackDomainState.self, from: legacyBytes)
     #expect(decoded == state)
     #expect(decoded.completedEffectHistoryPrefixCount == 3)
     #expect(decoded.completedEffectHistorySparseCount == 2)
@@ -208,7 +208,7 @@ struct CompletedEffectHistoryTests {
 
   @Test
   func productionCoreRetainsDuplicateClassificationAfterLongHistory() throws {
-    var runtime = PlaybackModelRuntime(recordsReplaySteps: false)
+    var runtime = PlaybackSessionHost()
     let load = runtime.send(.command(.load(
       source: .init(rawValue: "fixture/history.mkv"), autoplay: false
     )))
@@ -223,11 +223,11 @@ struct CompletedEffectHistoryTests {
       #expect(completion?.disposition == .accepted)
       #expect(completion?.invariantViolations.isEmpty == true)
     }
-    #expect(runtime.core.state.completedEffectIDs.count == 10_002)
-    #expect(runtime.core.state.completedEffectHistoryPrefixCount == 10_002)
-    #expect(runtime.core.state.completedEffectHistorySparseCount == 0)
+    #expect(runtime.state.completedEffectIDs.count == 10_002)
+    #expect(runtime.state.completedEffectHistoryPrefixCount == 10_002)
+    #expect(runtime.state.completedEffectHistorySparseCount == 0)
     #expect(runtime.pendingEffects.isEmpty)
-    let before = PlaybackUISnapshot(state: runtime.core.state)
+    let before = PlaybackUISnapshot(state: runtime.state)
     let duplicate = runtime.send(.effectResult(.init(
       context: first.context, token: .init(kind: .succeeded)
     )))
@@ -239,7 +239,7 @@ struct CompletedEffectHistoryTests {
 
   @Test
   func outstandingHolesRemainLiveUntilTheirOwnResultsArrive() throws {
-    var runtime = PlaybackModelRuntime(recordsReplaySteps: false)
+    var runtime = PlaybackSessionHost()
     _ = runtime.send(.command(.load(source: .init(rawValue: "fixture/holes.mkv"), autoplay: false)))
     _ = runtime.completeNext()
     _ = runtime.completeNext()
@@ -254,23 +254,21 @@ struct CompletedEffectHistoryTests {
     }
     for index in stride(from: 0, to: effects.count, by: 2) {
       let effect = effects[index]
-      #expect(!runtime.core.state.containsCompletedEffect(effect.context.effectID))
-      #expect(runtime.core.state.outstandingEffects[effect.context.effectID] != nil)
+      #expect(!runtime.state.containsCompletedEffect(effect.context.effectID))
+      #expect(runtime.state.outstandingEffects[effect.context.effectID] != nil)
       let completion = runtime.complete(effectID: effect.context.effectID)
       #expect(completion?.disposition == .accepted)
       #expect(completion?.invariantViolations.isEmpty == true)
     }
-    #expect(runtime.core.state.completedEffectHistoryPrefixCount == 34)
-    #expect(runtime.core.state.completedEffectHistorySparseCount == 0)
-    #expect(runtime.core.state.outstandingEffects.isEmpty)
+    #expect(runtime.state.completedEffectHistoryPrefixCount == 34)
+    #expect(runtime.state.completedEffectHistorySparseCount == 0)
+    #expect(runtime.state.outstandingEffects.isEmpty)
   }
 
   @Test
   func arbitraryInitialIDsDoNotTurnUnknownIDsIntoDuplicates() {
-    var runtime = PlaybackModelRuntime(
-      state: PlaybackCoreState(completedEffectIDs: [id(0), id(7), id(.max)]),
-      recordsReplaySteps: false
-    )
+    var runtime = PlaybackSessionHost(
+      state: PlaybackDomainState(completedEffectIDs: [id(0), id(7), id(.max)]))
     for value: UInt64 in [0, 1, 6, 7, 8, .max - 1, .max] {
       let context = PlaybackEffectContext(
         authority: .application(.init(rawValue: 1)), operationID: .init(rawValue: 1),

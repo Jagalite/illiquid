@@ -1,111 +1,16 @@
-public struct PlaybackCore: Sendable {
-  public private(set) var state: PlaybackCoreState
-
-  public init(state: PlaybackCoreState = PlaybackCoreState()) {
-    self.state = state
-  }
-
-  public mutating func update(_ envelope: PlaybackEventEnvelope) -> PlaybackTransition {
-    if state.lifecycle == .terminated {
-      return transition(disposition: .ignoredAfterTermination, effects: [])
-    }
-
-    guard envelope.virtualTime >= state.lastVirtualTime else {
-      state.rejectedEventCount += 1
-      return transition(
-        disposition: .invalid(reason: "virtualTimeRegressed"),
-        effects: []
-      )
-    }
-    state.lastVirtualTime = envelope.virtualTime
-
-    if state.lifecycle == .shuttingDown,
-      !isAllowedDuringShutdown(envelope.event)
-    {
-      state.rejectedEventCount += 1
-      return transition(
-        disposition: .invalid(reason: "eventRejectedDuringShutdown"),
-        effects: []
-      )
-    }
-
-    let reduction: (EventDisposition, [PlaybackEffect])
-    switch envelope.event {
-    case .command(let command):
-      reduction = reduce(command)
-    case .effectResult(let result):
-      reduction = reduce(result)
-    case .deadlineReached(let operationID):
-      reduction = reduceDeadline(operationID)
-    case .diagnosticObserved:
-      state.diagnosticEventCount += 1
-      reduction = (.accepted, [])
-    case .subtitle(let event):
-      reduction = reduce(event)
-    case .acceptedClockSample(let timestamp):
-      reduction = acceptClockSample(timestamp)
-    case .audioOutputChanged(let timestamp):
-      if let session = state.activeSession,
-        state.pendingSession == nil,
-        !session.lifecycleState.resumeAfterWake,
-        [.playing, .paused, .buffering, .seeking, .prerolling, .draining].contains(session.phase)
-      {
-        // Route changes are repeatable lifecycle observations, not decoder
-        // failures. An in-flight user seek retains its target. The existing
-        // exact-seek barriers flush/re-preroll both streams and preserve intent.
-        reduction = beginSeek(target: session.seek?.target ?? timestamp, mode: .exact)
-      } else {
-        reduction = (.accepted, [])
-      }
-    case .durationObserved(let timestamp):
-      reduction = acceptDuration(timestamp)
-    case .catalogObserved(let catalog):
-      reduction = observeCatalog(catalog)
-    case .demuxEndOfFile(let required):
-      reduction = beginDrain(required: required)
-    case .drainObserved(let component):
-      reduction = observeDrain(component)
-    case .failureObserved(let failure):
-      reduction = observeFailure(failure)
-    case .synchronization(let event):
-      reduction = observeSynchronization(event)
-    case .lifecycle(let event):
-      reduction = observeLifecycle(event)
-    }
-
-    switch reduction.0 {
-    case .accepted:
-      state.acceptedEventCount += 1
-      state.snapshotRevision += 1
-    case .duplicate, .stale, .invalid, .ignoredAfterTermination:
-      state.rejectedEventCount += 1
-    }
-
-    register(reduction.1)
-    let violations = PlaybackInvariantChecker.check(
-      state: state,
-      emittedEffects: reduction.1
-    )
-    if !violations.isEmpty {
-      state.lifecycle = .invariantFailed
-    }
-
-    return PlaybackTransition(
-      disposition: reduction.0,
-      effects: reduction.1,
-      snapshot: PlaybackUISnapshot(state: state),
-      invariantViolations: violations
-    )
-  }
-
-  private mutating func reduce(_ command: PlaybackCommand) -> (EventDisposition, [PlaybackEffect]) {
-    if state.lifecycle == .shuttingDown {
+/// Playback rules over the value state. Each rule is a deterministic
+/// transformation of `PlaybackDomainState` and the emitted effect intents; the
+/// production model's step (`PlaybackProductionModel.step`) orchestrates one
+/// turn and Statelessness owns execution and the committed state.
+extension PlaybackDomainState {
+  mutating func reduce(_ command: PlaybackCommand) -> (EventDisposition, [PlaybackEffect]) {
+    if self.lifecycle == .shuttingDown {
       return (.invalid(reason: "commandRejectedDuringShutdown"), [])
     }
-    if state.lifecycle == .invariantFailed {
+    if self.lifecycle == .invariantFailed {
       return (.invalid(reason: "coreInvariantFailed"), [])
     }
-    if state.pendingSession != nil {
+    if self.pendingSession != nil {
       switch command {
       case .load, .stop, .shutdown, .setPlaybackSpeed:
         break
@@ -119,36 +24,36 @@ public struct PlaybackCore: Sendable {
     case .load(let source, let autoplay):
       return beginLoad(source: source, autoplay: autoplay)
     case .play:
-      return beginRateChange(milliRate: state.playbackMilliRate)
+      return beginRateChange(milliRate: self.playbackMilliRate)
     case .pause:
       return beginRateChange(milliRate: 0)
     case .setPlaybackSpeed(let rate):
       guard (250...4_000).contains(rate) else {
         return (.invalid(reason: "unsupportedPlaybackSpeed"), [])
       }
-      state.preferredPlaybackMilliRate = rate
-      if var pending = state.pendingSession?.value {
+      self.preferredPlaybackMilliRate = rate
+      if var pending = self.pendingSession?.value {
         pending.synchronization.desiredMilliRate = pending.desiredTransport == .playing ? rate : 0
-        state.pendingSession = PendingPlaybackSession(pending)
+        self.pendingSession = PendingPlaybackSession(pending)
         return (.accepted, [])
       }
-      guard var session = state.activeSession else { return (.accepted, []) }
+      guard var session = self.activeSession else { return (.accepted, []) }
       session.synchronization.desiredMilliRate = session.desiredTransport == .playing ? rate : 0
-      state.activeSession = session
+      self.activeSession = session
       guard session.desiredTransport == .playing,
         session.synchronization.startupAcknowledged,
         session.phase == .playing || session.phase == .draining
       else { return (.accepted, []) }
       return beginRateChange(milliRate: rate)
     case .setLoop(let start, let end):
-      guard let start, let end else { state.loopRange = nil; return (.accepted, []) }
-      guard let session = state.activeSession,
+      guard let start, let end else { self.loopRange = nil; return (.accepted, []) }
+      guard let session = self.activeSession,
         case .valid(let a) = start, case .valid(let b) = end,
         a.value >= 0, Self.seconds(start) < Self.seconds(end),
         boundedSeekTarget(end, duration: session.duration) == end
       else { return (.invalid(reason: "invalidLoopRange"), []) }
       _ = b
-      state.loopRange = PlaybackLoopRange(sessionID: session.id, start: start, end: end)
+      self.loopRange = PlaybackLoopRange(sessionID: session.id, start: start, end: end)
       return (.accepted, [])
     case .seek(let target, let mode):
       return beginSeek(target: target, mode: mode)
@@ -163,8 +68,8 @@ public struct PlaybackCore: Sendable {
     case .stop:
       return beginStop(forShutdown: false)
     case .shutdown:
-      state.lifecycle = .shuttingDown
-      if state.activeSession != nil || state.pendingSession != nil {
+      self.lifecycle = .shuttingDown
+      if self.activeSession != nil || self.pendingSession != nil {
         return beginStop(forShutdown: true)
       }
       guard
@@ -181,20 +86,20 @@ public struct PlaybackCore: Sendable {
     }
   }
 
-  private mutating func beginLoad(
+  mutating func beginLoad(
     source: MediaSourceIdentity,
     autoplay: Bool
   ) -> (EventDisposition, [PlaybackEffect]) {
     guard !source.rawValue.isEmpty else {
       return (.invalid(reason: "emptySourceIdentity"), [])
     }
-    guard let sessionID = state.allocator.allocateSession(),
-      let operationID = state.allocator.allocateOperation()
+    guard let sessionID = self.allocator.allocateSession(),
+      let operationID = self.allocator.allocateOperation()
     else {
       return allocationFailure()
     }
 
-    if let superseded = state.pendingSession {
+    if let superseded = self.pendingSession {
       settleEffects(for: superseded.authority)
     }
 
@@ -208,9 +113,9 @@ public struct PlaybackCore: Sendable {
       activeOperationID: operationID,
       loading: LoadingTransactionState()
     )
-    session.synchronization.desiredMilliRate = autoplay ? state.playbackMilliRate : 0
-    state.pendingSession = PendingPlaybackSession(session)
-    state.lastLoadFailure = nil
+    session.synchronization.desiredMilliRate = autoplay ? self.playbackMilliRate : 0
+    self.pendingSession = PendingPlaybackSession(session)
+    self.lastLoadFailure = nil
 
     guard
       let openEffect = makeEffect(
@@ -226,10 +131,10 @@ public struct PlaybackCore: Sendable {
     return (.accepted, [openEffect])
   }
 
-  private mutating func beginRateChange(
+  mutating func beginRateChange(
     milliRate: Int32
   ) -> (EventDisposition, [PlaybackEffect]) {
-    guard var session = state.activeSession else {
+    guard var session = self.activeSession else {
       return (.invalid(reason: "transportRequiresSession"), [])
     }
     guard session.phase != .opening,
@@ -241,14 +146,14 @@ public struct PlaybackCore: Sendable {
     else {
       return (.invalid(reason: "transportNotReady"), [])
     }
-    guard let operationID = state.allocator.allocateOperation() else {
+    guard let operationID = self.allocator.allocateOperation() else {
       return allocationFailure()
     }
 
     session.desiredTransport = milliRate == 0 ? .paused : .playing
     session.synchronization.desiredMilliRate = milliRate
     session.activeOperationID = operationID
-    state.activeSession = session
+    self.activeSession = session
     if milliRate != 0, !session.synchronization.startupAcknowledged {
       return (.accepted, [])
     }
@@ -266,21 +171,21 @@ public struct PlaybackCore: Sendable {
     return (.accepted, [effect])
   }
 
-  private mutating func beginSeek(
+  mutating func beginSeek(
     target: MediaTimestamp,
     mode: SeekMode
   ) -> (EventDisposition, [PlaybackEffect]) {
     guard case .valid = target else {
       return (.invalid(reason: "seekRequiresValidTarget"), [])
     }
-    guard var session = state.activeSession else {
+    guard var session = self.activeSession else {
       return (.invalid(reason: "seekRequiresSession"), [])
     }
     guard session.phase != .opening && session.phase != .stopping else {
       return (.invalid(reason: "seekNotReady"), [])
     }
     guard session.generation.rawValue < UInt64.max,
-      let operationID = state.allocator.allocateOperation()
+      let operationID = self.allocator.allocateOperation()
     else {
       return allocationFailure()
     }
@@ -321,7 +226,7 @@ public struct PlaybackCore: Sendable {
       phase: .demuxSeeking,
       pendingBarriers: []
     )
-    state.activeSession = session
+    self.activeSession = session
     guard let effect = makeEffect(
       authority: session.authority,
       operationID: operationID,
@@ -332,20 +237,20 @@ public struct PlaybackCore: Sendable {
     return (.accepted, [effect])
   }
 
-  private static func seconds(_ timestamp: MediaTimestamp) -> Double {
+  static func seconds(_ timestamp: MediaTimestamp) -> Double {
     guard case .valid(let time) = timestamp else { return .nan }
     return Double(time.value) / Double(time.timescale)
   }
 
-  private mutating func acceptClockSample(
+  mutating func acceptClockSample(
     _ timestamp: MediaTimestamp
   ) -> (EventDisposition, [PlaybackEffect]) {
-    guard case .valid = timestamp, var session = state.activeSession else {
+    guard case .valid = timestamp, var session = self.activeSession else {
       return (.invalid(reason: "clockSampleRequiresValidSessionTime"), [])
     }
     session.logicalPosition = timestamp
-    state.activeSession = session
-    if let loop = state.loopRange, loop.sessionID == session.id,
+    self.activeSession = session
+    if let loop = self.loopRange, loop.sessionID == session.id,
       session.desiredTransport == .playing, session.seek == nil,
       session.phase == .playing || session.phase == .draining,
       Self.seconds(timestamp) >= Self.seconds(loop.end) {
@@ -354,10 +259,10 @@ public struct PlaybackCore: Sendable {
     return (.accepted, [])
   }
 
-  private mutating func beginAudioSelection(
+  mutating func beginAudioSelection(
     _ intent: AudioSelectionIntent
   ) -> (EventDisposition, [PlaybackEffect]) {
-    guard var session = state.activeSession else {
+    guard var session = self.activeSession else {
       return (.invalid(reason: "audioSelectionRequiresSession"), [])
     }
     let resolvedIntent: AudioSelectionIntent = switch intent {
@@ -367,7 +272,7 @@ public struct PlaybackCore: Sendable {
     }
     guard let directive = session.tracks.requestAudio(resolvedIntent),
       case let .prepareAudio(requested, revision) = directive,
-      let operationID = state.allocator.allocateOperation(),
+      let operationID = self.allocator.allocateOperation(),
       session.generation.rawValue < UInt64.max
     else { return (.invalid(reason: "audioSelectionNotAccepted"), []) }
     session.generation = PlaybackGenerationID(rawValue: session.generation.rawValue + 1)
@@ -377,7 +282,7 @@ public struct PlaybackCore: Sendable {
     session.phase = .prerolling
     session.actualTransport = .paused
     session.activeOperationID = operationID
-    state.activeSession = session
+    self.activeSession = session
     guard let effect = makeEffect(
       authority: session.authority,
       operationID: operationID,
@@ -388,10 +293,10 @@ public struct PlaybackCore: Sendable {
     return (.accepted, [effect])
   }
 
-  private mutating func beginSubtitleSelection(
+  mutating func beginSubtitleSelection(
     _ intent: SubtitleSelectionIntent
   ) -> (EventDisposition, [PlaybackEffect]) {
-    guard var session = state.activeSession else {
+    guard var session = self.activeSession else {
       return (.invalid(reason: "subtitleSelectionRequiresSession"), [])
     }
     let resolvedIntent: SubtitleSelectionIntent = switch intent {
@@ -401,7 +306,7 @@ public struct PlaybackCore: Sendable {
     }
     guard let directive = session.tracks.requestSubtitle(resolvedIntent),
       case let .prepareSubtitle(requested, revision) = directive,
-      let operationID = state.allocator.allocateOperation(),
+      let operationID = self.allocator.allocateOperation(),
       session.generation.rawValue < UInt64.max
     else { return (.invalid(reason: "subtitleSelectionNotAccepted"), []) }
     session.generation = PlaybackGenerationID(rawValue: session.generation.rawValue + 1)
@@ -411,7 +316,7 @@ public struct PlaybackCore: Sendable {
     session.phase = .prerolling
     session.actualTransport = .paused
     session.activeOperationID = operationID
-    state.activeSession = session
+    self.activeSession = session
     guard let effect = makeEffect(
       authority: session.authority,
       operationID: operationID,
@@ -422,15 +327,15 @@ public struct PlaybackCore: Sendable {
     return (.accepted, [effect])
   }
 
-  private mutating func beginSubtitleDelay(
+  mutating func beginSubtitleDelay(
     _ microseconds: Int64
   ) -> (EventDisposition, [PlaybackEffect]) {
-    guard var session = state.activeSession,
-      let operationID = state.allocator.allocateOperation()
+    guard var session = self.activeSession,
+      let operationID = self.allocator.allocateOperation()
     else { return (.invalid(reason: "subtitleDelayRequiresSession"), []) }
     let requested = session.controls.requestSubtitleDelay(microseconds: microseconds)
     session.activeOperationID = operationID
-    state.activeSession = session
+    self.activeSession = session
     guard let effect = makeEffect(
       authority: session.authority,
       operationID: operationID,
@@ -441,24 +346,24 @@ public struct PlaybackCore: Sendable {
     return (.accepted, [effect])
   }
 
-  private mutating func acceptDuration(
+  mutating func acceptDuration(
     _ timestamp: MediaTimestamp
   ) -> (EventDisposition, [PlaybackEffect]) {
     guard case .valid(let value) = timestamp,
       value.value >= 0,
-      var session = state.activeSession
+      var session = self.activeSession
     else {
       return (.invalid(reason: "durationRequiresValidSessionTime"), [])
     }
     session.duration = timestamp
-    state.activeSession = session
+    self.activeSession = session
     return (.accepted, [])
   }
 
-  private mutating func observeCatalog(
+  mutating func observeCatalog(
     _ catalog: PlaybackCatalog
   ) -> (EventDisposition, [PlaybackEffect]) {
-    guard var session = state.activeSession else {
+    guard var session = self.activeSession else {
       return (.invalid(reason: "catalogRequiresSession"), [])
     }
     if var loading = session.loading {
@@ -480,20 +385,20 @@ public struct PlaybackCore: Sendable {
     var required: Set<SynchronizedStream> = []
     if catalog.hasVideo { required.insert(.video) }
     if !catalog.audio.isEmpty { required.insert(.audio) }
-    session.synchronization.desiredMilliRate = session.desiredTransport == .playing ? state.playbackMilliRate : 0
+    session.synchronization.desiredMilliRate = session.desiredTransport == .playing ? self.playbackMilliRate : 0
     if session.synchronization.startupAcknowledged {
       session.synchronization.updateRequirementsAfterStartup(required)
     } else {
       _ = session.synchronization.observe(.require(required))
     }
-    state.activeSession = session
+    self.activeSession = session
     return (.accepted, [])
   }
 
-  private mutating func observeSynchronization(
+  mutating func observeSynchronization(
     _ event: SynchronizationCoreEvent
   ) -> (EventDisposition, [PlaybackEffect]) {
-    guard var session = state.activeSession else {
+    guard var session = self.activeSession else {
       return (.stale(reason: .sessionMismatch), [])
     }
     guard session.phase != .failed else {
@@ -514,11 +419,11 @@ public struct PlaybackCore: Sendable {
         session.actualTransport = .paused
       }
     }
-    guard let operationID = state.allocator.allocateOperation() else {
+    guard let operationID = self.allocator.allocateOperation() else {
       return allocationFailure()
     }
     session.activeOperationID = operationID
-    state.activeSession = session
+    self.activeSession = session
     var effects: [PlaybackEffect] = []
     for directive in directives {
       let specification: (ExecutorKind, PlaybackEffectKind, String)
@@ -554,28 +459,28 @@ public struct PlaybackCore: Sendable {
     return (.accepted, effects)
   }
 
-  private mutating func observeLifecycle(
+  mutating func observeLifecycle(
     _ event: LifecycleCoreEvent
   ) -> (EventDisposition, [PlaybackEffect]) {
-    guard var session = state.activeSession else {
+    guard var session = self.activeSession else {
       return (.stale(reason: .sessionMismatch), [])
     }
     guard session.phase != .failed else {
       return (.stale(reason: .operationMismatch), [])
     }
-    let desiredRate: Int32 = session.desiredTransport == .playing ? state.playbackMilliRate : 0
+    let desiredRate: Int32 = session.desiredTransport == .playing ? self.playbackMilliRate : 0
     let directive = session.lifecycleState.observe(
       event,
       desiredMilliRate: desiredRate,
       position: session.logicalPosition
     )
-    guard let operationID = state.allocator.allocateOperation() else {
+    guard let operationID = self.allocator.allocateOperation() else {
       return allocationFailure()
     }
     session.activeOperationID = operationID
     session.actualTransport = .paused
     if event == .systemWillSleep { session.phase = .paused }
-    state.activeSession = session
+    self.activeSession = session
     let effectKind: PlaybackEffectKind = switch directive {
     case .applyRate(let rate): .applyRate(milliRate: rate)
     case .resumeAfterWake(let position, let rate):
@@ -591,16 +496,16 @@ public struct PlaybackCore: Sendable {
     return (.accepted, [effect])
   }
 
-  private mutating func beginDrain(
+  mutating func beginDrain(
     required: Set<PlaybackDrainComponent>
   ) -> (EventDisposition, [PlaybackEffect]) {
-    guard var session = state.activeSession else {
+    guard var session = self.activeSession else {
       return (.invalid(reason: "drainRequiresSession"), [])
     }
     guard session.phase != .failed else {
       return (.stale(reason: .operationMismatch), [])
     }
-    if let loop = state.loopRange, loop.sessionID == session.id,
+    if let loop = self.loopRange, loop.sessionID == session.id,
       session.desiredTransport == .playing, session.seek == nil {
       return beginSeek(target: loop.start, mode: .exact)
     }
@@ -612,15 +517,15 @@ public struct PlaybackCore: Sendable {
     } else {
       session.drain.required.formUnion(required)
     }
-    state.activeSession = session
+    self.activeSession = session
     if session.drain.required.isEmpty { return finalizeDrain(session: session) }
     return (.accepted, [])
   }
 
-  private mutating func observeFailure(
+  mutating func observeFailure(
     _ failure: PlaybackFailure
   ) -> (EventDisposition, [PlaybackEffect]) {
-    guard var session = state.activeSession else {
+    guard var session = self.activeSession else {
       return (.stale(reason: .sessionMismatch), [])
     }
     // A queued observation is not a user retry. In particular, do not erase
@@ -629,7 +534,7 @@ public struct PlaybackCore: Sendable {
       session.phase != .stopping,
       session.phase != .stopped
     else { return (.stale(reason: .operationMismatch), []) }
-    guard let operationID = state.allocator.allocateOperation() else {
+    guard let operationID = self.allocator.allocateOperation() else {
       return allocationFailure()
     }
     let directive = session.recovery.classify(
@@ -644,7 +549,7 @@ public struct PlaybackCore: Sendable {
 
     switch directive {
     case .resumeVideoDecoderAfterTransientFailure(let lineage, let consecutiveCount):
-      state.activeSession = session
+      self.activeSession = session
       guard let resume = makeEffect(
         authority: session.authority,
         operationID: operationID,
@@ -665,7 +570,7 @@ public struct PlaybackCore: Sendable {
       session.revisions.decoder = revision
       session.phase = .prerolling
       session.actualTransport = .paused
-      state.activeSession = session
+      self.activeSession = session
       guard let recreate = makeEffect(
         authority: session.authority,
         operationID: operationID,
@@ -682,7 +587,7 @@ public struct PlaybackCore: Sendable {
       session.revisions.presentation = revision
       session.phase = .prerolling
       session.actualTransport = .paused
-      state.activeSession = session
+      self.activeSession = session
       guard let flush = makeEffect(
         authority: session.authority,
         operationID: operationID,
@@ -696,7 +601,7 @@ public struct PlaybackCore: Sendable {
       session.revisions.presentationGraph = revision
       session.phase = .prerolling
       session.actualTransport = .paused
-      state.activeSession = session
+      self.activeSession = session
       guard let rebuild = makeEffect(
         authority: session.authority,
         operationID: operationID,
@@ -710,7 +615,7 @@ public struct PlaybackCore: Sendable {
       session.revisions.presentation = revision
       session.phase = .prerolling
       session.actualTransport = .paused
-      state.activeSession = session
+      self.activeSession = session
       guard let flush = makeEffect(
         authority: session.authority,
         operationID: operationID,
@@ -724,7 +629,7 @@ public struct PlaybackCore: Sendable {
       session.revisions.presentationGraph = revision
       session.phase = .prerolling
       session.actualTransport = .paused
-      state.activeSession = session
+      self.activeSession = session
       guard let rebuild = makeEffect(
         authority: session.authority,
         operationID: operationID,
@@ -739,7 +644,7 @@ public struct PlaybackCore: Sendable {
         session.phase = .failed
         session.actualTransport = .stopped
         session.lastFailure = failure
-        state.activeSession = session
+        self.activeSession = session
         return (.accepted, [])
       }
       session.tracks.requestedAudio = .off
@@ -749,7 +654,7 @@ public struct PlaybackCore: Sendable {
       session.drain.required.subtract([
         .audioDecoder, .audioConverter, .audioSubmission, .audioPresenter,
       ])
-      state.activeSession = session
+      self.activeSession = session
       guard let disable = makeEffect(
         authority: session.authority,
         operationID: operationID,
@@ -762,7 +667,7 @@ public struct PlaybackCore: Sendable {
     case .disableSubtitleTrack(let streamID):
       session.tracks.requestedSubtitle = .off
       session.tracks.effectiveSubtitle = .off
-      state.activeSession = session
+      self.activeSession = session
       guard let disable = makeEffect(
         authority: session.authority,
         operationID: operationID,
@@ -776,29 +681,29 @@ public struct PlaybackCore: Sendable {
       session.phase = .failed
       session.actualTransport = .stopped
       session.lastFailure = failure
-      state.activeSession = session
+      self.activeSession = session
       return (.accepted, [])
     }
   }
 
-  private mutating func observeDrain(
+  mutating func observeDrain(
     _ component: PlaybackDrainComponent
   ) -> (EventDisposition, [PlaybackEffect]) {
-    guard var session = state.activeSession, session.phase == .draining else {
+    guard var session = self.activeSession, session.phase == .draining else {
       return (.stale(reason: .authorityMismatch), [])
     }
     guard session.drain.required.contains(component) else {
       return (.invalid(reason: "unexpectedDrainComponent"), [])
     }
     session.drain.observed.insert(component)
-    state.activeSession = session
+    self.activeSession = session
     guard session.drain.observed.isSuperset(of: session.drain.required) else {
       return (.accepted, [])
     }
     return finalizeDrain(session: session)
   }
 
-  private mutating func finalizeDrain(
+  mutating func finalizeDrain(
     session input: ActivePlaybackSession
   ) -> (EventDisposition, [PlaybackEffect]) {
     var session = input
@@ -806,7 +711,7 @@ public struct PlaybackCore: Sendable {
     session.drain.finalized = true
     session.phase = .ended
     session.actualTransport = .paused
-    state.activeSession = session
+    self.activeSession = session
     guard let persistence = makeEffect(
       authority: session.authority,
       operationID: session.activeOperationID,
@@ -817,17 +722,17 @@ public struct PlaybackCore: Sendable {
     return (.accepted, [persistence])
   }
 
-  private mutating func beginStop(
+  mutating func beginStop(
     forShutdown: Bool
   ) -> (EventDisposition, [PlaybackEffect]) {
-    if let pending = state.pendingSession {
+    if let pending = self.pendingSession {
       settleEffects(for: pending.authority)
-      state.pendingSession = nil
-      if state.activeSession == nil {
-        state.activeSession = pending.value
+      self.pendingSession = nil
+      if self.activeSession == nil {
+        self.activeSession = pending.value
       }
     }
-    guard var session = state.activeSession else {
+    guard var session = self.activeSession else {
       if forShutdown {
         guard
           let effect = makeApplicationEffect(
@@ -844,7 +749,7 @@ public struct PlaybackCore: Sendable {
       return (.accepted, [])
     }
     guard session.generation.rawValue < UInt64.max,
-      let operationID = state.allocator.allocateOperation()
+      let operationID = self.allocator.allocateOperation()
     else {
       return allocationFailure()
     }
@@ -856,7 +761,7 @@ public struct PlaybackCore: Sendable {
     session.desiredTransport = .stopped
     session.actualTransport = .stopped
     session.activeOperationID = operationID
-    state.activeSession = session
+    self.activeSession = session
     guard
       let effect = makeEffect(
         authority: session.authority,
@@ -872,11 +777,11 @@ public struct PlaybackCore: Sendable {
     return (.accepted, [effect])
   }
 
-  private mutating func beginCheckpoint() -> (EventDisposition, [PlaybackEffect]) {
-    guard let session = state.activeSession else {
+  mutating func beginCheckpoint() -> (EventDisposition, [PlaybackEffect]) {
+    guard let session = self.activeSession else {
       return (.invalid(reason: "checkpointRequiresSession"), [])
     }
-    guard let operationID = state.allocator.allocateOperation(),
+    guard let operationID = self.allocator.allocateOperation(),
       let effect = makeEffect(
         authority: session.authority,
         operationID: operationID,
@@ -890,17 +795,17 @@ public struct PlaybackCore: Sendable {
     return (.accepted, [effect])
   }
 
-  private mutating func reduce(
+  mutating func reduce(
     _ event: SubtitleCoreEvent
   ) -> (EventDisposition, [PlaybackEffect]) {
-    guard var session = state.activeSession else {
+    guard var session = self.activeSession else {
       return (.invalid(reason: "subtitleRequiresSession"), [])
     }
     switch event {
     case .invalidate:
       guard session.subtitles.subtitleRevision.rawValue < UInt64.max,
         session.subtitles.overlayRevision.rawValue < UInt64.max,
-        let operationID = state.allocator.allocateOperation()
+        let operationID = self.allocator.allocateOperation()
       else { return allocationFailure() }
 
       let subtitleRevision = SubtitleRevisionID(
@@ -916,7 +821,7 @@ public struct PlaybackCore: Sendable {
       session.revisions.subtitle = subtitleRevision
       session.revisions.overlay = overlayRevision
       session.activeOperationID = operationID
-      state.activeSession = session
+      self.activeSession = session
 
       guard let clear = makeEffect(
         authority: session.authority,
@@ -940,17 +845,17 @@ public struct PlaybackCore: Sendable {
         session.subtitles.pendingSourceInvalidation == nil
       else {
         session.subtitles.rejectedOverlayCommitCount += 1
-        state.activeSession = session
+        self.activeSession = session
         return (.stale(reason: .authorityMismatch), [])
       }
       session.subtitles.lastAcceptedOverlayRevision = revision
-      state.activeSession = session
+      self.activeSession = session
       return (.accepted, [])
 
     case .sourceInstalled(let source, let external):
       session.subtitles.installedSource = source
       session.subtitles.installedSourceIsExternal = external
-      state.activeSession = session
+      self.activeSession = session
       return (.accepted, [])
 
     case .appliedDelay(let microseconds):
@@ -958,19 +863,19 @@ public struct PlaybackCore: Sendable {
         return (.stale(reason: .operationMismatch), [])
       }
       session.subtitles.appliedDelayMicroseconds = microseconds
-      state.activeSession = session
+      self.activeSession = session
       return (.accepted, [])
     }
   }
 
-  private mutating func reduce(_ result: PlaybackEffectResult) -> (
+  mutating func reduce(_ result: PlaybackEffectResult) -> (
     EventDisposition, [PlaybackEffect]
   ) {
     let effectID = result.context.effectID
-    if state.containsCompletedEffect(effectID) {
+    if self.containsCompletedEffect(effectID) {
       return (.duplicate(effectID: effectID), [])
     }
-    guard let record = state.outstandingEffects[effectID] else {
+    guard let record = self.outstandingEffects[effectID] else {
       return (.stale(reason: .unknownEffect), [])
     }
     guard record.effect.context == result.context else {
@@ -980,8 +885,8 @@ public struct PlaybackCore: Sendable {
       return (.invalid(reason: "undeclaredEffectResultToken"), [])
     }
 
-    state.outstandingEffects.removeValue(forKey: effectID)
-    state.recordCompletedEffect(effectID)
+    self.outstandingEffects.removeValue(forKey: effectID)
+    self.recordCompletedEffect(effectID)
 
     if !record.effect.isCleanup,
       !authorityIsCurrent(record.effect.context.authority)
@@ -994,7 +899,7 @@ public struct PlaybackCore: Sendable {
     // or issue more work. A pending replacement has its own session authority;
     // persistence and resource cleanup must still be able to settle.
     if !record.effect.isCleanup,
-      state.activeSession?.phase == .failed,
+      self.activeSession?.phase == .failed,
       authorityMatchesActiveSession(record.effect.context.authority)
     {
       switch record.effect.kind {
@@ -1008,7 +913,7 @@ public struct PlaybackCore: Sendable {
     return apply(result: result, to: record.effect)
   }
 
-  private mutating func apply(
+  mutating func apply(
     result: PlaybackEffectResult,
     to effect: PlaybackEffect
   ) -> (EventDisposition, [PlaybackEffect]) {
@@ -1065,19 +970,19 @@ public struct PlaybackCore: Sendable {
       return completeSeekBarrier(.presentationFence, succeeded: succeeded, effect: effect)
 
     case .clearSubtitleOverlay(let revision):
-      guard var session = state.activeSession,
+      guard var session = self.activeSession,
         revision == session.subtitles.pendingVisibleClear
       else { return (.stale(reason: .authorityMismatch), []) }
       if succeeded { session.subtitles.pendingVisibleClear = nil }
-      state.activeSession = session
+      self.activeSession = session
       return completeSeekBarrier(.subtitleVisibleClear, succeeded: succeeded, effect: effect)
 
     case .invalidateSubtitleSource(let revision):
-      guard var session = state.activeSession,
+      guard var session = self.activeSession,
         revision == session.subtitles.pendingSourceInvalidation
       else { return (.stale(reason: .authorityMismatch), []) }
       if succeeded { session.subtitles.pendingSourceInvalidation = nil }
-      state.activeSession = session
+      self.activeSession = session
       return completeSeekBarrier(
         .subtitleSourceInvalidation,
         succeeded: succeeded,
@@ -1112,7 +1017,7 @@ public struct PlaybackCore: Sendable {
 
   // Keep each result branch in its own stack frame. In debug builds, putting
   // all session copies in one switch exhausted Swift worker-thread stacks.
-  private mutating func settleOpenSourceResult(
+  mutating func settleOpenSourceResult(
     result: PlaybackEffectResult, effect: PlaybackEffect
   ) -> (EventDisposition, [PlaybackEffect]) {
     let succeeded = result.token.kind == .succeeded
@@ -1125,7 +1030,7 @@ public struct PlaybackCore: Sendable {
       // complete before the prepared session is installed.
       session.phase = .prerolling
       session.loading?.phase = .prerolling
-      state.pendingSession = PendingPlaybackSession(session)
+      self.pendingSession = PendingPlaybackSession(session)
       guard let preroll = makeEffect(
         authority: session.authority,
         operationID: session.activeOperationID,
@@ -1135,29 +1040,29 @@ public struct PlaybackCore: Sendable {
       ) else { return allocationFailure() }
       return (.accepted, [preroll])
     } else {
-      state.pendingSession = nil
-      state.lastLoadFailure = result.failure ?? genericFailure(for: effect)
+      self.pendingSession = nil
+      self.lastLoadFailure = result.failure ?? genericFailure(for: effect)
     }
     return (.accepted, [])
   }
 
-  private mutating func settleProbeSourceResult(
+  mutating func settleProbeSourceResult(
     result: PlaybackEffectResult, effect: PlaybackEffect
   ) -> (EventDisposition, [PlaybackEffect]) {
     let succeeded = result.token.kind == .succeeded
-    guard var session = state.activeSession else {
+    guard var session = self.activeSession else {
       return (.stale(reason: .sessionMismatch), [])
     }
     guard succeeded else {
       session.phase = .failed
       session.lastFailure = result.failure ?? genericFailure(for: effect)
-      state.activeSession = session
+      self.activeSession = session
       return (.accepted, [])
     }
     session.phase = .configuring
     session.loading?.phase = .configuring
     let selection = session.loading?.initialSelection ?? InitialTrackSelectionState()
-    state.activeSession = session
+    self.activeSession = session
     guard let configure = makeEffect(
       authority: session.authority,
       operationID: session.activeOperationID,
@@ -1168,22 +1073,22 @@ public struct PlaybackCore: Sendable {
     return (.accepted, [configure])
   }
 
-  private mutating func settleConfigureSessionResult(
+  mutating func settleConfigureSessionResult(
     result: PlaybackEffectResult, effect: PlaybackEffect
   ) -> (EventDisposition, [PlaybackEffect]) {
     let succeeded = result.token.kind == .succeeded
-    guard var session = state.activeSession else {
+    guard var session = self.activeSession else {
       return (.stale(reason: .sessionMismatch), [])
     }
     guard succeeded else {
       session.phase = .failed
       session.lastFailure = result.failure ?? genericFailure(for: effect)
-      state.activeSession = session
+      self.activeSession = session
       return (.accepted, [])
     }
     session.phase = .prerolling
     session.loading?.phase = .prerolling
-    state.activeSession = session
+    self.activeSession = session
     guard let preroll = makeEffect(
       authority: session.authority,
       operationID: session.activeOperationID,
@@ -1194,47 +1099,47 @@ public struct PlaybackCore: Sendable {
     return (.accepted, [preroll])
   }
 
-  private mutating func settleAwaitPrerollResult(
+  mutating func settleAwaitPrerollResult(
     result: PlaybackEffectResult, effect: PlaybackEffect
   ) -> (EventDisposition, [PlaybackEffect]) {
     let succeeded = result.token.kind == .succeeded
     if var pending = pendingSession(matching: effect.context.authority) {
       guard succeeded else {
-        state.pendingSession = nil
-        state.lastLoadFailure = result.failure ?? genericFailure(for: effect)
+        self.pendingSession = nil
+        self.lastLoadFailure = result.failure ?? genericFailure(for: effect)
         return (.accepted, [])
       }
-      if let committed = state.activeSession {
+      if let committed = self.activeSession {
         settleEffects(for: committed.authority)
       }
       _ = pending.synchronization.satisfyStartupObligation()
       pending.loading?.phase = .settled
-      state.activeSession = pending
-      state.pendingSession = nil
-      state.lastLoadFailure = nil
+      self.activeSession = pending
+      self.pendingSession = nil
+      self.lastLoadFailure = nil
       if pending.desiredTransport == .paused {
         pending.phase = .paused
         pending.actualTransport = .paused
-        state.activeSession = pending
+        self.activeSession = pending
         return (.accepted, [])
       }
       guard let rateEffect = makeEffect(
         authority: pending.authority,
         operationID: pending.activeOperationID,
         executor: .presentation,
-        kind: .applyRate(milliRate: state.playbackMilliRate),
+        kind: .applyRate(milliRate: self.playbackMilliRate),
         exclusiveKey:
           "presentation.rate.\(pending.id.rawValue).\(pending.generation.rawValue)"
       ) else { return allocationFailure() }
       return (.accepted, [rateEffect])
     }
-    guard var session = state.activeSession else {
+    guard var session = self.activeSession else {
       return (.stale(reason: .sessionMismatch), [])
     }
     guard succeeded else {
       session.phase = .failed
       session.lastFailure = result.failure ?? genericFailure(for: effect)
-      state.activeSession = session
+      self.activeSession = session
       return (.accepted, [])
     }
     _ = session.synchronization.satisfyStartupObligation()
@@ -1242,26 +1147,26 @@ public struct PlaybackCore: Sendable {
     if session.desiredTransport == .paused {
       session.phase = .paused
       session.actualTransport = .paused
-      state.activeSession = session
+      self.activeSession = session
       return (.accepted, [])
     }
-    state.activeSession = session
+    self.activeSession = session
     guard let rateEffect = makeEffect(
       authority: session.authority,
       operationID: session.activeOperationID,
       executor: .presentation,
-      kind: .applyRate(milliRate: state.playbackMilliRate),
+      kind: .applyRate(milliRate: self.playbackMilliRate),
       exclusiveKey: "presentation.rate.\(session.id.rawValue).\(session.generation.rawValue)"
     ) else { return allocationFailure() }
     return (.accepted, [rateEffect])
   }
 
-  private mutating func settleApplyRateResult(
+  mutating func settleApplyRateResult(
     result: PlaybackEffectResult, effect: PlaybackEffect,
     milliRate: Int32
   ) -> (EventDisposition, [PlaybackEffect]) {
     let succeeded = result.token.kind == .succeeded
-    guard var session = state.activeSession else {
+    guard var session = self.activeSession else {
       return (.stale(reason: .sessionMismatch), [])
     }
     if succeeded {
@@ -1288,16 +1193,16 @@ public struct PlaybackCore: Sendable {
       session.actualTransport = .stopped
       session.lastFailure = result.failure ?? genericFailure(for: effect)
     }
-    state.activeSession = session
+    self.activeSession = session
     return (.accepted, [])
   }
 
-  private mutating func settleSeekPipelineResult(
+  mutating func settleSeekPipelineResult(
     result: PlaybackEffectResult, effect: PlaybackEffect,
     target: MediaTimestamp
   ) -> (EventDisposition, [PlaybackEffect]) {
     let succeeded = result.token.kind == .succeeded
-    guard var session = state.activeSession else {
+    guard var session = self.activeSession else {
       return (.stale(reason: .sessionMismatch), [])
     }
     if succeeded {
@@ -1305,8 +1210,8 @@ public struct PlaybackCore: Sendable {
       session.logicalPosition = target
       session.phase = .prerolling
       session.seek?.phase = .prerolling
-      state.activeSession = session
-      let rate = session.desiredTransport == .playing ? state.playbackMilliRate : Int32(0)
+      self.activeSession = session
+      let rate = session.desiredTransport == .playing ? self.playbackMilliRate : Int32(0)
       guard
         let rateEffect = makeEffect(
           authority: session.authority,
@@ -1322,16 +1227,16 @@ public struct PlaybackCore: Sendable {
     }
     session.phase = .failed
     session.lastFailure = result.failure ?? genericFailure(for: effect)
-    state.activeSession = session
+    self.activeSession = session
     return (.accepted, [])
   }
 
-  private mutating func settleApplySubtitleDelayResult(
+  mutating func settleApplySubtitleDelayResult(
     result: PlaybackEffectResult, effect: PlaybackEffect,
     microseconds: Int64
   ) -> (EventDisposition, [PlaybackEffect]) {
     let succeeded = result.token.kind == .succeeded
-    guard var session = state.activeSession else {
+    guard var session = self.activeSession else {
       return (.stale(reason: .sessionMismatch), [])
     }
     if succeeded {
@@ -1342,34 +1247,34 @@ public struct PlaybackCore: Sendable {
     } else {
       session.lastFailure = result.failure ?? genericFailure(for: effect)
     }
-    state.activeSession = session
+    self.activeSession = session
     return (.accepted, [])
   }
 
-  private mutating func settleCancelSessionResult(
+  mutating func settleCancelSessionResult(
     result: PlaybackEffectResult, effect: PlaybackEffect
   ) -> (EventDisposition, [PlaybackEffect]) {
     let succeeded = result.token.kind == .succeeded
     guard succeeded else {
-      if state.lifecycle == .shuttingDown {
-        state.externalWaitReason = .shutdownCancellationFailed
+      if self.lifecycle == .shuttingDown {
+        self.externalWaitReason = .shutdownCancellationFailed
       }
-      if var session = state.activeSession,
+      if var session = self.activeSession,
         authorityMatchesActiveSession(effect.context.authority)
       {
         session.phase = .failed
         session.actualTransport = .stopped
         session.lastFailure = result.failure ?? genericFailure(for: effect)
-        state.activeSession = session
+        self.activeSession = session
       }
       return (.accepted, [])
     }
     settleEffects(for: effect.context.authority)
     if authorityMatchesActiveSession(effect.context.authority) {
-      state.activeSession = nil
+      self.activeSession = nil
     }
-    if state.lifecycle == .shuttingDown {
-      state.externalWaitReason = nil
+    if self.lifecycle == .shuttingDown {
+      self.externalWaitReason = nil
       guard
         let shutdown = makeApplicationEffect(
           executor: .resource,
@@ -1385,36 +1290,36 @@ public struct PlaybackCore: Sendable {
     return (.accepted, [])
   }
 
-  private mutating func settleFinalizeShutdownResult(
+  mutating func settleFinalizeShutdownResult(
     result: PlaybackEffectResult, effect: PlaybackEffect
   ) -> (EventDisposition, [PlaybackEffect]) {
     let succeeded = result.token.kind == .succeeded
     if succeeded {
-      state.externalWaitReason = nil
-      state.activeSession = nil
-      state.pendingSession = nil
-      state.outstandingEffects.removeAll()
-      state.resourceLeases.removeAll()
-      state.lifecycle = .terminated
+      self.externalWaitReason = nil
+      self.activeSession = nil
+      self.pendingSession = nil
+      self.outstandingEffects.removeAll()
+      self.resourceLeases.removeAll()
+      self.lifecycle = .terminated
     } else {
-      state.lifecycle = .shuttingDown
-      state.externalWaitReason = .shutdownFinalizationFailed
+      self.lifecycle = .shuttingDown
+      self.externalWaitReason = .shutdownFinalizationFailed
     }
     return (.accepted, [])
   }
 
-  private mutating func settlePersistCheckpointResult(
+  mutating func settlePersistCheckpointResult(
     result: PlaybackEffectResult, effect: PlaybackEffect
   ) -> (EventDisposition, [PlaybackEffect]) {
     let succeeded = result.token.kind == .succeeded
-    state.lastPersistenceFailureCode =
+    self.lastPersistenceFailureCode =
       succeeded
       ? nil
       : (result.failure?.stableCode ?? "persistenceEffectFailed")
     // EOF advancement depends on durable storage, not merely scheduling a
     // write. A seek, replay or replacement during the write revokes this edge.
-    guard succeeded, state.pendingSession == nil,
-      let session = state.activeSession,
+    guard succeeded, self.pendingSession == nil,
+      let session = self.activeSession,
       session.phase == .ended, session.drain.finalized,
       session.activeOperationID == effect.context.operationID,
       effect.exclusiveKey == "eof.checkpoint.\(session.id.rawValue)"
@@ -1429,11 +1334,11 @@ public struct PlaybackCore: Sendable {
     return (.accepted, [advance])
   }
 
-  private mutating func settleResumeVideoDecoderAfterTransientFailureResult(
+  mutating func settleResumeVideoDecoderAfterTransientFailureResult(
     result: PlaybackEffectResult, effect: PlaybackEffect
   ) -> (EventDisposition, [PlaybackEffect]) {
     let succeeded = result.token.kind == .succeeded
-    guard var session = state.activeSession else {
+    guard var session = self.activeSession else {
       return (.stale(reason: .sessionMismatch), [])
     }
     if succeeded {
@@ -1443,15 +1348,15 @@ public struct PlaybackCore: Sendable {
       session.actualTransport = .stopped
       session.lastFailure = result.failure ?? genericFailure(for: effect)
     }
-    state.activeSession = session
+    self.activeSession = session
     return (.accepted, [])
   }
 
-  private mutating func settleRecreateVideoDecoderInSoftwareResult(
+  mutating func settleRecreateVideoDecoderInSoftwareResult(
     result: PlaybackEffectResult, effect: PlaybackEffect
   ) -> (EventDisposition, [PlaybackEffect]) {
     let succeeded = result.token.kind == .succeeded
-    guard var session = state.activeSession else {
+    guard var session = self.activeSession else {
       return (.stale(reason: .sessionMismatch), [])
     }
     if succeeded {
@@ -1459,8 +1364,8 @@ public struct PlaybackCore: Sendable {
       session.phase = .prerolling
       session.actualTransport = .paused
       session.lastFailure = nil
-      state.activeSession = session
-      let rate = session.desiredTransport == .playing ? state.playbackMilliRate : Int32(0)
+      self.activeSession = session
+      let rate = session.desiredTransport == .playing ? self.playbackMilliRate : Int32(0)
       guard let rateEffect = makeEffect(
         authority: session.authority,
         operationID: session.activeOperationID,
@@ -1474,23 +1379,23 @@ public struct PlaybackCore: Sendable {
       session.actualTransport = .stopped
       session.lastFailure = result.failure ?? genericFailure(for: effect)
     }
-    state.activeSession = session
+    self.activeSession = session
     return (.accepted, [])
   }
 
-  private mutating func settleReconfigureMediaFormatResult(
+  mutating func settleReconfigureMediaFormatResult(
     result: PlaybackEffectResult, effect: PlaybackEffect
   ) -> (EventDisposition, [PlaybackEffect]) {
     let succeeded = result.token.kind == .succeeded
-    guard var session = state.activeSession else {
+    guard var session = self.activeSession else {
       return (.stale(reason: .sessionMismatch), [])
     }
     if succeeded {
       _ = session.synchronization.satisfyStartupObligation()
       session.phase = .prerolling
       session.actualTransport = .paused
-      state.activeSession = session
-      let rate = session.desiredTransport == .playing ? state.playbackMilliRate : Int32(0)
+      self.activeSession = session
+      let rate = session.desiredTransport == .playing ? self.playbackMilliRate : Int32(0)
       guard let rateEffect = makeEffect(
         authority: session.authority,
         operationID: session.activeOperationID,
@@ -1504,17 +1409,17 @@ public struct PlaybackCore: Sendable {
       session.actualTransport = .stopped
       session.lastFailure = result.failure ?? genericFailure(for: effect)
     }
-    state.activeSession = session
+    self.activeSession = session
     return (.accepted, [])
   }
 
-  private mutating func settleResumeAfterWakeResult(
+  mutating func settleResumeAfterWakeResult(
     result: PlaybackEffectResult, effect: PlaybackEffect,
     position: MediaTimestamp,
     milliRate: Int32
   ) -> (EventDisposition, [PlaybackEffect]) {
     let succeeded = result.token.kind == .succeeded
-    guard var session = state.activeSession else {
+    guard var session = self.activeSession else {
       return (.stale(reason: .sessionMismatch), [])
     }
     if succeeded {
@@ -1526,16 +1431,16 @@ public struct PlaybackCore: Sendable {
       session.actualTransport = .stopped
       session.lastFailure = result.failure ?? genericFailure(for: effect)
     }
-    state.activeSession = session
+    self.activeSession = session
     return (.accepted, [])
   }
 
-  private mutating func settleTrackSelection(
+  mutating func settleTrackSelection(
     revision: TrackRevisionID,
     succeeded: Bool,
     result: PlaybackEffectResult
   ) -> (EventDisposition, [PlaybackEffect]) {
-    guard var session = state.activeSession,
+    guard var session = self.activeSession,
       revision == session.tracks.revision,
       session.tracks.phase == .preparing
     else { return (.stale(reason: .operationMismatch), []) }
@@ -1543,8 +1448,8 @@ public struct PlaybackCore: Sendable {
       _ = session.synchronization.satisfyStartupObligation()
       _ = session.tracks.prepared(revision: revision)
       _ = session.tracks.committed(revision: revision)
-      let rate = session.desiredTransport == .playing ? state.playbackMilliRate : Int32(0)
-      state.activeSession = session
+      let rate = session.desiredTransport == .playing ? self.playbackMilliRate : Int32(0)
+      self.activeSession = session
       guard let rateEffect = makeEffect(
         authority: session.authority,
         operationID: session.activeOperationID,
@@ -1561,27 +1466,27 @@ public struct PlaybackCore: Sendable {
       session.phase = session.desiredTransport == .playing ? .playing : .paused
       session.actualTransport = session.desiredTransport == .playing ? .playing : .paused
     }
-    state.activeSession = session
+    self.activeSession = session
     return (.accepted, [])
   }
 
-  private func isAllowedDuringShutdown(_ event: PlaybackEvent) -> Bool {
+  func isAllowedDuringShutdown(_ event: PlaybackEvent) -> Bool {
     switch event {
     case .diagnosticObserved:
       return true
     case .effectResult(let result):
-      return state.outstandingEffects[result.context.effectID]?.effect.isCleanup == true
+      return self.outstandingEffects[result.context.effectID]?.effect.isCleanup == true
     default:
       return false
     }
   }
 
-  private mutating func completeSeekBarrier(
+  mutating func completeSeekBarrier(
     _ barrier: SeekBarrier,
     succeeded: Bool,
     effect: PlaybackEffect
   ) -> (EventDisposition, [PlaybackEffect]) {
-    guard var session = state.activeSession,
+    guard var session = self.activeSession,
       var transaction = session.seek,
       transaction.operationID == effect.context.operationID,
       transaction.generation == session.generation
@@ -1591,17 +1496,17 @@ public struct PlaybackCore: Sendable {
       session.phase = .failed
       session.actualTransport = .stopped
       session.lastFailure = genericFailure(for: effect)
-      state.activeSession = session
+      self.activeSession = session
       return (.accepted, [])
     }
     transaction.pendingBarriers.remove(barrier)
     session.seek = transaction
-    state.activeSession = session
+    self.activeSession = session
     guard transaction.pendingBarriers.isEmpty else { return (.accepted, []) }
 
     transaction.phase = .demuxSeeking
     session.seek = transaction
-    state.activeSession = session
+    self.activeSession = session
     guard let seekEffect = makeEffect(
       authority: session.authority,
       operationID: transaction.operationID,
@@ -1612,10 +1517,10 @@ public struct PlaybackCore: Sendable {
     return (.accepted, [seekEffect])
   }
 
-  private mutating func reduceDeadline(
+  mutating func reduceDeadline(
     _ operationID: PlaybackOperationID
   ) -> (EventDisposition, [PlaybackEffect]) {
-    guard var session = state.activeSession else {
+    guard var session = self.activeSession else {
       return (.stale(reason: .expiredDeadline), [])
     }
     guard session.phase != .failed else {
@@ -1632,19 +1537,19 @@ public struct PlaybackCore: Sendable {
       stableCode: "operationTimedOut",
       recoverability: .fatal
     )
-    state.activeSession = session
+    self.activeSession = session
     return (.accepted, [])
   }
 
-  private mutating func makeApplicationEffect(
+  mutating func makeApplicationEffect(
     executor: ExecutorKind,
     kind: PlaybackEffectKind,
     isCleanup: Bool,
     exclusiveKey: String?
   ) -> PlaybackEffect? {
-    guard let operationID = state.allocator.allocateOperation() else { return nil }
+    guard let operationID = self.allocator.allocateOperation() else { return nil }
     return makeEffect(
-      authority: .application(state.applicationEpoch),
+      authority: .application(self.applicationEpoch),
       operationID: operationID,
       executor: executor,
       kind: kind,
@@ -1653,7 +1558,7 @@ public struct PlaybackCore: Sendable {
     )
   }
 
-  private mutating func makeEffect(
+  mutating func makeEffect(
     authority: PlaybackAuthority,
     operationID: PlaybackOperationID,
     executor: ExecutorKind,
@@ -1661,7 +1566,7 @@ public struct PlaybackCore: Sendable {
     isCleanup: Bool = false,
     exclusiveKey: String? = nil
   ) -> PlaybackEffect? {
-    guard let effectID = state.allocator.allocateEffect() else { return nil }
+    guard let effectID = self.allocator.allocateEffect() else { return nil }
     return PlaybackEffect(
       executor: executor,
       context: PlaybackEffectContext(
@@ -1675,24 +1580,24 @@ public struct PlaybackCore: Sendable {
     )
   }
 
-  private mutating func register(_ effects: [PlaybackEffect]) {
+  mutating func register(_ effects: [PlaybackEffect]) {
     for effect in effects {
       guard effect.completion != .bestEffortMirror else { continue }
-      state.outstandingEffects[effect.context.effectID] = OutstandingEffectRecord(effect: effect)
+      self.outstandingEffects[effect.context.effectID] = OutstandingEffectRecord(effect: effect)
     }
   }
 
-  private mutating func settleEffects(for authority: PlaybackAuthority) {
-    let settled = state.outstandingEffects
+  mutating func settleEffects(for authority: PlaybackAuthority) {
+    let settled = self.outstandingEffects
       .filter { $0.value.effect.context.authority == authority }
       .map(\.key)
     for effectID in settled {
-      state.outstandingEffects.removeValue(forKey: effectID)
-      state.recordCompletedEffect(effectID)
+      self.outstandingEffects.removeValue(forKey: effectID)
+      self.recordCompletedEffect(effectID)
     }
   }
 
-  private func completionContract(
+  func completionContract(
     _ contract: EffectCompletionContract,
     accepts token: EffectResultToken
   ) -> Bool {
@@ -1721,7 +1626,7 @@ public struct PlaybackCore: Sendable {
   public func authorityIsCurrent(_ authority: PlaybackAuthority) -> Bool {
     switch authority {
     case .application(let epoch):
-      return epoch == state.applicationEpoch
+      return epoch == self.applicationEpoch
     case .playback(let sessionID, let generation, let revisions):
       guard let session = session(matching: sessionID, generation: generation) else {
         return false
@@ -1740,19 +1645,19 @@ public struct PlaybackCore: Sendable {
     }
   }
 
-  private func authorityMatchesActiveSession(_ authority: PlaybackAuthority) -> Bool {
+  func authorityMatchesActiveSession(_ authority: PlaybackAuthority) -> Bool {
     guard case .playback(let sessionID, let generation, _) = authority,
-      let session = state.activeSession
+      let session = self.activeSession
     else { return false }
     return session.id == sessionID && session.generation == generation
   }
 
-  private func staleAuthorityReason(_ authority: PlaybackAuthority) -> StaleReason {
+  func staleAuthorityReason(_ authority: PlaybackAuthority) -> StaleReason {
     guard case .playback(let sessionID, let generation, _) = authority else {
       return .authorityMismatch
     }
     guard let session = session(matching: sessionID, generation: generation) else {
-      if state.activeSession?.id != sessionID, state.pendingSession?.id != sessionID {
+      if self.activeSession?.id != sessionID, self.pendingSession?.id != sessionID {
         return .sessionMismatch
       }
       return .generationMismatch
@@ -1762,28 +1667,28 @@ public struct PlaybackCore: Sendable {
     return .authorityMismatch
   }
 
-  private func pendingSession(
+  func pendingSession(
     matching authority: PlaybackAuthority
   ) -> ActivePlaybackSession? {
     guard case .playback(let sessionID, let generation, _) = authority,
-      let pending = state.pendingSession,
+      let pending = self.pendingSession,
       pending.id == sessionID,
       pending.generation == generation
     else { return nil }
     return pending.value
   }
 
-  private func session(
+  func session(
     matching sessionID: PlaybackSessionID,
     generation: PlaybackGenerationID
   ) -> ActivePlaybackSession? {
-    if let active = state.activeSession,
+    if let active = self.activeSession,
       active.id == sessionID,
       active.generation == generation
     {
       return active
     }
-    if let pending = state.pendingSession,
+    if let pending = self.pendingSession,
       pending.id == sessionID,
       pending.generation == generation
     {
@@ -1792,7 +1697,7 @@ public struct PlaybackCore: Sendable {
     return nil
   }
 
-  private func contextMismatch(
+  func contextMismatch(
     _ expected: PlaybackEffectContext,
     _ actual: PlaybackEffectContext
   ) -> StaleReason {
@@ -1801,7 +1706,7 @@ public struct PlaybackCore: Sendable {
     return .authorityMismatch
   }
 
-  private func genericFailure(for effect: PlaybackEffect) -> PlaybackFailure {
+  func genericFailure(for effect: PlaybackEffect) -> PlaybackFailure {
     let domain: PlaybackFailure.Domain
     switch effect.executor {
     case .input: domain = .input
@@ -1823,21 +1728,21 @@ public struct PlaybackCore: Sendable {
     )
   }
 
-  private mutating func allocationFailure() -> (EventDisposition, [PlaybackEffect]) {
-    state.lifecycle = .invariantFailed
+  mutating func allocationFailure() -> (EventDisposition, [PlaybackEffect]) {
+    self.lifecycle = .invariantFailed
     return (.invalid(reason: "monotonicIDExhausted"), [])
   }
 
-  private func transition(
+  func transition(
     disposition: EventDisposition,
     effects: [PlaybackEffect]
   ) -> PlaybackTransition {
     PlaybackTransition(
       disposition: disposition,
       effects: effects,
-      snapshot: PlaybackUISnapshot(state: state),
+      snapshot: PlaybackUISnapshot(state: self),
       invariantViolations: PlaybackInvariantChecker.check(
-        state: state,
+        state: self,
         emittedEffects: effects
       )
     )

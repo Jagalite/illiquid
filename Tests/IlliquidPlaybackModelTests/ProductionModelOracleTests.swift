@@ -1,17 +1,13 @@
 import CryptoKit
 import Foundation
 import IlliquidCore
-import IlliquidPlaybackCore
-import IlliquidPlaybackStateSpace
+import IlliquidPlaybackModel
+import Statelessness
 import Testing
 
-// Production migration P0 differential oracle.
-//
-// Deterministic concrete event streams are generated from a seed and from the
-// effects each transition emits, never from engine internals. The fixture was
-// recorded from the legacy `PlaybackCore` before the production model existed;
-// every later engine must reproduce each step's envelope, transition and
-// post-state bytes. Do not re-record it from a new engine to hide a difference.
+// Production migration differential oracle, executed against the production
+// model. The generator and fixture are those recorded from the legacy core in
+// P0 (see Tests/IlliquidPlaybackStateSpaceTests at that revision).
 //
 // Deterministic concrete event streams are generated from a seed and from the
 // effects each transition emits, never from engine internals. The fixture was
@@ -20,17 +16,34 @@ import Testing
 // post-state bytes. Do not re-record it from a new engine to hide a difference.
 
 /// One production transition function under test.
-typealias ProductionOracleStep = (PlaybackCoreState, PlaybackEventEnvelope) -> (
-  PlaybackCoreState, PlaybackTransition
+typealias ProductionOracleStep = (PlaybackDomainState, PlaybackEventEnvelope) -> (
+  PlaybackDomainState, PlaybackTransition
 )
 
 enum ProductionOracleEngine {
-  static func step(_ state: PlaybackCoreState, _ envelope: PlaybackEventEnvelope) -> (
-    PlaybackCoreState, PlaybackTransition
+  /// The model's step callback, without a session.
+  static func step(_ state: PlaybackDomainState, _ envelope: PlaybackEventEnvelope) -> (
+    PlaybackDomainState, PlaybackTransition
   ) {
-    var core = PlaybackCore(state: state)
-    let transition = core.update(envelope)
-    return (core.state, transition)
+    let transition = PlaybackProductionModel.step(state, envelope)
+    return (transition.state, transition.outputs[0])
+  }
+}
+
+/// Streams executed by a persistent Statelessness session, as in production.
+final class ProductionOracleSessionEngine {
+  private var session: PlaybackSession?
+
+  func step(_ state: PlaybackDomainState, _ envelope: PlaybackEventEnvelope) -> (
+    PlaybackDomainState, PlaybackTransition
+  ) {
+    do {
+      if session == nil { session = try PlaybackProductionModel.session(state: state) }
+      let turn = try session!.submit(envelope)
+      return (try session!.snapshot(), turn.outputs[0])
+    } catch {
+      fatalError("session fault: \(error)")
+    }
   }
 }
 
@@ -44,7 +57,7 @@ struct ProductionOracleStream {
   private var completed: [PlaybackEffectResult] = []
   private var history: [PlaybackEffect] = []
 
-  init(seed: UInt64, state: PlaybackCoreState) {
+  init(seed: UInt64, state: PlaybackDomainState) {
     rng = seed
     sequence = 1
     time = state.lastVirtualTime.ticks
@@ -209,7 +222,7 @@ struct ProductionOracleStream {
     MediaSourceIdentity(rawValue: "oracle-\(below(4))")
   }
 
-  private mutating func command() -> IlliquidPlaybackCore.PlaybackCommand {
+  private mutating func command() -> IlliquidPlaybackModel.PlaybackCommand {
     switch below(100) {
     case ..<14: return .load(source: source(), autoplay: chance(60))
     case ..<28: return .play
@@ -357,7 +370,7 @@ struct ProductionOracleStream {
 
 struct ProductionOracleStart {
   let name: String
-  let state: PlaybackCoreState
+  let state: PlaybackDomainState
 }
 
 enum ProductionOracle {
@@ -365,23 +378,6 @@ enum ProductionOracle {
   static let streamsPerStart = 6
   static let freshStreams = 120
   static let steps = 96
-
-  static func starts() throws -> [ProductionOracleStart] {
-    var starts: [ProductionOracleStart] = [ProductionOracleStart(name: "fresh", state: PlaybackCoreState())]
-    starts.append(ProductionOracleStart(
-      name: "exhausted-ids",
-      state: PlaybackCoreState(allocator: PlaybackIDAllocator(
-        nextSession: UInt64.max - 1, nextOperation: UInt64.max - 2,
-        nextEffect: UInt64.max - 3, nextLease: UInt64.max - 1))))
-    for model in PlaybackSearchModel.allCases {
-      let definition = PlaybackSearchModelDefinition(model: model)
-      for profile in definition.inventory.seedProfiles {
-        let seed = try definition.makeSeed(profile: profile)
-        starts.append(ProductionOracleStart(name: "\(model.rawValue)/\(profile)", state: seed.coreState))
-      }
-    }
-    return starts
-  }
 
   struct Stream: Codable, Equatable {
     var start: String
@@ -470,12 +466,12 @@ enum ProductionOracle {
       ProductionOracleStart(
         name: $0.name,
         state: try CanonicalJSON.decode(
-          PlaybackCoreState.self, from: Array(try #require(Data(base64Encoded: $0.state)))))
+          PlaybackDomainState.self, from: Array(try #require(Data(base64Encoded: $0.state)))))
     }
   }
 
   static func record(
-    _ step: ProductionOracleStep, starts: [ProductionOracleStart], recordedFrom: String
+    _ engine: () -> ProductionOracleStep, starts: [ProductionOracleStart], recordedFrom: String
   ) throws -> Fixture {
     var coverage = Coverage()
     var streams: [Stream] = []
@@ -483,7 +479,7 @@ enum ProductionOracle {
       let count = start.name == "fresh" ? freshStreams : streamsPerStart
       for offset in 0..<count {
         let seed = UInt64(index) << 32 | UInt64(offset + 1)
-        streams.append(try run(step, start: start, seed: seed, coverage: &coverage))
+        streams.append(try run(engine(), start: start, seed: seed, coverage: &coverage))
       }
     }
     return Fixture(
@@ -497,22 +493,17 @@ enum ProductionOracle {
   }
 }
 
-@Suite("Production migration oracle")
-struct ProductionMigrationOracleTests {
-  @Test func everyStreamMatchesTheFrozenLegacyCore() throws {
-    if ProcessInfo.processInfo.environment["ILLIQUID_RECORD_PRODUCTION_ORACLE"] == "1" {
-      let actual = try ProductionOracle.record(
-        ProductionOracleEngine.step, starts: try ProductionOracle.starts(),
-        recordedFrom: "legacy PlaybackCore at P0")
-      let encoder = JSONEncoder()
-      encoder.outputFormatting = [.sortedKeys]
-      try encoder.encode(actual).write(to: ProductionOracle.fixtureURL)
-      return
-    }
-    let expected = try JSONDecoder().decode(
+@Suite("Production model oracle")
+struct ProductionModelOracleTests {
+  static func fixture() throws -> ProductionOracle.Fixture {
+    try JSONDecoder().decode(
       ProductionOracle.Fixture.self, from: Data(contentsOf: ProductionOracle.fixtureURL))
+  }
+
+  static func check(_ engine: () -> ProductionOracleStep) throws {
+    let expected = try fixture()
     let actual = try ProductionOracle.record(
-      ProductionOracleEngine.step, starts: try ProductionOracle.decodedStarts(expected.starts),
+      engine, starts: try ProductionOracle.decodedStarts(expected.starts),
       recordedFrom: expected.recordedFrom)
     #expect(actual.streams.count == expected.streams.count)
     for (lhs, rhs) in zip(actual.streams, expected.streams) where lhs != rhs {
@@ -522,30 +513,23 @@ struct ProductionMigrationOracleTests {
     #expect(actual.coverage == expected.coverage)
   }
 
-  /// The stored start states still equal the reachable seeds the production
-  /// transition builds today.
-  @Test func storedStartsMatchTheReachableSeeds() throws {
-    let expected = try JSONDecoder().decode(
-      ProductionOracle.Fixture.self, from: Data(contentsOf: ProductionOracle.fixtureURL))
-    #expect(try ProductionOracle.encodedStarts(try ProductionOracle.starts()) == expected.starts)
+  /// Every frozen legacy step is reproduced by the model executed in a
+  /// persistent Statelessness session.
+  @Test func sessionReproducesTheFrozenLegacyCore() throws {
+    try Self.check { ProductionOracleSessionEngine().step }
   }
 
-  @Test func streamsAreDeterministic() throws {
-    let start = try #require(try ProductionOracle.starts().first)
-    var first = ProductionOracle.Coverage()
-    var second = ProductionOracle.Coverage()
-    let a = try ProductionOracle.run(ProductionOracleEngine.step, start: start, seed: 7, coverage: &first)
-    let b = try ProductionOracle.run(ProductionOracleEngine.step, start: start, seed: 7, coverage: &second)
-    #expect(a == b)
-    #expect(first == second)
+  /// The bare step callback agrees too, so the session adds no behavior.
+  @Test func stepCallbackReproducesTheFrozenLegacyCore() throws {
+    try Self.check { ProductionOracleEngine.step }
   }
 }
 
 /// Opt-in turn-latency measurement (ILLIQUID_PRODUCTION_TURN_BENCHMARK=1).
 /// Replays every oracle stream's envelopes through the engine without digests
 /// and prints per-turn latency. Used for the paired P0/P4 cost comparison.
-@Suite("Production migration turn cost")
-struct ProductionMigrationTurnCostTests {
+@Suite("Production model turn cost")
+struct ProductionModelTurnCostTests {
   @Test func turnLatency() throws {
     guard ProcessInfo.processInfo.environment["ILLIQUID_PRODUCTION_TURN_BENCHMARK"] == "1" else { return }
     let fixture = try JSONDecoder().decode(
@@ -553,7 +537,7 @@ struct ProductionMigrationTurnCostTests {
     let starts = Dictionary(
       uniqueKeysWithValues: try ProductionOracle.decodedStarts(fixture.starts).map { ($0.name, $0.state) })
     // Pre-generate the envelopes so only the engine is timed.
-    var workloads: [(PlaybackCoreState, [PlaybackEventEnvelope])] = []
+    var workloads: [(PlaybackDomainState, [PlaybackEventEnvelope])] = []
     for stream in fixture.streams {
       var state = try #require(starts[stream.start])
       let initial = state
@@ -574,9 +558,9 @@ struct ProductionMigrationTurnCostTests {
       var turns = 0
       let elapsed = clock.measure {
         for (initial, envelopes) in workloads {
-          var state = initial
+          let session = try! PlaybackProductionModel.session(state: initial)
           for envelope in envelopes {
-            state = ProductionOracleEngine.step(state, envelope).0
+            _ = try! session.submit(envelope)
             turns += 1
           }
         }
@@ -585,6 +569,6 @@ struct ProductionMigrationTurnCostTests {
       if round > 0 { samples.append(seconds / Double(turns) * 1e9) }
     }
     samples.sort()
-    print("production-turn-latency engine=legacy-core ns-per-turn median=\(samples[samples.count / 2]) min=\(samples[0]) max=\(samples[samples.count - 1])")
+    print("production-turn-latency engine=statelessness-session ns-per-turn median=\(samples[samples.count / 2]) min=\(samples[0]) max=\(samples[samples.count - 1])")
   }
 }

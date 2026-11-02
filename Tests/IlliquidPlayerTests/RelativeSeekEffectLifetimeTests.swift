@@ -1,7 +1,7 @@
 import Foundation
 import IlliquidCore
 import IlliquidPlayback
-import IlliquidPlaybackCore
+import IlliquidPlaybackModel
 import Testing
 @testable import IlliquidPlayer
 
@@ -327,25 +327,25 @@ private final class RelativeSeekLifetimeFixture {
     let observations = RelativeSeekLifetimeObservations()
 
     init(autoplay: Bool = true) throws {
-        var model = PlaybackModelRuntime(recordsReplaySteps: false)
+        let model = PlaybackSessionHost()
         _ = model.send(.command(.load(
             source: MediaSourceIdentity(rawValue: "fixture/relative-seek-lifetime.mkv"),
             autoplay: autoplay
         )))
-        // Settle the real core's open, preroll and resume sequence before the
+        // Settle the production model's open, preroll and resume sequence before the
         // driver is installed. The fake never opens a file or creates a view.
         for _ in 0..<8 where !model.pendingEffects.isEmpty {
             _ = model.completeNext()
         }
         #expect(model.pendingEffects.isEmpty)
-        #expect(model.core.state.activeSession?.phase == (autoplay ? .playing : .paused))
+        #expect(model.state.activeSession?.phase == (autoplay ? .playing : .paused))
         _ = model.send(.acceptedClockSample(.valid(ValidMediaTime(value: 20, timescale: 1)!)))
         _ = model.send(.durationObserved(.valid(ValidMediaTime(value: 3_600, timescale: 1)!)))
         // Freeze admission time: synchronous events cannot cross the dispatch
         // window even on a slow host. The MainActor timer cannot run until an
         // async test yields, after the assertions and sleep/shutdown handoff.
         let instant = ContinuousClock.now
-        driver = PlaybackRuntimeDriver(runtime: runtime, model: model, relativeSeekNow: { instant })
+        driver = PlaybackRuntimeDriver(runtime: runtime, host: model, relativeSeekNow: { instant })
         let observations = self.observations
         driver.onTransition = { observations.record($0) }
     }
@@ -370,13 +370,14 @@ private final class RelativeSeekLifetimeFixture {
         // Reflection is confined to assertions, without adding production
         // observability. Rebuild the ID sets so checkpoints do not retain the
         // model's pending/outstanding collections across commands or callbacks.
-        let reflected = Mirror(reflecting: driver).children.first { $0.label == "model" }?.value
-        let model = try #require(reflected as? PlaybackModelRuntime)
+        let reflected = Mirror(reflecting: driver).children.first { $0.label == "host" }?.value
+        let model = try #require(reflected as? PlaybackSessionHost)
+        let state = model.state
         return RelativeSeekLifetimeCheckpoint(
             pendingEffectIDs: Set(model.pendingEffects.map { $0.context.effectID }),
-            outstandingEffectIDs: Set(model.core.state.outstandingEffects.keys.map { $0 }),
-            completedEffectIDs: Set(model.core.state.completedEffectIDs.map { $0 }),
-            activeSession: model.core.state.activeSession
+            outstandingEffectIDs: Set(state.outstandingEffects.keys.map { $0 }),
+            completedEffectIDs: Set(state.completedEffectIDs.map { $0 }),
+            activeSession: state.activeSession
         )
     }
 

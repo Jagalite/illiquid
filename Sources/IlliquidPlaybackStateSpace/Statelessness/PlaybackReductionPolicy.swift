@@ -1,4 +1,4 @@
-import IlliquidPlaybackCore
+import IlliquidPlaybackModel
 import Statelessness
 
 /// Playback partial-order reduction policy for Statelessness (S4).

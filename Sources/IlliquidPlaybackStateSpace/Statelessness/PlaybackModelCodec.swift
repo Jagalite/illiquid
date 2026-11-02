@@ -1,4 +1,4 @@
-import IlliquidPlaybackCore
+import IlliquidPlaybackModel
 import Statelessness
 
 /// Versioned, lossless, deterministic encodings for playback model evidence.
@@ -18,7 +18,7 @@ public enum PlaybackModelCodec {
   struct StateRecord: Codable {
     let model: PlaybackSearchModel
     let seedProfile: String
-    let coreState: PlaybackCoreState
+    let coreState: PlaybackDomainState
     let environment: PlaybackModelEnvironment
     let lateResults: [RetainedEffectResult]
     let ghost: PlaybackSearchGhost

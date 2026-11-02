@@ -17,7 +17,7 @@ let package = Package(
             targets: ["IlliquidDifferentialHarness"]
         ),
         .library(name: "IlliquidCore", targets: ["IlliquidCore"]),
-        .library(name: "IlliquidPlaybackCore", targets: ["IlliquidPlaybackCore"]),
+        .library(name: "IlliquidPlaybackModel", targets: ["IlliquidPlaybackModel"]),
         .library(name: "IlliquidPlaybackStateSpace", targets: ["IlliquidPlaybackStateSpace"]),
         .library(name: "IlliquidPlayback", targets: ["IlliquidPlayback"]),
         .library(name: "IlliquidNativePlayback", targets: ["IlliquidNativePlayback"]),
@@ -29,11 +29,12 @@ let package = Package(
             url: "https://github.com/swiftlang/swift-testing.git",
             revision: "swift-6.3.2-RELEASE"
         ),
-        // Native Swift Statelessness, pinned to the reviewed S1-S6 merge. See
-        // Documentation/STATELESSNESS_SWIFT_MIGRATION.md before changing it.
+        // Native Swift Statelessness: the S1-S6 verification merge plus the
+        // production ExecutionSession. See
+        // Documentation/STATELESSNESS_PRODUCTION_MIGRATION.md before changing it.
         .package(
             url: "https://github.com/Jagalite/statelessness.git",
-            revision: "3fbdca7c49be3cf32da613f887a7f149e0b97087"
+            revision: "20fc035ec3c91a69934657909b3c044cec86a07e"
         ),
     ],
     targets: [
@@ -64,21 +65,24 @@ let package = Package(
             path: "Sources/IlliquidCore"
         ),
         .target(
-            name: "IlliquidPlaybackCore",
-            dependencies: ["IlliquidCore"],
-            path: "Sources/IlliquidPlaybackCore"
+            name: "IlliquidPlaybackModel",
+            dependencies: [
+                "IlliquidCore",
+                .product(name: "Statelessness", package: "statelessness"),
+            ],
+            path: "Sources/IlliquidPlaybackModel"
         ),
         .target(
             name: "IlliquidPlaybackStateSpace",
             dependencies: [
-                "IlliquidPlaybackCore",
+                "IlliquidPlaybackModel",
                 .product(name: "Statelessness", package: "statelessness"),
             ],
             path: "Sources/IlliquidPlaybackStateSpace"
         ),
         .target(
             name: "IlliquidPlayback",
-            dependencies: ["IlliquidCore", "IlliquidPlaybackCore"],
+            dependencies: ["IlliquidCore", "IlliquidPlaybackModel"],
             path: "Sources/IlliquidPlayback",
             linkerSettings: [
                 .linkedFramework("AppKit"),
@@ -91,7 +95,7 @@ let package = Package(
                 "CLibass",
                 "CNativeAudio",
                 "IlliquidCore",
-                "IlliquidPlaybackCore",
+                "IlliquidPlaybackModel",
                 "IlliquidPlayback",
             ],
             path: "Sources/IlliquidNativePlayback",
@@ -114,7 +118,7 @@ let package = Package(
             name: "IlliquidPlayer",
             dependencies: [
                 "IlliquidCore",
-                "IlliquidPlaybackCore",
+                "IlliquidPlaybackModel",
                 "IlliquidPlayback",
                 "IlliquidNativePlayback",
             ],
@@ -136,7 +140,7 @@ let package = Package(
         ),
         .executableTarget(
             name: "IlliquidArchitectureCheck",
-            dependencies: ["IlliquidPlayer", "IlliquidPlaybackCore"],
+            dependencies: ["IlliquidPlayer"],
             path: "Validation/IlliquidArchitectureCheck"
         ),
         .executableTarget(
@@ -167,12 +171,14 @@ let package = Package(
             path: "Validation/IlliquidStateSpaceExplorer"
         ),
         .testTarget(
-            name: "IlliquidPlaybackCoreTests",
+            name: "IlliquidPlaybackModelTests",
             dependencies: [
-                "IlliquidPlaybackCore",
+                "IlliquidPlaybackModel",
+                .product(name: "Statelessness", package: "statelessness"),
                 .product(name: "Testing", package: "swift-testing"),
             ],
-            path: "Tests/IlliquidPlaybackCoreTests"
+            path: "Tests/IlliquidPlaybackModelTests",
+            exclude: ["Fixtures"]
         ),
         .testTarget(
             name: "IlliquidPlaybackStateSpaceTests",
@@ -213,7 +219,7 @@ let package = Package(
             name: "IlliquidPlayerTests",
             dependencies: [
                 "IlliquidPlayer",
-                "IlliquidPlaybackCore",
+                "IlliquidPlaybackModel",
                 .product(name: "Testing", package: "swift-testing"),
             ],
             path: "Tests/IlliquidPlayerTests"

@@ -1,5 +1,5 @@
 import Foundation
-import IlliquidPlaybackCore
+import IlliquidPlaybackModel
 import Statelessness
 
 /// Source and toolchain identity supplied by the runner.
@@ -297,7 +297,7 @@ public enum PlaybackArtifactReplayer {
       minimizedComplete: minimizedReplay.completeReproduction
         && actions == artifact.minimizedWitness && bound,
       targetReproduced: PlaybackVerificationArtifacts.endsWith(minimized, target: target),
-      productionTransitionCount: outputs.count(where: \.calledProductionCore))
+      productionTransitionCount: outputs.count(where: \.calledProductionModel))
   }
 }
 

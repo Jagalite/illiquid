@@ -146,13 +146,13 @@ Own the authoritative event/effect vocabulary, session and generation identity, 
 
 **Observed source anchors**
 
-- `Sources/IlliquidPlaybackCore/IdentityAndTime.swift`
-- `Sources/IlliquidPlaybackCore/EventsAndEffects.swift`
-- `Sources/IlliquidPlaybackCore/PlaybackCore.swift`
-- `Sources/IlliquidPlaybackCore/PlaybackCoreState.swift`
-- `Sources/IlliquidPlaybackCore/PlaybackInvariants.swift`
-- `Sources/IlliquidPlaybackCore/PlaybackModelRuntime.swift`
-- `Sources/IlliquidPlaybackCore/PlaybackReplay.swift`
+- `Sources/IlliquidPlaybackModel/IdentityAndTime.swift`
+- `Sources/IlliquidPlaybackModel/EventsAndEffects.swift`
+- `Sources/IlliquidPlaybackModel/PlaybackProductionModel.swift` and `Sources/IlliquidPlaybackModel/PlaybackRules.swift`
+- `Sources/IlliquidPlaybackModel/PlaybackDomainState.swift`
+- `Sources/IlliquidPlaybackModel/PlaybackInvariants.swift`
+- `Sources/IlliquidPlaybackModel/PlaybackSessionHost.swift`
+- `Sources/IlliquidPlaybackModel/PlaybackReplay.swift`
 - `Sources/IlliquidPlayback/PlaybackRuntime.swift`
 - `Sources/IlliquidPlayback/PlaybackRuntimeEvent.swift`
 - `Sources/IlliquidPlayback/PlaybackCapabilities.swift`
@@ -165,7 +165,7 @@ Own the authoritative event/effect vocabulary, session and generation identity, 
 - **A01.01.q2 — Reducer boundaries:** Do all commands and results pass the intended authority gates?
 - **A01.01.q3 — Invariant quality:** Can replay and deliberately invalid transitions distinguish missing checks from correct rejection?
 
-**Verification starting points:** `Tests/IlliquidPlaybackCoreTests/`; `Tests/IlliquidPlaybackTests/`; `Validation/IlliquidArchitectureCheck/`.
+**Verification starting points:** `Tests/IlliquidPlaybackModelTests/`; `Tests/IlliquidPlaybackTests/`; `Validation/IlliquidArchitectureCheck/`.
 
 **Acceptance:** No duplicate authority or unreviewed contract change; retain minimal failing traces and bounded exploration assumptions. Native output remains separately qualified.
 
@@ -181,7 +181,7 @@ Own logical load readiness, end-of-stream/drain decisions, and permission to com
 
 **Observed source anchors**
 
-- `Sources/IlliquidPlaybackCore/LoadingAndDrainCore.swift`
+- `Sources/IlliquidPlaybackModel/LoadingAndDrainMachine.swift`
 
 **Assignable audit topics**
 
@@ -189,7 +189,7 @@ Own logical load readiness, end-of-stream/drain decisions, and permission to com
 - **A01.02.q2 — Checkpoint failure:** Can failed persistence or an intervening command still allow advancement?
 - **A01.02.q3 — Replacement at EOF:** What happens when EOF races a new source, repeat, seek, or shutdown?
 
-**Verification starting points:** `Tests/IlliquidPlaybackCoreTests/`; `Tests/IlliquidPlayerTests/`.
+**Verification starting points:** `Tests/IlliquidPlaybackModelTests/`; `Tests/IlliquidPlayerTests/`.
 
 **Acceptance:** Advancement has one accepted cause and observes the checkpoint contract; audio-only, video-only, and zero-output outcomes are explicit.
 
@@ -205,7 +205,7 @@ Own logical seek barriers and accepted transport intent, not native decoder seek
 
 **Observed source anchors**
 
-- `Sources/IlliquidPlaybackCore/SeekCore.swift`
+- `Sources/IlliquidPlaybackModel/SeekMachine.swift`
 - `Sources/IlliquidCore/Utilities/PlaybackTimeInput.swift`
 
 **Assignable audit topics**
@@ -214,7 +214,7 @@ Own logical seek barriers and accepted transport intent, not native decoder seek
 - **A01.03.q2 — Pause and rate:** Can a late result resume playback against the latest pause/rate intent?
 - **A01.03.q3 — Targets and boundaries:** How are invalid times, start/end boundaries, repeated targets, and interrupted scrubbing handled?
 
-**Verification starting points:** `Tests/IlliquidPlaybackCoreTests/`; `Tests/IlliquidCoreTests/`.
+**Verification starting points:** `Tests/IlliquidPlaybackModelTests/`; `Tests/IlliquidCoreTests/`.
 
 **Acceptance:** Preserve requested intent through all tested schedules; demonstrate native responsiveness separately from logical correctness.
 
@@ -230,8 +230,8 @@ Own deterministic decisions for buffering, drift response, recovery escalation, 
 
 **Observed source anchors**
 
-- `Sources/IlliquidPlaybackCore/SynchronizationCore.swift`
-- `Sources/IlliquidPlaybackCore/RecoveryCore.swift`
+- `Sources/IlliquidPlaybackModel/SynchronizationMachine.swift`
+- `Sources/IlliquidPlaybackModel/RecoveryMachine.swift`
 
 **Assignable audit topics**
 
@@ -239,7 +239,7 @@ Own deterministic decisions for buffering, drift response, recovery escalation, 
 - **A01.04.q2 — Buffering progress:** Are starvation, progress, drain, and stable pause distinguished?
 - **A01.04.q3 — Wake authority:** Can old wake/recovery acknowledgements affect a replacement session?
 
-**Verification starting points:** `Tests/IlliquidPlaybackCoreTests/`.
+**Verification starting points:** `Tests/IlliquidPlaybackModelTests/`.
 
 **Acceptance:** Recovery is bounded and identity-scoped; no second wall-clock or synchronization policy is introduced in the native layer.
 
@@ -255,8 +255,8 @@ Own desired track/source semantics and matching policy, including explicit Off v
 
 **Observed source anchors**
 
-- `Sources/IlliquidPlaybackCore/TrackSelectionCore.swift`
-- `Sources/IlliquidPlaybackCore/SubtitleCore.swift`
+- `Sources/IlliquidPlaybackModel/TrackSelectionMachine.swift`
+- `Sources/IlliquidPlaybackModel/SubtitleMachine.swift`
 - `Sources/IlliquidCore/Player/MediaTrack.swift`
 - `Sources/IlliquidCore/Player/TrackSelectionPreferences.swift`
 - `Sources/IlliquidCore/Player/SubtitleFallbackEncoding.swift`
@@ -267,7 +267,7 @@ Own desired track/source semantics and matching policy, including explicit Off v
 - **A01.05.q2 — Ambiguous metadata:** Are identical metadata, reused IDs, and changed stream order handled according to the stated guarantee?
 - **A01.05.q3 — Replacement intent:** Do selections and delay intent survive successful replacement and rollback without leaking to a different source?
 
-**Verification starting points:** `Tests/IlliquidPlaybackCoreTests/`; `Tests/IlliquidCoreTests/`; `Tests/IlliquidPlayerTests/`.
+**Verification starting points:** `Tests/IlliquidPlaybackModelTests/`; `Tests/IlliquidCoreTests/`; `Tests/IlliquidPlayerTests/`.
 
 **Acceptance:** Distinguish unchanged-file ID tie-breaking from stable content identity; verify the accepted selection and observed track content independently.
 

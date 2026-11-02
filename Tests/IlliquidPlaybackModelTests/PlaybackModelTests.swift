@@ -1,13 +1,14 @@
 import Foundation
 import Testing
 
-@testable import IlliquidPlaybackCore
+@testable import IlliquidPlaybackModel
+import Statelessness
 
-@Suite("Deterministic playback core")
-struct PlaybackCoreTests {
+@Suite("Deterministic playback model")
+struct PlaybackModelRuleTests {
   @Test
   func loadBecomesPlayingOnlyAfterOpenAndRateAcknowledgments() throws {
-    var runtime = PlaybackModelRuntime()
+    var runtime = PlaybackSessionHost()
 
     let load = runtime.send(
       .command(
@@ -39,7 +40,7 @@ struct PlaybackCoreTests {
 
   @Test
   func pausedLoadDoesNotRequestNonzeroRate() throws {
-    var runtime = PlaybackModelRuntime()
+    var runtime = PlaybackSessionHost()
     _ = runtime.send(
       .command(
         .load(
@@ -59,13 +60,13 @@ struct PlaybackCoreTests {
   func replacementKeepsCommittedSourceUntilCandidatePrerollCommits() throws {
     let first = MediaSourceIdentity(rawValue: "fixture/committed.mkv")
     let candidate = MediaSourceIdentity(rawValue: "fixture/candidate.mkv")
-    var runtime = PlaybackModelRuntime()
+    var runtime = PlaybackSessionHost()
 
     _ = runtime.send(.command(.load(source: first, autoplay: false)))
     _ = runtime.completeNext()
     _ = runtime.completeNext()
-    #expect(runtime.core.state.activeSession?.source == first)
-    #expect(runtime.core.state.pendingSession == nil)
+    #expect(runtime.state.activeSession?.source == first)
+    #expect(runtime.state.pendingSession == nil)
 
     let requested = runtime.send(.command(.load(source: candidate, autoplay: false)))
     #expect(requested.snapshot.source == first)
@@ -87,14 +88,14 @@ struct PlaybackCoreTests {
     let committed = try #require(optionalCommitted)
     #expect(committed.snapshot.source == candidate)
     #expect(committed.snapshot.pendingSource == nil)
-    #expect(runtime.core.state.activeSession?.source == candidate)
+    #expect(runtime.state.activeSession?.source == candidate)
   }
 
   @Test
   func failedReplacementDiscardsPendingSourceWithoutMutatingCommittedAuthority() throws {
     let first = MediaSourceIdentity(rawValue: "fixture/committed.mkv")
     let candidate = MediaSourceIdentity(rawValue: "fixture/malformed.mkv")
-    var runtime = PlaybackModelRuntime()
+    var runtime = PlaybackSessionHost()
 
     _ = runtime.send(.command(.load(source: first, autoplay: false)))
     _ = runtime.completeNext()
@@ -121,13 +122,13 @@ struct PlaybackCoreTests {
     #expect(rejected.snapshot.source == first)
     #expect(rejected.snapshot.pendingSource == nil)
     #expect(rejected.snapshot.failureCode == failure.stableCode)
-    #expect(runtime.core.state.activeSession?.source == first)
-    #expect(runtime.core.state.pendingSession == nil)
+    #expect(runtime.state.activeSession?.source == first)
+    #expect(runtime.state.pendingSession == nil)
   }
 
   @Test
   func staleGenerationResultCannotResumeAfterSeek() throws {
-    var runtime = PlaybackModelRuntime()
+    var runtime = PlaybackSessionHost()
     _ = runtime.send(
       .command(
         .load(
@@ -156,7 +157,7 @@ struct PlaybackCoreTests {
 
   @Test
   func duplicateCompletionIsIdempotent() throws {
-    var runtime = PlaybackModelRuntime()
+    var runtime = PlaybackSessionHost()
     _ = runtime.send(
       .command(
         .load(
@@ -179,7 +180,7 @@ struct PlaybackCoreTests {
 
   @Test
   func directEffectResultRetiresPendingRuntimeEffect() throws {
-    var runtime = PlaybackModelRuntime()
+    var runtime = PlaybackSessionHost()
     _ = runtime.send(
       .command(
         .load(
@@ -200,7 +201,7 @@ struct PlaybackCoreTests {
 
   @Test
   func shutdownRequiresCleanupAcknowledgmentAndThenEmitsNothing() throws {
-    var runtime = PlaybackModelRuntime()
+    var runtime = PlaybackSessionHost()
     _ = runtime.send(
       .command(
         .load(
@@ -230,8 +231,8 @@ struct PlaybackCoreTests {
     let terminated = try #require(optionalTerminated)
     #expect(terminated.snapshot.lifecycle == .terminated)
     #expect(terminated.effects.isEmpty)
-    #expect(runtime.core.state.outstandingEffects.isEmpty)
-    #expect(runtime.core.state.resourceLeases.isEmpty)
+    #expect(runtime.state.outstandingEffects.isEmpty)
+    #expect(runtime.state.resourceLeases.isEmpty)
 
     let hostileLateCommand = runtime.send(.command(.play))
     #expect(hostileLateCommand.disposition == .ignoredAfterTermination)
@@ -240,12 +241,12 @@ struct PlaybackCoreTests {
 
   @Test
   func invalidTimeAndInvalidSeekAreRejectedWithoutEffects() {
-    var runtime = PlaybackModelRuntime()
+    var runtime = PlaybackSessionHost()
     let invalidSeek = runtime.send(.command(.seek(target: .unknown, mode: .exact)))
     #expect(invalidSeek.disposition == .invalid(reason: "seekRequiresValidTarget"))
     #expect(invalidSeek.effects.isEmpty)
 
-    var core = PlaybackCore()
+    var core = ModelStepper()
     _ = core.update(
       PlaybackEventEnvelope(
         sequence: 1,
@@ -268,7 +269,7 @@ struct PlaybackCoreTests {
 
   @Test
   func checkpointAndDiagnosticEventsCarryDeterministicIdentity() throws {
-    var runtime = PlaybackModelRuntime()
+    var runtime = PlaybackSessionHost()
     _ = runtime.send(
       .command(
         .load(
@@ -295,22 +296,22 @@ struct PlaybackCoreTests {
       token: EffectResultToken(kind: .failed),
       failure: failure
     )
-    #expect(runtime.core.state.lastPersistenceFailureCode == "writeFailed")
+    #expect(runtime.state.lastPersistenceFailureCode == "writeFailed")
 
     _ = runtime.send(.diagnosticObserved(code: "backend.fixture"))
-    #expect(runtime.core.state.diagnosticEventCount == 1)
+    #expect(runtime.state.diagnosticEventCount == 1)
   }
 
   @Test
   func subtitleInvalidationOwnsRevisionsClearAndFinalCommitFence() throws {
-    var runtime = PlaybackModelRuntime()
+    var runtime = PlaybackSessionHost()
     _ = runtime.send(.command(.load(
       source: MediaSourceIdentity(rawValue: "fixture/subtitle.mkv"),
       autoplay: false
     )))
     _ = runtime.completeNext()
     _ = runtime.completeNext()
-    let oldAuthority = try #require(runtime.core.state.activeSession?.authority)
+    let oldAuthority = try #require(runtime.state.activeSession?.authority)
 
     let invalidation = runtime.send(.subtitle(.invalidate(reason: .seek)))
     #expect(invalidation.disposition == .accepted)
@@ -318,7 +319,7 @@ struct PlaybackCoreTests {
     #expect(invalidation.effects.contains { $0.executor == .mainActorControl })
     #expect(invalidation.effects.contains { $0.executor == .subtitle })
 
-    let currentSession = try #require(runtime.core.state.activeSession)
+    let currentSession = try #require(runtime.state.activeSession)
     #expect(currentSession.subtitles.pendingVisibleClear != nil)
     #expect(currentSession.subtitles.pendingSourceInvalidation != nil)
     let staleCommit = runtime.send(.subtitle(.overlayCommitCandidate(
@@ -328,7 +329,7 @@ struct PlaybackCoreTests {
     #expect(staleCommit.disposition == .stale(reason: .authorityMismatch))
 
     while !runtime.pendingEffects.isEmpty { _ = runtime.completeNext() }
-    let settled = try #require(runtime.core.state.activeSession)
+    let settled = try #require(runtime.state.activeSession)
     #expect(settled.subtitles.pendingVisibleClear == nil)
     #expect(settled.subtitles.pendingSourceInvalidation == nil)
     let acceptedCommit = runtime.send(.subtitle(.overlayCommitCandidate(
@@ -336,13 +337,13 @@ struct PlaybackCoreTests {
       revision: settled.subtitles.overlayRevision
     )))
     #expect(acceptedCommit.disposition == .accepted)
-    #expect(runtime.core.state.activeSession?.subtitles.lastAcceptedOverlayRevision
+    #expect(runtime.state.activeSession?.subtitles.lastAcceptedOverlayRevision
       == settled.subtitles.overlayRevision)
   }
 
   @Test
   func aggregateSeekAcknowledgmentRestoresRateOnlyAfterNativePreroll() throws {
-    var runtime = PlaybackModelRuntime()
+    var runtime = PlaybackSessionHost()
     _ = runtime.send(.command(.load(
       source: MediaSourceIdentity(rawValue: "fixture/seek-transaction.mkv"),
       autoplay: true
@@ -353,7 +354,7 @@ struct PlaybackCoreTests {
     let transition = runtime.send(.command(.seek(target: .valid(target), mode: .exact)))
     #expect(transition.effects.count == 1)
     #expect(transition.snapshot.position == .valid(target))
-    #expect(runtime.core.state.activeSession?.logicalPosition != .valid(target))
+    #expect(runtime.state.activeSession?.logicalPosition != .valid(target))
     let seekEffect = try #require(transition.effects.first)
     if case .seekPipeline(.valid(let acknowledgedTarget), .exact) = seekEffect.kind {
       // Aggregate success is permitted only after the native transaction has
@@ -362,22 +363,22 @@ struct PlaybackCoreTests {
     } else {
       Issue.record("expected aggregate seek pipeline")
     }
-    #expect(runtime.core.state.activeSession?.seek?.phase == .demuxSeeking)
+    #expect(runtime.state.activeSession?.seek?.phase == .demuxSeeking)
 
     _ = runtime.complete(effectID: seekEffect.context.effectID)
-    #expect(runtime.core.state.activeSession?.seek?.phase == .prerolling)
+    #expect(runtime.state.activeSession?.seek?.phase == .prerolling)
     let rate = try #require(runtime.pendingEffects.first {
       if case .applyRate = $0.kind { return true }
       return false
     })
     _ = runtime.complete(effectID: rate.context.effectID)
-    #expect(runtime.core.state.activeSession?.seek == nil)
-    #expect(runtime.core.state.activeSession?.actualTransport == .playing)
+    #expect(runtime.state.activeSession?.seek == nil)
+    #expect(runtime.state.activeSession?.actualTransport == .playing)
   }
 
   @Test
   func relativeSeekResolvesFromAcceptedClockAndAccumulatesPendingIntent() throws {
-    var runtime = PlaybackModelRuntime()
+    var runtime = PlaybackSessionHost()
     _ = runtime.send(.command(.load(
       source: MediaSourceIdentity(rawValue: "fixture/relative.mkv"),
       autoplay: false
@@ -393,8 +394,8 @@ struct PlaybackCoreTests {
     let accepted = runtime.send(.command(.seek(target: .valid(delta), mode: .relative)))
     #expect(accepted.disposition == .accepted)
     let expected = try #require(ValidMediaTime(value: 12, timescale: 1))
-    #expect(runtime.core.state.activeSession?.seek?.target == .valid(expected))
-    #expect(runtime.core.state.activeSession?.seek?.mode == .relative)
+    #expect(runtime.state.activeSession?.seek?.target == .valid(expected))
+    #expect(runtime.state.activeSession?.seek?.mode == .relative)
     if case .seekPipeline(.valid(let effectTarget), .exact) = accepted.effects.first?.kind {
       #expect(effectTarget == expected)
     } else {
@@ -404,7 +405,7 @@ struct PlaybackCoreTests {
     let repeated = runtime.send(.command(.seek(target: .valid(delta), mode: .relative)))
     #expect(repeated.disposition == .accepted)
     let accumulated = try #require(ValidMediaTime(value: 14, timescale: 1))
-    #expect(runtime.core.state.activeSession?.seek?.target == .valid(accumulated))
+    #expect(runtime.state.activeSession?.seek?.target == .valid(accumulated))
     if case .seekPipeline(.valid(let effectTarget), .exact) = repeated.effects.first?.kind {
       #expect(effectTarget == accumulated)
     } else {
@@ -414,7 +415,7 @@ struct PlaybackCoreTests {
 
   @Test
   func catalogDefaultsAndDrainFinalizationAreDeterministicAndExactlyOnce() throws {
-    var runtime = PlaybackModelRuntime()
+    var runtime = PlaybackSessionHost()
     _ = runtime.send(.command(.load(
       source: MediaSourceIdentity(rawValue: "fixture/drain.mkv"),
       autoplay: false
@@ -436,8 +437,8 @@ struct PlaybackCoreTests {
         PlaybackTrackCandidate(id: subtitleForced, isDefault: false, isForced: true)
       ]
     )))
-    #expect(runtime.core.state.activeSession?.loading?.initialSelection.audio == audioDefault)
-    #expect(runtime.core.state.activeSession?.loading?.initialSelection.subtitle == subtitleForced)
+    #expect(runtime.state.activeSession?.loading?.initialSelection.audio == audioDefault)
+    #expect(runtime.state.activeSession?.loading?.initialSelection.subtitle == subtitleForced)
     _ = runtime.completeNext()
     _ = runtime.completeNext()
     _ = runtime.completeNext()
@@ -467,7 +468,7 @@ struct PlaybackCoreTests {
 
     _ = runtime.send(.demuxEndOfFile(requiredDrain: required))
 
-    #expect(runtime.core.state.activeSession?.drain.observed == [.videoDecoder])
+    #expect(runtime.state.activeSession?.drain.observed == [.videoDecoder])
     let final = runtime.send(.drainObserved(.videoPresenter))
     #expect(final.snapshot.phase == .ended)
     #expect(final.effects.filter { $0.kind == .persistCheckpoint }.count == 1)
@@ -487,7 +488,7 @@ struct PlaybackCoreTests {
     )
     let failure = try #require(failedCompletion)
     #expect(failure.effects.isEmpty)
-    #expect(runtime.core.state.lastPersistenceFailureCode != nil)
+    #expect(runtime.state.lastPersistenceFailureCode != nil)
 
     var replacing = try readyRuntime(autoplay: false)
     let oldEOF = replacing.send(.demuxEndOfFile(requiredDrain: []))
@@ -509,26 +510,26 @@ struct PlaybackCoreTests {
     let duplicateAggregate = runtime.send(.demuxEndOfFile(requiredDrain: []))
 
     #expect(duplicateAggregate.effects.isEmpty)
-    #expect(runtime.core.state.activeSession?.drain.finalized == false)
-    #expect(runtime.core.state.activeSession?.drain.observed == [.videoDecoder])
+    #expect(runtime.state.activeSession?.drain.finalized == false)
+    #expect(runtime.state.activeSession?.drain.observed == [.videoDecoder])
   }
 
   @Test
   func acceptedNewSeekGenerationRearmsFinalizedEOFCycle() throws {
     var runtime = try readyRuntime(autoplay: false)
     _ = runtime.send(.demuxEndOfFile(requiredDrain: []))
-    #expect(runtime.core.state.activeSession?.drain.finalized == true)
+    #expect(runtime.state.activeSession?.drain.finalized == true)
 
     let target = try #require(ValidMediaTime(value: 7, timescale: 1))
     let seek = runtime.send(.command(.seek(target: .valid(target), mode: .exact)))
 
     #expect(seek.disposition == .accepted)
-    #expect(runtime.core.state.activeSession?.drain == PlaybackDrainState())
+    #expect(runtime.state.activeSession?.drain == PlaybackDrainState())
   }
 
   @Test
   func shutdownCleanupFailuresBecomeExplicitExternalWaits() throws {
-    var cancellationRuntime = PlaybackModelRuntime()
+    var cancellationRuntime = PlaybackSessionHost()
     _ = cancellationRuntime.send(.command(.load(
       source: MediaSourceIdentity(rawValue: "fixture/shutdown-cancel.mkv"),
       autoplay: false
@@ -539,16 +540,16 @@ struct PlaybackCoreTests {
       effectID: cancellation.context.effectID,
       token: EffectResultToken(kind: .failed)
     )
-    #expect(cancellationRuntime.core.state.externalWaitReason == .shutdownCancellationFailed)
+    #expect(cancellationRuntime.state.externalWaitReason == .shutdownCancellationFailed)
 
-    var finalizerRuntime = PlaybackModelRuntime()
+    var finalizerRuntime = PlaybackSessionHost()
     let finalizerRequest = finalizerRuntime.send(.command(.shutdown))
     let finalizer = try #require(finalizerRequest.effects.first)
     _ = finalizerRuntime.complete(
       effectID: finalizer.context.effectID,
       token: EffectResultToken(kind: .cancelled)
     )
-    #expect(finalizerRuntime.core.state.externalWaitReason == .shutdownFinalizationFailed)
+    #expect(finalizerRuntime.state.externalWaitReason == .shutdownFinalizationFailed)
   }
 
   @Test
@@ -578,8 +579,8 @@ struct PlaybackCoreTests {
     let failed = try #require(optionalFailed)
 
     #expect(failed.invariantViolations.isEmpty)
-    #expect(runtime.core.state.activeSession?.actualTransport == .playing)
-    #expect(runtime.core.state.activeSession?.synchronization.startupAcknowledged == true)
+    #expect(runtime.state.activeSession?.actualTransport == .playing)
+    #expect(runtime.state.activeSession?.synchronization.startupAcknowledged == true)
   }
 
   @Test
@@ -598,8 +599,8 @@ struct PlaybackCoreTests {
     let selectionResult = try #require(optionalSelectionResult)
 
     #expect(selectionResult.disposition == .accepted)
-    #expect(runtime.core.state.activeSession?.tracks.phase == .idle)
-    #expect(runtime.core.state.activeSession?.tracks.effectiveSubtitle == .external(
+    #expect(runtime.state.activeSession?.tracks.phase == .idle)
+    #expect(runtime.state.activeSession?.tracks.effectiveSubtitle == .external(
       MediaSourceIdentity(rawValue: "fixture/external.srt")
     ))
     #expect(selectionResult.effects.contains { $0.kind == .applyRate(milliRate: 0) })
@@ -626,13 +627,13 @@ struct PlaybackCoreTests {
     let rateResult = try #require(optionalRateResult)
 
     #expect(rateResult.disposition == .accepted)
-    #expect(runtime.core.state.activeSession?.phase == .paused)
-    #expect(runtime.core.state.activeSession?.actualTransport == .paused)
+    #expect(runtime.state.activeSession?.phase == .paused)
+    #expect(runtime.state.activeSession?.actualTransport == .paused)
   }
 
   @Test
   func aggregatePrerollIsTheOnlyStartupRateAuthority() throws {
-    var runtime = PlaybackModelRuntime()
+    var runtime = PlaybackSessionHost()
     _ = runtime.send(.command(.load(
       source: MediaSourceIdentity(rawValue: "fixture/preroll-authority.mkv"),
       autoplay: true
@@ -643,7 +644,7 @@ struct PlaybackCoreTests {
     let componentReady = runtime.send(.synchronization(.prerolled(.video)))
     #expect(componentReady.effects.isEmpty)
     #expect(
-      runtime.core.state.pendingSession?.synchronization.startupAcknowledged == false
+      runtime.state.pendingSession?.synchronization.startupAcknowledged == false
     )
 
     let aggregate = try #require(runtime.pendingEffects.first {
@@ -651,7 +652,7 @@ struct PlaybackCoreTests {
     })
     let optionalAggregateReady = runtime.complete(effectID: aggregate.context.effectID)
     let aggregateReady = try #require(optionalAggregateReady)
-    #expect(runtime.core.state.activeSession?.synchronization.startupAcknowledged == true)
+    #expect(runtime.state.activeSession?.synchronization.startupAcknowledged == true)
     #expect(aggregateReady.effects.contains { $0.kind == .applyRate(milliRate: 1_000) })
   }
 
@@ -662,9 +663,9 @@ struct PlaybackCoreTests {
     let catalog = runtime.send(.catalogObserved(PlaybackCatalog(hasVideo: true)))
 
     #expect(catalog.invariantViolations.isEmpty)
-    #expect(runtime.core.state.lifecycle == .running)
-    #expect(runtime.core.state.activeSession?.actualTransport == .playing)
-    #expect(runtime.core.state.activeSession?.synchronization.startupAcknowledged == true)
+    #expect(runtime.state.lifecycle == .running)
+    #expect(runtime.state.activeSession?.actualTransport == .playing)
+    #expect(runtime.state.activeSession?.synchronization.startupAcknowledged == true)
   }
 
   @Test
@@ -683,7 +684,7 @@ struct PlaybackCoreTests {
         startupAcknowledged: false
       )
     )
-    let violations = PlaybackInvariantChecker.check(state: PlaybackCoreState(
+    let violations = PlaybackInvariantChecker.check(state: PlaybackDomainState(
       activeSession: session
     ))
     #expect(violations.contains { $0.name == "playingRequiresCurrentPreroll" })
@@ -982,8 +983,8 @@ struct PlaybackCoreTests {
     #expect(controls.appliedSubtitleDelayMicroseconds == 10_000_000)
   }
 
-  private func readyRuntime(autoplay: Bool) throws -> PlaybackModelRuntime {
-    var runtime = PlaybackModelRuntime()
+  private func readyRuntime(autoplay: Bool) throws -> PlaybackSessionHost {
+    var runtime = PlaybackSessionHost()
     _ = runtime.send(.command(.load(
       source: MediaSourceIdentity(rawValue: "fixture/ready.mkv"),
       autoplay: autoplay
@@ -1070,7 +1071,7 @@ struct OptionalTrackRecoveryTests {
   }
 
   @Test func audioOnlyDecodeFailureRemainsTerminal() throws {
-    var runtime = PlaybackModelRuntime()
+    var runtime = PlaybackSessionHost()
     _ = runtime.send(.command(.load(
       source: MediaSourceIdentity(rawValue: "fixture/audio-only.m4a"),
       autoplay: false
@@ -1110,7 +1111,7 @@ struct OptionalTrackRecoveryTests {
   }
 }
 
-@Suite("Playback core replay")
+@Suite("Playback model replay")
 struct PlaybackReplayTests {
   @Test
   func canonicalEncodingIgnoresSetAndDictionaryInsertionHistory() throws {
@@ -1141,7 +1142,7 @@ struct PlaybackReplayTests {
       isCleanup: true
     )
 
-    var first = PlaybackCoreState()
+    var first = PlaybackDomainState()
     first.outstandingEffects[effectID] = OutstandingEffectRecord(
       effect: effectA,
       acceptedTokens: Set([tokenA, tokenB])
@@ -1149,7 +1150,7 @@ struct PlaybackReplayTests {
     first.completedEffectIDs.insert(PlaybackEffectID(rawValue: 9))
     first.completedEffectIDs.insert(PlaybackEffectID(rawValue: 3))
 
-    var second = PlaybackCoreState()
+    var second = PlaybackDomainState()
     second.completedEffectIDs.insert(PlaybackEffectID(rawValue: 3))
     second.completedEffectIDs.insert(PlaybackEffectID(rawValue: 9))
     second.outstandingEffects[effectID] = OutstandingEffectRecord(
@@ -1165,8 +1166,12 @@ struct PlaybackReplayTests {
   }
 
   @Test
-  func replayJSONRoundTripsWithStableBytes() throws {
-    var runtime = PlaybackModelRuntime()
+  func recordedTraceRoundTripsWithStableBytesAndReplays() throws {
+    let model = PlaybackProductionModel.make()
+    let recorder = try Recorder(
+      checkedInitial: checkInitial(model, state: PlaybackDomainState()),
+      config: RunConfig(strategy: "illiquid.live", seed: 847_221))
+    let runtime = PlaybackSessionHost(recorder: recorder)
     _ = runtime.send(
       .command(
         .load(
@@ -1174,40 +1179,69 @@ struct PlaybackReplayTests {
           autoplay: true
         )))
     _ = runtime.completeNext()
-    let replay = runtime.replayDocument(
-      illiquidRevision: "fbdc699",
-      seed: 847_221
-    )
+    let trace = recorder.snapshot()
 
-    let firstEncoding = try PlaybackReplayCodec.encode(replay)
-    let decoded = try PlaybackReplayCodec.decode(firstEncoding)
-    let secondEncoding = try PlaybackReplayCodec.encode(decoded)
-    #expect(decoded == replay)
+    let firstEncoding = try encodeAuditTrace(trace)
+    let decoded = try decodeAuditTrace(firstEncoding)
+    let secondEncoding = try encodeAuditTrace(decoded)
     #expect(firstEncoding == secondEncoding)
+    #expect(recorder.observedSteps == 2)
+    // Replay is effect-free and reproduces every recorded state and output.
+    let report = try replayWithObservationsBounded(model, trace: decoded) { _, _ in }
+    #expect(report.outcome == "exact", "\(report)")
+    #expect(report.stepsVerified == 2)
   }
 
   @Test
-  func shrinkerProducesDeterministicNonemptyDeletionCandidates() {
-    let envelopes = (1...8).map { value in
-      PlaybackEventEnvelope(
-        sequence: UInt64(value),
-        virtualTime: PlaybackInstant(ticks: UInt64(value)),
-        event: .command(.pause)
-      )
+  func invariantFailureIsShrunkByStatelessness() throws {
+    // A reachable invariant failure found by the production oracle streams
+    // (frozen legacy behavior, see the production migration status).
+    let target = try #require(try Self.failingStream())
+    let generate = Generate(
+      model: PlaybackProductionModel.make(),
+      generate: { _, _ in nil },
+      equalInputs: { $0 == $1 })
+    let report = try shrinkContinued(generate, inputs: target.inputs, target: target.violation)
+    let minimized = report.base.minimized.inputs
+    #expect(!minimized.isEmpty)
+    #expect(minimized.count <= target.inputs.count)
+    #expect(report.base.minimized.violations.contains { $0.check.id == target.violation.check.id })
+    // The minimized witness still ends with the same failure when re-executed.
+    let session = try PlaybackProductionModel.session()
+    var last: [Check] = []
+    for input in minimized { last = try session.submit(input).failedChecks }
+    #expect(last.contains { $0.id == target.violation.check.id })
+  }
+
+  /// First oracle stream that fails an invariant, cut at that failure.
+  static func failingStream() throws -> (inputs: [PlaybackEventEnvelope], violation: Violation)? {
+    let fixture = try ProductionModelOracleTests.fixture()
+    let starts = try ProductionOracle.decodedStarts(fixture.starts)
+    guard let fresh = starts.first(where: { $0.name == "fresh" }) else { return nil }
+    for stream in fixture.streams where stream.start == "fresh" {
+      var state = fresh.state
+      var generator = ProductionOracleStream(seed: stream.seed, state: state)
+      var inputs: [PlaybackEventEnvelope] = []
+      for _ in 0..<stream.steps {
+        let envelope = generator.nextEnvelope()
+        let stepped = PlaybackProductionModel.step(state, envelope)
+        state = stepped.state
+        generator.observe(stepped.outputs[0])
+        inputs.append(envelope)
+        if let failed = PlaybackProductionModel.checks(stepped).first(where: { $0.status == .failed }) {
+          return (inputs, Violation(phase: "transition", check: failed))
+        }
+      }
     }
-    let first = PlaybackReplayShrinker.deletionCandidates(for: envelopes)
-    let second = PlaybackReplayShrinker.deletionCandidates(for: envelopes)
-    #expect(first == second)
-    #expect(!first.isEmpty)
-    #expect(first.allSatisfy { !$0.isEmpty && $0.count < envelopes.count })
+    return nil
   }
 }
 
-@Suite("Playback core model runtime")
-struct PlaybackModelRuntimeTests {
+@Suite("Playback session host")
+struct PlaybackSessionHostTests {
   @Test
-  func productionModeSkipsReplayEncodingAndRetention() {
-    var runtime = PlaybackModelRuntime(recordsReplaySteps: false)
+  func productionModeRetainsNoStepHistory() {
+    var runtime = PlaybackSessionHost()
 
     let transition = runtime.send(
       .command(
@@ -1217,17 +1251,18 @@ struct PlaybackModelRuntimeTests {
         )))
 
     #expect(transition.disposition == .accepted)
-    #expect(runtime.core.state.activeSession == nil)
-    #expect(runtime.core.state.pendingSession != nil)
-    #expect(runtime.steps.isEmpty)
+    #expect(runtime.state.activeSession == nil)
+    #expect(runtime.state.pendingSession != nil)
+    #expect(runtime.session.recorder == nil)
+    #expect(runtime.session.sequence == 1)
     #expect(!runtime.pendingEffects.isEmpty)
   }
 
   @Test
-  func seededSequencesRemainDeterministicAndInvariantSafe() {
-    let first = runSequence(seed: 0xC0FFEE, steps: 2_000)
-    let second = runSequence(seed: 0xC0FFEE, steps: 2_000)
-    #expect(first.document == second.document)
+  func seededSequencesRemainDeterministicAndInvariantSafe() throws {
+    let first = try runSequence(seed: 0xC0FFEE, steps: 2_000)
+    let second = try runSequence(seed: 0xC0FFEE, steps: 2_000)
+    #expect(first.trace == second.trace)
     #expect(first.violations.isEmpty)
     #expect(second.violations.isEmpty)
   }
@@ -1235,13 +1270,18 @@ struct PlaybackModelRuntimeTests {
   private func runSequence(
     seed: UInt64,
     steps: Int
-  ) -> (document: PlaybackReplayDocument, violations: [PlaybackInvariantViolation]) {
-    var runtime = PlaybackModelRuntime()
+  ) throws -> (trace: [UInt8], violations: [PlaybackInvariantViolation]) {
+    let model = PlaybackProductionModel.make()
+    let recorder = try Recorder(
+      checkedInitial: checkInitial(model, state: PlaybackDomainState()),
+      config: RunConfig(strategy: "illiquid.seeded", seed: seed),
+      options: RecorderOptions(maxSteps: steps + 1, maxRetainedBytes: 1 << 30))
+    let runtime = PlaybackSessionHost(recorder: recorder)
     var generator = SeededPlaybackGenerator(seed: seed)
     var violations: [PlaybackInvariantViolation] = []
 
     for _ in 0..<steps {
-      if runtime.core.state.lifecycle == .terminated { break }
+      if runtime.state.lifecycle == .terminated { break }
       let transition: PlaybackTransition
       if !runtime.pendingEffects.isEmpty && generator.next() % 3 != 0 {
         let index = Int(generator.next() % UInt64(runtime.pendingEffects.count))
@@ -1257,14 +1297,11 @@ struct PlaybackModelRuntimeTests {
           transition = runtime.completeNext(at: index) ?? runtime.send(.command(.pause))
         }
       } else {
-        transition = runtime.send(.command(generator.nextCommand(for: runtime.core.state)))
+        transition = runtime.send(.command(generator.nextCommand(for: runtime.state)))
       }
       violations.append(contentsOf: transition.invariantViolations)
     }
 
-    return (
-      runtime.replayDocument(illiquidRevision: "test", seed: seed),
-      violations
-    )
+    return (try encodeAuditTrace(recorder.snapshot()), violations)
   }
 }

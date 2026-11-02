@@ -1,6 +1,6 @@
 import Foundation
 import Testing
-@testable import IlliquidPlaybackCore
+@testable import IlliquidPlaybackModel
 
 @Suite("Renderer recovery regression coverage")
 struct RendererRecoveryRegressionTests {
@@ -17,8 +17,8 @@ struct RendererRecoveryRegressionTests {
     }
   }
 
-  private func readyRuntime(autoplay: Bool = true) throws -> PlaybackModelRuntime {
-    var runtime = PlaybackModelRuntime(recordsReplaySteps: false)
+  private func readyRuntime(autoplay: Bool = true) throws -> PlaybackSessionHost {
+    var runtime = PlaybackSessionHost()
     let load = runtime.send(.command(.load(
       source: MediaSourceIdentity(rawValue: "fixture/recovery.mkv"), autoplay: autoplay
     )))
@@ -27,7 +27,7 @@ struct RendererRecoveryRegressionTests {
       if let step = runtime.completeNext() { #expect(step.invariantViolations.isEmpty) }
     }
     #expect(runtime.pendingEffects.isEmpty)
-    #expect(runtime.core.state.activeSession?.phase == (autoplay ? .playing : .paused))
+    #expect(runtime.state.activeSession?.phase == (autoplay ? .playing : .paused))
     let catalog = runtime.send(.catalogObserved(PlaybackCatalog(
       hasVideo: true, audio: [PlaybackTrackCandidate(
         id: PlaybackTrackID(kind: .audio, mediaTrackID: 1), isDefault: true
@@ -54,7 +54,7 @@ struct RendererRecoveryRegressionTests {
   }
 
   private func complete(
-    _ effect: PlaybackEffect, runtime: inout PlaybackModelRuntime
+    _ effect: PlaybackEffect, runtime: inout PlaybackSessionHost
   ) throws -> PlaybackTransition {
     let result = runtime.complete(effectID: effect.context.effectID)
     let completed = try #require(result)
@@ -63,14 +63,14 @@ struct RendererRecoveryRegressionTests {
   }
 
   private func finishRecovery(
-    _ effect: PlaybackEffect, runtime: inout PlaybackModelRuntime
+    _ effect: PlaybackEffect, runtime: inout PlaybackSessionHost
   ) throws {
     let completion = try complete(effect, runtime: &runtime)
     for next in completion.effects { _ = try complete(next, runtime: &runtime) }
   }
 
   private func startRecovery(
-    _ route: Route, runtime: inout PlaybackModelRuntime
+    _ route: Route, runtime: inout PlaybackSessionHost
   ) throws -> PlaybackEffect {
     let video = PlaybackStreamID(kind: .video, demuxIndex: 0)
     let audio = PlaybackStreamID(kind: .audio, demuxIndex: 1)
@@ -126,13 +126,13 @@ struct RendererRecoveryRegressionTests {
     let first = runtime.send(.failureObserved(failure))
     let flush = try #require(first.effects.first)
     #expect(flush.kind == .flushPresentationForRecovery(revision: .init(rawValue: 1)))
-    #expect(runtime.core.state.activeSession?.revisions.presentation?.rawValue == 1)
+    #expect(runtime.state.activeSession?.revisions.presentation?.rawValue == 1)
     try finishRecovery(flush, runtime: &runtime)
 
     let second = runtime.send(.failureObserved(failure))
     let rebuild = try #require(second.effects.first)
     #expect(rebuild.kind == .rebuildPresentationGraph(revision: .init(rawValue: 1)))
-    #expect(runtime.core.state.activeSession?.revisions.presentationGraph?.rawValue == 1)
+    #expect(runtime.state.activeSession?.revisions.presentationGraph?.rawValue == 1)
     try finishRecovery(rebuild, runtime: &runtime)
 
     let third = runtime.send(.failureObserved(failure))
@@ -140,7 +140,7 @@ struct RendererRecoveryRegressionTests {
     #expect(third.snapshot.phase == .failed)
     #expect(third.snapshot.actualTransport == .stopped)
     #expect(third.snapshot.failureCode == failure.stableCode)
-    #expect(runtime.core.state.activeSession?.recovery.presentationFlushConsumed.count == 1)
+    #expect(runtime.state.activeSession?.recovery.presentationFlushConsumed.count == 1)
   }
 
   @Test(arguments: Route.allCases, [EffectResultKind.succeeded, .failed, .cancelled])
@@ -149,7 +149,7 @@ struct RendererRecoveryRegressionTests {
     let recovery = try startRecovery(route, runtime: &runtime)
     let failed = runtime.send(.failureObserved(terminalFailure))
     #expect(failed.snapshot.phase == .failed)
-    let before = runtime.core.state.activeSession
+    let before = runtime.state.activeSession
     let result = PlaybackEffectResult(
       context: recovery.context, token: EffectResultToken(kind: token),
       failure: token == .succeeded ? nil : PlaybackFailure(
@@ -161,11 +161,11 @@ struct RendererRecoveryRegressionTests {
     #expect(late.disposition == .stale(reason: .operationMismatch))
     #expect(late.effects.isEmpty)
     #expect(late.invariantViolations.isEmpty)
-    #expect(runtime.core.state.activeSession == before)
-    #expect(runtime.core.state.outstandingEffects[recovery.context.effectID] == nil)
+    #expect(runtime.state.activeSession == before)
+    #expect(runtime.state.outstandingEffects[recovery.context.effectID] == nil)
     let duplicate = runtime.send(.effectResult(result))
     #expect(duplicate.disposition == .duplicate(effectID: recovery.context.effectID))
-    #expect(runtime.core.state.activeSession == before)
+    #expect(runtime.state.activeSession == before)
   }
 
   @Test(arguments: Route.allCases)
@@ -174,11 +174,11 @@ struct RendererRecoveryRegressionTests {
     let recovery = try startRecovery(route, runtime: &runtime)
     let timeout = runtime.send(.deadlineReached(operationID: recovery.context.operationID))
     #expect(timeout.snapshot.failureCode == "operationTimedOut")
-    let before = runtime.core.state.activeSession
+    let before = runtime.state.activeSession
     let completion = try complete(recovery, runtime: &runtime)
     #expect(completion.disposition == .stale(reason: .operationMismatch))
     #expect(completion.effects.isEmpty)
-    #expect(runtime.core.state.activeSession == before)
+    #expect(runtime.state.activeSession == before)
   }
 
   @Test(arguments: Route.allCases.filter(\.restartsPresentation), [true, false])
@@ -196,23 +196,23 @@ struct RendererRecoveryRegressionTests {
     } else {
       _ = runtime.send(.failureObserved(terminalFailure))
     }
-    let before = runtime.core.state.activeSession
+    let before = runtime.state.activeSession
     let late = try complete(rate, runtime: &runtime)
     #expect(late.disposition == .stale(reason: .operationMismatch))
     #expect(late.effects.isEmpty)
-    #expect(runtime.core.state.activeSession == before)
+    #expect(runtime.state.activeSession == before)
   }
 
   @Test
   func furtherFailureObservationsDoNotRestartATerminalSession() throws {
     var runtime = try readyRuntime()
     _ = runtime.send(.failureObserved(terminalFailure))
-    let before = runtime.core.state.activeSession
+    let before = runtime.state.activeSession
     for _ in 0..<100 {
       let ignored = runtime.send(.failureObserved(presentationFailure()))
       #expect(ignored.disposition == .stale(reason: .operationMismatch))
       #expect(ignored.effects.isEmpty)
-      #expect(runtime.core.state.activeSession == before)
+      #expect(runtime.state.activeSession == before)
     }
   }
 
@@ -237,11 +237,11 @@ struct RendererRecoveryRegressionTests {
     let recovery = try startRecovery(route, runtime: &runtime)
     let pause = runtime.send(.command(.pause))
     for effect in pause.effects { _ = try complete(effect, runtime: &runtime) }
-    #expect(runtime.core.state.activeSession?.activeOperationID != recovery.context.operationID)
+    #expect(runtime.state.activeSession?.activeOperationID != recovery.context.operationID)
     try finishRecovery(recovery, runtime: &runtime)
-    #expect(runtime.core.state.activeSession?.phase == .paused)
-    #expect(runtime.core.state.activeSession?.actualTransport == .paused)
-    #expect(runtime.core.state.activeSession?.lastFailure == nil)
+    #expect(runtime.state.activeSession?.phase == .paused)
+    #expect(runtime.state.activeSession?.actualTransport == .paused)
+    #expect(runtime.state.activeSession?.lastFailure == nil)
   }
 
   @Test
@@ -274,8 +274,8 @@ struct RendererRecoveryRegressionTests {
         return false
       }) { _ = try complete(effect, runtime: &runtime) }
     }
-    #expect(runtime.core.state.activeSession?.phase == .playing)
-    #expect(runtime.core.state.activeSession?.recovery.presentationFlushConsumed.isEmpty == true)
+    #expect(runtime.state.activeSession?.phase == .playing)
+    #expect(runtime.state.activeSession?.recovery.presentationFlushConsumed.isEmpty == true)
     let old = runtime.send(.effectResult(PlaybackEffectResult(
       context: flush.context, token: EffectResultToken(kind: .succeeded)
     )))
@@ -295,11 +295,11 @@ struct RendererRecoveryRegressionTests {
     let rebuild = try #require(second.effects.first)
     let terminal = runtime.send(.failureObserved(presentationFailure()))
     #expect(terminal.snapshot.phase == .failed)
-    let before = runtime.core.state.activeSession
+    let before = runtime.state.activeSession
     for effect in flushFirst ? [flush, rebuild] : [rebuild, flush] {
       let result = try complete(effect, runtime: &runtime)
       #expect(result.effects.isEmpty)
-      #expect(runtime.core.state.activeSession == before)
+      #expect(runtime.state.activeSession == before)
     }
     #expect(runtime.pendingEffects.isEmpty)
   }
@@ -310,18 +310,18 @@ struct RendererRecoveryRegressionTests {
     let checkpoint = runtime.send(.command(.checkpoint))
     let persistence = try #require(checkpoint.effects.first)
     _ = runtime.send(.failureObserved(terminalFailure))
-    let before = runtime.core.state.activeSession
+    let before = runtime.state.activeSession
     _ = try complete(persistence, runtime: &runtime)
-    #expect(runtime.core.state.activeSession == before)
+    #expect(runtime.state.activeSession == before)
     let stop = runtime.send(.command(.stop))
     let cancellation = try #require(stop.effects.first)
-    let stopping = runtime.core.state.activeSession
+    let stopping = runtime.state.activeSession
     let observation = runtime.send(.failureObserved(presentationFailure()))
     #expect(observation.disposition == .stale(reason: .operationMismatch))
     #expect(observation.effects.isEmpty)
-    #expect(runtime.core.state.activeSession == stopping)
+    #expect(runtime.state.activeSession == stopping)
     _ = try complete(cancellation, runtime: &runtime)
-    #expect(runtime.core.state.activeSession == nil)
+    #expect(runtime.state.activeSession == nil)
   }
 
   @Test
@@ -333,11 +333,11 @@ struct RendererRecoveryRegressionTests {
       context: second.context, token: EffectResultToken(kind: .failed), failure: terminalFailure
     )))
     #expect(failed.snapshot.phase == .failed)
-    let before = runtime.core.state.activeSession
+    let before = runtime.state.activeSession
     let late = try complete(first, runtime: &runtime)
     #expect(late.disposition == .stale(reason: .operationMismatch))
     #expect(late.effects.isEmpty)
-    #expect(runtime.core.state.activeSession == before)
+    #expect(runtime.state.activeSession == before)
   }
 
   @Test(arguments: [
@@ -350,14 +350,14 @@ struct RendererRecoveryRegressionTests {
     var runtime = try readyRuntime()
     let recovery = try startRecovery(.videoFlush, runtime: &runtime)
     _ = runtime.send(.failureObserved(terminalFailure))
-    let before = runtime.core.state.activeSession
+    let before = runtime.state.activeSession
     let observation = runtime.send(event)
     #expect(observation.disposition == .stale(reason: .operationMismatch))
     #expect(observation.effects.isEmpty)
-    #expect(runtime.core.state.activeSession == before)
+    #expect(runtime.state.activeSession == before)
     let late = try complete(recovery, runtime: &runtime)
     #expect(late.effects.isEmpty)
-    #expect(runtime.core.state.activeSession == before)
+    #expect(runtime.state.activeSession == before)
   }
 
   @Test(arguments: [
@@ -375,7 +375,7 @@ struct RendererRecoveryRegressionTests {
     let pending = runtime.send(event)
     let effect = try #require(pending.effects.first)
     _ = runtime.send(.failureObserved(terminalFailure))
-    let before = runtime.core.state.activeSession
+    let before = runtime.state.activeSession
     let late = runtime.send(.effectResult(PlaybackEffectResult(
       context: effect.context, token: EffectResultToken(kind: token),
       failure: token == .succeeded ? nil : PlaybackFailure(
@@ -385,29 +385,29 @@ struct RendererRecoveryRegressionTests {
     )))
     #expect(late.disposition == .stale(reason: .operationMismatch))
     #expect(late.effects.isEmpty)
-    #expect(runtime.core.state.activeSession == before)
-    #expect(runtime.core.state.outstandingEffects[effect.context.effectID] == nil)
+    #expect(runtime.state.activeSession == before)
+    #expect(runtime.state.outstandingEffects[effect.context.effectID] == nil)
   }
 
   @Test
   func aLateDeadlineDoesNotReplaceTheFirstTerminalError() throws {
     var runtime = try readyRuntime()
     _ = runtime.send(.failureObserved(terminalFailure))
-    let before = try #require(runtime.core.state.activeSession)
+    let before = try #require(runtime.state.activeSession)
     let result = runtime.send(.deadlineReached(operationID: before.activeOperationID))
     #expect(result.disposition == .stale(reason: .operationMismatch))
-    #expect(runtime.core.state.activeSession == before)
+    #expect(runtime.state.activeSession == before)
   }
 
   @Test(arguments: [PlaybackCommand.play, .pause])
   func transportCommandsDoNotUnpauseATerminallyFailedPipeline(command: PlaybackCommand) throws {
     var runtime = try readyRuntime()
     _ = runtime.send(.failureObserved(terminalFailure))
-    let before = runtime.core.state.activeSession
+    let before = runtime.state.activeSession
     let result = runtime.send(.command(command))
     #expect(result.disposition == .invalid(reason: "transportNotReady"))
     #expect(result.effects.isEmpty)
-    #expect(runtime.core.state.activeSession == before)
+    #expect(runtime.state.activeSession == before)
   }
 
   @Test
