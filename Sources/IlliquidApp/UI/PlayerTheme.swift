@@ -94,6 +94,12 @@ enum PlayerTheme: String, CaseIterable, Hashable, Identifiable, Sendable {
         }
     }
 
+    var popoverSurfaceColor: Color {
+        self == .liquidGlass
+            ? Color(red: 0.18, green: 0.20, blue: 0.25)
+            : previewSurfaceColor
+    }
+
     var hoverFillColor: Color {
         primaryColor.opacity(self == .liquidGlass ? 0.07 : 0.12)
     }
@@ -739,6 +745,38 @@ struct PlayerTextPalette {
     let rainbowPalette: PlayerRainbowPalette
     let sample: VideoColorSample?
     let store: PlaybackVideoColorStore?
+
+    /// The native title bar follows video hues, but contrast is against its
+    /// dark chrome rather than the video pixels. No text halo is needed here.
+    func titlebarColors() -> PlayerTextStyleColors {
+        guard theme == .liquidGlass, mode.usesVideoSampling, let sample else {
+            return colors(at: nil, contrastRegion: .local, alignedRegion: nil)
+        }
+        let background = SampledVideoColor(red: 0.18, green: 0.18, blue: 0.18)
+        let fill = NSColor(theme.selectedFillColor).usingColorSpace(.sRGB)
+        let alpha = Double(fill?.alphaComponent ?? 0)
+        let selectedBackground = SampledVideoColor(
+            red: background.red * (1 - alpha) + Double(fill?.redComponent ?? 0) * alpha,
+            green: background.green * (1 - alpha) + Double(fill?.greenComponent ?? 0) * alpha,
+            blue: background.blue * (1 - alpha) + Double(fill?.blueComponent ?? 0) * alpha
+        )
+        let legibility = AdaptiveTextLegibility(
+            backgrounds: [background, selectedBackground],
+            luminanceLift: 0
+        )
+        let components = legibility.resolve(hueSource: sample.overall,
+            palette: rainbowPalette, monochrome: mode == .dynamicMonochrome, previous: nil)
+        let color = Color(red: components.red, green: components.green, blue: components.blue)
+        return PlayerTextStyleColors(
+            primary: color,
+            secondary: color.opacity(legibility.readableOpacity(for: components,
+                preferred: PlayerDynamicTextRole.secondary.opacity)),
+            tertiary: color.opacity(legibility.readableOpacity(for: components,
+                preferred: PlayerDynamicTextRole.tertiary.opacity)),
+            contrastHalo: .clear,
+            contrastHaloRadius: 0
+        )
+    }
 
     func colors(
         at location: PlayerTextGridLocation?,
