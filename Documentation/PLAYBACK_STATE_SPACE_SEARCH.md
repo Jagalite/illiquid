@@ -1,5 +1,9 @@
 # Playback bounded state-space search
 
+The proposed [full migration to Statelessness Swift](STATELESSNESS_SWIFT_MIGRATION.md)
+defines the replacement architecture, upstream library changes, and qualification gates.
+The implementation described below remains the current custom explorer.
+
 Superplayr includes a deterministic, custom Swift explorer around the production
 `PlaybackCore.update(_:)` transition. It exhausts finite policy schedules; it is
 not a media simulator and does not add a general model-checking dependency.
