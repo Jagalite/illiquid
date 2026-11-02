@@ -100,7 +100,7 @@ Building for debugging...
 [76/98] Applying IlliquidStateSpaceExplorer
 [78/98] Compiling IlliquidPlaybackModelTests RendererRecoveryRegressionTests.swift
 /Volumes/seed2/Projects/illiquid-production-migration/Tests/IlliquidPlaybackModelTests/RendererRecoveryRegressionTests.swift:21:9: warning: variable 'runtime' was never mutated; consider changing to 'let' constant
- 19 | 
+ 19 |
  20 |   private func readyRuntime(autoplay: Bool = true) throws -> PlaybackSessionHost {
  21 |     var runtime = PlaybackSessionHost()
     |         `- warning: variable 'runtime' was never mutated; consider changing to 'let' constant
@@ -146,7 +146,7 @@ Building for debugging...
   10 |   func loadBecomesPlayingOnlyAfterOpenAndRateAcknowledgments() throws {
   11 |     var runtime = PlaybackSessionHost()
      |         `- warning: variable 'runtime' was never mutated; consider changing to 'let' constant
-  12 | 
+  12 |
   13 |     let load = runtime.send(
 
 /Volumes/seed2/Projects/illiquid-production-migration/Tests/IlliquidPlaybackModelTests/PlaybackModelTests.swift:43:9: warning: variable 'runtime' was never mutated; consider changing to 'let' constant
@@ -162,7 +162,7 @@ Building for debugging...
   62 |     let candidate = MediaSourceIdentity(rawValue: "fixture/candidate.mkv")
   63 |     var runtime = PlaybackSessionHost()
      |         `- warning: variable 'runtime' was never mutated; consider changing to 'let' constant
-  64 | 
+  64 |
   65 |     _ = runtime.send(.command(.load(source: first, autoplay: false)))
 
 /Volumes/seed2/Projects/illiquid-production-migration/Tests/IlliquidPlaybackModelTests/PlaybackModelTests.swift:98:9: warning: variable 'runtime' was never mutated; consider changing to 'let' constant
@@ -170,7 +170,7 @@ Building for debugging...
   97 |     let candidate = MediaSourceIdentity(rawValue: "fixture/malformed.mkv")
   98 |     var runtime = PlaybackSessionHost()
      |         `- warning: variable 'runtime' was never mutated; consider changing to 'let' constant
-  99 | 
+  99 |
  100 |     _ = runtime.send(.command(.load(source: first, autoplay: false)))
 
 /Volumes/seed2/Projects/illiquid-production-migration/Tests/IlliquidPlaybackModelTests/PlaybackModelTests.swift:131:9: warning: variable 'runtime' was never mutated; consider changing to 'let' constant
@@ -271,7 +271,7 @@ Building for debugging...
 
 /Volumes/seed2/Projects/illiquid-production-migration/Tests/IlliquidPlaybackModelTests/PlaybackModelTests.swift:493:9: warning: variable 'replacing' was never mutated; consider changing to 'let' constant
  491 |     #expect(runtime.state.lastPersistenceFailureCode != nil)
- 492 | 
+ 492 |
  493 |     var replacing = try readyRuntime(autoplay: false)
      |         `- warning: variable 'replacing' was never mutated; consider changing to 'let' constant
  494 |     let oldEOF = replacing.send(.demuxEndOfFile(requiredDrain: []))
@@ -303,7 +303,7 @@ Building for debugging...
 
 /Volumes/seed2/Projects/illiquid-production-migration/Tests/IlliquidPlaybackModelTests/PlaybackModelTests.swift:545:9: warning: variable 'finalizerRuntime' was never mutated; consider changing to 'let' constant
  543 |     #expect(cancellationRuntime.state.externalWaitReason == .shutdownCancellationFailed)
- 544 | 
+ 544 |
  545 |     var finalizerRuntime = PlaybackSessionHost()
      |         `- warning: variable 'finalizerRuntime' was never mutated; consider changing to 'let' constant
  546 |     let finalizerRequest = finalizerRuntime.send(.command(.shutdown))
@@ -315,7 +315,7 @@ Building for debugging...
  557 |     var runtime = try readyRuntime(autoplay: true)
      |         `- warning: variable 'runtime' was never mutated; consider changing to 'let' constant
  558 |     _ = runtime.send(.command(.shutdown))
- 559 | 
+ 559 |
 
 /Volumes/seed2/Projects/illiquid-production-migration/Tests/IlliquidPlaybackModelTests/PlaybackModelTests.swift:569:9: warning: variable 'runtime' was never mutated; consider changing to 'let' constant
  567 |   @Test
@@ -354,7 +354,7 @@ Building for debugging...
  660 |   func lateCatalogMetadataDoesNotRearmSatisfiedStartupPreroll() throws {
  661 |     var runtime = try readyRuntime(autoplay: true)
      |         `- warning: variable 'runtime' was never mutated; consider changing to 'let' constant
- 662 | 
+ 662 |
  663 |     let catalog = runtime.send(.catalogObserved(PlaybackCatalog(hasVideo: true)))
 
 /Volumes/seed2/Projects/illiquid-production-migration/Tests/IlliquidPlaybackModelTests/PlaybackModelTests.swift:791:9: warning: variable 'runtime' was never mutated; consider changing to 'let' constant
@@ -366,7 +366,7 @@ Building for debugging...
  793 |     let failure = PlaybackFailure(
 
 /Volumes/seed2/Projects/illiquid-production-migration/Tests/IlliquidPlaybackModelTests/PlaybackModelTests.swift:987:9: warning: variable 'runtime' was never mutated; consider changing to 'let' constant
- 985 | 
+ 985 |
  986 |   private func readyRuntime(autoplay: Bool) throws -> PlaybackSessionHost {
  987 |     var runtime = PlaybackSessionHost()
      |         `- warning: variable 'runtime' was never mutated; consider changing to 'let' constant
@@ -374,7 +374,7 @@ Building for debugging...
  989 |       source: MediaSourceIdentity(rawValue: "fixture/ready.mkv"),
 
 /Volumes/seed2/Projects/illiquid-production-migration/Tests/IlliquidPlaybackModelTests/PlaybackModelTests.swift:1074:9: warning: variable 'runtime' was never mutated; consider changing to 'let' constant
-1072 | 
+1072 |
 1073 |   @Test func audioOnlyDecodeFailureRemainsTerminal() throws {
 1074 |     var runtime = PlaybackSessionHost()
      |         `- warning: variable 'runtime' was never mutated; consider changing to 'let' constant
@@ -386,7 +386,7 @@ Building for debugging...
 1243 |   func productionModeRetainsNoStepHistory() {
 1244 |     var runtime = PlaybackSessionHost()
      |         `- warning: variable 'runtime' was never mutated; consider changing to 'let' constant
-1245 | 
+1245 |
 1246 |     let transition = runtime.send(
 [82/98] Compiling IlliquidPlaybackModelTests CompletedEffectHistoryTests.swift
 /Volumes/seed2/Projects/illiquid-production-migration/Tests/IlliquidPlaybackModelTests/CompletedEffectHistoryTests.swift:211:9: warning: variable 'runtime' was never mutated; consider changing to 'let' constant
@@ -1512,7 +1512,7 @@ SOURCE_TREE_PROJECTION count=100000 rows_search_and_replacement=1.677974292 seco
 ◇ Suite "Source browser search equivalence" started.
 ◇ Test emptyQueryPreservesAllRowsExactly(query:) started.
 ◇ Test case passing 1 argument query → "" to emptyQueryPreservesAllRowsExactly(query:) started.
-◇ Test case passing 1 argument query → " 	
+◇ Test case passing 1 argument query → "
 " to emptyQueryPreservesAllRowsExactly(query:) started.
 ◇ Test case passing 1 argument query → " 
 " to emptyQueryPreservesAllRowsExactly(query:) started.

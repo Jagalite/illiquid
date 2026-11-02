@@ -2,8 +2,9 @@
 """Copy a finished Kyoto job record and log into a receipt directory.
 
 Writes NAME.job.json (the `kyoto show` record) and NAME.log. Explorer
-progress lines are dropped from the stored log; the SHA-256 and line count of
-the complete log are kept in the job record under `receipt`.
+progress lines are dropped and trailing whitespace is removed from the stored
+log (the repository's whitespace check); the SHA-256 and line count of the
+complete original log are kept in the job record under `receipt`.
 """
 import hashlib
 import json
@@ -35,9 +36,9 @@ def main():
         if path.exists():
             raise SystemExit(f"{path} exists; receipts are never overwritten")
     (directory / f"{name}.job.json").write_text(json.dumps(record, indent=1, sort_keys=True) + "\n")
-    (directory / f"{name}.log").write_text(
-        "".join(line for line in log.splitlines(keepends=True)
-                if not line.startswith("[state-space-progress]")))
+    kept = [line.rstrip() for line in log.splitlines()
+            if not line.startswith("[state-space-progress]")]
+    (directory / f"{name}.log").write_text("\n".join(kept).rstrip("\n") + "\n")
     print(f"{name}: {record.get('status')} exit {record.get('exit_code')}")
 
 

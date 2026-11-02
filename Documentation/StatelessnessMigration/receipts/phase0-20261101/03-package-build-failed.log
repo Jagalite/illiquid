@@ -181,7 +181,7 @@ Building for debugging...
 [226/226] Compiling IlliquidPlaybackStateSpace PlaybackEngineParity.swift
 /Volumes/seed2/Projects/illiquid-statelessness/Sources/IlliquidPlaybackStateSpace/Statelessness/PlaybackEngineParity.swift:47:35: error: generic parameter 'T' could not be inferred
  45 |     }
- 46 | 
+ 46 |
  47 |     let legacyKeys = legacy.nodes.map(PlaybackSearchCanonicalizer.key(for:))
     |                                   `- error: generic parameter 'T' could not be inferred
  48 |     let migratedKeys = migrated.nodes.map(\.state.key)
@@ -191,11 +191,11 @@ Swift.Collection.map:2:24: note: in call to function 'map'
 1 | protocol Collection {
 2 | @inlinable public func map<T, E>(_ transform: (Self.Element) throws(E) -> T) throws(E) -> [T] where E : Error}
   |                        `- note: in call to function 'map'
-3 | 
+3 |
 
 /Volumes/seed2/Projects/illiquid-statelessness/Sources/IlliquidPlaybackStateSpace/Statelessness/PlaybackEngineParity.swift:47:67: error: type 'PlaybackSearchCanonicalizer' has no member 'key(for:)'
  45 |     }
- 46 | 
+ 46 |
  47 |     let legacyKeys = legacy.nodes.map(PlaybackSearchCanonicalizer.key(for:))
     |                                                                   `- error: type 'PlaybackSearchCanonicalizer' has no member 'key(for:)'
  48 |     let migratedKeys = migrated.nodes.map(\.state.key)
