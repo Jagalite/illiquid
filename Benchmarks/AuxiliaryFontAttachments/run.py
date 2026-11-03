@@ -28,9 +28,7 @@ BASELINE = "6f70cd2446fc6ef38d4e5a0fbf96f91b2234e635"
 VARIANTS = ("baseline", "candidate")
 REGRESSION_TARGET = "d4155469a3b1657396a29f8d8e98a56f64afbf56"
 CURRENT_SUPPORT = {
-    # Refreshed for the software decoder thread-count change (decoder
-    # creation only; no attachment or font helper changed).
-    'Sources/CFFmpeg/include/ffmpeg_shim.h': 'b11fc2b9b917d3b08290f46f773dbfef29de096e5c9eaace8ef3ea030e4ca190',
+    'Sources/CFFmpeg/include/ffmpeg_shim.h': 'ca3ed76b8feff89079d1dca5fc96651923f5f0f4693f0c8fb4625741e15c7c05',
     'Sources/IlliquidNativePlayback/Subtitles/BitmapSubtitleTimeline.swift': '5d12db66ead5f13fa1e0ab6d61975c9fb259fb1ca460fd4561155041d4beb6b6',
     "Sources/IlliquidNativePlayback/Media/FFmpegPacket.swift": "9127a96fee6e66c2b43d37b7354b330040910e836f17a69d2a0feb25a3a6f694",
     "Sources/IlliquidNativePlayback/Playback/FixedRingBuffer.swift": "e376c12e8332bc95894bffb916d578ef314f831161f0d9eb4700b88a0f04f4f5",

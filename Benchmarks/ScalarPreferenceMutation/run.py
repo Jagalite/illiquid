@@ -141,12 +141,7 @@ def stage(run: Run, head: str) -> dict:
     paths += ["Benchmarks/ScalarPreferenceMutation/Harness.swift"]
     # Read current support once. Both variants receive those same exact bytes.
     current = {path: (ROOT / path).read_bytes() for path in paths}
-    # Historical focal files carried forward to current source (three-way merge;
-    # see baseline/README.md): they add only the later decoder thread-limit
-    # preference plumbing, so the measured mutation change is the sole difference.
-    requalified = {path: HERE / "baseline" / Path(path).name for path in FOCAL}
-    baseline = {path: requalified[path].read_bytes() if requalified[path].is_file()
-                else run.git("show", f"{BASELINE}:{path}").encode() for path in FOCAL}
+    baseline = {path: run.git("show", f"{BASELINE}:{path}").encode() for path in FOCAL}
     manifests = {}
     for variant in VARIANTS:
         package = run.output / "work" / variant / "package"

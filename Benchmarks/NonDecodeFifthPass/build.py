@@ -30,10 +30,7 @@ def build(output:Path,variant='v5',configuration='release',meter=False,different
   raw=(HERE/name).read_bytes();actual=hashlib.sha1(b'blob '+str(len(raw)).encode()+b'\0'+raw).hexdigest()
   if actual!=expected: raise ValueError(f'Original Git blob mismatch: {name}: {actual}')
  state={'v4':HERE/'baseline/PlaybackState.swift','batch':HERE/'baseline/PlaybackStateBatchOnly.swift','guarded':HERE/'baseline/PlaybackStateGuardedTrial.swift','batched':HERE/'baseline/PlaybackStateBatched.swift','v5':ROOT/'Sources/IlliquidCore/Player/PlaybackState.swift'}[variant]
- # PlaybackPreferences: the follow-up fixture carried forward with the later
- # software decoder thread-limit members that current PlaybackState reads
- # (support/README.md). Other support stays the frozen follow-up fixtures.
- sources=[*sorted((HERE/'fixtures').glob('*.swift')),*[(HERE/'support'/n if (HERE/'support'/n).is_file() else OLD/n) for n in SUPPORT],state,ROOT/'Sources/IlliquidCore/Utilities/NonDecodePerformance.swift']
+ sources=[*sorted((HERE/'fixtures').glob('*.swift')),*[OLD/n for n in SUPPORT],state,ROOT/'Sources/IlliquidCore/Utilities/NonDecodePerformance.swift']
  if differential:
   import re
   legacy=(HERE/'baseline/PlaybackState.swift').read_text()
