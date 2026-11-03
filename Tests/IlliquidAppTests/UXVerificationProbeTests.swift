@@ -54,7 +54,7 @@ struct UXVerificationProbeTests {
         _ = scroll.consume(.init(deltaX: 8, deltaY: 0, isPrecise: true, phase: .began))
         _ = scroll.consume(.init(deltaX: 0, deltaY: 0, isPrecise: true, phase: .ended))
         #expect(scroll.consume(.init(deltaX: 8, deltaY: 20, isPrecise: true,
-                                    phase: .momentum)) == .seek(5))
+                                    phase: .momentum)) == .seek(-5))
         _ = scroll.consume(.init(deltaX: 0, deltaY: 0, isPrecise: true, phase: .momentumEnded))
         #expect(scroll.consume(.init(deltaX: 8, deltaY: 0, isPrecise: true, phase: .momentum)) == nil)
         _ = scroll.consume(.init(deltaX: 4, deltaY: 0, isPrecise: true, phase: .began))

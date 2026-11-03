@@ -969,7 +969,7 @@ private final class PlaybackTimelineNativeView: NSView {
         }
 
         let delta = abs(event.scrollingDeltaX) > abs(event.scrollingDeltaY)
-            ? event.scrollingDeltaX
+            ? -event.scrollingDeltaX
             : event.scrollingDeltaY
         let threshold = event.hasPreciseScrollingDeltas ? 8.0 : 1.0
         scrollPointRemainder += delta

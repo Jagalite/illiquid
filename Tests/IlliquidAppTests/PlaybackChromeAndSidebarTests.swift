@@ -1556,7 +1556,7 @@ struct VideoSurfaceInteractionRoutingTests {
             isPrecise: true,
             phase: .changed
         ))
-        #expect(seek == .seek(5))
+        #expect(seek == .seek(-5))
 
         let volume = accumulator.consume(PlaybackSurfaceScroll(
             deltaX: 0,
@@ -1565,6 +1565,18 @@ struct VideoSurfaceInteractionRoutingTests {
             phase: .discrete
         ))
         #expect(volume == .volume(-10))
+    }
+
+    @Test(arguments: [true, false])
+    func horizontalScrollSeeksInBothDirections(isPrecise: Bool) {
+        var accumulator = SurfaceScrollAccumulator()
+        let delta = isPrecise ? 8.0 : 1.0
+        #expect(accumulator.consume(.init(
+            deltaX: -delta, deltaY: 0, isPrecise: isPrecise, phase: .discrete
+        )) == .seek(5))
+        #expect(accumulator.consume(.init(
+            deltaX: delta, deltaY: 0, isPrecise: isPrecise, phase: .discrete
+        )) == .seek(-5))
     }
 
     @Test func scrollAxisRemainsStableThroughMomentumAndResetsAtEnd() {
@@ -1581,7 +1593,7 @@ struct VideoSurfaceInteractionRoutingTests {
             isPrecise: true,
             phase: .momentum
         ))
-        #expect(momentum == .seek(5))
+        #expect(momentum == .seek(-5))
         _ = accumulator.consume(PlaybackSurfaceScroll(
             deltaX: 0,
             deltaY: 0,
