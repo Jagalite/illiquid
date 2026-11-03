@@ -1,4 +1,4 @@
-import IlliquidPlaybackCore
+import IlliquidPlaybackModel
 
 public enum SearchResultOutcome: String, Codable, Hashable, CaseIterable, Sendable {
   case succeeded, failed, cancelled

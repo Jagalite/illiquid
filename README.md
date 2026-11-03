@@ -64,9 +64,11 @@ After a side double-tap, each additional rapid tap seeks another 5 seconds.
 
 ## Architecture
 
-- `IlliquidPlaybackCore` is the deterministic imperative playback authority.
-  It owns transitions, effect identity, seeks, drains, recovery, lifecycle,
-  synchronization, track intent, and subtitle/control state.
+- `IlliquidPlaybackModel` defines the deterministic playback state machine as a
+  native [Statelessness](https://github.com/Jagalite/statelessness) model; a
+  Statelessness `ExecutionSession` owns the committed playback state. The
+  model's rules decide transitions, effect identity, seeks, drains, recovery,
+  lifecycle, synchronization, track intent, and subtitle/control state.
 - `IlliquidNativePlayback` executes those decisions through FFmpeg,
   VideoToolbox, AVSampleBuffer renderers, and libass. Generation fences and
   leases reject stale work and separate logical invalidation from cleanup.

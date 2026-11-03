@@ -1,5 +1,5 @@
 import Foundation
-import IlliquidPlaybackCore
+import IlliquidPlaybackModel
 
 enum NativeOperationKind: String, CaseIterable, Sendable {
     case open
@@ -17,7 +17,7 @@ enum NativeOperationKind: String, CaseIterable, Sendable {
 enum NativeOperationRequestedState: Equatable, Sendable {
     case openSource(MediaSourceIdentity)
     case awaitPreroll
-    case seek(target: MediaTimestamp, mode: IlliquidPlaybackCore.SeekMode)
+    case seek(target: MediaTimestamp, mode: IlliquidPlaybackModel.SeekMode)
     case audioTrack(Int64?)
     case subtitle(SubtitleSelectionIntent)
     case externalSubtitle(URL)

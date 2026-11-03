@@ -1410,9 +1410,11 @@ private struct SourceVisibilityPopover: View {
         }
         .padding(16)
         .frame(width: 360)
-        .dynamicPlayerTextStyle(contrastRegion: .leading)
-        .playerOverlaySurface(cornerRadius: 18, role: .sidebar)
-        .presentationBackground(.clear)
+        // This form lives in its own popover, outside the video sampling space.
+        // Keep small labels and native controls crisp on a stable background.
+        .foregroundStyle(theme.primaryColor, theme.secondaryColor, theme.secondaryColor)
+        .tint(theme.accentColor)
+        .presentationBackground(theme.popoverSurfaceColor)
         .preferredColorScheme(theme.preferredColorScheme)
         .environment(\.colorScheme, theme.preferredColorScheme)
         .onDisappear {

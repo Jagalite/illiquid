@@ -1,4 +1,4 @@
-import IlliquidPlaybackCore
+import IlliquidPlaybackModel
 
 public struct PlaybackSearchModelDefinition: Sendable {
   public let model: PlaybackSearchModel
@@ -120,7 +120,7 @@ public struct PlaybackSearchModelDefinition: Sendable {
         _ = builder.send(.command(.seek(target: fixedTime(12), mode: .exact)))
       }
       return node(
-        state: builder.core.state, seedProfile: profile,
+        state: builder.state, seedProfile: profile,
         environment: .seek(SeekSearchEnvironment())
       )
     case .eofDrain:
@@ -135,7 +135,7 @@ public struct PlaybackSearchModelDefinition: Sendable {
         _ = builder.send(.demuxEndOfFile(requiredDrain: [.videoDecoder, .videoPresenter]))
       }
       return node(
-        state: builder.core.state, seedProfile: profile,
+        state: builder.state, seedProfile: profile,
         environment: .eofDrain(EOFDrainSearchEnvironment())
       )
     case .recovery:
@@ -156,7 +156,7 @@ public struct PlaybackSearchModelDefinition: Sendable {
       if profile == "prerolling-hardware" { environment.presenter = .prerolling }
       if profile == "recovery-in-flight" { environment.decoder = .failed }
       return node(
-        state: builder.core.state, seedProfile: profile,
+        state: builder.state, seedProfile: profile,
         environment: .recovery(environment)
       )
     case .trackSubtitles:
@@ -177,7 +177,7 @@ public struct PlaybackSearchModelDefinition: Sendable {
         try builder.completeFirst(where: isRate)
       }
       return node(
-        state: builder.core.state, seedProfile: profile,
+        state: builder.state, seedProfile: profile,
         environment: .trackSubtitles(TrackSubtitleSearchEnvironment())
       )
     case .stopShutdown:
@@ -201,7 +201,7 @@ public struct PlaybackSearchModelDefinition: Sendable {
         }
       }
       return node(
-        state: builder.core.state, seedProfile: profile,
+        state: builder.state, seedProfile: profile,
         environment: .stopShutdown(StopShutdownSearchEnvironment())
       )
     case .prerollBuffering:
@@ -237,7 +237,7 @@ public struct PlaybackSearchModelDefinition: Sendable {
         environment.audioQueue = .full
       }
       return node(
-        state: builder.core.state, seedProfile: profile,
+        state: builder.state, seedProfile: profile,
         environment: .prerollBuffering(environment)
       )
     }
@@ -575,7 +575,7 @@ public struct PlaybackSearchModelDefinition: Sendable {
   }
 
   private func node(
-    state: PlaybackCoreState,
+    state: PlaybackDomainState,
     seedProfile: String,
     environment: PlaybackModelEnvironment
   ) -> PlaybackSearchNode {
@@ -592,19 +592,21 @@ public enum PlaybackSearchError: Error, Equatable {
 }
 
 private struct ReachableSeedBuilder {
-  var core = PlaybackCore()
+  var state = PlaybackDomainState()
   var sequence: UInt64 = 1
 
   @discardableResult
   mutating func send(_ event: PlaybackEvent) -> PlaybackTransition {
-    let transition = core.update(
+    let stepped = PlaybackProductionModel.step(
+      state,
       PlaybackEventEnvelope(
         sequence: sequence,
-        virtualTime: PlaybackInstant(ticks: core.state.lastVirtualTime.ticks + 1),
+        virtualTime: PlaybackInstant(ticks: state.lastVirtualTime.ticks + 1),
         event: event
       ))
+    state = stepped.state
     sequence += 1
-    return transition
+    return stepped.outputs[0]
   }
 
   mutating func ready(autoplay: Bool) throws {
@@ -617,7 +619,7 @@ private struct ReachableSeedBuilder {
 
   mutating func completeFirst(where predicate: (PlaybackEffectKind) -> Bool) throws {
     guard
-      let effect = core.state.outstandingEffects.values.map(\.effect).first(where: {
+      let effect = state.outstandingEffects.values.map(\.effect).first(where: {
         predicate($0.kind)
       })
     else { throw PlaybackSearchError.missingEffect("seed effect") }
@@ -733,7 +735,7 @@ func stableUnique(_ actions: [SearchAction]) -> [SearchAction] {
 func normalizedEffectClass(_ effect: PlaybackEffect, node: PlaybackSearchNode) -> String {
   let single = PlaybackSearchNode(
     model: node.model,
-    coreState: PlaybackCoreState(
+    coreState: PlaybackDomainState(
       lifecycle: node.coreState.lifecycle,
       activeSession: node.coreState.activeSession,
       outstandingEffects: [effect.context.effectID: OutstandingEffectRecord(effect: effect)]

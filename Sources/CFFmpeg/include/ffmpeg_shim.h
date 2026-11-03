@@ -287,7 +287,9 @@ static inline int illiquid_create_decoder_with_thread_count(
         avcodec_free_context(&context);
         return result;
     }
-    if (software_thread_count > 0)
+    // Zero explicitly enables FFmpeg automatic threading. Negative preserves
+    // the library default for callers of the generic decoder wrapper.
+    if (software_thread_count >= 0)
         context->thread_count = software_thread_count;
     if (parameters->codec_type == AVMEDIA_TYPE_SUBTITLE)
         context->flags2 |= AV_CODEC_FLAG2_RO_FLUSH_NOOP;
@@ -328,7 +330,7 @@ static inline int illiquid_create_decoder_with_thread_count(
         if (!context)
             return AVERROR(ENOMEM);
         result = avcodec_parameters_to_context(context, parameters);
-        if (result >= 0 && software_thread_count > 0)
+        if (result >= 0 && software_thread_count >= 0)
             context->thread_count = software_thread_count;
         if (result >= 0 && parameters->codec_type == AVMEDIA_TYPE_SUBTITLE)
             context->flags2 |= AV_CODEC_FLAG2_RO_FLUSH_NOOP;
@@ -543,7 +545,7 @@ static inline int illiquid_create_decoder(
     return illiquid_create_decoder_with_thread_count(
         parameters,
         prefer_hardware,
-        0,
+        -1,
         output_context,
         hardware_configured
     );

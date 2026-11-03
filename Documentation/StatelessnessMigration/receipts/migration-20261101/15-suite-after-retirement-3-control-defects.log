@@ -1,0 +1,124 @@
+warning: 'focused-package': found 3 file(s) which are unhandled; explicitly declare them as resources or exclude from the target
+    /Volumes/seed2/Projects/illiquid-statelessness-receipts/focused-package/Tests/IlliquidPlaybackStateSpaceTests/Fixtures/legacy-artifact-v1-seek-ready-playing.json
+    /Volumes/seed2/Projects/illiquid-statelessness-receipts/focused-package/Tests/IlliquidPlaybackStateSpaceTests/Fixtures/statelessness-migration-golden-v1.json
+    /Volumes/seed2/Projects/illiquid-statelessness-receipts/focused-package/Tests/IlliquidPlaybackStateSpaceTests/Fixtures/statelessness-migration-inventory-v1.json
+[0/1] Planning build
+Building for debugging...
+[0/2] Write swift-version--58304C5D6DBC2206.txt
+Build complete! (0.66s)
+Test Suite 'All tests' started at 2026-11-01 09:24:14.722.
+Test Suite 'All tests' passed at 2026-11-01 09:24:14.725.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.003) seconds
+◇ Test run started.
+↳ Testing Library Version: 1902
+↳ Target Platform: arm64e-apple-macos14.0
+◇ Suite "Statelessness verification" started.
+◇ Suite "Playback bounded state-space explorer" started.
+◇ Test artifactRoundTripsAcrossProcessesWhenRequested() started.
+◇ Test recoveryExecutorPrerequisitesAdvanceAbstractMechanismLifecycle() started.
+◇ Test conservativePORMatchesUnreducedReachabilityAndFailures() started.
+◇ Test eligibleArtifactPromotesToRuntimeScheduleWithoutInventingMechanisms() started.
+◇ Test cachedSearchIdentityMatchesRecomputedIdentity() started.
+◇ Test canonicalJSONIgnoresUnorderedCollectionHistory() started.
+◇ Test stateCapEdgeFindingIsReported() started.
+◇ Test everyAdvertisedSeedCanBeConstructed() started.
+◇ Test everyModelPublishesACompleteScenarioInventory() started.
+◇ Test layeredBFSIsDeterministicAndUsesProductionTransitions() started.
+◇ Test approvedProfilesFreezeConservativeBounds() started.
+◇ Test causalShrinkingReplaysProductionForAcceptedCandidates() started.
+◇ Test negativeControlStaleIngressAdmissionIsDetected() started.
+◇ Test negativeControlOmittedObservedEffectsAreDetected() started.
+◇ Test allSixModelsCompleteAtValidationBounds() started.
+◇ Test artifactIsDeterministicMinimizedAndReplayable() started.
+◇ Test modelVersionsRecordPendingSourceAndRecoveryDependencySemantics() started.
+◇ Test negativeControlSuppressedChecksAreDetected() started.
+◇ Test negativeControlFalseProgressIsDetected() started.
+◇ Test searchTerminatesAtConfiguredWallClockBudget() started.
+◇ Test equalKeysExposeEqualNormalizedEnabledActions() started.
+◇ Test aggregateRecoveryAndReplacementSuccessWaitForExecutorPrerequisites() started.
+◇ Test porValidationChecksEnabledActionDiamonds() started.
+◇ Test corruptedIncompatibleAndRetargetedArtifactsAreRejected() started.
+◇ Test trendPolicyFlagsCountAndNormalizationDrift() started.
+◇ Test syntheticFailureProducesStableReplayableArtifact() started.
+◇ Test legacyArtifactConvertsAndReplaysThroughTheStatelessnessModel() started.
+◇ Test negativeControlForcedAcceptedDispositionIsDetected() started.
+◇ Test intactModelMatchesTheGoldenControlSeed() started.
+◇ Test searchIdentityHashIsConsistentWithCanonicallyEquivalentText() started.
+◇ Test progressAnalysisSeparatesNamedWaitsCutoffsAndStuckSCCs() started.
+◇ Test canonicalizationPreservesBehaviorallyDistinctPendingEffects() started.
+◇ Test recoveryMechanismLifecycleParticipatesInStableCanonicalDigest() started.
+◇ Test negativeControlIncorrectIdentityMergingIsDetected() started.
+◇ Test actionCardinalityBudgetsControlFailureAndDuplicateClasses() started.
+◇ Test inventoryMatchesTheFrozenPhase0Inventory() started.
+◇ Test stepsCallProductionAtMostOnceAndOnlyWhenAdmitted() started.
+◇ Test exposesAllSixIndependentModels() started.
+◇ Test everySeedMatchesTheGoldenEvidence() started.
+◇ Test externalSubtitleSeedHasNoStuckProgressStates() started.
+◇ Test recoveryPrerequisitesExposeOnlyDependencyReadyActions() started.
+◇ Test canonicalizationIsIdempotentAndAlphaRenamingInvariant() started.
+◇ Test negativeControlMissingTransitionIsDetected() started.
+◇ Test capBoundariesReportExactCoverage() started.
+◇ Test stateCodecIsLosslessAndDeterministicForAdmittedStates() started.
+◇ Test negativeControlIncorrectReductionIsDetected() started.
+◇ Test injectedOracleFailuresAreCollectedWithoutStopping() started.
+◇ Test continuedFailureWitnessIsShrunkAndReplayedAcrossEarlierFailures() started.
+✘ Test stateCapEdgeFindingIsReported() recorded an issue at StatelessnessMigrationTests.swift:348:23: Expectation failed: (run.report.findings → []).first → nil → nil
+✘ Test negativeControlFalseProgressIsDetected() recorded an issue at StatelessnessMigrationTests.swift:272:29: Expectation failed: Self.allSeeds.first { Self.golden.seed($0.0, $0.1)!.progress.transactionStates > 0 } → nil
+✘ Test negativeControlIncorrectReductionIsDetected() recorded an issue at StatelessnessMigrationTests.swift:300:5: Expectation failed: !((comparison → ReductionComparison(missingInReduced: [], extraInReduced: [], unrepresentedEdges: [], extraReducedEdges: [], findingsMatch: true, coverageMatch: true, progressMatch: nil, progressMismatches: [])).equivalent → true → true)
+✔ Test artifactRoundTripsAcrossProcessesWhenRequested() passed after 5.835 seconds.
+✔ Test everyModelPublishesACompleteScenarioInventory() passed after 5.835 seconds.
+✔ Test approvedProfilesFreezeConservativeBounds() passed after 5.835 seconds.
+✔ Test recoveryExecutorPrerequisitesAdvanceAbstractMechanismLifecycle() passed after 5.835 seconds.
+✔ Test everyAdvertisedSeedCanBeConstructed() passed after 5.835 seconds.
+✘ Test stateCapEdgeFindingIsReported() failed after 5.835 seconds with 1 issue.
+↳ /// Discrepancy D3: the edge that reaches the state cap keeps its finding.
+✔ Test causalShrinkingReplaysProductionForAcceptedCandidates() passed after 5.835 seconds.
+✔ Test canonicalJSONIgnoresUnorderedCollectionHistory() passed after 5.835 seconds.
+✔ Test eligibleArtifactPromotesToRuntimeScheduleWithoutInventingMechanisms() passed after 5.835 seconds.
+✔ Test modelVersionsRecordPendingSourceAndRecoveryDependencySemantics() passed after 5.835 seconds.
+✔ Test conservativePORMatchesUnreducedReachabilityAndFailures() passed after 5.835 seconds.
+✘ Test negativeControlFalseProgressIsDetected() failed after 5.835 seconds with 1 issue.
+✔ Test searchTerminatesAtConfiguredWallClockBudget() passed after 5.835 seconds.
+✔ Test equalKeysExposeEqualNormalizedEnabledActions() passed after 5.835 seconds.
+✔ Test aggregateRecoveryAndReplacementSuccessWaitForExecutorPrerequisites() passed after 5.835 seconds.
+✔ Test porValidationChecksEnabledActionDiamonds() passed after 5.835 seconds.
+✔ Test allSixModelsCompleteAtValidationBounds() passed after 5.835 seconds.
+✔ Test trendPolicyFlagsCountAndNormalizationDrift() passed after 5.835 seconds.
+✔ Test syntheticFailureProducesStableReplayableArtifact() passed after 5.835 seconds.
+✔ Test corruptedIncompatibleAndRetargetedArtifactsAreRejected() passed after 5.835 seconds.
+✔ Test legacyArtifactConvertsAndReplaysThroughTheStatelessnessModel() passed after 5.835 seconds.
+✔ Test artifactIsDeterministicMinimizedAndReplayable() passed after 5.835 seconds.
+✔ Test searchIdentityHashIsConsistentWithCanonicallyEquivalentText() passed after 5.835 seconds.
+✔ Test progressAnalysisSeparatesNamedWaitsCutoffsAndStuckSCCs() passed after 5.835 seconds.
+✔ Test canonicalizationPreservesBehaviorallyDistinctPendingEffects() passed after 5.835 seconds.
+✔ Test recoveryMechanismLifecycleParticipatesInStableCanonicalDigest() passed after 5.835 seconds.
+✔ Test negativeControlIncorrectIdentityMergingIsDetected() passed after 5.835 seconds.
+✔ Test actionCardinalityBudgetsControlFailureAndDuplicateClasses() passed after 5.835 seconds.
+✔ Test inventoryMatchesTheFrozenPhase0Inventory() passed after 5.835 seconds.
+✔ Test layeredBFSIsDeterministicAndUsesProductionTransitions() passed after 5.836 seconds.
+✔ Test exposesAllSixIndependentModels() passed after 5.835 seconds.
+✔ Test negativeControlForcedAcceptedDispositionIsDetected() passed after 5.835 seconds.
+✔ Test negativeControlOmittedObservedEffectsAreDetected() passed after 5.836 seconds.
+✔ Test recoveryPrerequisitesExposeOnlyDependencyReadyActions() passed after 5.835 seconds.
+✔ Test canonicalizationIsIdempotentAndAlphaRenamingInvariant() passed after 5.835 seconds.
+✔ Test intactModelMatchesTheGoldenControlSeed() passed after 5.835 seconds.
+✔ Test negativeControlMissingTransitionIsDetected() passed after 5.835 seconds.
+✔ Test cachedSearchIdentityMatchesRecomputedIdentity() passed after 5.836 seconds.
+✔ Test negativeControlSuppressedChecksAreDetected() passed after 5.836 seconds.
+✘ Test negativeControlIncorrectReductionIsDetected() failed after 5.835 seconds with 1 issue.
+✔ Test injectedOracleFailuresAreCollectedWithoutStopping() passed after 5.835 seconds.
+✔ Test continuedFailureWitnessIsShrunkAndReplayedAcrossEarlierFailures() passed after 5.866 seconds.
+✔ Test capBoundariesReportExactCoverage() passed after 6.722 seconds.
+✔ Test stepsCallProductionAtMostOnceAndOnlyWhenAdmitted() passed after 10.831 seconds.
+✔ Test externalSubtitleSeedHasNoStuckProgressStates() passed after 13.553 seconds.
+✔ Suite "Playback bounded state-space explorer" passed after 13.554 seconds.
+✔ Test stateCodecIsLosslessAndDeterministicForAdmittedStates() passed after 16.376 seconds.
+✔ Test negativeControlStaleIngressAdmissionIsDetected() passed after 23.348 seconds.
+✔ Test everySeedMatchesTheGoldenEvidence() passed after 67.859 seconds.
+✘ Suite "Statelessness verification" failed after 67.860 seconds with 3 issues.
+↳ /// Statelessness verification against immutable migration evidence.
+↳ ///
+↳ /// The golden fixture was recorded from the retired explorer (oracle revision
+↳ /// `ea2ff568`) after the Statelessness engine passed strict edge-by-edge
+↳ /// parity with it; see Documentation/StatelessnessMigration/STATUS.md.
+✘ Test run with 48 tests in 2 suites failed after 67.860 seconds with 3 issues.

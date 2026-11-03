@@ -1,0 +1,447 @@
+{
+  "schema": 1,
+  "machine": "macOS-26.5.2-arm64-arm-64bit-Mach-O",
+  "source_count": 100000,
+  "skip_navigation": true,
+  "prevents_idle_display_sleep": true,
+  "scripts": {
+    "profile-performance-suite.py": "e5392097134be79ada75323326e6409dbe1e49f8883edc09ad867dc36ddcdb51",
+    "profile-output-recovery.py": "b2ec289d859510ab5f3316137579105084b97cbf2de08c82239028fbe8a717da",
+    "profile-responsiveness.py": "ae14199e015b885b0ef3a7eeaebf8f08ecf4e35bf0aa8d92ee4ed23ba2d7446a",
+    "profile-lifecycle.py": "dd95378acb8c8e18871672f4264998bd4f4d5c27cf480b1f6dff03ef70743f17",
+    "profile-reference-player.py": "b9e980c65fafa72dff0c16476e34c40bdc271fd7fd5d8d99a5500539023b0dda"
+  },
+  "apps": {
+    "baseline": {
+      "path": "/Volumes/seed2/Projects/illiquid-production-receipts/p0-baseline-bundle/local-bundle/Illiquid.app",
+      "binary_sha256": "cd106bb0005d8772f287f8858949133bf5bee12a6b7bfcb3877ff85f45490f6c"
+    },
+    "candidate": {
+      "path": "/Volumes/seed2/Projects/illiquid-production-receipts/p4-candidate-bundle-2/local-bundle/Illiquid.app",
+      "binary_sha256": "465072e08a9faf8828390914a238b3f615f83d7cc1764c5362101ba3771f2cc7"
+    }
+  },
+  "fixtures": {
+    "/Volumes/seed2/Projects/illiquid-production-receipts/fixtures/perf-h264-aac-1080p-60s.mp4": "2fa24cde9baa71d6ad508fb044c26598f5960ea42021344038e252c870b2cbfe"
+  },
+  "records": [
+    {
+      "app": "baseline",
+      "case": "output-0",
+      "repeat": 0,
+      "receipt": "/Volumes/seed2/Projects/illiquid-production-receipts/p4-performance-cohort/1-output-0-baseline/summary.json",
+      "metrics": {
+        "quit_ms": 379.6076250146143,
+        "launch_ms": 480.97808298189193,
+        "seek_ms": 75.12650050921366,
+        "seek_max_ms": 125.12833304936066,
+        "steady_cpu": 10.11893717975804,
+        "steady_mib": 164.1123046875,
+        "steady_dropped": 0.0,
+        "steady_corrupted": 0.0,
+        "hover_cpu": 17.987508714041304,
+        "hover_mib": 172.9716796875,
+        "hover_dropped": 0.0,
+        "hover_corrupted": 0.0,
+        "resize_cpu": 15.987917672808146,
+        "resize_mib": 169.1904296875,
+        "resize_dropped": 0.0,
+        "resize_corrupted": 0.0
+      }
+    },
+    {
+      "app": "candidate",
+      "case": "output-0",
+      "repeat": 0,
+      "receipt": "/Volumes/seed2/Projects/illiquid-production-receipts/p4-performance-cohort/1-output-0-candidate/summary.json",
+      "metrics": {
+        "quit_ms": 353.7108330056071,
+        "launch_ms": 845.8383749821223,
+        "seek_ms": 85.31127098831348,
+        "seek_max_ms": 149.63766699656844,
+        "steady_cpu": 8.31016555252299,
+        "steady_mib": 167.8779296875,
+        "steady_dropped": 0.0,
+        "steady_corrupted": 0.0,
+        "hover_cpu": 17.267098762524174,
+        "hover_mib": 175.5029296875,
+        "hover_dropped": 0.0,
+        "hover_corrupted": 0.0,
+        "resize_cpu": 15.17881558030028,
+        "resize_mib": 174.3623046875,
+        "resize_dropped": 0.0,
+        "resize_corrupted": 0.0
+      }
+    },
+    {
+      "app": "candidate",
+      "case": "output-0",
+      "repeat": 1,
+      "receipt": "/Volumes/seed2/Projects/illiquid-production-receipts/p4-performance-cohort/2-output-0-candidate/summary.json",
+      "metrics": {
+        "quit_ms": 294.8485829983838,
+        "launch_ms": 525.014791986905,
+        "seek_ms": 87.37914598896168,
+        "seek_max_ms": 111.83095799060538,
+        "steady_cpu": 9.988991894307803,
+        "steady_mib": 150.8309326171875,
+        "steady_dropped": 0.0,
+        "steady_corrupted": 0.0,
+        "hover_cpu": 17.38741006104228,
+        "hover_mib": 170.73724365234375,
+        "hover_dropped": 0.0,
+        "hover_corrupted": 0.0,
+        "resize_cpu": 15.916504660732384,
+        "resize_mib": 169.89349365234375,
+        "resize_dropped": 0.0,
+        "resize_corrupted": 0.0
+      }
+    },
+    {
+      "app": "baseline",
+      "case": "output-0",
+      "repeat": 1,
+      "receipt": "/Volumes/seed2/Projects/illiquid-production-receipts/p4-performance-cohort/2-output-0-baseline/summary.json",
+      "metrics": {
+        "quit_ms": 397.8367089875974,
+        "launch_ms": 1114.8472499917261,
+        "seek_ms": 93.36945851100609,
+        "seek_max_ms": 123.7970000365749,
+        "steady_cpu": 9.890664627275795,
+        "steady_mib": 153.5654296875,
+        "steady_dropped": 0.0,
+        "steady_corrupted": 0.0,
+        "hover_cpu": 17.72736785936042,
+        "hover_mib": 164.3779296875,
+        "hover_dropped": 0.0,
+        "hover_corrupted": 0.0,
+        "resize_cpu": 15.874489516181708,
+        "resize_mib": 168.9873046875,
+        "resize_dropped": 0.0,
+        "resize_corrupted": 0.0
+      }
+    },
+    {
+      "app": "baseline",
+      "case": "output-0",
+      "repeat": 2,
+      "receipt": "/Volumes/seed2/Projects/illiquid-production-receipts/p4-performance-cohort/3-output-0-baseline/summary.json",
+      "metrics": {
+        "quit_ms": 418.9494170132093,
+        "launch_ms": 381.84591697063297,
+        "seek_ms": 84.20641702832654,
+        "seek_max_ms": 102.74466697592288,
+        "steady_cpu": 9.817065725318578,
+        "steady_mib": 159.86224365234375,
+        "steady_dropped": 0.0,
+        "steady_corrupted": 0.0,
+        "hover_cpu": 17.796575189942654,
+        "hover_mib": 171.20599365234375,
+        "hover_dropped": 0.0,
+        "hover_corrupted": 0.0,
+        "resize_cpu": 16.190099684796174,
+        "resize_mib": 166.59661865234375,
+        "resize_dropped": 0.0,
+        "resize_corrupted": 0.0
+      }
+    },
+    {
+      "app": "candidate",
+      "case": "output-0",
+      "repeat": 2,
+      "receipt": "/Volumes/seed2/Projects/illiquid-production-receipts/p4-performance-cohort/3-output-0-candidate/summary.json",
+      "metrics": {
+        "quit_ms": 388.1730840075761,
+        "launch_ms": 858.83520799689,
+        "seek_ms": 71.48220849921927,
+        "seek_max_ms": 121.56629201490432,
+        "steady_cpu": 10.369162821408452,
+        "steady_mib": 156.31549072265625,
+        "steady_dropped": 0.0,
+        "steady_corrupted": 0.0,
+        "hover_cpu": 16.97053095175419,
+        "hover_mib": 178.48736572265625,
+        "hover_dropped": 0.0,
+        "hover_corrupted": 0.0,
+        "resize_cpu": 15.87164799912428,
+        "resize_mib": 175.83111572265625,
+        "resize_dropped": 0.0,
+        "resize_corrupted": 0.0
+      }
+    },
+    {
+      "app": "candidate",
+      "case": "output-0",
+      "repeat": 3,
+      "receipt": "/Volumes/seed2/Projects/illiquid-production-receipts/p4-performance-cohort/4-output-0-candidate/summary.json",
+      "metrics": {
+        "quit_ms": 255.8235420146957,
+        "launch_ms": 388.10645800549537,
+        "seek_ms": 83.16985398414545,
+        "seek_max_ms": 125.81637495895848,
+        "steady_cpu": 10.01528656835364,
+        "steady_mib": 152.0654296875,
+        "steady_dropped": 0.0,
+        "steady_corrupted": 0.0,
+        "hover_cpu": 18.006896545144436,
+        "hover_mib": 164.54986572265625,
+        "hover_dropped": 0.0,
+        "hover_corrupted": 0.0,
+        "resize_cpu": 15.848914105570577,
+        "resize_mib": 167.15924072265625,
+        "resize_dropped": 0.0,
+        "resize_corrupted": 0.0
+      }
+    },
+    {
+      "app": "baseline",
+      "case": "output-0",
+      "repeat": 3,
+      "receipt": "/Volumes/seed2/Projects/illiquid-production-receipts/p4-performance-cohort/4-output-0-baseline/summary.json",
+      "metrics": {
+        "quit_ms": 426.0743750492111,
+        "launch_ms": 1143.9535829704255,
+        "seek_ms": 92.38310399814509,
+        "seek_max_ms": 115.82366703078151,
+        "steady_cpu": 9.905494591979654,
+        "steady_mib": 155.5029296875,
+        "steady_dropped": 0.0,
+        "steady_corrupted": 0.0,
+        "hover_cpu": 17.518515182380447,
+        "hover_mib": 167.56549072265625,
+        "hover_dropped": 0.0,
+        "hover_corrupted": 0.0,
+        "resize_cpu": 16.01687413409151,
+        "resize_mib": 174.40924072265625,
+        "resize_dropped": 0.0,
+        "resize_corrupted": 0.0
+      }
+    },
+    {
+      "app": "baseline",
+      "case": "output-0",
+      "repeat": 4,
+      "receipt": "/Volumes/seed2/Projects/illiquid-production-receipts/p4-performance-cohort/5-output-0-baseline/summary.json",
+      "metrics": {
+        "quit_ms": 392.6341669866815,
+        "launch_ms": 376.7560420092195,
+        "seek_ms": 75.40925004286692,
+        "seek_max_ms": 130.01949997851625,
+        "steady_cpu": 9.914301898624744,
+        "steady_mib": 156.70599365234375,
+        "steady_dropped": 0.0,
+        "steady_corrupted": 0.0,
+        "hover_cpu": 17.524427522548965,
+        "hover_mib": 174.7529296875,
+        "hover_dropped": 0.0,
+        "hover_corrupted": 0.0,
+        "resize_cpu": 15.946273732609928,
+        "resize_mib": 170.8935546875,
+        "resize_dropped": 0.0,
+        "resize_corrupted": 0.0
+      }
+    },
+    {
+      "app": "candidate",
+      "case": "output-0",
+      "repeat": 4,
+      "receipt": "/Volumes/seed2/Projects/illiquid-production-receipts/p4-performance-cohort/5-output-0-candidate/summary.json",
+      "metrics": {
+        "quit_ms": 386.4331659860909,
+        "launch_ms": 621.2657919968478,
+        "seek_ms": 73.42058350332081,
+        "seek_max_ms": 103.04870799882337,
+        "steady_cpu": 10.289272940742324,
+        "steady_mib": 154.86224365234375,
+        "steady_dropped": 0.0,
+        "steady_corrupted": 0.0,
+        "hover_cpu": 17.264278828838325,
+        "hover_mib": 165.5654296875,
+        "hover_dropped": 0.0,
+        "hover_corrupted": 0.0,
+        "resize_cpu": 15.406186588510822,
+        "resize_mib": 168.3154296875,
+        "resize_dropped": 0.0,
+        "resize_corrupted": 0.0
+      }
+    }
+  ],
+  "comparison": {
+    "passed": false,
+    "regression_passed": false,
+    "quality_passed": true,
+    "quality_checks": [
+      {
+        "case": "output-0",
+        "metric": "hover_dropped",
+        "baseline": 0.0,
+        "candidate": 0.0,
+        "limit": 0,
+        "passed": true
+      },
+      {
+        "case": "output-0",
+        "metric": "resize_dropped",
+        "baseline": 0.0,
+        "candidate": 0.0,
+        "limit": 0,
+        "passed": true
+      },
+      {
+        "case": "output-0",
+        "metric": "steady_dropped",
+        "baseline": 0.0,
+        "candidate": 0.0,
+        "limit": 0,
+        "passed": true
+      }
+    ],
+    "checks": [
+      {
+        "case": "output-0",
+        "metric": "hover_corrupted",
+        "baseline": 0.0,
+        "candidate": 0.0,
+        "limit": 0,
+        "passed": true,
+        "n": 5
+      },
+      {
+        "case": "output-0",
+        "metric": "hover_cpu",
+        "baseline": 17.72736785936042,
+        "candidate": 17.267098762524174,
+        "limit": 20.38647303826448,
+        "passed": true,
+        "n": 5
+      },
+      {
+        "case": "output-0",
+        "metric": "hover_dropped",
+        "baseline": 0.0,
+        "candidate": 0.0,
+        "limit": 0.0,
+        "passed": true,
+        "n": 5
+      },
+      {
+        "case": "output-0",
+        "metric": "hover_mib",
+        "baseline": 171.20599365234375,
+        "candidate": 170.73724365234375,
+        "limit": 196.8868927001953,
+        "passed": true,
+        "n": 5
+      },
+      {
+        "case": "output-0",
+        "metric": "launch_ms",
+        "baseline": 480.97808298189193,
+        "candidate": 621.2657919968478,
+        "limit": 553.1247954291757,
+        "passed": false,
+        "n": 5
+      },
+      {
+        "case": "output-0",
+        "metric": "quit_ms",
+        "baseline": 397.8367089875974,
+        "candidate": 353.7108330056071,
+        "limit": 457.5122153357369,
+        "passed": true,
+        "n": 5
+      },
+      {
+        "case": "output-0",
+        "metric": "resize_corrupted",
+        "baseline": 0.0,
+        "candidate": 0.0,
+        "limit": 0,
+        "passed": true,
+        "n": 5
+      },
+      {
+        "case": "output-0",
+        "metric": "resize_cpu",
+        "baseline": 15.987917672808146,
+        "candidate": 15.848914105570577,
+        "limit": 18.386105323729367,
+        "passed": true,
+        "n": 5
+      },
+      {
+        "case": "output-0",
+        "metric": "resize_dropped",
+        "baseline": 0.0,
+        "candidate": 0.0,
+        "limit": 0.0,
+        "passed": true,
+        "n": 5
+      },
+      {
+        "case": "output-0",
+        "metric": "resize_mib",
+        "baseline": 169.1904296875,
+        "candidate": 169.89349365234375,
+        "limit": 194.568994140625,
+        "passed": true,
+        "n": 5
+      },
+      {
+        "case": "output-0",
+        "metric": "seek_max_ms",
+        "baseline": 123.7970000365749,
+        "candidate": 121.56629201490432,
+        "limit": 148.7970000365749,
+        "passed": true,
+        "n": 5
+      },
+      {
+        "case": "output-0",
+        "metric": "seek_ms",
+        "baseline": 84.20641702832654,
+        "candidate": 83.16985398414545,
+        "limit": 109.20641702832654,
+        "passed": true,
+        "n": 5
+      },
+      {
+        "case": "output-0",
+        "metric": "steady_corrupted",
+        "baseline": 0.0,
+        "candidate": 0.0,
+        "limit": 0,
+        "passed": true,
+        "n": 5
+      },
+      {
+        "case": "output-0",
+        "metric": "steady_cpu",
+        "baseline": 9.905494591979654,
+        "candidate": 10.01528656835364,
+        "limit": 11.905494591979654,
+        "passed": true,
+        "n": 5
+      },
+      {
+        "case": "output-0",
+        "metric": "steady_dropped",
+        "baseline": 0.0,
+        "candidate": 0.0,
+        "limit": 0.0,
+        "passed": true,
+        "n": 5
+      },
+      {
+        "case": "output-0",
+        "metric": "steady_mib",
+        "baseline": 156.70599365234375,
+        "candidate": 154.86224365234375,
+        "limit": 180.2118927001953,
+        "passed": true,
+        "n": 5
+      }
+    ],
+    "policy": "median <= max(baseline * 1.15, baseline + 2 CPU points / 16 MiB / 25 ms); maximum dropped frames cannot increase; no corrupted frames in either cohort; absolute playback qualification requires zero dropped frames in both cohorts"
+  }
+}

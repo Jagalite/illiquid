@@ -1,0 +1,282 @@
+{
+  "families" : [
+    {
+      "actionClasses" : [
+        "exact",
+        "keyframe",
+        "preview",
+        "relative",
+        "superseding-seek",
+        "pause",
+        "eof",
+        "shutdown",
+        "success",
+        "failure",
+        "cancellation",
+        "duplicate",
+        "previous-generation",
+        "wrong-operation",
+        "unrelated-session",
+        "executor-prerequisite"
+      ],
+      "model" : "seek",
+      "modelVersion" : 10,
+      "requiredScenarios" : [
+        "paused-restore-zero",
+        "aggregate-before-rate",
+        "seek-after-eof-rearm",
+        "old-rate-stale",
+        "old-frame-fenced",
+        "old-subtitle-fenced",
+        "shutdown-boundaries"
+      ],
+      "seedProfiles" : [
+        "ready-playing",
+        "ready-paused",
+        "ended",
+        "seek-in-flight"
+      ]
+    },
+    {
+      "actionClasses" : [
+        "eof",
+        "drain-component",
+        "duplicate-eof",
+        "unexpected-component",
+        "seek",
+        "stop",
+        "replacement",
+        "shutdown",
+        "persistence-outcome",
+        "playlist-outcome"
+      ],
+      "model" : "eof-drain",
+      "modelVersion" : 10,
+      "requiredScenarios" : [
+        "all-drain-orders",
+        "no-premature-finalization",
+        "same-cycle-progress",
+        "advance-at-most-once",
+        "old-cycle-cannot-finalize",
+        "aggregate-zero-required",
+        "drain-interruptions-isolated"
+      ],
+      "seedProfiles" : [
+        "playing-av",
+        "paused-av",
+        "buffering-av",
+        "seeking-av",
+        "draining-av",
+        "draining-stop",
+        "draining-shutdown",
+        "draining-seek",
+        "draining-replacement",
+        "playing-video",
+        "playing-audio",
+        "playing-empty"
+      ]
+    },
+    {
+      "actionClasses" : [
+        "video-failure",
+        "software-outcome",
+        "recurrent-failure",
+        "replacement-lineage",
+        "seek",
+        "track",
+        "stop",
+        "shutdown",
+        "presentation-flush",
+        "graph-rebuild",
+        "old-output"
+      ],
+      "model" : "recovery",
+      "modelVersion" : 9,
+      "requiredScenarios" : [
+        "one-fallback-per-lineage",
+        "seek-does-not-reset-budget",
+        "terminal-exhaustion",
+        "revision-fence",
+        "interrupted-result-stale",
+        "matching-outcome-settles"
+      ],
+      "seedProfiles" : [
+        "playing-hardware",
+        "prerolling-hardware",
+        "software-active",
+        "presentation-flush-consumed",
+        "recovery-in-flight"
+      ]
+    },
+    {
+      "actionClasses" : [
+        "audio-select",
+        "subtitle-select",
+        "subtitle-off",
+        "success",
+        "failure",
+        "cancellation",
+        "in-flight-rejection",
+        "invalid-id",
+        "wrong-kind",
+        "replacement",
+        "seek",
+        "stop",
+        "shutdown",
+        "invalidation",
+        "overlay-current",
+        "overlay-old"
+      ],
+      "model" : "track-subtitles",
+      "modelVersion" : 9,
+      "requiredScenarios" : [
+        "commit-only-on-success",
+        "rollback",
+        "explicit-inflight-rejection",
+        "invalid-never-effective",
+        "revision-monotonic",
+        "clear-before-overlay"
+      ],
+      "seedProfiles" : [
+        "automatic",
+        "embedded-selected",
+        "external-subtitle"
+      ]
+    },
+    {
+      "actionClasses" : [
+        "stop",
+        "shutdown",
+        "duplicate-command",
+        "cleanup-success",
+        "cleanup-failure",
+        "cleanup-cancellation",
+        "late-result",
+        "late-fact",
+        "resource-custody"
+      ],
+      "model" : "stop-shutdown",
+      "modelVersion" : 9,
+      "requiredScenarios" : [
+        "shutdown-monotonic",
+        "cleanup-only",
+        "terminated-quiescent",
+        "late-callback-dropped",
+        "cleanup-at-most-once",
+        "explicit-finalization-wait"
+      ],
+      "seedProfiles" : [
+        "opening",
+        "await-preroll",
+        "seeking",
+        "recovery",
+        "track-replacement",
+        "playing",
+        "draining",
+        "idle"
+      ]
+    },
+    {
+      "actionClasses" : [
+        "video-ready",
+        "audio-ready",
+        "aggregate-preroll",
+        "play",
+        "pause",
+        "starve",
+        "supply",
+        "queue-offer",
+        "queue-consume",
+        "seek",
+        "stop",
+        "shutdown",
+        "eof",
+        "format-change"
+      ],
+      "model" : "preroll-buffering",
+      "modelVersion" : 9,
+      "requiredScenarios" : [
+        "single-startup-authority",
+        "absent-stream-not-required",
+        "partial-does-not-start",
+        "paused-preroll-zero",
+        "starvation-restores-desired",
+        "queue-bounds",
+        "control-preemption",
+        "format-change-repreroll"
+      ],
+      "seedProfiles" : [
+        "opening-av",
+        "partial-av",
+        "playing-av",
+        "playing-format",
+        "buffering-av",
+        "opening-video",
+        "opening-audio",
+        "opening-empty"
+      ]
+    }
+  ],
+  "profiles" : [
+    {
+      "algorithm" : "breadthFirst",
+      "depthLimit" : 12,
+      "duplicateLimit" : 1,
+      "edgeLimit" : 500000,
+      "failureLimit" : 1,
+      "generationLimit" : 2,
+      "interruptLimit" : 1,
+      "lateResultLimit" : 2,
+      "pendingEffectLimit" : 4,
+      "porMode" : "disabled",
+      "profile" : "pr",
+      "stateLimit" : 50000,
+      "timeLimitSeconds" : 60
+    },
+    {
+      "algorithm" : "breadthFirst",
+      "depthLimit" : 20,
+      "duplicateLimit" : 1,
+      "edgeLimit" : 5000000,
+      "failureLimit" : 2,
+      "generationLimit" : 3,
+      "interruptLimit" : 2,
+      "lateResultLimit" : 4,
+      "pendingEffectLimit" : 6,
+      "porMode" : "conservative",
+      "profile" : "nightly",
+      "stateLimit" : 500000,
+      "timeLimitSeconds" : 300
+    },
+    {
+      "algorithm" : "breadthFirst",
+      "depthLimit" : 28,
+      "duplicateLimit" : 1,
+      "edgeLimit" : 25000000,
+      "failureLimit" : 3,
+      "generationLimit" : 4,
+      "interruptLimit" : 3,
+      "lateResultLimit" : 6,
+      "pendingEffectLimit" : 8,
+      "porMode" : "validation",
+      "profile" : "qualification",
+      "stateLimit" : 2000000,
+      "timeLimitSeconds" : 600
+    },
+    {
+      "algorithm" : "breadthFirst",
+      "depthLimit" : 5,
+      "duplicateLimit" : 1,
+      "edgeLimit" : 100000,
+      "failureLimit" : 1,
+      "generationLimit" : 1,
+      "interruptLimit" : 1,
+      "lateResultLimit" : 1,
+      "pendingEffectLimit" : 3,
+      "porMode" : "disabled",
+      "profile" : "validation",
+      "stateLimit" : 10000,
+      "timeLimitSeconds" : 30
+    }
+  ]
+}

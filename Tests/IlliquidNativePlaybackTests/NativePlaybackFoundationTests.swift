@@ -5,7 +5,7 @@ import CoreVideo
 import Foundation
 import Metal
 import IlliquidPlayback
-import IlliquidPlaybackCore
+import IlliquidPlaybackModel
 import Testing
 @testable import IlliquidNativePlayback
 

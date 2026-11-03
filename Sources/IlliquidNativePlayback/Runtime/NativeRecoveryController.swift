@@ -1,5 +1,5 @@
 import Foundation
-import IlliquidPlaybackCore
+import IlliquidPlaybackModel
 
 /// Converts framework failures into stable typed facts. It deliberately owns
 /// no retry counters, revisions, or recovery decisions; those live only in the

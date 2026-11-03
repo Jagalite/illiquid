@@ -3,7 +3,7 @@
 ## Scope and status
 
 This investigation concerns the deterministic playback authority in
-`IlliquidPlaybackCore`: renderer retry budgets, delayed effect results, and
+`IlliquidPlaybackCore` (now the production model in `IlliquidPlaybackModel`): renderer retry budgets, delayed effect results, and
 preservation of terminal errors. It is independent of the packet ownership,
 packet queues, native I/O, and media-library changes being investigated in other
 PRs. No native decoder, renderer, queue, or buffering default is changed here.
@@ -28,7 +28,7 @@ The starting recovery/core files were checked against their Git blob hashes.
 `Scripts/test-renderer-recovery.sh` copies the **actual complete core sources**,
 their real `MediaTrack.swift` dependency, and all core tests into a temporary
 Swift package. It does not substitute a mock recovery implementation. The
-existing `PlaybackModelRuntime` supplies deterministic effect acknowledgements;
+existing `PlaybackModelRuntime` (now `PlaybackSessionHost` over a Statelessness session) supplies deterministic effect acknowledgements;
 it does not execute native side effects. The toolchain's built-in Testing
 library avoids resolving the app's native macOS dependencies.
 

@@ -20,6 +20,8 @@ public struct PlaybackPreferences: Codable, Equatable, Sendable {
     public var isSidebarVisible: Bool
     public var repeatMode: PlaybackRepeatMode
     public var isShuffleEnabled: Bool
+    /// Zero selects FFmpeg automatic threading; positive values cap decoder threads.
+    public var softwareDecoderThreadLimit: Int
     public var hardwareDecodingPolicy: HardwareDecodingPolicy
     public var trackSelection: TrackSelectionPreferences
     public var subtitleFallbackEncoding: SubtitleFallbackEncoding
@@ -37,7 +39,8 @@ public struct PlaybackPreferences: Codable, Equatable, Sendable {
         subtitleFallbackEncoding: SubtitleFallbackEncoding = .unicodeOnly,
         trackSelection: TrackSelectionPreferences = .init(),
         remembersPlaybackHistory: Bool = true,
-        restoresSessionPaused: Bool = true
+        restoresSessionPaused: Bool = true,
+        softwareDecoderThreadLimit: Int = 0
     ) {
         self.remembersPlaybackHistory = remembersPlaybackHistory
         self.restoresSessionPaused = restoresSessionPaused
@@ -49,6 +52,7 @@ public struct PlaybackPreferences: Codable, Equatable, Sendable {
         self.isSidebarVisible = isSidebarVisible
         self.repeatMode = repeatMode
         self.isShuffleEnabled = isShuffleEnabled
+        self.softwareDecoderThreadLimit = Self.validSoftwareDecoderThreadLimit(softwareDecoderThreadLimit)
         self.hardwareDecodingPolicy = hardwareDecodingPolicy
         self.preferredAudioOutputDeviceID = Self.validAudioOutputDeviceID(
             preferredAudioOutputDeviceID
@@ -68,8 +72,13 @@ public struct PlaybackPreferences: Codable, Equatable, Sendable {
             subtitleFallbackEncoding: subtitleFallbackEncoding,
             trackSelection: trackSelection,
             remembersPlaybackHistory: remembersPlaybackHistory,
-            restoresSessionPaused: restoresSessionPaused
+            restoresSessionPaused: restoresSessionPaused,
+            softwareDecoderThreadLimit: softwareDecoderThreadLimit
         )
+    }
+
+    public static func validSoftwareDecoderThreadLimit(_ value: Int) -> Int {
+        min(max(value, 0), 64)
     }
 
     static func validVolume(_ volume: Double) -> Double {
@@ -108,6 +117,7 @@ public struct PlaybackPreferences: Codable, Equatable, Sendable {
         case isSidebarVisible
         case repeatMode
         case isShuffleEnabled
+        case softwareDecoderThreadLimit
         case hardwareDecodingPolicy
         case trackSelection
         case subtitleFallbackEncoding
@@ -142,7 +152,8 @@ public struct PlaybackPreferences: Codable, Equatable, Sendable {
             ) ?? .unicodeOnly,
             trackSelection: try container.decodeIfPresent(TrackSelectionPreferences.self, forKey: .trackSelection) ?? .init(),
             remembersPlaybackHistory: try container.decodeIfPresent(Bool.self, forKey: .remembersPlaybackHistory) ?? true,
-            restoresSessionPaused: try container.decodeIfPresent(Bool.self, forKey: .restoresSessionPaused) ?? true
+            restoresSessionPaused: try container.decodeIfPresent(Bool.self, forKey: .restoresSessionPaused) ?? true,
+            softwareDecoderThreadLimit: try container.decodeIfPresent(Int.self, forKey: .softwareDecoderThreadLimit) ?? 0
         )
     }
 }

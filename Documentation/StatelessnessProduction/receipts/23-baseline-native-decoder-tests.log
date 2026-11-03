@@ -1,0 +1,38 @@
+[0/1] Planning build
+Building for debugging...
+[0/14] Write swift-version--58304C5D6DBC2206.txt
+Build complete! (9.48s)
+Test Suite 'Selected tests' started at 2026-11-02 03:09:27.743.
+Test Suite 'IlliquidPackageTests.xctest' started at 2026-11-02 03:09:27.746.
+Test Suite 'IlliquidPackageTests.xctest' passed at 2026-11-02 03:09:27.746.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.000) seconds
+Test Suite 'Selected tests' passed at 2026-11-02 03:09:27.746.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.003) seconds
+◇ Test run started.
+↳ Testing Library Version: 6.3.2 (70eff261d7f462c)
+◇ Suite "Hardware video output equivalence" started.
+◇ Test hardwarePreservesPixelsTimingAndMetadataIncludingSeek(filename:) started.
+◇ Test case passing 1 argument filename → "h264-aac.mp4" to hardwarePreservesPixelsTimingAndMetadataIncludingSeek(filename:) started.
+[hardware-output] fixture=h264-aac.mp4 target=0.0 frames=12 exact-pixels-timing-metadata=true
+[hardware-output] fixture=h264-aac.mp4 target=1.25 frames=12 exact-pixels-timing-metadata=true
+◇ Test case passing 1 argument filename → "hevc-10bit-aac.mkv" to hardwarePreservesPixelsTimingAndMetadataIncludingSeek(filename:) started.
+[hardware-output] fixture=hevc-10bit-aac.mkv target=0.0 frames=12 exact-pixels-timing-metadata=true
+[hardware-output] fixture=hevc-10bit-aac.mkv target=1.25 frames=12 exact-pixels-timing-metadata=true
+◇ Test case passing 1 argument filename → "vp9-opus.mkv" to hardwarePreservesPixelsTimingAndMetadataIncludingSeek(filename:) started.
+[hardware-output] fixture=vp9-opus.mkv target=0.0 frames=12 exact-pixels-timing-metadata=true
+[hardware-output] fixture=vp9-opus.mkv target=1.25 frames=12 exact-pixels-timing-metadata=true
+◇ Test case passing 1 argument filename → "vp9-10bit-video-only.mkv" to hardwarePreservesPixelsTimingAndMetadataIncludingSeek(filename:) started.
+[hardware-output] fixture=vp9-10bit-video-only.mkv target=0.0 frames=12 exact-pixels-timing-metadata=true
+✘ Test hardwarePreservesPixelsTimingAndMetadataIncludingSeek(filename:) recorded an issue with 1 argument filename → "vp9-10bit-video-only.mkv" at HardwareVideoOutputTests.swift:100:13: Expectation failed: (frames.count → 10) >= 12
+✘ Test hardwarePreservesPixelsTimingAndMetadataIncludingSeek(filename:) with 4 test cases failed after 0.624 seconds with 1 issue.
+✘ Suite "Hardware video output equivalence" failed after 0.625 seconds with 1 issue.
+◇ Suite "Planar software output experiment" started.
+◇ Test planarEOFDrainAndTeardownAreBounded() started.
+✘ Test planarEOFDrainAndTeardownAreBounded() recorded an issue at PlanarSoftwareOutputExperimentTests.swift:744:13: Expectation failed: (decoded.count → 2) <= 1
+✘ Test planarEOFDrainAndTeardownAreBounded() recorded an issue at PlanarSoftwareOutputExperimentTests.swift:744:13: Expectation failed: (decoded.count → 2) <= 1
+✘ Test planarEOFDrainAndTeardownAreBounded() recorded an issue at PlanarSoftwareOutputExperimentTests.swift:744:13: Expectation failed: (decoded.count → 2) <= 1
+✘ Test planarEOFDrainAndTeardownAreBounded() recorded an issue at PlanarSoftwareOutputExperimentTests.swift:744:13: Expectation failed: (decoded.count → 2) <= 1
+✘ Test planarEOFDrainAndTeardownAreBounded() recorded an issue at PlanarSoftwareOutputExperimentTests.swift:744:13: Expectation failed: (decoded.count → 2) <= 1
+✘ Test planarEOFDrainAndTeardownAreBounded() failed after 0.033 seconds with 5 issues.
+✘ Suite "Planar software output experiment" failed after 0.033 seconds with 5 issues.
+✘ Test run with 2 tests in 2 suites failed after 0.659 seconds with 6 issues.

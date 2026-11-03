@@ -2,11 +2,13 @@ import Foundation
 import OSLog
 import IlliquidCore
 import IlliquidPlayback
-import IlliquidPlaybackCore
+import IlliquidPlaybackModel
 
 /// The sole serialized command/result path between the product coordinator and
-/// the native mechanism adapter. Effect identity and command acceptance are
-/// allocated by the deterministic core; the runtime only executes effects.
+/// the native mechanism adapter. Every input is submitted to the Statelessness
+/// session that owns the committed playback state (`PlaybackSessionHost`);
+/// effect identity and command acceptance are decided by the production
+/// model's step. The runtime only executes effects.
 @MainActor
 final class PlaybackRuntimeDriver {
     let runtime: any PlaybackRuntime
@@ -15,10 +17,9 @@ final class PlaybackRuntimeDriver {
     var onPersistCheckpoint: (@MainActor () async -> Bool)?
     var onAdvancePlaylist: (@MainActor () -> Void)?
 
-    // Replay documents are a diagnostic/test facility. Recording every live
-    // event performs two canonical encodes and retains an ever-growing step
-    // history, so keep it out of the production playback path.
-    private var model: PlaybackModelRuntime
+    // The live session keeps no step history. A bounded Statelessness recorder
+    // can be attached to the host for diagnostics; production runs without one.
+    private let host: PlaybackSessionHost
     private var pendingLoad: PlaybackRuntimeLoadRequest?
     private var sessionBeforePendingLoad: PlaybackSessionID?
     private var pendingExternalSubtitleURLs: [MediaSourceIdentity: URL] = [:]
@@ -33,15 +34,15 @@ final class PlaybackRuntimeDriver {
     private static let relativeSeekDispatchInterval: Duration = .milliseconds(40)
     private let relativeSeekNow: () -> ContinuousClock.Instant
 
-    var currentSnapshot: PlaybackUISnapshot { PlaybackUISnapshot(state: model.core.state) }
+    var currentSnapshot: PlaybackUISnapshot { PlaybackUISnapshot(state: host.state) }
 
     init(
         runtime: any PlaybackRuntime,
-        model: PlaybackModelRuntime = PlaybackModelRuntime(recordsReplaySteps: false),
+        host: PlaybackSessionHost = PlaybackSessionHost(),
         relativeSeekNow: @escaping () -> ContinuousClock.Instant = { .now }
     ) {
         self.runtime = runtime
-        self.model = model
+        self.host = host
         self.relativeSeekNow = relativeSeekNow
         runtime.eventHandler = { [weak self] event in self?.receive(event) }
     }
@@ -49,7 +50,7 @@ final class PlaybackRuntimeDriver {
     @discardableResult
     func load(_ request: PlaybackRuntimeLoadRequest) -> Bool {
         pendingLoad = request
-        sessionBeforePendingLoad = model.core.state.activeSession?.id
+        sessionBeforePendingLoad = host.state.activeSession?.id
         return send(.load(
             source: sourceIdentity(request.media.source),
             autoplay: true
@@ -86,7 +87,7 @@ final class PlaybackRuntimeDriver {
     func systemDidWake() -> Bool { sendEvent(.lifecycle(.systemDidWake)) }
 
     @discardableResult
-    func seek(to seconds: TimeInterval, mode: IlliquidPlaybackCore.SeekMode) -> Bool {
+    func seek(to seconds: TimeInterval, mode: IlliquidPlaybackModel.SeekMode) -> Bool {
         send(.seek(target: timestamp(seconds), mode: mode))
     }
 
@@ -130,7 +131,7 @@ final class PlaybackRuntimeDriver {
             resumeShutdownWaitersIfFinished()
             return
         }
-        if model.core.state.lifecycle == .terminated || shutdownEffectFinished { return }
+        if host.state.lifecycle == .terminated || shutdownEffectFinished { return }
         await withCheckedContinuation { continuation in
             shutdownWaiters.append(continuation)
         }
@@ -143,30 +144,30 @@ final class PlaybackRuntimeDriver {
         }
         switch event.payload {
         case let .effectResult(result):
-            let completedKind = model.pendingEffects.first(where: {
+            let completedKind = host.pendingEffects.first(where: {
                 $0.context.effectID == result.context.effectID
             })?.kind
-            process(model.send(.effectResult(result)))
+            process(host.send(.effectResult(result)))
             settlePendingLoad(after: completedKind, result: result)
             if case .finalizeShutdown = completedKind { shutdownEffectFinished = true }
             resumeShutdownWaitersIfFinished()
         case .started, .loaded, .prerollReady, .seekCompleted, .pauseChanged:
             break
         case let .positionChanged(seconds):
-            process(model.send(.acceptedClockSample(timestamp(seconds))))
+            process(host.send(.acceptedClockSample(timestamp(seconds))))
         case let .audioOutputChanged(seconds):
-            process(model.send(.audioOutputChanged(timestamp(seconds))))
+            process(host.send(.audioOutputChanged(timestamp(seconds))))
         case let .durationChanged(seconds):
-            process(model.send(.durationObserved(timestamp(seconds))))
+            process(host.send(.durationObserved(timestamp(seconds))))
         case .endOfFile:
             // Native emits EOF only after decoder drain and the presentation
             // horizon are complete, so this is one real aggregate drain fact.
-            process(model.send(.demuxEndOfFile(requiredDrain: [])))
+            process(host.send(.demuxEndOfFile(requiredDrain: [])))
         case let .typedFailure(failure):
-            process(model.send(.failureObserved(failure)))
+            process(host.send(.failureObserved(failure)))
         case let .failed(message):
             let failure = playbackFailure(code: stableCode(message))
-            process(model.send(.failureObserved(failure)))
+            process(host.send(.failureObserved(failure)))
         case .shutdownCompleted:
             break
         case let .transportRequested(playing):
@@ -174,17 +175,17 @@ final class PlaybackRuntimeDriver {
         case let .relativeSeekRequested(interval):
             _ = seek(to: interval, mode: .relative)
         case .diagnostic:
-            process(model.send(.diagnosticObserved(code: "native.runtime")))
+            process(host.send(.diagnosticObserved(code: "native.runtime")))
         case let .bufferingChanged(status):
             let cache = UInt64(max(status.cacheDuration, 0) * 1_000_000)
-            process(model.send(.synchronization(.supplyObserved(
+            process(host.send(.synchronization(.supplyObserved(
                 starved: status.isBuffering,
                 cacheMicroseconds: cache
             ))))
         case let .synchronization(event):
-            process(model.send(.synchronization(event)))
+            process(host.send(.synchronization(event)))
         case let .tracksChanged(snapshot):
-            process(model.send(.catalogObserved(catalog(snapshot))))
+            process(host.send(.catalogObserved(catalog(snapshot))))
         case .firstFrameSubmitted, .mediaVersionObserved,
              .decoderChanged, .videoChanged, .videoColorSampleChanged, .displayChanged,
              .volumeChanged, .muteChanged, .speedChanged, .audioDevicesChanged, .audioOutputSelectionFailed,
@@ -205,9 +206,9 @@ final class PlaybackRuntimeDriver {
     ) {
         guard let pendingLoad else { return }
         let pendingSource = sourceIdentity(pendingLoad.media.source)
-        if model.core.state.activeSession?.source == pendingSource,
-           model.core.state.activeSession?.id != sessionBeforePendingLoad,
-           model.core.state.pendingSession == nil
+        if host.state.activeSession?.source == pendingSource,
+           host.state.activeSession?.id != sessionBeforePendingLoad,
+           host.state.pendingSession == nil
         {
             eventGate.activate(pendingLoad.identity)
             self.pendingLoad = nil
@@ -225,14 +226,14 @@ final class PlaybackRuntimeDriver {
     private(set) var commandRevision: UInt64 = 0
 
     @discardableResult
-    private func send(_ command: IlliquidPlaybackCore.PlaybackCommand) -> Bool {
+    private func send(_ command: IlliquidPlaybackModel.PlaybackCommand) -> Bool {
         commandRevision &+= 1
         return sendEvent(.command(command))
     }
 
     @discardableResult
     func sendEvent(_ event: PlaybackEvent) -> Bool {
-        let transition = model.send(event)
+        let transition = host.send(event)
         process(transition)
         if case .accepted = transition.disposition { return true }
         return false
@@ -249,7 +250,7 @@ final class PlaybackRuntimeDriver {
     private func execute(_ effect: PlaybackEffect) {
         switch effect.kind {
         case .seekPipeline:
-            if model.core.state.activeSession?.seek?.mode == .relative {
+            if host.state.activeSession?.seek?.mode == .relative {
                 dispatchRelativeSeek(effect)
             } else {
                 // A timeline release, recovery, or other absolute seek wins
@@ -299,8 +300,8 @@ final class PlaybackRuntimeDriver {
     }
 
     private func isCurrentSeek(_ effect: PlaybackEffect) -> Bool {
-        model.core.authorityIsCurrent(effect.context.authority) &&
-            model.core.state.outstandingEffects[effect.context.effectID] != nil
+        host.state.authorityIsCurrent(effect.context.authority) &&
+            host.state.outstandingEffects[effect.context.effectID] != nil
     }
 
     private func cancelPendingRelativeSeek() {
@@ -311,13 +312,13 @@ final class PlaybackRuntimeDriver {
         pendingRelativeSeekReceivedAt = nil
 
         // A superseded deferred seek never reached the native executor, so
-        // nobody else can settle its effect. Use the core's authority rule:
+        // nobody else can settle its effect. Use the model's authority rule:
         // recovery/format revisions can invalidate work in the same generation,
         // but subtitle/overlay-only revisions and sleep handoff keep it live.
-        guard let cancelled, model.core.state.lifecycle == .running,
-              !model.core.authorityIsCurrent(cancelled.context.authority)
+        guard let cancelled, host.state.lifecycle == .running,
+              !host.state.authorityIsCurrent(cancelled.context.authority)
         else { return }
-        if let transition = model.complete(
+        if let transition = host.complete(
             effectID: cancelled.context.effectID,
             token: EffectResultToken(kind: .cancelled)
         ) {
@@ -368,13 +369,13 @@ final class PlaybackRuntimeDriver {
     ) {
         let token = EffectResultToken(kind: succeeded ? .succeeded : .failed)
         let failure = code.map(playbackFailure(code:))
-        if let transition = model.complete(effectID: effectID, token: token, failure: failure) {
+        if let transition = host.complete(effectID: effectID, token: token, failure: failure) {
             process(transition)
         }
     }
 
     private func resumeShutdownWaitersIfFinished() {
-        guard model.core.state.lifecycle == .terminated || shutdownEffectFinished else { return }
+        guard host.state.lifecycle == .terminated || shutdownEffectFinished else { return }
         let waiters = shutdownWaiters
         shutdownWaiters.removeAll()
         for waiter in waiters { waiter.resume() }

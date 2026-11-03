@@ -524,6 +524,12 @@ public final class PlaybackPersistenceStore: @unchecked Sendable {
         mutatePreferences { $0.preferences.isShuffleEnabled = isEnabled }
     }
 
+    public func setSoftwareDecoderThreadLimit(_ value: Int) {
+        mutatePreferences {
+            $0.preferences.softwareDecoderThreadLimit = PlaybackPreferences.validSoftwareDecoderThreadLimit(value)
+        }
+    }
+
     public func setHardwareDecodingPolicy(_ policy: HardwareDecodingPolicy) {
         mutatePreferences { $0.preferences.hardwareDecodingPolicy = policy }
     }

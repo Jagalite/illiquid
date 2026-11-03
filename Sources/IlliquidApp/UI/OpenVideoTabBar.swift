@@ -37,7 +37,7 @@ struct OpenVideoTabBar: View {
                                 .accessibilityIdentifier("illiquid.videos.close-tab.\(tab.id)")
                                 .help("Close video tab")
                             }
-                            .foregroundStyle(tab.id == model.openVideoTabs.selectedID ? theme.primaryColor : theme.secondaryColor)
+                            .foregroundStyle(tab.id == model.openVideoTabs.selectedID ? .primary : .secondary)
                             .background(tab.id == model.openVideoTabs.selectedID ? theme.selectedFillColor : Color.clear,
                                         in: RoundedRectangle(cornerRadius: 7))
                             .id(tab.id)

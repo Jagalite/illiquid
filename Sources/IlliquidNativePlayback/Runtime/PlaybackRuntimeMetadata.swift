@@ -1,5 +1,5 @@
 import Foundation
-import IlliquidPlaybackCore
+import IlliquidPlaybackModel
 
 enum RuntimeResourceKind: String, Sendable {
     case applicationPresentationGraph
