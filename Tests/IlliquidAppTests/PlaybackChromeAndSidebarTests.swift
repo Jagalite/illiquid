@@ -2050,7 +2050,7 @@ struct ElasticPlaybackControlBarPlacementTests {
         var placement = ElasticPlaybackControlBarPlacement.defaultValue
         placement.normalizedCenter = CGPoint(x: 0.72, y: 0.34)
         placement.orientation = .up
-        placement.bendDirection = .down
+        placement.bendDirection = .up
 
         ElasticPlaybackControlBarPlacementStore.persist(
             placement,
@@ -2063,7 +2063,7 @@ struct ElasticPlaybackControlBarPlacementTests {
         #expect(restored == placement)
         #expect(restored.normalizedCenter == CGPoint(x: 0.72, y: 0.34))
         #expect(restored.orientation == .up)
-        #expect(restored.bendDirection == .down)
+        #expect(restored.bendDirection == .up)
     }
 
     @Test func absentOrMalformedPlacementFallsBackToTheDefault() throws {

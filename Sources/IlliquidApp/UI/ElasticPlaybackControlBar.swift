@@ -52,6 +52,8 @@ struct ElasticPlaybackControlBarPlacement: Codable, Equatable {
     var normalizedY: Double?
     var orientationRawValue: Int
     var bendsUp: Bool
+    var attachmentStrength: Double? = nil
+    var normalizedRenderOffset: CGSize? = nil
 
     static let defaultValue = Self(
         normalizedX: nil,
@@ -85,7 +87,9 @@ struct ElasticPlaybackControlBarPlacement: Codable, Equatable {
     }
 
     var isValid: Bool {
-        guard ElasticPlaybackControlBarOrientation(rawValue: orientationRawValue) != nil
+        guard normalizedRenderOffset.map({ $0.width.isFinite && $0.height.isFinite }) ?? true,
+              attachmentStrength.map({ $0.isFinite && (0...1).contains($0) }) ?? true,
+              ElasticPlaybackControlBarOrientation(rawValue: orientationRawValue) != nil
         else { return false }
         switch (normalizedX, normalizedY) {
         case (nil, nil):
@@ -103,12 +107,14 @@ enum ElasticPlaybackControlBarPlacementStore {
 
     static func restored(defaults: UserDefaults = AppPreferences.defaults) -> ElasticPlaybackControlBarPlacement {
         guard let data = defaults.data(forKey: defaultsKey),
-              let placement = try? JSONDecoder().decode(
+              var placement = try? JSONDecoder().decode(
                   ElasticPlaybackControlBarPlacement.self,
                   from: data
               ),
               placement.isValid
         else { return .defaultValue }
+        // Retain the saved location while retiring downward bend preferences.
+        placement.bendsUp = true
         return placement
     }
 
@@ -165,7 +171,9 @@ struct ElasticPlaybackControlBarGeometry {
         center: CGPoint,
         utilityCount: Int,
         bendDirection: ElasticPlaybackControlBarBendDirection,
-        orientation: ElasticPlaybackControlBarOrientation = .right
+        orientation: ElasticPlaybackControlBarOrientation = .right,
+        attachmentStrength: CGFloat? = nil,
+        renderOffset: CGSize? = nil
     ) {
         self.containerSize = containerSize
         self.center = center
@@ -216,14 +224,42 @@ struct ElasticPlaybackControlBarGeometry {
             in: containerSize,
             orientation: orientation,
             side: side,
-            edgeAttachmentStrength: Self.edgeAttachmentStrength(
+            edgeAttachmentStrength: attachmentStrength ?? Self.edgeAttachmentStrength(
                 for: bendProgress
             )
         )
+        if let renderOffset {
+            containmentOffset = Self.constrainedRenderOffset(renderOffset, points: rawSurfacePoints, in: containerSize)
+        }
+        if bendProgress > 0 {
+            // A bent bar must still touch the side that caused the bend. A
+            // grip-tracking offset must not carry a curved shape into free space.
+            let contactOffset = Self.placementOffset(
+                for: rawSurfacePoints, in: containerSize, orientation: orientation,
+                side: side, edgeAttachmentStrength: 1)
+            if orientation.isHorizontal {
+                containmentOffset.width = contactOffset.width
+            } else {
+                containmentOffset.height = contactOffset.height
+            }
+        }
         utilityPositions = (0..<utilityCount).map { index in
             point(at: firstUtilityS + CGFloat(index) * Self.utilitySpacing)
         }
         surfacePoints = rawSurfacePoints.map(applyingContainmentOffset(to:))
+    }
+
+    static func constrainedRenderOffset(_ offset: CGSize, points: [CGPoint], in size: CGSize) -> CGSize {
+        guard let first = points.first else { return offset }
+        var bounds = CGRect(origin: first, size: .zero)
+        for point in points.dropFirst() { bounds = bounds.union(CGRect(origin: point, size: .zero)) }
+        let radius = thickness / 2
+        let lowerX = horizontalInset + radius - bounds.minX
+        let upperX = size.width - horizontalInset - radius - bounds.maxX
+        let lowerY = topInset + radius - bounds.minY
+        let upperY = size.height - bottomInset - radius - bounds.maxY
+        return CGSize(width: min(max(offset.width, lowerX), max(lowerX, upperX)),
+                      height: min(max(offset.height, lowerY), max(lowerY, upperY)))
     }
 
     static func defaultCenter(in size: CGSize) -> CGPoint {
@@ -261,7 +297,9 @@ struct ElasticPlaybackControlBarGeometry {
         utilityCount: Int,
         bendDirection: ElasticPlaybackControlBarBendDirection,
         orientation: ElasticPlaybackControlBarOrientation = .right,
-        sidebarOccupiedWidth: CGFloat
+        sidebarOccupiedWidth: CGFloat,
+        attachmentStrength: CGFloat? = nil,
+        renderOffset: CGSize? = nil
     ) -> Self {
         var adjustedCenter = center
         var geometry = Self(
@@ -269,7 +307,9 @@ struct ElasticPlaybackControlBarGeometry {
             center: adjustedCenter,
             utilityCount: utilityCount,
             bendDirection: bendDirection,
-            orientation: orientation
+            orientation: orientation,
+            attachmentStrength: attachmentStrength,
+            renderOffset: renderOffset
         )
         let sidebarBoundary = min(
             max(0, sidebarOccupiedWidth),
@@ -283,6 +323,12 @@ struct ElasticPlaybackControlBarGeometry {
         guard geometry.surfaceBounds.minX < sidebarBoundary else {
             return geometry
         }
+        if renderOffset != nil {
+            let shift = max(0, sidebarBoundary - geometry.surfaceBounds.minX)
+            let available = max(0, containerSize.width - Self.horizontalInset - geometry.surfaceBounds.maxX)
+            geometry.translateSurface(by: CGSize(width: min(shift, available), height: 0))
+            return geometry
+        }
         let initialOverlap = sidebarBoundary - geometry.surfaceBounds.minX
         adjustedCenter.x = max(
             adjustedCenter.x + initialOverlap,
@@ -293,7 +339,9 @@ struct ElasticPlaybackControlBarGeometry {
             center: adjustedCenter,
             utilityCount: utilityCount,
             bendDirection: bendDirection,
-            orientation: orientation
+            orientation: orientation,
+            attachmentStrength: attachmentStrength,
+            renderOffset: renderOffset
         )
         for _ in 0..<7 {
             let overlap = sidebarBoundary - geometry.surfaceBounds.minX
@@ -304,7 +352,9 @@ struct ElasticPlaybackControlBarGeometry {
                 center: adjustedCenter,
                 utilityCount: utilityCount,
                 bendDirection: bendDirection,
-                orientation: orientation
+                orientation: orientation,
+                attachmentStrength: attachmentStrength,
+                renderOffset: renderOffset
             )
         }
         if geometry.surfaceBounds.minX < sidebarBoundary - 0.25 {
@@ -315,7 +365,9 @@ struct ElasticPlaybackControlBarGeometry {
                 center: adjustedCenter,
                 utilityCount: utilityCount,
                 bendDirection: bendDirection,
-                orientation: orientation
+                orientation: orientation,
+                attachmentStrength: attachmentStrength,
+                renderOffset: renderOffset
             )
         }
         return geometry
@@ -812,6 +864,13 @@ struct ElasticPlaybackControlBarGeometry {
         return containment
     }
 
+    private mutating func translateSurface(by offset: CGSize) {
+        containmentOffset.width += offset.width
+        containmentOffset.height += offset.height
+        surfacePoints = surfacePoints.map { CGPoint(x: $0.x + offset.width, y: $0.y + offset.height) }
+        utilityPositions = utilityPositions.map { CGPoint(x: $0.x + offset.width, y: $0.y + offset.height) }
+    }
+
     private func applyingContainmentOffset(to point: CGPoint) -> CGPoint {
         CGPoint(
             x: point.x + containmentOffset.width,
@@ -1284,10 +1343,7 @@ struct ElasticPlaybackControlBar: View {
     private let sidebarOccupiedWidth: CGFloat
     private let placementDefaults: UserDefaults
     @State private var placement: ElasticPlaybackControlBarPlacement
-    @State private var dragStartCenter: CGPoint?
-    @State private var dragLastLocation: CGPoint?
-    @State private var dragGrabFraction: CGFloat?
-    @State private var dragGrabLocalOffset = CGPoint.zero
+    @State private var barDrag: ElasticPlaybackBarDrag?
     @State private var dragTimelineFraction: CGFloat?
     @State private var draggedCenter: CGPoint?
     @State private var gestureMode: ElasticPlaybackGestureMode?
@@ -1332,14 +1388,22 @@ struct ElasticPlaybackControlBar: View {
                 utilityCount: activeUtilities.count,
                 bendDirection: bendDirection,
                 orientation: orientation,
-                sidebarOccupiedWidth: sidebarOccupiedWidth
+                sidebarOccupiedWidth: sidebarOccupiedWidth,
+                attachmentStrength: placement.attachmentStrength.map { CGFloat($0) },
+                renderOffset: placement.normalizedRenderOffset.map {
+                    CGSize(width: $0.width * size.width, height: $0.height * size.height)
+                }
             )
             let utilities = ElasticPlaybackUtility.fitting(activeUtilities, length: fullGeometry.totalLength)
             let geometry = utilities.count == activeUtilities.count ? fullGeometry
                 : ElasticPlaybackControlBarGeometry.avoidingSidebar(
                     containerSize: size, center: center, utilityCount: utilities.count,
                     bendDirection: bendDirection, orientation: orientation,
-                    sidebarOccupiedWidth: sidebarOccupiedWidth
+                    sidebarOccupiedWidth: sidebarOccupiedWidth,
+                    attachmentStrength: placement.attachmentStrength.map { CGFloat($0) },
+                    renderOffset: placement.normalizedRenderOffset.map {
+                        CGSize(width: $0.width * size.width, height: $0.height * size.height)
+                    }
                 )
             let shape = ElasticPlaybackControlBarShape(points: geometry.surfacePoints)
 
@@ -1721,9 +1785,7 @@ struct ElasticPlaybackControlBar: View {
                             return
                         }
                         beginMovingBar(
-                            geometry: geometry,
-                            startLocation: value.startLocation,
-                            size: size
+                            geometry: geometry
                         )
                     }
                     model.registerUserActivity()
@@ -1739,54 +1801,7 @@ struct ElasticPlaybackControlBar: View {
                 case .pendingTimeline:
                     break
                 case .move:
-                    guard let dragStartCenter, let dragGrabFraction else { return }
-                    let previousLocation = dragLastLocation ?? value.startLocation
-                    let incrementalTranslation = CGSize(
-                        width: value.location.x - previousLocation.x,
-                        height: value.location.y - previousLocation.y
-                    )
-                    let currentCenter = draggedCenter ?? dragStartCenter
-                    dragLastLocation = value.location
-                    if let advancingCenter = geometry.centerAdvancingBendAtTerminalBoundary(
-                        translation: incrementalTranslation
-                    ) {
-                        _ = applyTrackedCenter(
-                            advancingCenter,
-                            size: size,
-                            utilityCount: utilityCount,
-                            bendDirection: bendDirection
-                        )
-                        break
-                    }
-                    let incrementalCenter = ElasticPlaybackControlBarGeometry.movedCenter(
-                        from: currentCenter,
-                        translation: incrementalTranslation
-                    )
-                    let direction = stableBendDirection(
-                        at: incrementalCenter,
-                        size: size,
-                        utilityCount: utilityCount
-                    )
-                    bendDirection = direction
-                    let trackedCenter = ElasticPlaybackControlBarGeometry.centerTracking(
-                        desiredPoint: value.location,
-                        surfaceFraction: dragGrabFraction,
-                        localOffset: dragGrabLocalOffset,
-                        initialCenter: incrementalCenter,
-                        containerSize: size,
-                        utilityCount: utilityCount,
-                        bendDirection: direction,
-                        orientation: orientation,
-                        maximumCorrection: geometry.trackingCorrectionLimit(
-                            for: incrementalTranslation
-                        )
-                    )
-                    _ = applyTrackedCenter(
-                        trackedCenter,
-                        size: size,
-                        utilityCount: utilityCount,
-                        bendDirection: direction
-                    )
+                    updateBarDrag(translation: value.translation, size: size, utilityCount: utilityCount)
                 case .scrub:
                     previewTimeline(at: value.location, geometry: geometry)
                 case nil:
@@ -1804,59 +1819,14 @@ struct ElasticPlaybackControlBar: View {
                     gestureStartPlacement = nil
                     model.setChromePin(.scrubbing, active: false)
                     gestureMode = nil
-                    dragStartCenter = nil
-                    dragLastLocation = nil
-                    dragGrabFraction = nil
-                    dragGrabLocalOffset = .zero
+                    barDrag = nil
                     dragTimelineFraction = nil
                 }
                 switch gestureMode {
                 case .pendingTimeline:
                     commitTimeline(at: value.location, geometry: geometry)
                 case .move:
-                    let origin = dragStartCenter ?? geometry.center
-                    let direction = bendDirection
-                    bendDirection = direction
-                    let previousLocation = dragLastLocation ?? value.startLocation
-                    let residualTranslation = CGSize(
-                        width: value.location.x - previousLocation.x,
-                        height: value.location.y - previousLocation.y
-                    )
-                    let currentCenter = draggedCenter ?? origin
-                    let finalCenter: CGPoint
-                    if let advancingCenter = geometry.centerAdvancingBendAtTerminalBoundary(
-                        translation: residualTranslation
-                    ) {
-                        finalCenter = advancingCenter
-                    } else {
-                        let incrementalCenter = ElasticPlaybackControlBarGeometry.movedCenter(
-                            from: currentCenter,
-                            translation: residualTranslation
-                        )
-                        finalCenter = ElasticPlaybackControlBarGeometry.centerTracking(
-                            desiredPoint: value.location,
-                            surfaceFraction: dragGrabFraction ?? 0.5,
-                            localOffset: dragGrabLocalOffset,
-                            initialCenter: incrementalCenter,
-                            containerSize: size,
-                            utilityCount: utilityCount,
-                            bendDirection: direction,
-                            orientation: orientation,
-                            maximumCorrection: geometry.trackingCorrectionLimit(
-                                for: residualTranslation
-                            )
-                        )
-                    }
-                    let placedCenter = applyTrackedCenter(
-                        finalCenter,
-                        size: size,
-                        utilityCount: utilityCount,
-                        bendDirection: direction
-                    )
-                    normalizedCenter = ElasticPlaybackControlBarGeometry.normalizedCenter(
-                        placedCenter,
-                        in: size
-                    )
+                    updateBarDrag(translation: value.translation, size: size, utilityCount: utilityCount)
                     persistPlacement()
                     draggedCenter = nil
                     model.setChromePin(.chromeDrag, active: false)
@@ -1879,9 +1849,7 @@ struct ElasticPlaybackControlBar: View {
         transaction = nil
         gestureStartPlacement = nil
         gestureMode = nil
-        dragStartCenter = nil
-        dragLastLocation = nil
-        dragGrabFraction = nil
+        barDrag = nil
         dragTimelineFraction = nil
         draggedCenter = nil
         model.setChromePin(.chromeDrag, active: false)
@@ -1889,91 +1857,28 @@ struct ElasticPlaybackControlBar: View {
     }
 
     private func beginMovingBar(
-        geometry: ElasticPlaybackControlBarGeometry,
-        startLocation: CGPoint,
-        size: CGSize
+        geometry: ElasticPlaybackControlBarGeometry
     ) {
         gestureMode = .move
-        dragStartCenter = geometry.center
-        dragLastLocation = startLocation
-        if geometry.bendProgress < 0.08 {
-            bendDirection = ElasticPlaybackControlBarGeometry.preferredBendDirection(
-                at: geometry.center,
-                in: size,
-                orientation: orientation
-            )
-        }
-        let grabFraction = geometry.surfaceFraction(
-            at: startLocation,
-            maximumDistance: ElasticPlaybackControlBarGeometry.thickness / 2 + 8
-        ) ?? 0.5
-        dragGrabFraction = grabFraction
-        dragGrabLocalOffset = geometry.localOffset(
-            from: startLocation,
-            atSurfaceFraction: grabFraction
-        )
+        barDrag = ElasticPlaybackBarDrag(geometry: geometry,
+            attachmentStrength: placement.attachmentStrength.map { CGFloat($0) })
         model.setChromePin(.chromeDrag, active: true)
     }
 
-    private func stableBendDirection(
-        at center: CGPoint,
-        size: CGSize,
-        utilityCount: Int
-    ) -> ElasticPlaybackControlBarBendDirection {
-        let candidate = ElasticPlaybackControlBarGeometry(
-            containerSize: size,
-            center: center,
-            utilityCount: utilityCount,
-            bendDirection: bendDirection,
-            orientation: orientation
-        )
-        guard candidate.bendProgress < 0.08 else { return bendDirection }
-        return ElasticPlaybackControlBarGeometry.preferredBendDirection(
-            at: center,
-            in: size,
-            orientation: orientation
-        )
-    }
+    private func updateBarDrag(translation: CGSize, size: CGSize, utilityCount: Int) {
+        guard var drag = barDrag else { return }
+        let center = drag.update(translation: translation, size: size, utilityCount: utilityCount)
+        barDrag = drag
+        bendDirection = drag.bendDirection
+        // The same forward mapping runs for movement and release. No extra
+        // mouse-up correction, hidden inverse solver or mid-gesture rebase.
+        normalizedCenter = ElasticPlaybackControlBarGeometry.normalizedCenter(center, in: size)
+        placement.attachmentStrength = Double(drag.attachmentStrength)
+        placement.normalizedRenderOffset = CGSize(
+            width: size.width > 0 ? drag.renderOffset.width / size.width : 0,
+            height: size.height > 0 ? drag.renderOffset.height / size.height : 0)
 
-    @discardableResult
-    private func applyTrackedCenter(
-        _ center: CGPoint,
-        size: CGSize,
-        utilityCount: Int,
-        bendDirection: ElasticPlaybackControlBarBendDirection
-    ) -> CGPoint {
-        let geometry = ElasticPlaybackControlBarGeometry(
-            containerSize: size,
-            center: center,
-            utilityCount: utilityCount,
-            bendDirection: bendDirection,
-            orientation: orientation
-        )
-        guard geometry.bendProgress >= 0.995 else {
-            normalizedCenter = ElasticPlaybackControlBarGeometry.normalizedCenter(
-                center,
-                in: size
-            )
-            draggedCenter = center
-            return center
-        }
-
-        // A completely turned bar is geometrically identical to a straight
-        // bar in the next cardinal orientation. Rebase at its displayed
-        // midpoint so dragging can continue around the following corner.
-        let rebasedCenter = geometry.point(at: 0)
-        orientation = geometry.terminalOrientation
-        self.bendDirection = ElasticPlaybackControlBarGeometry.preferredBendDirection(
-            at: rebasedCenter,
-            in: size,
-            orientation: orientation
-        )
-        normalizedCenter = ElasticPlaybackControlBarGeometry.normalizedCenter(
-            rebasedCenter,
-            in: size
-        )
-        draggedCenter = rebasedCenter
-        return rebasedCenter
+        draggedCenter = center
     }
 
     private func previewTimeline(

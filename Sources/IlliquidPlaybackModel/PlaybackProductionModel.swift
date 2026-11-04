@@ -155,7 +155,8 @@ public enum PlaybackProductionModel {
       cloneOutput: { $0 },
       checkTransition: { _, _, transition in checks(transition) },
       equalStates: { $0 == $1 },
-      codec: PlaybackProductionCodec.codec)
+      codec: PlaybackProductionCodec.codec,
+      estimatedStateBytes: { PlaybackStateMemoryEstimate.estimate($0) })
   }
 
   /// A live session over the production model, starting from `state`.
