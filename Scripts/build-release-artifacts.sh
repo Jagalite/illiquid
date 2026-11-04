@@ -65,10 +65,12 @@ PY
 cat > dist/release-notes.md <<EOF
 Illiquid $version — Apple Silicon, macOS 26 or later.
 
+Download: [Illiquid for macOS](https://github.com/Jagalite/illiquid/releases/download/${ILLIQUID_RELEASE_TAG:-v$version}/Illiquid-$version-macOS.dmg).
+
 $distribution_status
 
 Source revision: \`$revision\`. Matching project source, dependency source,
-build provenance and SHA-256 checksums are attached. Original project code is
+and the DMG SHA-256 checksum are attached. Original project code is
 GPL-3.0-or-later; dependency terms are included in the app and source package.
 
 Packaging checks include dependency-lock verification, signature and library
