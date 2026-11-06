@@ -1,0 +1,495 @@
+{
+  "schema": 1,
+  "machine": "macOS-26.5.2-arm64-arm-64bit-Mach-O",
+  "source_count": 100000,
+  "skip_navigation": true,
+  "prevents_idle_display_sleep": true,
+  "scripts": {
+    "profile-performance-suite.py": "e5392097134be79ada75323326e6409dbe1e49f8883edc09ad867dc36ddcdb51",
+    "profile-output-recovery.py": "b2ec289d859510ab5f3316137579105084b97cbf2de08c82239028fbe8a717da",
+    "profile-responsiveness.py": "ae14199e015b885b0ef3a7eeaebf8f08ecf4e35bf0aa8d92ee4ed23ba2d7446a",
+    "profile-lifecycle.py": "dd95378acb8c8e18871672f4264998bd4f4d5c27cf480b1f6dff03ef70743f17",
+    "profile-reference-player.py": "b9e980c65fafa72dff0c16476e34c40bdc271fd7fd5d8d99a5500539023b0dda"
+  },
+  "apps": {
+    "baseline": {
+      "path": "/Volumes/seed2/Projects/illiquid-production-receipts/p0-baseline-bundle/local-bundle/Illiquid.app",
+      "binary_sha256": "cd106bb0005d8772f287f8858949133bf5bee12a6b7bfcb3877ff85f45490f6c"
+    },
+    "candidate": {
+      "path": "/Volumes/seed2/Projects/illiquid-production-receipts/final/candidate-bundle/local-bundle/Illiquid.app",
+      "binary_sha256": "bc4c55f36c972b210697ba42cad7e5b147ab0df8bdb0d72d20f67a77dde53eb4"
+    }
+  },
+  "fixtures": {
+    "/Volumes/seed2/Projects/illiquid-production-receipts/fixtures/perf-h264-aac-1080p-60s.mp4": "2fa24cde9baa71d6ad508fb044c26598f5960ea42021344038e252c870b2cbfe"
+  },
+  "records": [
+    {
+      "app": "baseline",
+      "case": "output-0",
+      "repeat": 0,
+      "receipt": "/Volumes/seed2/Projects/illiquid-production-receipts/final/performance-cohort/1-output-0-baseline/summary.json",
+      "metrics": {
+        "quit_ms": 286.80341702420264,
+        "launch_ms": 1495.1578329782933,
+        "seek_ms": 86.99891649303026,
+        "seek_max_ms": 130.72075002128258,
+        "steady_cpu": 9.503716802692958,
+        "steady_mib": 169.8779296875,
+        "steady_dropped": 0.0,
+        "steady_corrupted": 0.0,
+        "hover_cpu": 17.252850441488583,
+        "hover_mib": 179.98736572265625,
+        "hover_dropped": 0.0,
+        "hover_corrupted": 0.0,
+        "resize_cpu": 15.461151639342718,
+        "resize_mib": 172.33111572265625,
+        "resize_dropped": 0.0,
+        "resize_corrupted": 0.0
+      }
+    },
+    {
+      "app": "candidate",
+      "case": "output-0",
+      "repeat": 0,
+      "receipt": "/Volumes/seed2/Projects/illiquid-production-receipts/final/performance-cohort/1-output-0-candidate/summary.json",
+      "metrics": {
+        "quit_ms": 256.7922080052085,
+        "launch_ms": 1794.0428330330178,
+        "seek_ms": 91.85322900884785,
+        "seek_max_ms": 155.4783339961432,
+        "steady_cpu": 9.286430924786247,
+        "steady_mib": 154.67474365234375,
+        "steady_dropped": 0.0,
+        "steady_corrupted": 0.0,
+        "hover_cpu": 16.88442241008167,
+        "hover_mib": 165.6279296875,
+        "hover_dropped": 0.0,
+        "hover_corrupted": 0.0,
+        "resize_cpu": 15.667331164991271,
+        "resize_mib": 170.7685546875,
+        "resize_dropped": 0.0,
+        "resize_corrupted": 0.0
+      }
+    },
+    {
+      "app": "candidate",
+      "case": "output-0",
+      "repeat": 1,
+      "receipt": "/Volumes/seed2/Projects/illiquid-production-receipts/final/performance-cohort/2-output-0-candidate/summary.json",
+      "metrics": {
+        "quit_ms": 378.39320802595466,
+        "launch_ms": 518.4059159946628,
+        "seek_ms": 75.15099999727681,
+        "seek_max_ms": 124.67454199213535,
+        "steady_cpu": 10.11745482162623,
+        "steady_mib": 150.48724365234375,
+        "steady_dropped": 0.0,
+        "steady_corrupted": 0.0,
+        "hover_cpu": 17.235843713494397,
+        "hover_mib": 168.4716796875,
+        "hover_dropped": 0.0,
+        "hover_corrupted": 0.0,
+        "resize_cpu": 16.020990282651322,
+        "resize_mib": 172.9091796875,
+        "resize_dropped": 0.0,
+        "resize_corrupted": 0.0
+      }
+    },
+    {
+      "app": "baseline",
+      "case": "output-0",
+      "repeat": 1,
+      "receipt": "/Volumes/seed2/Projects/illiquid-production-receipts/final/performance-cohort/2-output-0-baseline/summary.json",
+      "metrics": {
+        "quit_ms": 418.5159160406329,
+        "launch_ms": 1170.2427080017515,
+        "seek_ms": 86.0421459947247,
+        "seek_max_ms": 141.9764999882318,
+        "steady_cpu": 9.962943741544553,
+        "steady_mib": 164.9873046875,
+        "steady_dropped": 0.0,
+        "steady_corrupted": 0.0,
+        "hover_cpu": 16.93793081022674,
+        "hover_mib": 178.5029296875,
+        "hover_dropped": 0.0,
+        "hover_corrupted": 0.0,
+        "resize_cpu": 15.96559957592997,
+        "resize_mib": 178.01861572265625,
+        "resize_dropped": 0.0,
+        "resize_corrupted": 0.0
+      }
+    },
+    {
+      "app": "baseline",
+      "case": "output-0",
+      "repeat": 2,
+      "receipt": "/Volumes/seed2/Projects/illiquid-production-receipts/final/performance-cohort/3-output-0-baseline/summary.json",
+      "metrics": {
+        "quit_ms": 388.1358749931678,
+        "launch_ms": 410.69099999731407,
+        "seek_ms": 85.44224998331629,
+        "seek_max_ms": 112.33816697495058,
+        "steady_cpu": 9.719967319468887,
+        "steady_mib": 162.00286865234375,
+        "steady_dropped": 0.0,
+        "steady_corrupted": 0.0,
+        "hover_cpu": 18.05921979307182,
+        "hover_mib": 180.94036865234375,
+        "hover_dropped": 0.0,
+        "hover_corrupted": 0.0,
+        "resize_cpu": 15.946566042805694,
+        "resize_mib": 168.33099365234375,
+        "resize_dropped": 0.0,
+        "resize_corrupted": 0.0
+      }
+    },
+    {
+      "app": "candidate",
+      "case": "output-0",
+      "repeat": 2,
+      "receipt": "/Volumes/seed2/Projects/illiquid-production-receipts/final/performance-cohort/3-output-0-candidate/summary.json",
+      "metrics": {
+        "quit_ms": 239.91604201728478,
+        "launch_ms": 1313.9279590104707,
+        "seek_ms": 90.89108352782205,
+        "seek_max_ms": 142.69458397757262,
+        "steady_cpu": 9.990758102573661,
+        "steady_mib": 149.2373046875,
+        "steady_dropped": 0.0,
+        "steady_corrupted": 0.0,
+        "hover_cpu": 17.893372382246802,
+        "hover_mib": 169.6904296875,
+        "hover_dropped": 0.0,
+        "hover_corrupted": 0.0,
+        "resize_cpu": 16.248862368097083,
+        "resize_mib": 171.9248046875,
+        "resize_dropped": 0.0,
+        "resize_corrupted": 0.0
+      }
+    },
+    {
+      "app": "candidate",
+      "case": "output-0",
+      "repeat": 3,
+      "receipt": "/Volumes/seed2/Projects/illiquid-production-receipts/final/performance-cohort/4-output-0-candidate/summary.json",
+      "metrics": {
+        "quit_ms": 395.1992500224151,
+        "launch_ms": 375.57758297771215,
+        "seek_ms": 94.07843754161149,
+        "seek_max_ms": 120.3648749506101,
+        "steady_cpu": 9.921344494905322,
+        "steady_mib": 148.2373046875,
+        "steady_dropped": 0.0,
+        "steady_corrupted": 0.0,
+        "hover_cpu": 18.030161551390343,
+        "hover_mib": 168.3154296875,
+        "hover_dropped": 0.0,
+        "hover_corrupted": 0.0,
+        "resize_cpu": 14.489729794914508,
+        "resize_mib": 169.7216796875,
+        "resize_dropped": 0.0,
+        "resize_corrupted": 0.0
+      }
+    },
+    {
+      "app": "baseline",
+      "case": "output-0",
+      "repeat": 3,
+      "receipt": "/Volumes/seed2/Projects/illiquid-production-receipts/final/performance-cohort/4-output-0-baseline/summary.json",
+      "metrics": {
+        "quit_ms": 384.82429197756574,
+        "launch_ms": 1134.9429169786163,
+        "seek_ms": 78.9811874856241,
+        "seek_max_ms": 139.6447079605423,
+        "steady_cpu": 9.636297336021748,
+        "steady_mib": 153.0029296875,
+        "steady_dropped": 0.0,
+        "steady_corrupted": 0.0,
+        "hover_cpu": 17.290456271704947,
+        "hover_mib": 165.67486572265625,
+        "hover_dropped": 0.0,
+        "hover_corrupted": 0.0,
+        "resize_cpu": 15.986554732069566,
+        "resize_mib": 167.94049072265625,
+        "resize_dropped": 0.0,
+        "resize_corrupted": 0.0
+      }
+    },
+    {
+      "app": "baseline",
+      "case": "output-0",
+      "repeat": 4,
+      "receipt": "/Volumes/seed2/Projects/illiquid-production-receipts/final/performance-cohort/5-output-0-baseline/summary.json",
+      "metrics": {
+        "quit_ms": 273.20912503637373,
+        "launch_ms": 566.5159579948522,
+        "seek_ms": 85.75579198077321,
+        "seek_max_ms": 128.55525000486523,
+        "steady_cpu": 10.047279126327075,
+        "steady_mib": 148.7685546875,
+        "steady_dropped": 0.0,
+        "steady_corrupted": 0.0,
+        "hover_cpu": 17.121968787987925,
+        "hover_mib": 171.2373046875,
+        "hover_dropped": 0.0,
+        "hover_corrupted": 0.0,
+        "resize_cpu": 15.822599612203685,
+        "resize_mib": 169.6123046875,
+        "resize_dropped": 0.0,
+        "resize_corrupted": 0.0
+      }
+    },
+    {
+      "app": "candidate",
+      "case": "output-0",
+      "repeat": 4,
+      "receipt": "/Volumes/seed2/Projects/illiquid-production-receipts/final/performance-cohort/5-output-0-candidate/summary.json",
+      "metrics": {
+        "quit_ms": 259.8356669768691,
+        "launch_ms": 1576.5387080027722,
+        "seek_ms": 83.98091702838428,
+        "seek_max_ms": 526.9291669828817,
+        "steady_cpu": 10.054440252996418,
+        "steady_mib": 163.8310546875,
+        "steady_dropped": 0.0,
+        "steady_corrupted": 0.0,
+        "hover_cpu": 17.40265284817129,
+        "hover_mib": 170.6435546875,
+        "hover_dropped": 0.0,
+        "hover_corrupted": 0.0,
+        "resize_cpu": 15.746118706993542,
+        "resize_mib": 168.5029296875,
+        "resize_dropped": 0.0,
+        "resize_corrupted": 0.0
+      }
+    },
+    {
+      "app": "candidate",
+      "case": "output-0",
+      "repeat": 5,
+      "receipt": "/Volumes/seed2/Projects/illiquid-production-receipts/final/performance-cohort/6-output-0-candidate/summary.json",
+      "metrics": {
+        "quit_ms": 374.9725000234321,
+        "launch_ms": 465.7803750014864,
+        "seek_ms": 91.61422899342142,
+        "seek_max_ms": 115.54533295566216,
+        "steady_cpu": 9.991511343816088,
+        "steady_mib": 159.0498046875,
+        "steady_dropped": 0.0,
+        "steady_corrupted": 0.0,
+        "hover_cpu": 18.20964806541828,
+        "hover_mib": 179.1591796875,
+        "hover_dropped": 0.0,
+        "hover_corrupted": 0.0,
+        "resize_cpu": 16.010319457581033,
+        "resize_mib": 177.6279296875,
+        "resize_dropped": 0.0,
+        "resize_corrupted": 0.0
+      }
+    },
+    {
+      "app": "baseline",
+      "case": "output-0",
+      "repeat": 5,
+      "receipt": "/Volumes/seed2/Projects/illiquid-production-receipts/final/performance-cohort/6-output-0-baseline/summary.json",
+      "metrics": {
+        "quit_ms": 379.6376249520108,
+        "launch_ms": 1136.6127499495633,
+        "seek_ms": 83.15006247721612,
+        "seek_max_ms": 132.94916599988937,
+        "steady_cpu": 9.532665142007778,
+        "steady_mib": 146.9404296875,
+        "steady_dropped": 0.0,
+        "steady_corrupted": 0.0,
+        "hover_cpu": 17.89472935211232,
+        "hover_mib": 170.40924072265625,
+        "hover_dropped": 0.0,
+        "hover_corrupted": 0.0,
+        "resize_cpu": 16.197297764825308,
+        "resize_mib": 169.36236572265625,
+        "resize_dropped": 0.0,
+        "resize_corrupted": 0.0
+      }
+    }
+  ],
+  "comparison": {
+    "passed": true,
+    "regression_passed": true,
+    "quality_passed": true,
+    "quality_checks": [
+      {
+        "case": "output-0",
+        "metric": "hover_dropped",
+        "baseline": 0.0,
+        "candidate": 0.0,
+        "limit": 0,
+        "passed": true
+      },
+      {
+        "case": "output-0",
+        "metric": "resize_dropped",
+        "baseline": 0.0,
+        "candidate": 0.0,
+        "limit": 0,
+        "passed": true
+      },
+      {
+        "case": "output-0",
+        "metric": "steady_dropped",
+        "baseline": 0.0,
+        "candidate": 0.0,
+        "limit": 0,
+        "passed": true
+      }
+    ],
+    "checks": [
+      {
+        "case": "output-0",
+        "metric": "hover_corrupted",
+        "baseline": 0.0,
+        "candidate": 0.0,
+        "limit": 0,
+        "passed": true,
+        "n": 6
+      },
+      {
+        "case": "output-0",
+        "metric": "hover_cpu",
+        "baseline": 17.271653356596765,
+        "candidate": 17.648012615209048,
+        "limit": 19.862401360086277,
+        "passed": true,
+        "n": 6
+      },
+      {
+        "case": "output-0",
+        "metric": "hover_dropped",
+        "baseline": 0.0,
+        "candidate": 0.0,
+        "limit": 0.0,
+        "passed": true,
+        "n": 6
+      },
+      {
+        "case": "output-0",
+        "metric": "hover_mib",
+        "baseline": 174.8701171875,
+        "candidate": 169.0810546875,
+        "limit": 201.100634765625,
+        "passed": true,
+        "n": 6
+      },
+      {
+        "case": "output-0",
+        "metric": "launch_ms",
+        "baseline": 1135.7778334640898,
+        "candidate": 916.1669375025667,
+        "limit": 1306.1445084837032,
+        "passed": true,
+        "n": 6
+      },
+      {
+        "case": "output-0",
+        "metric": "quit_ms",
+        "baseline": 382.2309584647883,
+        "candidate": 317.4040835001506,
+        "limit": 439.56560223450646,
+        "passed": true,
+        "n": 6
+      },
+      {
+        "case": "output-0",
+        "metric": "resize_corrupted",
+        "baseline": 0.0,
+        "candidate": 0.0,
+        "limit": 0,
+        "passed": true,
+        "n": 6
+      },
+      {
+        "case": "output-0",
+        "metric": "resize_cpu",
+        "baseline": 15.956082809367832,
+        "candidate": 15.878219082287288,
+        "limit": 18.349495230773005,
+        "passed": true,
+        "n": 6
+      },
+      {
+        "case": "output-0",
+        "metric": "resize_dropped",
+        "baseline": 0.0,
+        "candidate": 0.0,
+        "limit": 0.0,
+        "passed": true,
+        "n": 6
+      },
+      {
+        "case": "output-0",
+        "metric": "resize_mib",
+        "baseline": 169.48733520507812,
+        "candidate": 171.3466796875,
+        "limit": 194.91043548583983,
+        "passed": true,
+        "n": 6
+      },
+      {
+        "case": "output-0",
+        "metric": "seek_max_ms",
+        "baseline": 131.83495801058598,
+        "candidate": 133.68456298485398,
+        "limit": 156.83495801058598,
+        "passed": true,
+        "n": 6
+      },
+      {
+        "case": "output-0",
+        "metric": "seek_ms",
+        "baseline": 85.59902098204475,
+        "candidate": 91.25265626062173,
+        "limit": 110.59902098204475,
+        "passed": true,
+        "n": 6
+      },
+      {
+        "case": "output-0",
+        "metric": "steady_corrupted",
+        "baseline": 0.0,
+        "candidate": 0.0,
+        "limit": 0,
+        "passed": true,
+        "n": 6
+      },
+      {
+        "case": "output-0",
+        "metric": "steady_cpu",
+        "baseline": 9.678132327745317,
+        "candidate": 9.991134723194875,
+        "limit": 11.678132327745317,
+        "passed": true,
+        "n": 6
+      },
+      {
+        "case": "output-0",
+        "metric": "steady_dropped",
+        "baseline": 0.0,
+        "candidate": 0.0,
+        "limit": 0.0,
+        "passed": true,
+        "n": 6
+      },
+      {
+        "case": "output-0",
+        "metric": "steady_mib",
+        "baseline": 157.50289916992188,
+        "candidate": 152.58099365234375,
+        "limit": 181.12833404541016,
+        "passed": true,
+        "n": 6
+      }
+    ],
+    "policy": "median <= max(baseline * 1.15, baseline + 2 CPU points / 16 MiB / 25 ms); maximum dropped frames cannot increase; no corrupted frames in either cohort; absolute playback qualification requires zero dropped frames in both cohorts"
+  }
+}

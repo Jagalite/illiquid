@@ -3,7 +3,7 @@ import Foundation
 import IlliquidCore
 import IlliquidNativePlayback
 import IlliquidPlayback
-import IlliquidPlaybackCore
+import IlliquidPlaybackModel
 
 @MainActor
 public final class PlaybackCoordinator {

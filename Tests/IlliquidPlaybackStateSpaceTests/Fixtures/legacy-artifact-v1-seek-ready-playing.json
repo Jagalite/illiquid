@@ -1,0 +1,1175 @@
+{
+  "configuration" : {
+    "algorithm" : "breadthFirst",
+    "depthLimit" : 3,
+    "duplicateLimit" : 1,
+    "edgeLimit" : 100000,
+    "failureLimit" : 1,
+    "generationLimit" : 1,
+    "interruptLimit" : 1,
+    "lateResultLimit" : 1,
+    "pendingEffectLimit" : 3,
+    "porMode" : "disabled",
+    "profile" : "validation",
+    "stateLimit" : 10000,
+    "timeLimitSeconds" : 30
+  },
+  "dirty" : false,
+  "explorerVersion" : 1,
+  "failedInvariant" : {
+    "action" : {
+      "command" : {
+        "_0" : "seekExact"
+      }
+    },
+    "depth" : 1,
+    "details" : "Test-only oracle rejected accepted action class command.seekExact.",
+    "fromNodeIndex" : 0,
+    "invariantName" : "syntheticSeekFailure",
+    "nodeIndex" : 2
+  },
+  "initialState" : {
+    "acceptedEventCount" : 5,
+    "activeSession" : {
+      "activeOperationID" : 1,
+      "actualTransport" : "playing",
+      "controls" : {
+        "appliedSubtitleDelayMicroseconds" : 0,
+        "requestedSubtitleDelayMicroseconds" : 0
+      },
+      "desiredTransport" : "playing",
+      "drain" : {
+        "finalized" : false,
+        "observed" : [
+
+        ],
+        "required" : [
+
+        ]
+      },
+      "duration" : {
+        "unknown" : {
+
+        }
+      },
+      "generation" : 1,
+      "id" : 1,
+      "lifecycleState" : {
+        "resumeAfterWake" : false
+      },
+      "loading" : {
+        "initialSelection" : {
+
+        },
+        "phase" : "settled"
+      },
+      "logicalPosition" : {
+        "valid" : {
+          "_0" : {
+            "timescale" : 1,
+            "value" : 10
+          }
+        }
+      },
+      "phase" : "playing",
+      "recovery" : {
+        "audioPresentationRecoveryStage" : [
+
+        ],
+        "consumedVideoFallbackLineages" : [
+
+        ],
+        "disabledAudioStreams" : [
+
+        ],
+        "disabledSubtitleStreams" : [
+
+        ],
+        "presentationFlushConsumed" : [
+
+        ],
+        "presentationGraphRebuildCount" : 0
+      },
+      "revisions" : {
+
+      },
+      "source" : "seed",
+      "subtitles" : {
+        "appliedDelayMicroseconds" : 0,
+        "installedSourceIsExternal" : false,
+        "overlayRevision" : 0,
+        "rejectedOverlayCommitCount" : 0,
+        "subtitleRevision" : 0
+      },
+      "synchronization" : {
+        "appliedMilliRate" : 1000,
+        "audioPresentation" : {
+          "unknown" : {
+
+          }
+        },
+        "cacheMicroseconds" : 0,
+        "clock" : {
+          "unknown" : {
+
+          }
+        },
+        "desiredMilliRate" : 1000,
+        "isBuffering" : false,
+        "prerolled" : [
+
+        ],
+        "required" : [
+
+        ],
+        "startupAcknowledged" : true,
+        "videoPresentation" : {
+          "unknown" : {
+
+          }
+        }
+      },
+      "tracks" : {
+        "effectiveAudio" : {
+          "automatic" : {
+
+          }
+        },
+        "effectiveSubtitle" : {
+          "off" : {
+
+          }
+        },
+        "phase" : "idle",
+        "requestedAudio" : {
+          "automatic" : {
+
+          }
+        },
+        "requestedSubtitle" : {
+          "off" : {
+
+          }
+        },
+        "revision" : 0
+      }
+    },
+    "allocator" : {
+      "nextEffect" : 4,
+      "nextLease" : 1,
+      "nextOperation" : 2,
+      "nextSession" : 2
+    },
+    "applicationEpoch" : 1,
+    "completedEffectIDs" : [
+      1,
+      2,
+      3
+    ],
+    "diagnosticEventCount" : 0,
+    "lastVirtualTime" : {
+      "ticks" : 5
+    },
+    "lifecycle" : "running",
+    "outstandingEffects" : [
+
+    ],
+    "rejectedEventCount" : 0,
+    "resourceLeases" : [
+
+    ],
+    "schemaVersion" : 1,
+    "snapshotRevision" : 5
+  },
+  "minimizationHistory" : [
+
+  ],
+  "minimizedTrace" : [
+    {
+      "action" : {
+        "command" : {
+          "_0" : "seekExact"
+        }
+      },
+      "disposition" : {
+        "accepted" : {
+
+        }
+      },
+      "envelope" : {
+        "event" : {
+          "command" : {
+            "_0" : {
+              "seek" : {
+                "mode" : "exact",
+                "target" : {
+                  "valid" : {
+                    "_0" : {
+                      "timescale" : 1,
+                      "value" : 20
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "sequence" : 6,
+        "virtualTime" : {
+          "ticks" : 6
+        }
+      },
+      "gateRejected" : false,
+      "generatedEffects" : [
+        {
+          "completion" : {
+            "oneShot" : {
+              "terminals" : [
+                {
+                  "kind" : "cancelled"
+                },
+                {
+                  "kind" : "failed"
+                },
+                {
+                  "kind" : "succeeded"
+                }
+              ]
+            }
+          },
+          "context" : {
+            "authority" : {
+              "playback" : {
+                "generation" : 2,
+                "revisions" : {
+                  "overlay" : 1,
+                  "subtitle" : 1
+                },
+                "sessionID" : 1
+              }
+            },
+            "effectID" : 4,
+            "operationID" : 2
+          },
+          "exclusiveKey" : "seek.pipeline.1.2",
+          "executor" : "input",
+          "isCleanup" : false,
+          "kind" : {
+            "seekPipeline" : {
+              "mode" : "exact",
+              "target" : {
+                "valid" : {
+                  "_0" : {
+                    "timescale" : 1,
+                    "value" : 20
+                  }
+                }
+              }
+            }
+          }
+        }
+      ],
+      "invariantObservations" : [
+        {
+          "details" : "Test-only oracle rejected accepted action class command.seekExact.",
+          "name" : "syntheticSeekFailure"
+        }
+      ],
+      "postSearchDigest" : "fnv1a64:75d6aec35a2150bb",
+      "postState" : {
+        "acceptedEventCount" : 6,
+        "activeSession" : {
+          "activeOperationID" : 2,
+          "actualTransport" : "paused",
+          "controls" : {
+            "appliedSubtitleDelayMicroseconds" : 0,
+            "requestedSubtitleDelayMicroseconds" : 0
+          },
+          "desiredTransport" : "playing",
+          "drain" : {
+            "finalized" : false,
+            "observed" : [
+
+            ],
+            "required" : [
+
+            ]
+          },
+          "duration" : {
+            "unknown" : {
+
+            }
+          },
+          "generation" : 2,
+          "id" : 1,
+          "lifecycleState" : {
+            "resumeAfterWake" : false
+          },
+          "loading" : {
+            "initialSelection" : {
+
+            },
+            "phase" : "settled"
+          },
+          "logicalPosition" : {
+            "valid" : {
+              "_0" : {
+                "timescale" : 1,
+                "value" : 10
+              }
+            }
+          },
+          "phase" : "seeking",
+          "recovery" : {
+            "audioPresentationRecoveryStage" : [
+
+            ],
+            "consumedVideoFallbackLineages" : [
+
+            ],
+            "disabledAudioStreams" : [
+
+            ],
+            "disabledSubtitleStreams" : [
+
+            ],
+            "presentationFlushConsumed" : [
+
+            ],
+            "presentationGraphRebuildCount" : 0
+          },
+          "revisions" : {
+            "overlay" : 1,
+            "subtitle" : 1
+          },
+          "seek" : {
+            "generation" : 2,
+            "mode" : "exact",
+            "operationID" : 2,
+            "pendingBarriers" : [
+
+            ],
+            "phase" : "demuxSeeking",
+            "target" : {
+              "valid" : {
+                "_0" : {
+                  "timescale" : 1,
+                  "value" : 20
+                }
+              }
+            }
+          },
+          "source" : "seed",
+          "subtitles" : {
+            "appliedDelayMicroseconds" : 0,
+            "installedSourceIsExternal" : false,
+            "overlayRevision" : 1,
+            "pendingSourceInvalidation" : 1,
+            "pendingVisibleClear" : 1,
+            "rejectedOverlayCommitCount" : 0,
+            "subtitleRevision" : 1
+          },
+          "synchronization" : {
+            "appliedMilliRate" : 1000,
+            "audioPresentation" : {
+              "unknown" : {
+
+              }
+            },
+            "cacheMicroseconds" : 0,
+            "clock" : {
+              "unknown" : {
+
+              }
+            },
+            "desiredMilliRate" : 1000,
+            "isBuffering" : false,
+            "prerolled" : [
+
+            ],
+            "required" : [
+
+            ],
+            "startupAcknowledged" : false,
+            "videoPresentation" : {
+              "unknown" : {
+
+              }
+            }
+          },
+          "tracks" : {
+            "effectiveAudio" : {
+              "automatic" : {
+
+              }
+            },
+            "effectiveSubtitle" : {
+              "off" : {
+
+              }
+            },
+            "phase" : "idle",
+            "requestedAudio" : {
+              "automatic" : {
+
+              }
+            },
+            "requestedSubtitle" : {
+              "off" : {
+
+              }
+            },
+            "revision" : 0
+          }
+        },
+        "allocator" : {
+          "nextEffect" : 5,
+          "nextLease" : 1,
+          "nextOperation" : 3,
+          "nextSession" : 2
+        },
+        "applicationEpoch" : 1,
+        "completedEffectIDs" : [
+          1,
+          2,
+          3
+        ],
+        "diagnosticEventCount" : 0,
+        "lastVirtualTime" : {
+          "ticks" : 6
+        },
+        "lifecycle" : "running",
+        "outstandingEffects" : [
+          {
+            "acceptedTokens" : [
+
+            ],
+            "effect" : {
+              "completion" : {
+                "oneShot" : {
+                  "terminals" : [
+                    {
+                      "kind" : "cancelled"
+                    },
+                    {
+                      "kind" : "failed"
+                    },
+                    {
+                      "kind" : "succeeded"
+                    }
+                  ]
+                }
+              },
+              "context" : {
+                "authority" : {
+                  "playback" : {
+                    "generation" : 2,
+                    "revisions" : {
+                      "overlay" : 1,
+                      "subtitle" : 1
+                    },
+                    "sessionID" : 1
+                  }
+                },
+                "effectID" : 4,
+                "operationID" : 2
+              },
+              "exclusiveKey" : "seek.pipeline.1.2",
+              "executor" : "input",
+              "isCleanup" : false,
+              "kind" : {
+                "seekPipeline" : {
+                  "mode" : "exact",
+                  "target" : {
+                    "valid" : {
+                      "_0" : {
+                        "timescale" : 1,
+                        "value" : 20
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "effectID" : 4
+          }
+        ],
+        "rejectedEventCount" : 0,
+        "resourceLeases" : [
+
+        ],
+        "schemaVersion" : 1,
+        "snapshotRevision" : 6
+      },
+      "preSearchDigest" : "fnv1a64:ff7c7aaa7dac20b1",
+      "preState" : {
+        "acceptedEventCount" : 5,
+        "activeSession" : {
+          "activeOperationID" : 1,
+          "actualTransport" : "playing",
+          "controls" : {
+            "appliedSubtitleDelayMicroseconds" : 0,
+            "requestedSubtitleDelayMicroseconds" : 0
+          },
+          "desiredTransport" : "playing",
+          "drain" : {
+            "finalized" : false,
+            "observed" : [
+
+            ],
+            "required" : [
+
+            ]
+          },
+          "duration" : {
+            "unknown" : {
+
+            }
+          },
+          "generation" : 1,
+          "id" : 1,
+          "lifecycleState" : {
+            "resumeAfterWake" : false
+          },
+          "loading" : {
+            "initialSelection" : {
+
+            },
+            "phase" : "settled"
+          },
+          "logicalPosition" : {
+            "valid" : {
+              "_0" : {
+                "timescale" : 1,
+                "value" : 10
+              }
+            }
+          },
+          "phase" : "playing",
+          "recovery" : {
+            "audioPresentationRecoveryStage" : [
+
+            ],
+            "consumedVideoFallbackLineages" : [
+
+            ],
+            "disabledAudioStreams" : [
+
+            ],
+            "disabledSubtitleStreams" : [
+
+            ],
+            "presentationFlushConsumed" : [
+
+            ],
+            "presentationGraphRebuildCount" : 0
+          },
+          "revisions" : {
+
+          },
+          "source" : "seed",
+          "subtitles" : {
+            "appliedDelayMicroseconds" : 0,
+            "installedSourceIsExternal" : false,
+            "overlayRevision" : 0,
+            "rejectedOverlayCommitCount" : 0,
+            "subtitleRevision" : 0
+          },
+          "synchronization" : {
+            "appliedMilliRate" : 1000,
+            "audioPresentation" : {
+              "unknown" : {
+
+              }
+            },
+            "cacheMicroseconds" : 0,
+            "clock" : {
+              "unknown" : {
+
+              }
+            },
+            "desiredMilliRate" : 1000,
+            "isBuffering" : false,
+            "prerolled" : [
+
+            ],
+            "required" : [
+
+            ],
+            "startupAcknowledged" : true,
+            "videoPresentation" : {
+              "unknown" : {
+
+              }
+            }
+          },
+          "tracks" : {
+            "effectiveAudio" : {
+              "automatic" : {
+
+              }
+            },
+            "effectiveSubtitle" : {
+              "off" : {
+
+              }
+            },
+            "phase" : "idle",
+            "requestedAudio" : {
+              "automatic" : {
+
+              }
+            },
+            "requestedSubtitle" : {
+              "off" : {
+
+              }
+            },
+            "revision" : 0
+          }
+        },
+        "allocator" : {
+          "nextEffect" : 4,
+          "nextLease" : 1,
+          "nextOperation" : 2,
+          "nextSession" : 2
+        },
+        "applicationEpoch" : 1,
+        "completedEffectIDs" : [
+          1,
+          2,
+          3
+        ],
+        "diagnosticEventCount" : 0,
+        "lastVirtualTime" : {
+          "ticks" : 5
+        },
+        "lifecycle" : "running",
+        "outstandingEffects" : [
+
+        ],
+        "rejectedEventCount" : 0,
+        "resourceLeases" : [
+
+        ],
+        "schemaVersion" : 1,
+        "snapshotRevision" : 5
+      }
+    }
+  ],
+  "model" : "seek",
+  "modelVersion" : 10,
+  "oracle" : {
+    "failOnActionClass" : {
+      "_0" : "command.seekExact",
+      "invariantName" : "syntheticSeekFailure"
+    }
+  },
+  "originalTrace" : [
+    {
+      "action" : {
+        "command" : {
+          "_0" : "seekExact"
+        }
+      },
+      "disposition" : {
+        "accepted" : {
+
+        }
+      },
+      "envelope" : {
+        "event" : {
+          "command" : {
+            "_0" : {
+              "seek" : {
+                "mode" : "exact",
+                "target" : {
+                  "valid" : {
+                    "_0" : {
+                      "timescale" : 1,
+                      "value" : 20
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "sequence" : 6,
+        "virtualTime" : {
+          "ticks" : 6
+        }
+      },
+      "gateRejected" : false,
+      "generatedEffects" : [
+        {
+          "completion" : {
+            "oneShot" : {
+              "terminals" : [
+                {
+                  "kind" : "cancelled"
+                },
+                {
+                  "kind" : "failed"
+                },
+                {
+                  "kind" : "succeeded"
+                }
+              ]
+            }
+          },
+          "context" : {
+            "authority" : {
+              "playback" : {
+                "generation" : 2,
+                "revisions" : {
+                  "overlay" : 1,
+                  "subtitle" : 1
+                },
+                "sessionID" : 1
+              }
+            },
+            "effectID" : 4,
+            "operationID" : 2
+          },
+          "exclusiveKey" : "seek.pipeline.1.2",
+          "executor" : "input",
+          "isCleanup" : false,
+          "kind" : {
+            "seekPipeline" : {
+              "mode" : "exact",
+              "target" : {
+                "valid" : {
+                  "_0" : {
+                    "timescale" : 1,
+                    "value" : 20
+                  }
+                }
+              }
+            }
+          }
+        }
+      ],
+      "invariantObservations" : [
+        {
+          "details" : "Test-only oracle rejected accepted action class command.seekExact.",
+          "name" : "syntheticSeekFailure"
+        }
+      ],
+      "postSearchDigest" : "fnv1a64:75d6aec35a2150bb",
+      "postState" : {
+        "acceptedEventCount" : 6,
+        "activeSession" : {
+          "activeOperationID" : 2,
+          "actualTransport" : "paused",
+          "controls" : {
+            "appliedSubtitleDelayMicroseconds" : 0,
+            "requestedSubtitleDelayMicroseconds" : 0
+          },
+          "desiredTransport" : "playing",
+          "drain" : {
+            "finalized" : false,
+            "observed" : [
+
+            ],
+            "required" : [
+
+            ]
+          },
+          "duration" : {
+            "unknown" : {
+
+            }
+          },
+          "generation" : 2,
+          "id" : 1,
+          "lifecycleState" : {
+            "resumeAfterWake" : false
+          },
+          "loading" : {
+            "initialSelection" : {
+
+            },
+            "phase" : "settled"
+          },
+          "logicalPosition" : {
+            "valid" : {
+              "_0" : {
+                "timescale" : 1,
+                "value" : 10
+              }
+            }
+          },
+          "phase" : "seeking",
+          "recovery" : {
+            "audioPresentationRecoveryStage" : [
+
+            ],
+            "consumedVideoFallbackLineages" : [
+
+            ],
+            "disabledAudioStreams" : [
+
+            ],
+            "disabledSubtitleStreams" : [
+
+            ],
+            "presentationFlushConsumed" : [
+
+            ],
+            "presentationGraphRebuildCount" : 0
+          },
+          "revisions" : {
+            "overlay" : 1,
+            "subtitle" : 1
+          },
+          "seek" : {
+            "generation" : 2,
+            "mode" : "exact",
+            "operationID" : 2,
+            "pendingBarriers" : [
+
+            ],
+            "phase" : "demuxSeeking",
+            "target" : {
+              "valid" : {
+                "_0" : {
+                  "timescale" : 1,
+                  "value" : 20
+                }
+              }
+            }
+          },
+          "source" : "seed",
+          "subtitles" : {
+            "appliedDelayMicroseconds" : 0,
+            "installedSourceIsExternal" : false,
+            "overlayRevision" : 1,
+            "pendingSourceInvalidation" : 1,
+            "pendingVisibleClear" : 1,
+            "rejectedOverlayCommitCount" : 0,
+            "subtitleRevision" : 1
+          },
+          "synchronization" : {
+            "appliedMilliRate" : 1000,
+            "audioPresentation" : {
+              "unknown" : {
+
+              }
+            },
+            "cacheMicroseconds" : 0,
+            "clock" : {
+              "unknown" : {
+
+              }
+            },
+            "desiredMilliRate" : 1000,
+            "isBuffering" : false,
+            "prerolled" : [
+
+            ],
+            "required" : [
+
+            ],
+            "startupAcknowledged" : false,
+            "videoPresentation" : {
+              "unknown" : {
+
+              }
+            }
+          },
+          "tracks" : {
+            "effectiveAudio" : {
+              "automatic" : {
+
+              }
+            },
+            "effectiveSubtitle" : {
+              "off" : {
+
+              }
+            },
+            "phase" : "idle",
+            "requestedAudio" : {
+              "automatic" : {
+
+              }
+            },
+            "requestedSubtitle" : {
+              "off" : {
+
+              }
+            },
+            "revision" : 0
+          }
+        },
+        "allocator" : {
+          "nextEffect" : 5,
+          "nextLease" : 1,
+          "nextOperation" : 3,
+          "nextSession" : 2
+        },
+        "applicationEpoch" : 1,
+        "completedEffectIDs" : [
+          1,
+          2,
+          3
+        ],
+        "diagnosticEventCount" : 0,
+        "lastVirtualTime" : {
+          "ticks" : 6
+        },
+        "lifecycle" : "running",
+        "outstandingEffects" : [
+          {
+            "acceptedTokens" : [
+
+            ],
+            "effect" : {
+              "completion" : {
+                "oneShot" : {
+                  "terminals" : [
+                    {
+                      "kind" : "cancelled"
+                    },
+                    {
+                      "kind" : "failed"
+                    },
+                    {
+                      "kind" : "succeeded"
+                    }
+                  ]
+                }
+              },
+              "context" : {
+                "authority" : {
+                  "playback" : {
+                    "generation" : 2,
+                    "revisions" : {
+                      "overlay" : 1,
+                      "subtitle" : 1
+                    },
+                    "sessionID" : 1
+                  }
+                },
+                "effectID" : 4,
+                "operationID" : 2
+              },
+              "exclusiveKey" : "seek.pipeline.1.2",
+              "executor" : "input",
+              "isCleanup" : false,
+              "kind" : {
+                "seekPipeline" : {
+                  "mode" : "exact",
+                  "target" : {
+                    "valid" : {
+                      "_0" : {
+                        "timescale" : 1,
+                        "value" : 20
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "effectID" : 4
+          }
+        ],
+        "rejectedEventCount" : 0,
+        "resourceLeases" : [
+
+        ],
+        "schemaVersion" : 1,
+        "snapshotRevision" : 6
+      },
+      "preSearchDigest" : "fnv1a64:ff7c7aaa7dac20b1",
+      "preState" : {
+        "acceptedEventCount" : 5,
+        "activeSession" : {
+          "activeOperationID" : 1,
+          "actualTransport" : "playing",
+          "controls" : {
+            "appliedSubtitleDelayMicroseconds" : 0,
+            "requestedSubtitleDelayMicroseconds" : 0
+          },
+          "desiredTransport" : "playing",
+          "drain" : {
+            "finalized" : false,
+            "observed" : [
+
+            ],
+            "required" : [
+
+            ]
+          },
+          "duration" : {
+            "unknown" : {
+
+            }
+          },
+          "generation" : 1,
+          "id" : 1,
+          "lifecycleState" : {
+            "resumeAfterWake" : false
+          },
+          "loading" : {
+            "initialSelection" : {
+
+            },
+            "phase" : "settled"
+          },
+          "logicalPosition" : {
+            "valid" : {
+              "_0" : {
+                "timescale" : 1,
+                "value" : 10
+              }
+            }
+          },
+          "phase" : "playing",
+          "recovery" : {
+            "audioPresentationRecoveryStage" : [
+
+            ],
+            "consumedVideoFallbackLineages" : [
+
+            ],
+            "disabledAudioStreams" : [
+
+            ],
+            "disabledSubtitleStreams" : [
+
+            ],
+            "presentationFlushConsumed" : [
+
+            ],
+            "presentationGraphRebuildCount" : 0
+          },
+          "revisions" : {
+
+          },
+          "source" : "seed",
+          "subtitles" : {
+            "appliedDelayMicroseconds" : 0,
+            "installedSourceIsExternal" : false,
+            "overlayRevision" : 0,
+            "rejectedOverlayCommitCount" : 0,
+            "subtitleRevision" : 0
+          },
+          "synchronization" : {
+            "appliedMilliRate" : 1000,
+            "audioPresentation" : {
+              "unknown" : {
+
+              }
+            },
+            "cacheMicroseconds" : 0,
+            "clock" : {
+              "unknown" : {
+
+              }
+            },
+            "desiredMilliRate" : 1000,
+            "isBuffering" : false,
+            "prerolled" : [
+
+            ],
+            "required" : [
+
+            ],
+            "startupAcknowledged" : true,
+            "videoPresentation" : {
+              "unknown" : {
+
+              }
+            }
+          },
+          "tracks" : {
+            "effectiveAudio" : {
+              "automatic" : {
+
+              }
+            },
+            "effectiveSubtitle" : {
+              "off" : {
+
+              }
+            },
+            "phase" : "idle",
+            "requestedAudio" : {
+              "automatic" : {
+
+              }
+            },
+            "requestedSubtitle" : {
+              "off" : {
+
+              }
+            },
+            "revision" : 0
+          }
+        },
+        "allocator" : {
+          "nextEffect" : 4,
+          "nextLease" : 1,
+          "nextOperation" : 2,
+          "nextSession" : 2
+        },
+        "applicationEpoch" : 1,
+        "completedEffectIDs" : [
+          1,
+          2,
+          3
+        ],
+        "diagnosticEventCount" : 0,
+        "lastVirtualTime" : {
+          "ticks" : 5
+        },
+        "lifecycle" : "running",
+        "outstandingEffects" : [
+
+        ],
+        "rejectedEventCount" : 0,
+        "resourceLeases" : [
+
+        ],
+        "schemaVersion" : 1,
+        "snapshotRevision" : 5
+      }
+    }
+  ],
+  "schemaVersion" : 1,
+  "seedProfile" : "ready-playing",
+  "sourceRevision" : "ea2ff568",
+  "summary" : {
+    "canonicalDigest" : "fnv1a64:441b6f9c8bd09fb9",
+    "configuration" : {
+      "algorithm" : "breadthFirst",
+      "depthLimit" : 3,
+      "duplicateLimit" : 1,
+      "edgeLimit" : 100000,
+      "failureLimit" : 1,
+      "generationLimit" : 1,
+      "interruptLimit" : 1,
+      "lateResultLimit" : 1,
+      "pendingEffectLimit" : 3,
+      "porMode" : "disabled",
+      "profile" : "validation",
+      "stateLimit" : 10000,
+      "timeLimitSeconds" : 30
+    },
+    "deepestCompletedLayer" : 3,
+    "edgeCount" : 519,
+    "gateRejectionCount" : 0,
+    "model" : "seek",
+    "modelVersion" : 10,
+    "nonCommutingDiamondCount" : 0,
+    "peakFrontier" : 151,
+    "productionTransitionCount" : 263,
+    "reducedEdgeCount" : 0,
+    "seedProfile" : "ready-playing",
+    "stateCount" : 196,
+    "termination" : "completeWithinBounds",
+    "validatedDiamondCount" : 0
+  }
+}

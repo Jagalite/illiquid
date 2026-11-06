@@ -1,0 +1,176 @@
+Building for production...
+[0/50] Write sources
+[0/50] Copying NativePlaybackShaders.metal
+[0/50] Write sources
+[0/50] Write swift-version--58304C5D6DBC2206.txt
+[0/50] Write sources
+[0/50] /Volumes/seed2/Projects/illiquid-production-migration/.build/arm64-apple-macosx/release/IlliquidPackageTests.derived/runner.swift
+[0/50] Write sources
+[25/50] Copying Resources
+[26/50] Compiling _TestingInternals WillThrow.cpp
+[27/50] Compiling _TestingInternals ExecutablePath.cpp
+[27/50] Compiling _TestingInternals Discovery.cpp
+[27/52] Write sources
+[31/53] Compiling _TestingInternals Versions.cpp
+[32/54] Copying Sparkle.framework
+[34/54] Compiling _TestDiscovery WinSDKAdditions.swift
+[34/54] Compiling CNativeAudio AudioOutputDevice.m
+[36/54] Compiling TestingMacros ConditionMacro.swift
+[36/54] Write Objects.LinkFileList
+[37/54] Linking TestingMacros-tool
+[39/55] Compiling IlliquidCore MediaMetadataHints.swift
+[40/56] Compiling IlliquidPlaybackCore CompletedPlaybackEffectHistory.swift
+[41/57] Compiling IlliquidPlayback Module.swift
+[42/58] Compiling Testing ABI.Record+Streaming.swift
+[43/61] Compiling Statelessness Assurance.swift
+[44/62] Compiling IlliquidPlaybackTests RuntimeContractTests.swift
+[45/62] Compiling IlliquidPlaybackCoreTests CompletedEffectHistoryTests.swift
+[46/62] Compiling IlliquidPlaybackStateSpace PlaybackModelTransitions.swift
+[47/64] Compiling IlliquidStateSpaceExplorer main.swift
+[47/64] Write Objects.LinkFileList
+[48/64] Linking IlliquidStateSpaceExplorer
+[50/64] Compiling IlliquidPlaybackStateSpaceTests PlaybackStateSpaceTests.swift
+[51/64] Compiling IlliquidNativePlayback DeterministicCommitBarrier.swift
+/Volumes/seed2/Projects/illiquid-production-migration/Sources/IlliquidNativePlayback/Presentation/PiPSubtitleCompositor.swift:1152:23: warning: capture of 'commandBuffer' with non-Sendable type 'any MTLCommandBuffer' in a '@Sendable' closure [#SendableClosureCaptures]
+1150 |             self.workQueue.async {
+1151 |                 _ = resources.retainedCVTextures
+1152 |                 guard commandBuffer.status != .error else {
+     |                       `- warning: capture of 'commandBuffer' with non-Sendable type 'any MTLCommandBuffer' in a '@Sendable' closure [#SendableClosureCaptures]
+1153 |                     completion(.failure(
+1154 |                         commandBuffer.error
+
+/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.5.sdk/System/Library/Frameworks/Metal.framework/Headers/MTLCommandBuffer.h:245:11: note: protocol 'MTLCommandBuffer' does not conform to the 'Sendable' protocol
+243 |  */
+244 | API_AVAILABLE(macos(10.11), ios(8.0))
+245 | @protocol MTLCommandBuffer <NSObject>
+    |           `- note: protocol 'MTLCommandBuffer' does not conform to the 'Sendable' protocol
+246 |
+247 | /*!
+
+/Volumes/seed2/Projects/illiquid-production-migration/Sources/IlliquidNativePlayback/Presentation/PiPSubtitleCompositor.swift:6:1: warning: add '@preconcurrency' to treat 'Sendable'-related errors from module 'Metal' as warnings
+   4 | import CoreVideo
+   5 | import Foundation
+   6 | import Metal
+     | `- warning: add '@preconcurrency' to treat 'Sendable'-related errors from module 'Metal' as warnings
+   7 | import OSLog
+   8 | import QuartzCore
+
+[#SendableClosureCaptures]: <https://docs.swift.org/compiler/documentation/diagnostics/sendable-closure-captures>
+[52/68] Compiling IlliquidRenderProfile main.swift
+[52/68] Write Objects.LinkFileList
+[53/68] Linking IlliquidRenderProfile
+[55/68] Compiling IlliquidDifferentialHarness main.swift
+[55/68] Write Objects.LinkFileList
+[57/68] Compiling IlliquidPlayer ArchitectureValidation.swift
+[57/72] Linking IlliquidDifferentialHarness
+[59/72] Compiling IlliquidPlaybackStress main.swift
+[59/72] Write Objects.LinkFileList
+[61/72] Compiling IlliquidArchitectureCheck main.swift
+[61/72] Write Objects.LinkFileList
+[62/72] Linking IlliquidPlaybackStress
+[63/72] Linking IlliquidArchitectureCheck
+[65/72] Compiling IlliquidCoreTests AspectFitWindowSizingTests.swift
+/Volumes/seed2/Projects/illiquid-production-migration/Tests/IlliquidCoreTests/PlaylistIdentityLookupTests.swift:99:26: warning: '#require(_:_:)' is redundant because 'URL(string: "https://example.invalid/Media/A.mkv")' never equals 'nil' (from macro 'require')
+ 97 |             nil,
+ 98 |             URL(fileURLWithPath: "/Media/A.mkv"),
+ 99 |             try #require(URL(string: "https://example.invalid/Media/A.mkv")),
+    |                          `- warning: '#require(_:_:)' is redundant because 'URL(string: "https://example.invalid/Media/A.mkv")' never equals 'nil' (from macro 'require')
+100 |             try #require(URL(string: "file://media-server.example/Media/A.mkv")),
+101 |         ]
+
+/Volumes/seed2/Projects/illiquid-production-migration/Tests/IlliquidCoreTests/PlaylistIdentityLookupTests.swift:100:26: warning: '#require(_:_:)' is redundant because 'URL(string: "file://media-server.example/Media/A.mkv")' never equals 'nil' (from macro 'require')
+ 98 |             URL(fileURLWithPath: "/Media/A.mkv"),
+ 99 |             try #require(URL(string: "https://example.invalid/Media/A.mkv")),
+100 |             try #require(URL(string: "file://media-server.example/Media/A.mkv")),
+    |                          `- warning: '#require(_:_:)' is redundant because 'URL(string: "file://media-server.example/Media/A.mkv")' never equals 'nil' (from macro 'require')
+101 |         ]
+102 |         let folder = FolderPlaylist(folderURL: URL(fileURLWithPath: "/Media"), items: [])
+[66/72] Compiling IlliquidPlayerTests PlaybackCoordinatorTests.swift
+[67/72] Compiling IlliquidApp AppDelegate.swift
+[67/72] Write Objects.LinkFileList
+[68/72] Linking Illiquid
+[70/73] Compiling IlliquidAppTests AdaptiveRainbowTextColorTests.swift
+[71/73] Compiling IlliquidNativePlaybackTests ASSBitmapCopyTests.swift
+/Volumes/seed2/Projects/illiquid-production-migration/Tests/IlliquidNativePlaybackTests/PGSSubtitlePacketBorrowTests.swift:77:18: warning: weak variable 'released' was never mutated; consider changing to 'let' constant [#WeakMutability]
+ 75 |             reference(x: 30, y: 40),
+ 76 |         ]))
+ 77 |         weak var released = owner
+    |                  `- warning: weak variable 'released' was never mutated; consider changing to 'let' constant [#WeakMutability]
+ 78 |         let metadata = try parseThenOverwrite(try #require(owner))
+ 79 |         owner = nil
+
+/Volumes/seed2/Projects/illiquid-production-migration/Tests/IlliquidNativePlaybackTests/PacketQueueWakeupTests.swift:127:18: warning: weak variable 'retained' was never mutated; consider changing to 'let' constant [#WeakMutability]
+125 |         let queue = BoundedQueue<Payload>(capacity: 1)
+126 |         var value: Payload? = Payload()
+127 |         weak var retained = value
+    |                  `- warning: weak variable 'retained' was never mutated; consider changing to 'let' constant [#WeakMutability]
+128 |         #expect(queue.push(value!)); value = nil
+129 |         #expect(retained != nil); queue.removeAll(); #expect(retained == nil)
+
+/Volumes/seed2/Projects/illiquid-production-migration/Tests/IlliquidNativePlaybackTests/PlanarOwnershipTransitionTests.swift:99:13: warning: '#require(_:_:)' is redundant because 'ledger.makeRendererSampleAttachment(checkoutID: checkoutID)' never equals 'nil' (from macro 'require')
+ 97 |         let checkoutID = try #require(token).checkoutID
+ 98 |         var attachment: PlanarRendererSampleLifetimeAttachment? = try #require(
+ 99 |             ledger.makeRendererSampleAttachment(checkoutID: checkoutID)
+    |             `- warning: '#require(_:_:)' is redundant because 'ledger.makeRendererSampleAttachment(checkoutID: checkoutID)' never equals 'nil' (from macro 'require')
+100 |         )
+101 |         token?.transition(to: .queued)
+
+/Volumes/seed2/Projects/illiquid-production-migration/Tests/IlliquidNativePlaybackTests/PlaybackPerformanceRegressionTests.swift:168:18: warning: weak variable 'released' was never mutated; consider changing to 'let' constant [#WeakMutability]
+166 |         var ring = FixedRingBuffer<Value>(capacity: 3)
+167 |         var first: Value? = Value()
+168 |         weak var released = first
+    |                  `- warning: weak variable 'released' was never mutated; consider changing to 'let' constant [#WeakMutability]
+169 |         ring.append(first!)
+170 |         first = nil
+
+/Volumes/seed2/Projects/illiquid-production-migration/Tests/IlliquidNativePlaybackTests/SubtitleResultLifetimeTests.swift:11:18: warning: weak variable 'retiredDecoder' was never mutated; consider changing to 'let' constant [#WeakMutability]
+  9 |     @Test func bitmapEventsOutliveNativeOutputUpdatesFlushAndDecoderDestruction() throws {
+ 10 |         var decoder: SubtitleDecoder? = try makeDecoder()
+ 11 |         weak var retiredDecoder = decoder
+    |                  `- warning: weak variable 'retiredDecoder' was never mutated; consider changing to 'let' constant [#WeakMutability]
+ 12 |         let first = try #require(try decoder?.decode(packet(fullPGS, at: 2)).first)
+ 13 |         let bitmap = try #require(first.bitmapComposition)
+
+/Volumes/seed2/Projects/illiquid-production-migration/Tests/IlliquidNativePlaybackTests/SubtitleResultLifetimeTests.swift:66:18: warning: weak variable 'retiredDecoder' was never mutated; consider changing to 'let' constant [#WeakMutability]
+ 64 |     @Test func textEventsOwnTheirBytesAcrossNativeOutputReuseFlushAndDestruction() throws {
+ 65 |         var decoder: SubtitleDecoder? = try makeDecoder(codec: AV_CODEC_ID_SUBRIP, name: "subrip")
+ 66 |         weak var retiredDecoder = decoder
+    |                  `- warning: weak variable 'retiredDecoder' was never mutated; consider changing to 'let' constant [#WeakMutability]
+ 67 |         let first = try #require(try decoder?.decode(packet(Array("First caption".utf8), at: 2)).first)
+ 68 |         #expect(decoder?.hasRetainedDecodedOutput == false)
+
+/Volumes/seed2/Projects/illiquid-production-migration/Tests/IlliquidNativePlaybackTests/VideoScratchFrameLifetimeMeasurements.swift:58:18: warning: weak variable 'retiredDecoder' was never mutated; consider changing to 'let' constant [#WeakMutability]
+ 56 |             width: workload.width, height: workload.height
+ 57 |         )
+ 58 |         weak var retiredDecoder = decoder
+    |                  `- warning: weak variable 'retiredDecoder' was never mutated; consider changing to 'let' constant [#WeakMutability]
+ 59 |         var probes: [VideoScratchAllocationProbe] = []
+ 60 |         var refcounts: [Int] = []
+
+/Volumes/seed2/Projects/illiquid-production-migration/Tests/IlliquidNativePlaybackTests/VideoScratchFrameLifetimeTests.swift:317:18: warning: weak variable 'retiredDecoder' was never mutated; consider changing to 'let' constant [#WeakMutability]
+315 |             width: 32, height: 24, deinterlacing: deinterlacing
+316 |         )
+317 |         weak var retiredDecoder = decoder
+    |                  `- warning: weak variable 'retiredDecoder' was never mutated; consider changing to 'let' constant [#WeakMutability]
+318 |         var tracked: (FFmpegPacket, VideoScratchAllocationProbe)? =
+319 |             try VideoScratchFrameFixture.makePacket(width: 32, height: 24,
+
+[#WeakMutability]: <https://docs.swift.org/compiler/documentation/diagnostics/weak-mutability>
+[72/74] Compiling IlliquidPackageTests runner.swift
+[72/74] Write Objects.LinkFileList
+[73/74] Linking IlliquidPackageTests
+Build complete! (319.40s)
+Test Suite 'Selected tests' started at 2026-11-01 23:43:02.066.
+Test Suite 'IlliquidPackageTests.xctest' started at 2026-11-01 23:43:02.069.
+Test Suite 'IlliquidPackageTests.xctest' passed at 2026-11-01 23:43:02.069.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.000) seconds
+Test Suite 'Selected tests' passed at 2026-11-01 23:43:02.069.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.003) seconds
+◇ Test run started.
+↳ Testing Library Version: 6.3.2 (70eff261d7f462c)
+◇ Suite "Production migration turn cost" started.
+◇ Test turnLatency() started.
+production-turn-latency engine=legacy-core ns-per-turn median=1008.2014742714025 min=992.6808117030964 max=1083.972506830601
+✔ Test turnLatency() passed after 0.267 seconds.
+✔ Suite "Production migration turn cost" passed after 0.267 seconds.
+✔ Test run with 1 test in 1 suite passed after 0.267 seconds.

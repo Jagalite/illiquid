@@ -1,105 +1,37 @@
 # Illiquid
 
-Illiquid is a native macOS media player built with SwiftUI, AppKit, FFmpeg,
-VideoToolbox, Apple sample-buffer renderers, and libass. It supports local files
-and folder playlists, tracks and subtitles, crash-safe resume, HDR/EDR display
-policy, Now Playing/media keys, and system Picture in Picture.
+A native macOS media player for your videos.
+
+![Illiquid playing a video with the sources sidebar and playback controls visible](Documentation/Images/illiquid-player.png)
+
+Illiquid puts your videos at the center of an interface that moves with you.
+Browse your folders without leaving the player, arrange the playback controls
+around your video, and find your place with a visual timeline.
+
+- **A flexible timeline.** Move and reshape the playback bar, preview moments,
+  and seek precisely without leaving the video.
+- **Your library alongside playback.** Browse, filter, and organize local
+  sources in the sidebar, with tabs for quick switching.
+- **A player that remembers.** Track progress and resume videos where you
+  left off.
+- **Made for macOS.** Enjoy Picture in Picture, HDR, media keys, and a resizable
+  interface, with audio and subtitle controls close at hand.
+
+## Performance
+
+Illiquid uses FFmpeg and Apple's VideoToolbox for video decoding, with native
+macOS rendering and hardware acceleration when available. Its playback pipeline
+uses bounded queues to manage buffered media during playback.
 
 ## Download
 
-Get the Apple Silicon DMG from [GitHub Releases](https://github.com/Jagalite/illiquid/releases).
-Requires macOS 26 or later. Current releases are **ad hoc signed, unnotarized
-prereleases**; macOS may block downloaded copies. Notarization is planned later.
+Get Illiquid from [GitHub Releases](https://github.com/Jagalite/illiquid/releases).
+Requires an Apple Silicon Mac running macOS 26 or later.
 
-## Build and run
-
-Requirements: macOS 26, full Xcode, Homebrew, FFmpeg, libass, and pkg-config.
-Packaging enforces the exact native versions/hashes in the dependency lock;
-current Homebrew versions may differ. See the pinned CI inputs in
-[DISTRIBUTING.md](DISTRIBUTING.md).
-
-```sh
-brew install ffmpeg libass pkg-config
-./Scripts/run-app.sh
-# Validate the architecture separately:
-swift run IlliquidArchitectureCheck
-swift test --no-parallel
-./Scripts/build-local-dmg.sh
-open dist/Illiquid.app
-```
-
-`run-app.sh` builds and runs the optimized release executable directly, without
-packaging an `.app` or running a signing step. Use `--configuration debug` for a
-development build. When the pinned native SDK is installed, the launcher selects
-its FFmpeg and runtime library directories, including the matching x265 library,
-so moved Homebrew `opt` links do not break source launches. An explicit
-`PKG_CONFIG_PATH` keeps your selected toolchain; use `ILLIQUID_NATIVE_LIBRARY_PATH`
-for any runtime library directory overrides it needs.
-
-See [DISTRIBUTING.md](DISTRIBUTING.md) for release packaging
-and [Documentation/MANUAL_PLAYBACK_CHECKLIST.md](Documentation/MANUAL_PLAYBACK_CHECKLIST.md)
-for physical-device playback QA.
-
-For agent-driven macOS UI inspection, input, screenshots, and Instruments capture,
-see the [automation runbook](Documentation/MACOS_AGENT_UI_AUTOMATION_RUNBOOK.md).
-It documents the benchmark runner, required Kyoto build coordination, and retained
-inspection/playback smoke receipts. Preference isolation, broader interactions,
-and rendering performance remain unqualified.
-
-The [living findings register](Documentation/ROBUSTNESS_REVIEW_MPV_IINA.md)
-tracks structural, robustness, and user-experience research against mpv and IINA.
-
-Use **⌘+** and **⌘−** to resize the interface, and **⌘0** to reset it to the
-90% default. The scale is remembered across launches and can also be selected in
-**Settings → Appearance → UI Scale** (80–150%, in 10% steps).
-
-The UI hide timer runs only while playing. Single-click the video outside the
-controls to hide or show them while playing or paused. Adjust the delay in
-**Settings → Playback → Controls → Auto-hide timeout** (0.5–60 seconds).
-
-Double-click or double-tap the video’s left third to seek backward 5 seconds,
-or the right third to seek forward 5 seconds. Double-click the center third to
-toggle fullscreen. Trackpad taps require macOS **Tap to click** to be enabled.
-After a side double-tap, each additional rapid tap seeks another 5 seconds.
-
-## Architecture
-
-- `IlliquidPlaybackCore` is the deterministic imperative playback authority.
-  It owns transitions, effect identity, seeks, drains, recovery, lifecycle,
-  synchronization, track intent, and subtitle/control state.
-- `IlliquidNativePlayback` executes those decisions through FFmpeg,
-  VideoToolbox, AVSampleBuffer renderers, and libass. Generation fences and
-  leases reject stale work and separate logical invalidation from cleanup.
-- `IlliquidPlayer` coordinates product commands, persistence, and immutable
-  runtime snapshots. It constructs the native runtime directly.
-- `IlliquidApp` is the reactive SwiftUI/AppKit shell. It observes
-  `PlaybackViewStore` and does not own playback truth.
-
-The Swift package, executable, modules, and installed app are named Illiquid. The macOS bundle identifier is `io.github.jagalite.illiquid`;
-existing user data is preserved through the documented preference migration.
-
-There is one playback implementation. The package has no engine selector,
-fallback preference, libmpv dependency, or OpenGL surface.
-
-## Qualification
-
-Synthetic fixture generation and native qualification are repeatable:
-
-```sh
-./Scripts/run-playback-state-space.sh
-./Scripts/generate-native-fixtures.sh
-ILLIQUID_NATIVE_FIXTURE_DIR="$PWD/TestFixtures/Generated" swift test --no-parallel
-./Scripts/run-native-qualification.sh
-```
-
-The ownership model and qualification evidence are documented in
-[Documentation/ARCHITECTURE.md](Documentation/ARCHITECTURE.md) and
-[Documentation/NATIVE_PLAYBACK_QUALIFICATION.md](Documentation/NATIVE_PLAYBACK_QUALIFICATION.md).
-The bounded policy explorer is documented in
-[Documentation/PLAYBACK_STATE_SPACE_SEARCH.md](Documentation/PLAYBACK_STATE_SPACE_SEARCH.md).
+Current releases are ad hoc signed and unnotarized prereleases, so macOS may
+block downloaded copies.
 
 ## License
 
-Original project code, documentation and assets are licensed under
-**GPL-3.0-or-later**. See [LICENSE](LICENSE), [licensing scope](LICENSING.md), and
-[third-party notices](THIRD_PARTY_NOTICES.md).
+Illiquid is licensed under [GPL-3.0-or-later](LICENSE). See
+[third-party notices](THIRD_PARTY_NOTICES.md) for dependency licenses.

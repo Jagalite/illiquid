@@ -658,6 +658,16 @@ struct PlaybackTitlebarAccessoryView: View {
     @Bindable var model: AppModel
     @Bindable var themeStore: PlayerThemeStore
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @Environment(\.colorSchemeContrast) private var colorSchemeContrast
+
+    private var textColors: PlayerTextStyleColors {
+        PlayerTextPalette(theme: themeStore.selection,
+            mode: colorSchemeContrast == .increased && themeStore.textColorMode.usesVideoSampling
+                ? .dynamicMonochrome : themeStore.textColorMode,
+            rainbowPalette: themeStore.rainbowPalette,
+            sample: model.player.videoColorStore.sample,
+            store: model.player.videoColorStore).titlebarColors()
+    }
 
     private var isVisible: Bool {
         model.isPlaybackChromeVisible
@@ -706,9 +716,7 @@ struct PlaybackTitlebarAccessoryView: View {
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .frame(height: 28)
-        // The native title bar is an opaque dark surface, not part of the video.
-        .foregroundStyle(themeStore.selection.primaryColor,
-            themeStore.selection.secondaryColor, themeStore.selection.secondaryColor)
+        .foregroundStyle(textColors.primary, textColors.secondary, textColors.tertiary)
         .environment(\.playerTheme, themeStore.selection)
         .environment(\.playerTextColorMode, themeStore.textColorMode)
         .environment(\.playerRainbowPalette, themeStore.rainbowPalette)

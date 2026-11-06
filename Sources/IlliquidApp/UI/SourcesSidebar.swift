@@ -121,9 +121,17 @@ struct SourcesSidebar: View {
                         ScrollView {
                             LazyVStack(spacing: 2) {
                                 ForEach(visibleRows) { row in
-                                    sourceRow(row)
+                                    // Keep one layout child per identity even though
+                                    // sourceRow switches between different view types.
+                                    // This lets the lazy stack count rows without
+                                    // expanding their conditional content.
+                                    VStack(spacing: 0) {
+                                        sourceRow(row)
+                                    }
                                         .accessibilityIdentifier("illiquid.sources.row.\(row.id)")
-                                        .dynamicPlayerTextStyle()
+                                        // Inherit the sidebar's palette. Measuring
+                                        // every row in video coordinates during a
+                                        // scroll causes continuous state/layout work.
                                         .padding(.horizontal, 7)
                                         .onScrollVisibilityChange(threshold: 0.1) { visible in
                                             if case .media = row.kind {
@@ -1410,9 +1418,11 @@ private struct SourceVisibilityPopover: View {
         }
         .padding(16)
         .frame(width: 360)
-        .dynamicPlayerTextStyle(contrastRegion: .leading)
-        .playerOverlaySurface(cornerRadius: 18, role: .sidebar)
-        .presentationBackground(.clear)
+        // This form lives in its own popover, outside the video sampling space.
+        // Keep small labels and native controls crisp on a stable background.
+        .foregroundStyle(theme.primaryColor, theme.secondaryColor, theme.secondaryColor)
+        .tint(theme.accentColor)
+        .presentationBackground(theme.popoverSurfaceColor)
         .preferredColorScheme(theme.preferredColorScheme)
         .environment(\.colorScheme, theme.preferredColorScheme)
         .onDisappear {

@@ -1,5 +1,5 @@
 import Testing
-import IlliquidPlaybackCore
+import IlliquidPlaybackModel
 
 @testable import IlliquidNativePlayback
 

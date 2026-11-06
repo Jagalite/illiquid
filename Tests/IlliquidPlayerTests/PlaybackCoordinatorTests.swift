@@ -2,7 +2,7 @@ import AppKit
 import Foundation
 import IlliquidCore
 import IlliquidPlayback
-import IlliquidPlaybackCore
+import IlliquidPlaybackModel
 import Testing
 @testable import IlliquidPlayer
 
@@ -2353,11 +2353,8 @@ struct PlaybackCoordinatorTests {
     @Test
     func invariantFailureStillPhysicallyShutsDownRuntime() async {
         let runtime = CoordinatorFakeBackend()
-        let model = PlaybackModelRuntime(
-            state: PlaybackCoreState(lifecycle: .invariantFailed),
-            recordsReplaySteps: false
-        )
-        let driver = PlaybackRuntimeDriver(runtime: runtime, model: model)
+        let host = PlaybackSessionHost(state: PlaybackDomainState(lifecycle: .invariantFailed))
+        let driver = PlaybackRuntimeDriver(runtime: runtime, host: host)
 
         await driver.shutdown()
 

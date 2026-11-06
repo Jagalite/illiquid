@@ -1,6 +1,6 @@
 import Foundation
 import IlliquidCore
-import IlliquidPlaybackCore
+import IlliquidPlaybackModel
 
 public struct PlayerSessionIdentity: Hashable, Sendable {
     public let source: MediaSource

@@ -54,7 +54,7 @@ public struct PlaybackSearchTrendViolation: Codable, Hashable, Sendable {
 
 public enum PlaybackSearchTrendEvaluator {
   public static func evaluate(
-    _ summary: PlaybackSearchSummary,
+    _ summary: PlaybackVerificationSummary,
     against baseline: PlaybackSearchTrendBaseline,
     tolerancePercent: Int? = nil
   ) -> [PlaybackSearchTrendViolation] {

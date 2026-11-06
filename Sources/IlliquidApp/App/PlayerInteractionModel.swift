@@ -96,7 +96,9 @@ struct SurfaceScrollAccumulator {
 
         switch axis {
         case .horizontal:
-            pendingHorizontal += event.deltaX
+            // Horizontal wheel deltas describe content motion; seeking follows
+            // movement along the timeline in the opposite direction.
+            pendingHorizontal -= event.deltaX
             let threshold = event.isPrecise ? 8.0 : 1.0
             guard abs(pendingHorizontal) >= threshold else { return nil }
             let steps = (pendingHorizontal / threshold).rounded(.towardZero)

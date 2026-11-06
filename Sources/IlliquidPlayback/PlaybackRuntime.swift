@@ -1,7 +1,7 @@
 import AppKit
 import Foundation
 import IlliquidCore
-import IlliquidPlaybackCore
+import IlliquidPlaybackModel
 
 public typealias PictureInPictureRestoreRequestHandler =
     @MainActor @Sendable (@escaping @Sendable (Bool) -> Void) -> Void

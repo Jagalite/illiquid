@@ -2,7 +2,7 @@ import AppKit
 import CoreMedia
 import Foundation
 import IlliquidCore
-import IlliquidPlaybackCore
+import IlliquidPlaybackModel
 import IlliquidPlayback
 
 public enum NativePlaybackRuntimeError: LocalizedError {
@@ -4021,7 +4021,7 @@ public final class NativePlaybackRuntime: PlaybackRuntime {
     }
 
     private func runtimeSeekMode(
-        _ mode: IlliquidPlaybackCore.SeekMode
+        _ mode: IlliquidPlaybackModel.SeekMode
     ) -> IlliquidPlayback.SeekMode {
         switch mode {
         case .relative: .relative

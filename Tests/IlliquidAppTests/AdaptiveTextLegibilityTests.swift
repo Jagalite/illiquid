@@ -11,6 +11,79 @@ struct AdaptiveTextLegibilityTests {
     private let white = SampledVideoColor(red: 1, green: 1, blue: 1)
     private let black = SampledVideoColor(red: 0, green: 0, blue: 0)
 
+    @MainActor private func composite(_ color: Color, over background: SampledVideoColor) -> SampledVideoColor {
+        let rgb = NSColor(color).usingColorSpace(.sRGB)!
+        let alpha = Double(rgb.alphaComponent)
+        return .init(red: Double(rgb.redComponent) * alpha + background.red * (1 - alpha),
+                     green: Double(rgb.greenComponent) * alpha + background.green * (1 - alpha),
+                     blue: Double(rgb.blueComponent) * alpha + background.blue * (1 - alpha))
+    }
+
+    private func contrast(_ foreground: SampledVideoColor, _ background: SampledVideoColor) -> Double {
+        let values = [foreground.relativeLuminance, background.relativeLuminance].sorted()
+        return (values[1] + 0.05) / (values[0] + 0.05)
+    }
+
+    @MainActor @Test func titlebarTextIsReadableOnSelectedAndUnselectedTabs() {
+        let background = SampledVideoColor(red: 0.18, green: 0.18, blue: 0.18)
+        let selected = composite(PlayerTheme.liquidGlass.selectedFillColor, over: background)
+        let samples = [white, black, SampledVideoColor(red: 1, green: 0, blue: 0),
+                       SampledVideoColor(red: 0, green: 0, blue: 1)]
+        for mode in [PlayerTextColorMode.dynamicRainbow, .dynamicMonochrome] {
+            for sample in samples {
+                let style = PlayerTextPalette(theme: .liquidGlass, mode: mode,
+                    rainbowPalette: .softSpectrum,
+                    sample: .init(columns: 1, rows: 1, colors: [sample]), store: nil).titlebarColors()
+                #expect(contrast(composite(style.primary, over: selected), selected) >= 4.5)
+                #expect(contrast(composite(style.secondary, over: background), background) >= 4.5)
+                #expect(style.contrastHaloRadius == 0)
+            }
+        }
+    }
+
+    @MainActor @Test func popoverCaptionsAreReadableAcrossThemes() {
+        for theme in PlayerTheme.allCases {
+            let background = composite(theme.popoverSurfaceColor, over: black)
+            for foreground in [theme.primaryColor, theme.secondaryColor] {
+                #expect(contrast(composite(foreground, over: background), background) >= 4.5,
+                        Comment(rawValue: theme.rawValue))
+            }
+        }
+    }
+
+    @MainActor @Test func titlebarFollowsVideoHueWithoutDarkTextOrHalos() {
+        func colors(_ sample: SampledVideoColor) -> PlayerTextStyleColors {
+            PlayerTextPalette(theme: .liquidGlass, mode: .dynamicRainbow,
+                rainbowPalette: .softSpectrum,
+                sample: .init(columns: 1, rows: 1, colors: [sample]), store: nil)
+                .titlebarColors()
+        }
+        #expect(colors(.init(red: 1, green: 0, blue: 0)).primary
+            != colors(.init(red: 0, green: 0, blue: 1)).primary)
+        let background = SampledVideoColor(red: 0.18, green: 0.18, blue: 0.18)
+        for sample in [white, black, SampledVideoColor(red: 0, green: 1, blue: 0)] {
+            let style = colors(sample)
+            let rgb = NSColor(style.primary).usingColorSpace(.sRGB)!
+            let foreground = SampledVideoColor(red: rgb.redComponent,
+                green: rgb.greenComponent, blue: rgb.blueComponent)
+            #expect((foreground.relativeLuminance + 0.05)
+                / (background.relativeLuminance + 0.05) >= 4.5)
+            #expect(style.contrastHaloRadius == 0)
+            #expect(style.contrastHalo == .clear)
+        }
+    }
+
+    @MainActor @Test func titlebarRespectsStaticModeAndSampleReset() {
+        let store = PlaybackVideoColorStore(sample: .init(columns: 1, rows: 1, colors: [white]))
+        func colors(_ mode: PlayerTextColorMode) -> PlayerTextStyleColors {
+            PlayerTextPalette(theme: .liquidGlass, mode: mode,
+                rainbowPalette: .softSpectrum, sample: store.sample, store: store).titlebarColors()
+        }
+        #expect(colors(.staticColor).primary == PlayerTheme.liquidGlass.primaryColor)
+        store.reset()
+        #expect(colors(.dynamicRainbow).primary == PlayerTheme.liquidGlass.primaryColor)
+    }
+
     @MainActor @Test func adaptiveTextRefreshesAcrossBrightDarkCutsAndReset() {
         let store = PlaybackVideoColorStore(sample: .init(columns: 1, rows: 1, colors: [white]))
         func colors() -> PlayerTextStyleColors {

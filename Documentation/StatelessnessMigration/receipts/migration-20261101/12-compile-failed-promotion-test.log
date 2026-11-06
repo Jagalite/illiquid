@@ -1,0 +1,42 @@
+warning: 'focused-package': found 1 file(s) which are unhandled; explicitly declare them as resources or exclude from the target
+    /Volumes/seed2/Projects/illiquid-statelessness-receipts/focused-package/Tests/IlliquidPlaybackStateSpaceTests/Fixtures/statelessness-migration-inventory-v1.json
+[0/1] Planning build
+Building for debugging...
+[0/5] Write sources
+[2/5] Write swift-version--58304C5D6DBC2206.txt
+[4/13] Compiling IlliquidPlaybackStateSpace PlaybackReductionPolicy.swift
+[5/14] Compiling IlliquidPlaybackStateSpace PlaybackVerifier.swift
+[6/14] Compiling IlliquidPlaybackStateSpace PlaybackProgressPolicy.swift
+[7/14] Compiling IlliquidPlaybackStateSpace CanonicalJSONEncoder.swift
+[8/14] Compiling IlliquidPlaybackStateSpace PlaybackModelCodec.swift
+[9/14] Compiling IlliquidPlaybackStateSpace PlaybackStatelessnessModel.swift
+[10/14] Compiling IlliquidPlaybackStateSpace PlaybackSearchArtifact.swift
+[11/14] Emitting module IlliquidPlaybackStateSpace
+[12/14] Compiling IlliquidPlaybackStateSpace PlaybackVerificationArtifact.swift
+[13/22] Compiling IlliquidPlaybackStateSpace PlaybackEngineParity.swift
+[14/22] Compiling IlliquidPlaybackStateSpace PlaybackSearchTypes.swift
+[15/22] Compiling IlliquidPlaybackStateSpace PlaybackStateSpaceExplorer.swift
+[16/22] Compiling IlliquidPlaybackStateSpace SearchAction.swift
+[17/22] Compiling IlliquidPlaybackStateSpace PlaybackProgressAnalyzer.swift
+[18/22] Compiling IlliquidPlaybackStateSpace PlaybackPartialOrderReducer.swift
+[19/22] Compiling IlliquidPlaybackStateSpace PlaybackSearchModels.swift
+[20/22] Compiling IlliquidPlaybackStateSpace PlaybackSearchCanonicalizer.swift
+[21/26] Compiling IlliquidPlaybackStateSpaceTests LegacyRetirementCaptureTests.swift
+[22/26] Compiling IlliquidPlaybackStateSpaceTests StatelessnessMigrationTests.swift
+[23/26] Emitting module IlliquidPlaybackStateSpaceTests
+[24/26] Compiling IlliquidPlaybackStateSpaceTests PlaybackStateSpaceTests.swift
+/Volumes/seed2/Projects/illiquid-statelessness-receipts/focused-package/Tests/IlliquidPlaybackStateSpaceTests/PlaybackStateSpaceTests.swift:480:66: error: cannot convert value of type 'PlaybackSearchArtifact' to expected argument type 'PlaybackVerificationArtifact'
+478 |       result: result, failure: failure, sourceRevision: "test", dirty: false
+479 |     )
+480 |     let promoted = try #require(PlaybackRuntimePromotion.promote(artifact))
+    |                                                                  `- error: cannot convert value of type 'PlaybackSearchArtifact' to expected argument type 'PlaybackVerificationArtifact'
+481 |     #expect(!promoted.steps.isEmpty)
+482 |     #expect(promoted.steps.allSatisfy { $0.effectContextPreserved })
+
+/Volumes/seed2/Projects/illiquid-statelessness-receipts/focused-package/Tests/IlliquidPlaybackStateSpaceTests/PlaybackStateSpaceTests.swift:480:20: warning: no calls to throwing functions occur within 'try' expression
+478 |       result: result, failure: failure, sourceRevision: "test", dirty: false
+479 |     )
+480 |     let promoted = try #require(PlaybackRuntimePromotion.promote(artifact))
+    |                    `- warning: no calls to throwing functions occur within 'try' expression
+481 |     #expect(!promoted.steps.isEmpty)
+482 |     #expect(promoted.steps.allSatisfy { $0.effectContextPreserved })

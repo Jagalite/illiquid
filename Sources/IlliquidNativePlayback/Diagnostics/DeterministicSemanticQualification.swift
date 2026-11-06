@@ -1,6 +1,6 @@
 import CoreMedia
 import Foundation
-import IlliquidPlaybackCore
+import IlliquidPlaybackModel
 
 public enum DifferentialSemanticPolicyID: String, CaseIterable, Codable, Sendable {
   case audioSwitchRollback
