@@ -13,6 +13,14 @@ public struct CachedTimelineThumbnail: Sendable {
 /// Produces timeline previews from an independent FFmpeg decode path so hover
 /// never seeks, pauses, or otherwise mutates the active playback session.
 public actor NativeTimelineThumbnailGenerator {
+    /// Preview-only decode shortcuts that trade exact pixels for CPU and RAM.
+    struct ReducedFidelity: OptionSet, Sendable {
+        let rawValue: Int
+        static let skipLoopFilter = ReducedFidelity(rawValue: 1 << 0)
+        static let scaledConversion = ReducedFidelity(rawValue: 1 << 1)
+        static let all: ReducedFidelity = [.skipLoopFilter, .scaledConversion]
+    }
+
     private static let logger = Logger(subsystem: "com.illiquid.thumbnail", category: "decode")
     private final class ImageRenderer: @unchecked Sendable {
         // CIContext is expensive to construct and supports concurrent rendering.
@@ -62,8 +70,11 @@ public actor NativeTimelineThumbnailGenerator {
         let softwareThreads: Int
         let planarOutput: Bool
         let usesKeyframeIndex: Bool
+        let skipsNonReferencePreroll: Bool
+        let reducedFidelity: ReducedFidelity
         init(optimized: Bool = true, maximumPackets: Int = 1_500,
              softwareThreads: Int = 2, planarOutput: Bool = false, usesKeyframeIndex: Bool = true,
+             skipsNonReferencePreroll: Bool = true, reducedFidelity: ReducedFidelity = .all,
              packetWindowBytes: Int = 0, packetReadAheadSeconds: Double = 0, simulatedRefillDelay: Double = 0,
              observe: (@Sendable (ThumbnailDecodeObservation) -> Void)?) {
             self.packetWindowBytes = min(max(0, packetWindowBytes), 32 * 1024 * 1024)
@@ -73,6 +84,8 @@ public actor NativeTimelineThumbnailGenerator {
             self.softwareThreads = softwareThreads
             self.planarOutput = planarOutput
             self.usesKeyframeIndex = usesKeyframeIndex
+            self.skipsNonReferencePreroll = skipsNonReferencePreroll
+            self.reducedFidelity = reducedFidelity
             self.maximumPackets = max(1, min(maximumPackets, 1_500))
             self.observe = observe
         }
@@ -100,7 +113,9 @@ public actor NativeTimelineThumbnailGenerator {
                     cancellation: cancellation, context: &context,
                     token: FFmpegInputEffectToken(rawValue: nextToken), optimized: optimized,
                     maximumPackets: maximumPackets, softwareThreads: softwareThreads, planarOutput: planarOutput,
-                    usesKeyframeIndex: usesKeyframeIndex, packetWindowBytes: packetWindowBytes,
+                    usesKeyframeIndex: usesKeyframeIndex, skipsNonReferencePreroll: skipsNonReferencePreroll,
+                    reducedFidelity: reducedFidelity,
+                    packetWindowBytes: packetWindowBytes,
                     packetReadAheadSeconds: packetReadAheadSeconds, simulatedRefillDelay: simulatedRefillDelay,
                     measuresPacketReads: observe != nil,
                     observation: &observation
@@ -179,11 +194,13 @@ public actor NativeTimelineThumbnailGenerator {
     // two-thread BGRA route and the established worker scheduling priority.
     init(optimized: Bool = true, maximumPackets: Int = 1_500,
          softwareThreads: Int = 2, planarOutput: Bool = false, prioritizesForeground: Bool = false, usesKeyframeIndex: Bool = true,
+         skipsNonReferencePreroll: Bool = true, reducedFidelity: ReducedFidelity = .all,
          packetWindowBytes: Int = 0, packetReadAheadSeconds: Double = 0, simulatedRefillDelay: Double = 0,
          observe: @escaping @Sendable (ThumbnailDecodeObservation) -> Void) {
         cache = NativeThumbnailCache()
         let storage = DecoderStorage(optimized: optimized, maximumPackets: maximumPackets,
             softwareThreads: softwareThreads, planarOutput: planarOutput, usesKeyframeIndex: usesKeyframeIndex,
+            skipsNonReferencePreroll: skipsNonReferencePreroll, reducedFidelity: reducedFidelity,
             packetWindowBytes: packetWindowBytes, packetReadAheadSeconds: packetReadAheadSeconds,
             simulatedRefillDelay: simulatedRefillDelay, observe: observe)
         worker = TimelineThumbnailWorker(requestTimeout: Self.maximumRequestSeconds, prioritizesForeground: prioritizesForeground,
@@ -323,7 +340,8 @@ public actor NativeTimelineThumbnailGenerator {
         token: FFmpegInputEffectToken,
         optimized: Bool,
         maximumPackets: Int,
-        softwareThreads: Int, planarOutput: Bool, usesKeyframeIndex: Bool,
+        softwareThreads: Int, planarOutput: Bool, usesKeyframeIndex: Bool, skipsNonReferencePreroll: Bool,
+        reducedFidelity: ReducedFidelity,
         packetWindowBytes: Int, packetReadAheadSeconds: Double, simulatedRefillDelay: Double, measuresPacketReads: Bool,
         observation: inout ThumbnailDecodeObservation
     ) throws -> CGImage? {
@@ -410,12 +428,25 @@ public actor NativeTimelineThumbnailGenerator {
             }
         }
         decoder.retainsSeekPrerollFallback = optimized
+        // Non-reference pictures cannot change the selected frame's pixels, so
+        // the playback seek policy may skip them well before the target. Near
+        // the end, video can stop before the container duration; keep full
+        // decode there so the EOF fallback remains the true final frame.
+        decoder.skipsNonReferencePrerollWithFallback = optimized && skipsNonReferencePreroll
+            && duration.isFinite && duration > 0 && target < duration - 2
+        // Previews are small: skip deblocking and convert straight to preview
+        // size. Pixels differ slightly from a full decode; CPU and RAM drop.
+        decoder.skipsLoopFilter = reducedFidelity.contains(.skipLoopFilter)
+        decoder.softwareBGRAOutputMaximumSize = reducedFidelity.contains(.scaledConversion)
+            ? (Int(maximumPixelSize.width.rounded(.up)), Int(maximumPixelSize.height.rounded(.up))) : nil
         decoder.seekOutputFloor = optimized ? (1, target) : nil
         let discardedAtStart = decoder.discardedSeekPrerollFrames
+        let skippedAtStart = decoder.seekPrerollNonReferencePackets
 
         let startedAt = ProcessInfo.processInfo.systemUptime
         defer {
             observation.discardedBeforeOutput = decoder.discardedSeekPrerollFrames - discardedAtStart
+            observation.skippedNonReferencePackets = max(0, decoder.seekPrerollNonReferencePackets - skippedAtStart)
             observation.decodeMilliseconds = max(0,
                 (ProcessInfo.processInfo.systemUptime - startedAt) * 1_000 - observation.imageMilliseconds - observation.prefetchMilliseconds)
         }
@@ -527,10 +558,18 @@ public actor NativeTimelineThumbnailGenerator {
     ) -> CGImage? {
         var image = CIImage(cvPixelBuffer: frame.pixelBuffer)
 
-        if let aperture = frame.cleanAperture,
-           aperture.width > 0,
-           aperture.height > 0
+        // Scaled conversion produces a buffer smaller than the coded frame;
+        // map the coded-pixel clean aperture into buffer pixels.
+        let bufferScaleX = frame.codedSize.width > 0
+            ? CGFloat(CVPixelBufferGetWidth(frame.pixelBuffer)) / frame.codedSize.width : 1
+        let bufferScaleY = frame.codedSize.height > 0
+            ? CGFloat(CVPixelBufferGetHeight(frame.pixelBuffer)) / frame.codedSize.height : 1
+        if let codedAperture = frame.cleanAperture,
+           codedAperture.width > 0,
+           codedAperture.height > 0
         {
+            let aperture = codedAperture.applying(
+                CGAffineTransform(scaleX: bufferScaleX, y: bufferScaleY))
             let ciCrop = CGRect(
                 x: aperture.minX,
                 y: image.extent.height - aperture.maxY,

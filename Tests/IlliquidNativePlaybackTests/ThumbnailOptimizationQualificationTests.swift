@@ -32,7 +32,8 @@ struct ThumbnailOptimizationQualificationTests {
             }
         }
         guard result == KERN_SUCCESS else { return [:] }
-        return ["resident": info.resident_size, "physical_footprint": info.phys_footprint]
+        return ["resident": info.resident_size, "physical_footprint": info.phys_footprint,
+                "physical_footprint_peak": UInt64(max(0, info.ledger_phys_footprint_peak))]
     }
 
     @Test func indexedKeyframeAvoidsRedundantForwardDecodeWithoutChangingPixels() async throws {
@@ -62,6 +63,108 @@ struct ThumbnailOptimizationQualificationTests {
         #expect(demuxer.indexedKeyframeTime(at: .nan, streamIndex: 0) == nil)
         #expect(demuxer.indexedKeyframeTime(at: 2, streamIndex: -1) == nil)
         await old.releaseIdleResources(); await new.releaseIdleResources()
+    }
+
+    /// Non-reference preroll skipping must only remove work: every selected
+    /// frame, and therefore every image, must match a full-preroll decode.
+    @Test func nonReferencePrerollSkippingPreservesPixels() async throws {
+        guard let path = ProcessInfo.processInfo.environment["ILLIQUID_PREVIEW_NONREF_FIXTURE"] else { return }
+        let url = URL(fileURLWithPath: path), size = CGSize(width: 368, height: 208)
+        let duration = try FFmpegDemuxer(url: url).mediaInfo.duration
+        let fullRecords = Observations(), skipRecords = Observations()
+        let full = NativeTimelineThumbnailGenerator(skipsNonReferencePreroll: false, reducedFidelity: []) { fullRecords.append($0) }
+        let skip = NativeTimelineThumbnailGenerator(skipsNonReferencePreroll: true, reducedFidelity: []) { skipRecords.append($0) }
+        // Backward, forward-continuation, far-jump and near-EOF targets.
+        let targets = [duration * 0.6, duration * 0.3, duration * 0.3 + 1, duration * 0.9, 0.5, duration]
+        for target in targets {
+            let reference = try #require(await full.thumbnail(for: url, at: target, maximumPixelSize: size))
+            let candidate = try #require(await skip.thumbnail(for: url, at: target, maximumPixelSize: size))
+            #expect(candidate.dataProvider?.data == reference.dataProvider?.data)
+        }
+        let fullStages = fullRecords.snapshot(), skipStages = skipRecords.snapshot()
+        #expect(fullStages.count == skipStages.count)
+        for (before, after) in zip(fullStages, skipStages) {
+            #expect(after.selectedFrameSeconds == before.selectedFrameSeconds)
+            #expect(before.skippedNonReferencePackets == 0)
+        }
+        #expect(skipStages.contains { $0.skippedNonReferencePackets > 0 })
+        // The final-frame request keeps full decode for the EOF fallback.
+        #expect(skipStages.last?.skippedNonReferencePackets == 0)
+        await full.releaseIdleResources(); await skip.releaseIdleResources()
+    }
+
+    @Test func scaledBGRAOutputCoversRequestedPreviewInEitherOrientation() {
+        let size = { VideoDecoder.scaledBGRAOutputSize(width: $0, height: $1, maximum: $2) }
+        #expect(size(3840, 2160, (368, 208)) == (656, 368))
+        #expect(size(2160, 3840, (368, 208)) == (368, 656))
+        #expect(size(1920, 1080, nil) == (1920, 1080))
+        // Never upscale small sources.
+        #expect(size(320, 240, (368, 208)) == (320, 240))
+        #expect(size(1920, 1080, (0, 208)) == (1920, 1080))
+    }
+
+    private func difference(_ lhs: CGImage, _ rhs: CGImage, width: Int = 368, height: Int = 208) -> (psnr: Double, meanAbsolute: Double)? {
+        func pixels(_ image: CGImage) -> [UInt8]? {
+            var data = [UInt8](repeating: 0, count: width * height * 4)
+            let drawn = data.withUnsafeMutableBytes { buffer -> Bool in
+                guard let context = CGContext(data: buffer.baseAddress, width: width, height: height,
+                    bitsPerComponent: 8, bytesPerRow: width * 4, space: CGColorSpace(name: CGColorSpace.sRGB)!,
+                    bitmapInfo: CGImageAlphaInfo.premultipliedLast.rawValue) else { return false }
+                context.interpolationQuality = .high
+                context.draw(image, in: CGRect(x: 0, y: 0, width: width, height: height))
+                return true
+            }
+            return drawn ? data : nil
+        }
+        guard let a = pixels(lhs), let b = pixels(rhs) else { return nil }
+        var squared = 0.0, absolute = 0.0, count = 0.0
+        for index in a.indices where index % 4 != 3 {
+            let delta = Double(a[index]) - Double(b[index])
+            squared += delta * delta; absolute += abs(delta); count += 1
+        }
+        let mse = squared / max(count, 1)
+        return (mse == 0 ? .infinity : 10 * log10(255 * 255 / mse), absolute / max(count, 1))
+    }
+
+    /// Reduced-fidelity previews may differ from an exact decode, but must
+    /// select the same frame and stay visually close at preview size. PSNR is
+    /// reported only: the two downscalers place hard synthetic edges at
+    /// different subpixel offsets, so mean absolute difference is the bound.
+    @Test func reducedFidelityPreviewStaysCloseToExactDecode() async throws {
+        guard let path = ProcessInfo.processInfo.environment["ILLIQUID_PREVIEW_REDUCED_FIXTURE"] else { return }
+        let url = URL(fileURLWithPath: path), size = CGSize(width: 368, height: 208)
+        let duration = try FFmpegDemuxer(url: url).mediaInfo.duration
+        let exactRecords = Observations(), reducedRecords = Observations()
+        let exact = NativeTimelineThumbnailGenerator(reducedFidelity: []) { exactRecords.append($0) }
+        let mode: NativeTimelineThumbnailGenerator.ReducedFidelity = switch ProcessInfo.processInfo.environment["ILLIQUID_PREVIEW_REDUCED_MODE"] {
+        case "loop": .skipLoopFilter
+        case "scale": .scaledConversion
+        default: .all
+        }
+        let imageDirectory = ProcessInfo.processInfo.environment["ILLIQUID_PREVIEW_REDUCED_IMAGES"]
+        let reduced = NativeTimelineThumbnailGenerator(reducedFidelity: mode) { reducedRecords.append($0) }
+        var worst = 0.0
+        for target in [duration * 0.6, duration * 0.3, duration * 0.3 + 1, duration * 0.9, 0.5, duration] {
+            let reference = try #require(await exact.thumbnail(for: url, at: target, maximumPixelSize: size))
+            let candidate = try #require(await reduced.thumbnail(for: url, at: target, maximumPixelSize: size))
+            #expect(abs(candidate.width - reference.width) <= 2 && abs(candidate.height - reference.height) <= 2)
+            let value = try #require(difference(candidate, reference))
+            worst = max(worst, value.meanAbsolute)
+            if let imageDirectory {
+                for (name, image) in [("exact", reference), ("reduced", candidate)] {
+                    let imageURL = URL(fileURLWithPath: imageDirectory).appendingPathComponent("\(name)-\(Int(target * 10)).png")
+                    if let destination = CGImageDestinationCreateWithURL(imageURL as CFURL, "public.png" as CFString, 1, nil) {
+                        CGImageDestinationAddImage(destination, image, nil); _ = CGImageDestinationFinalize(destination)
+                    }
+                }
+            }
+            print("reduced-fidelity target=\(target) psnr=\(value.psnr) mean-abs=\(value.meanAbsolute) size=\(candidate.width)x\(candidate.height)")
+        }
+        #expect(worst <= 6)
+        for (before, after) in zip(exactRecords.snapshot(), reducedRecords.snapshot()) {
+            #expect(after.selectedFrameSeconds == before.selectedFrameSeconds)
+        }
+        await exact.releaseIdleResources(); await reduced.releaseIdleResources()
     }
 
     @Test func packetExperimentFallsBackUnderTinyBudgetAndReleasesOnPressureOrInvalidation() async throws {
@@ -117,11 +220,19 @@ struct ThumbnailOptimizationQualificationTests {
         let planar = env["ILLIQUID_PREVIEW_PLANAR"] == "1"
         let foreground = env["ILLIQUID_PREVIEW_FOREGROUND_PRIORITY"] == "1"
         let indexed = env["ILLIQUID_PREVIEW_KEYFRAME_INDEX"] == "1"
+        let skipsNonReference = env["ILLIQUID_PREVIEW_NONREF_SKIP"] != "0"
+        let reducedFidelity: NativeTimelineThumbnailGenerator.ReducedFidelity = switch env["ILLIQUID_PREVIEW_REDUCED"] {
+        case "0": []
+        case "loop": .skipLoopFilter
+        case "scale": .scaledConversion
+        default: .all
+        }
         let packetBytes = Int(env["ILLIQUID_PREVIEW_PACKET_BYTES"] ?? "0") ?? 0
         let readAhead = Double(env["ILLIQUID_PREVIEW_READAHEAD_SECONDS"] ?? "0") ?? 0
         let refillDelay = Double(env["ILLIQUID_PREVIEW_REFILL_DELAY_MS"] ?? "0") ?? 0
         let generator = NativeTimelineThumbnailGenerator(softwareThreads: threads, planarOutput: planar,
-            prioritizesForeground: foreground, usesKeyframeIndex: indexed, packetWindowBytes: packetBytes,
+            prioritizesForeground: foreground, usesKeyframeIndex: indexed,
+            skipsNonReferencePreroll: skipsNonReference, reducedFidelity: reducedFidelity, packetWindowBytes: packetBytes,
             packetReadAheadSeconds: readAhead, simulatedRefillDelay: refillDelay / 1000) { observations.append($0) }
         var requests: [(URL, Double)] = [1.5, 2, 2.5, 1.5, 3.5, 4, 3.5].map { (url, $0) }
         if env["ILLIQUID_PREVIEW_PACKET_WORKLOAD"] == "1" {
@@ -176,7 +287,7 @@ struct ThumbnailOptimizationQualificationTests {
         let cpu = (cpuSeconds() - batchCPU) * 1_000
         await generator.releaseIdleResources()
         let stages = try JSONSerialization.jsonObject(with: JSONEncoder().encode(observations.snapshot()))
-        let receipt: [String: Any] = ["packet_bytes": packetBytes, "read_ahead_seconds": readAhead, "simulated_refill_delay_ms": refillDelay, "threads": threads, "planar": planar, "foreground_priority": foreground, "keyframe_index": indexed, "requests": callers,
+        let receipt: [String: Any] = ["packet_bytes": packetBytes, "read_ahead_seconds": readAhead, "simulated_refill_delay_ms": refillDelay, "threads": threads, "planar": planar, "foreground_priority": foreground, "keyframe_index": indexed, "nonref_skip": skipsNonReference, "reduced_fidelity": reducedFidelity.rawValue, "requests": callers,
             "stages": stages, "batch_wall_ms": wall, "batch_cpu_ms": cpu,
             "renderer_prewarmed": prewarm, "preparation_wall_ms": preparationWallMS,
             "preparation_cpu_ms": preparationCPUMS, "memory_before": memoryBefore,

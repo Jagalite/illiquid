@@ -19,6 +19,7 @@ struct ThumbnailDecodeObservation: Codable, Sendable {
     var packets = 0
     var frames = 0
     var discardedBeforeOutput = 0
+    var skippedNonReferencePackets = 0
     var usedEOFFallback = false
     var selectedFrameSeconds: Double?
     var openMilliseconds: Double = 0
@@ -32,7 +33,7 @@ struct ThumbnailDecodeObservation: Codable, Sendable {
 
     var summary: String {
         "target=\(target) reused=\(reusedContext) forward=\(continuedForward) "
-            + "packets=\(packets) output-frames=\(frames) discarded-before-output=\(discardedBeforeOutput) open-ms=\(openMilliseconds) "
+            + "packets=\(packets) output-frames=\(frames) discarded-before-output=\(discardedBeforeOutput) skipped-nonref=\(skippedNonReferencePackets) open-ms=\(openMilliseconds) "
             + "seek-ms=\(seekMilliseconds) decode-ms=\(decodeMilliseconds) "
             + "image-ms=\(imageMilliseconds) total-ms=\(totalMilliseconds) "
             + "image=\(imageCreated) cancelled=\(cancelled) failure=\(failure ?? "none")"

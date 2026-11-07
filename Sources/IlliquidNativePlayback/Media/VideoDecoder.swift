@@ -579,6 +579,17 @@ final class VideoDecoder {
     // Thumbnail-only EOF fallback: one reference-counted native frame, never
     // a history of converted images or compressed packets. Playback leaves off.
     var retainsSeekPrerollFallback = false
+    // Thumbnail-only: allow non-reference preroll skipping even while the EOF
+    // fallback is retained. Set only when the target is far enough from the
+    // end that the fallback is not expected to be selected.
+    var skipsNonReferencePrerollWithFallback = false
+    // Thumbnail-only reduced-fidelity controls. Playback leaves both off.
+    // Skipping deblocking lets small reference errors drift through a GOP;
+    // acceptable for downscaled previews, never for displayed video.
+    var skipsLoopFilter = false
+    // Convert software frames directly to at most this size instead of the
+    // coded size, so previews neither convert nor pool full-resolution BGRA.
+    var softwareBGRAOutputMaximumSize: (width: Int, height: Int)?
     private var seekPrerollFallback: SeekPrerollFallback?
     var seekPrerollFallbackProgress: (seconds: Double, filtered: Bool, discontinuity: Bool)? {
         seekPrerollFallback.map { ($0.pts.seconds, $0.filtered, $0.discontinuity) }
@@ -862,10 +873,12 @@ final class VideoDecoder {
             decodeTime: packet.decodeSeconds.map { $0 - timelineOriginSeconds },
             frameRate: stream.averageFrameRate,
             eligible: seekPrerollFrameSkippingEnabled && streamDeclaresProgressive
-                && !observedInterlacedFrame && !retainsSeekPrerollFallback && !packet.isCorrupt
+                && !observedInterlacedFrame
+                && (!retainsSeekPrerollFallback || skipsNonReferencePrerollWithFallback) && !packet.isCorrupt
                 && ["h264", "hevc"].contains(stream.codecName)
         )
         context.pointee.skip_frame = skipsNonReference ? AVDISCARD_NONREF : AVDISCARD_DEFAULT
+        context.pointee.skip_loop_filter = skipsLoopFilter ? AVDISCARD_ALL : AVDISCARD_DEFAULT
         if skipsNonReference { seekPrerollNonReferencePackets += 1 }
         defer { context.pointee.skip_frame = AVDISCARD_DEFAULT }
         var sendResult = avcodec_send_packet(context, packetPointer)
@@ -1565,6 +1578,8 @@ final class VideoDecoder {
         height: Int,
         while shouldContinue: () -> Bool
     ) throws -> CVPixelBuffer {
+        let (width, height) = Self.scaledBGRAOutputSize(
+            width: width, height: height, maximum: softwareBGRAOutputMaximumSize)
         let outputPool: SoftwareBGRAOutputPool
         if let existing = softwarePixelBufferPool,
            existing.width == width, existing.height == height
@@ -1588,6 +1603,20 @@ final class VideoDecoder {
             )
         }
         return created
+    }
+
+    /// Uniform downscale whose shorter side still covers the larger requested
+    /// dimension, so later crop, pixel-aspect and rotation never upscale much.
+    static func scaledBGRAOutputSize(
+        width: Int, height: Int, maximum: (width: Int, height: Int)?
+    ) -> (width: Int, height: Int) {
+        guard let maximum, maximum.width > 0, maximum.height > 0,
+              width > 0, height > 0 else { return (width, height) }
+        let scale = Double(max(maximum.width, maximum.height)) / Double(min(width, height))
+        guard scale < 1 else { return (width, height) }
+        // Even dimensions keep 4:2:0 chroma sampling aligned in the scaler.
+        func even(_ value: Double) -> Int { max(2, Int((value / 2).rounded(.up)) * 2) }
+        return (min(width, even(Double(width) * scale)), min(height, even(Double(height) * scale)))
     }
 
     private func retirePlanarPool() {

@@ -13,7 +13,9 @@ import subprocess
 MODES = {"baseline": (2, False, False), "one-thread": (1, False, False),
          "four-threads": (4, False, False), "planar": (2, True, False),
          "foreground": (2, False, True), "indexed": (2, False, False),
-         "packet-retain": (2, False, False), "packet-prefetch": (2, False, False)}
+         "packet-retain": (2, False, False), "packet-prefetch": (2, False, False),
+         "full-preroll": (2, False, False), "exact": (2, False, False),
+         "reduced-loop": (2, False, False), "reduced-scale": (2, False, False)}
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
@@ -71,11 +73,14 @@ def main():
                                ILLIQUID_PREVIEW_THREADS=str(threads),
                                ILLIQUID_PREVIEW_PLANAR=str(int(planar)),
                                ILLIQUID_PREVIEW_FOREGROUND_PRIORITY=str(int(foreground)),
-                               ILLIQUID_PREVIEW_KEYFRAME_INDEX=str(int(mode in ("indexed", "packet-retain", "packet-prefetch"))),
+                               ILLIQUID_PREVIEW_KEYFRAME_INDEX=str(int(mode in ("indexed", "packet-retain", "packet-prefetch", "full-preroll", "exact", "reduced-loop", "reduced-scale"))),
                                ILLIQUID_PREVIEW_PACKET_WORKLOAD=str(int(args.packet_workload)),
                                ILLIQUID_PREVIEW_PACKET_BYTES=str(32 * 1024 * 1024 if mode.startswith("packet-") else 0),
                                ILLIQUID_PREVIEW_READAHEAD_SECONDS="0.5" if mode == "packet-prefetch" else "0",
-                               ILLIQUID_PREVIEW_REFILL_DELAY_MS=str(args.refill_delay_ms))
+                               ILLIQUID_PREVIEW_REFILL_DELAY_MS=str(args.refill_delay_ms),
+                               ILLIQUID_PREVIEW_NONREF_SKIP="0" if mode == "full-preroll" else "1",
+                               ILLIQUID_PREVIEW_REDUCED={"full-preroll": "0", "exact": "0", "reduced-loop": "loop",
+                                                         "reduced-scale": "scale"}.get(mode, "1"))
                     if args.batch:
                         env.update(ILLIQUID_PREVIEW_SECOND_FIXTURE=str(args.fixture[1].resolve()),
                                    ILLIQUID_PREVIEW_BATCH_SIZE=str(chunk))
@@ -86,13 +91,16 @@ def main():
                     data = json.loads((output / f"{name}.json").read_text())
                     calls = data["requests"]
                     hashes = {(r["file"], r["target"]): r.get("sha256") for r in calls}
-                    ref_key = str(fixture)
+                    ref_key = f"{fixture}:{env['ILLIQUID_PREVIEW_REDUCED']}"
                     references.setdefault(ref_key, hashes)
                     row = {"fixture": fixture.name, "mode": mode, "exit_code": result.returncode,
                            "missing_images": sum(not r["available"] for r in calls), "chunk": chunk, "run": run,
                            "first_ms": calls[0]["wall_ms"], "batch_ms": data["batch_wall_ms"],
                            "cpu_ms": data["batch_cpu_ms"],
                            "decoder_opens": sum(not s["reusedContext"] for s in data["stages"]),
+                           "decode_ms": sum(s["decodeMilliseconds"] for s in data["stages"]),
+                           "skipped_nonref": sum(s.get("skippedNonReferencePackets", 0) for s in data["stages"]),
+                           "peak_footprint_mb": data["memory_after_requests"].get("physical_footprint_peak", 0) / 1048576,
                            "hashes_match_first_run": hashes == references[ref_key]}
                     if args.packet_workload:
                         row.update(demux_bytes=sum(s["demuxBytesRead"] for s in data["stages"]),
