@@ -58,6 +58,10 @@ final class BoundedQueue<Element>: @unchecked Sendable {
     private var producerWaitSeconds = 0.0
     private var capacityChangeHandler: (@Sendable () -> Void)?
     private var blockedProducerObservers = 0
+    /// Adjustable admission limits, never above the construction-time limits.
+    private var softCapacity: Int
+    private var softByteCapacity: Int
+    private var softDurationCapacityMicroseconds: Int64
 
     init(
         capacity: Int,
@@ -72,7 +76,33 @@ final class BoundedQueue<Element>: @unchecked Sendable {
         storage = FixedRingBuffer(capacity: capacity)
         self.byteCapacity = byteCapacity
         self.durationCapacityMicroseconds = durationCapacityMicroseconds
+        softCapacity = capacity
+        softByteCapacity = byteCapacity
+        softDurationCapacityMicroseconds = durationCapacityMicroseconds
         self.cost = cost
+    }
+
+    /// Changes admission limits without reallocating storage. nil restores the
+    /// construction-time limit. Lowering a limit never drops queued items; it
+    /// only delays the next push. Raising one wakes blocked producers.
+    func setSoftLimits(count: Int? = nil, bytes: Int? = nil, durationMicroseconds: Int64? = nil) {
+        let handler = condition.withLock { () -> (@Sendable () -> Void)? in
+            let previous = (softCapacity, softByteCapacity, softDurationCapacityMicroseconds)
+            softCapacity = min(max(1, count ?? capacity), capacity)
+            softByteCapacity = min(max(1, bytes ?? byteCapacity), byteCapacity)
+            softDurationCapacityMicroseconds = min(
+                max(1, durationMicroseconds ?? durationCapacityMicroseconds), durationCapacityMicroseconds)
+            let raised = softCapacity > previous.0 || softByteCapacity > previous.1
+                || softDurationCapacityMicroseconds > previous.2
+            guard raised else { return nil }
+            condition.broadcast()
+            return capacityChangeHandler
+        }
+        handler?()
+    }
+
+    var softLimits: (count: Int, bytes: Int, durationMicroseconds: Int64) {
+        condition.withLock { (softCapacity, softByteCapacity, softDurationCapacityMicroseconds) }
     }
 
     var count: Int {
@@ -256,11 +286,11 @@ final class BoundedQueue<Element>: @unchecked Sendable {
     }
 
     private func wouldExceedBudget(adding cost: BoundedQueueCost) -> Bool {
-        storage.count >= capacity
-            || storedBytes > byteCapacity - min(cost.bytes, byteCapacity)
+        storage.count >= softCapacity
+            || storedBytes > softByteCapacity - min(cost.bytes, softByteCapacity)
             || storedDurationMicroseconds
-                > durationCapacityMicroseconds
-                    - min(cost.durationMicroseconds, durationCapacityMicroseconds)
+                > softDurationCapacityMicroseconds
+                    - min(cost.durationMicroseconds, softDurationCapacityMicroseconds)
     }
 }
 

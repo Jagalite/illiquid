@@ -243,6 +243,7 @@ final class MediaSession: @unchecked Sendable {
 
     var activeAudioStream: FFmpegStreamInfo? { selectedAudio }
     var activeSubtitleStream: FFmpegStreamInfo? { selectedSubtitle }
+    var activeVideoStream: FFmpegStreamInfo? { selectedVideo }
     var activeSubtitleSource: NativeSubtitleSource { subtitleSource }
     var pictureInPictureSubtitlePipeline: SubtitlePipeline? {
         pictureInPictureSubtitles
@@ -324,6 +325,9 @@ final class MediaSession: @unchecked Sendable {
 
     private let workerGroup = DispatchGroup()
     private let stateLock = NSLock()
+    /// Inputs for adaptive buffering, drained once per window by the runtime.
+    let resourceTelemetry = PlaybackResourceTelemetry()
+    private var pendingInitialBufferTargets: AdaptiveBufferTargets?
     private var running = false
     private var desiredRate: Float = 1
     private var presentationWorkersStarted = false
@@ -376,6 +380,7 @@ final class MediaSession: @unchecked Sendable {
         usesFairDemuxDispatch: Bool = false,
         softwarePlanarOutputMaximumBufferCount: Int =
             SoftwareBGRAOutputPool.qualifiedMaximumBufferCount,
+        initialBufferTargets: AdaptiveBufferTargets? = nil,
         constructionCancellation: FFmpegInputCancellationSignal? = nil,
         sessionID: PlaybackSessionID = PlaybackSessionID(rawValue: 0),
         onLifecycleTrace: (@Sendable (String) -> Void)? = nil,
@@ -393,6 +398,7 @@ final class MediaSession: @unchecked Sendable {
         videoFrames = BoundedQueue<VideoFrameQueueItem>(
             capacity: boundedVideoFrameCapacity
         )
+        pendingInitialBufferTargets = initialBufferTargets
         // Controlled flush/recheckout probes found as many as five pool
         // buffers temporarily unavailable after every known application and
         // CMSampleBuffer owner had released. Active playback separately
@@ -699,6 +705,10 @@ final class MediaSession: @unchecked Sendable {
             return true
         }
         guard shouldStart else { return false }
+        if let targets = pendingInitialBufferTargets {
+            pendingInitialBufferTargets = nil
+            applyBufferTargets(targets)
+        }
         synchronization.beginGeneration(generation.current)
         launch("demux", body: demuxLoop)
         if videoDecoder != nil {
@@ -737,6 +747,21 @@ final class MediaSession: @unchecked Sendable {
             return (desiredRate, presentationFence)
         }
         return presentation.setRate(state.0, fence: state.1)
+    }
+
+    /// Sets queue admission limits. Lowering a limit never drops queued work.
+    /// Packet counts scale with the duration targets so containers without
+    /// packet durations are bounded too.
+    func applyBufferTargets(_ targets: AdaptiveBufferTargets) {
+        let frameRate = selectedVideo?.averageFrameRate.flatMap { $0.isFinite && $0 > 0 ? $0 : nil } ?? 30
+        videoFrames.setSoftLimits(count: targets.videoFrames)
+        videoPackets.setSoftLimits(
+            count: Int((targets.videoPacketSeconds * frameRate).rounded(.up)) + 8,
+            durationMicroseconds: Int64(targets.videoPacketSeconds * 1_000_000))
+        // AAC and Opus deliver roughly 47–50 packets per second.
+        audioPackets.setSoftLimits(
+            count: Int((targets.audioPacketSeconds * 64).rounded(.up)) + 16,
+            durationMicroseconds: Int64(targets.audioPacketSeconds * 1_000_000))
     }
 
     func adoptPresentationFence(_ fence: PresentationFence) {
@@ -812,6 +837,7 @@ final class MediaSession: @unchecked Sendable {
                 isPreview: isPreview
             )
             seeks.submit(seekRequest)
+            resourceTelemetry.reset()
             let decoder = videoDecoder
             decoder?.recordPlanarFlushRequested(activeGeneration: newGeneration)
             let recordVideoFlushCompletion = decoder?.planarVideoFlushCompletionRecorder(
@@ -953,6 +979,11 @@ final class MediaSession: @unchecked Sendable {
             if sync.isFinite {
                 metrics.bufferedVideoDuration = max(0, metrics.videoPTS - sync)
                 metrics.bufferedAudioDuration = max(0, metrics.audioPTS - sync)
+                if presentation.rate != 0 {
+                    if selectedVideo != nil {
+                        resourceTelemetry.observeRendererVideoAhead(metrics.bufferedVideoDuration)
+                    }
+                }
             }
             let beforeEnd = !metrics.ended && sync < max(mediaInfo.duration - 0.1, 0)
             let videoStarved = MediaSessionEndPolicy.isStreamStarved(
@@ -1127,7 +1158,11 @@ final class MediaSession: @unchecked Sendable {
 
     private func readDemuxPacket(generation: Int) throws -> FFmpegPacket? {
         if let demuxPacketReader { return try demuxPacketReader(generation) }
-        return try input.readPacket(generation: generation)
+        let started = ProcessInfo.processInfo.systemUptime
+        let packet = try input.readPacket(generation: generation)
+        resourceTelemetry.recordDemuxRead(
+            milliseconds: (ProcessInfo.processInfo.systemUptime - started) * 1_000)
+        return packet
     }
 
     private func readDelayedAudioPacket(generation: Int) throws -> FFmpegPacket? {
@@ -1375,15 +1410,25 @@ final class MediaSession: @unchecked Sendable {
         decoder.seekOutputFloor = stateLock.withLock {
             videoSeekFloor.flatMap { $0.generation == packet.generation ? $0 : nil }
         }
+        // Decoder work excludes output-capacity and frame-queue waits, which
+        // measure downstream backpressure rather than decode cost.
+        let decodeStarted = ProcessInfo.processInfo.systemUptime
+        var downstreamWaitSeconds = 0.0
         let reserveSoftwareOutput: (() -> VideoFrameCapacityPermit?)?
         if let gate = videoPipelineCapacityGate {
             reserveSoftwareOutput = {
-                gate.acquire {
+                let waitStarted = ProcessInfo.processInfo.systemUptime
+                defer { downstreamWaitSeconds += ProcessInfo.processInfo.systemUptime - waitStarted }
+                return gate.acquire {
                     self.isRunning && self.generation.accepts(packet.generation)
                 }
             }
         } else {
             reserveSoftwareOutput = nil
+        }
+        defer {
+            resourceTelemetry.recordVideoDecode(milliseconds: max(0,
+                ProcessInfo.processInfo.systemUptime - decodeStarted - downstreamWaitSeconds) * 1_000)
         }
         try decoder.decode(
             packet,
@@ -1392,6 +1437,8 @@ final class MediaSession: @unchecked Sendable {
             },
             reserveSoftwareOutput: reserveSoftwareOutput
         ) { decodedFrame in
+            let deliveryStarted = ProcessInfo.processInfo.systemUptime
+            defer { downstreamWaitSeconds += ProcessInfo.processInfo.systemUptime - deliveryStarted }
             let frame = decodedFrame
             self.stateLock.withLock {
                 if decoder.hardwareWasConfigured {
@@ -1472,6 +1519,7 @@ final class MediaSession: @unchecked Sendable {
             switch videoPackets.pop() {
             case .closed: return
             case let .value(item):
+                resourceTelemetry.observeVideoPackets(videoPackets.budgetSnapshot)
                 do {
                     switch item {
                     case let .packet(packet):
@@ -1559,6 +1607,7 @@ final class MediaSession: @unchecked Sendable {
             switch audioPackets.pop() {
             case .closed: return
             case let .value(item):
+                resourceTelemetry.observeAudioPackets(audioPackets.budgetSnapshot)
                 do {
                     switch item {
                     case let .packet(packet):
@@ -1837,6 +1886,7 @@ final class MediaSession: @unchecked Sendable {
             switch videoFrames.pop() {
             case .closed: return
             case let .value(item):
+                resourceTelemetry.observeVideoFrameQueue(depth: videoFrames.count)
                 switch item {
                 case let .frame(frame):
                     frame.planarOwnershipToken?.transition(to: .presenting)

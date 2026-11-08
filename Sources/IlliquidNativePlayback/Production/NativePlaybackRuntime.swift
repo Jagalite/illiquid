@@ -525,6 +525,15 @@ public final class NativePlaybackRuntime: PlaybackRuntime {
     private var shutdownResult: Bool?
     private var shutdownEffectTask: Task<Void, Never>?
     private var lastMetricsEmission = Date.distantPast
+    /// Adaptive buffering. Qualified against the fixed queues on 7 workloads:
+    /// no starvation or frame-rate change, roughly half the queued frames and
+    /// 2–4x less buffered compressed data.
+    private var bufferPolicy = AdaptiveBufferPolicy()
+    private var bufferPolicySessionID: PlaybackSessionID?
+    private var bufferPolicyStarvations = 0
+    private var bufferPolicySeekCount = 0
+    private var memoryPressureSource: DispatchSourceMemoryPressure?
+    private var isUnderMemoryPressure = false
     private var lastPositionEmission = Date.distantPast
     private var lastBufferingEmission = Date.distantPast
     private var lastBufferingState: Bool?
@@ -2333,6 +2342,7 @@ public final class NativePlaybackRuntime: PlaybackRuntime {
                         usesFairDemuxDispatch: usesFairDemuxDispatch,
                         softwarePlanarOutputMaximumBufferCount:
                             softwarePlanarOutputMaximumBufferCount,
+                        initialBufferTargets: AdaptiveBufferPolicy.initial,
                         constructionCancellation: constructionCancellation,
                         sessionID: replacementSessionID,
                         onLifecycleTrace: { stage in
@@ -3190,6 +3200,7 @@ public final class NativePlaybackRuntime: PlaybackRuntime {
         }
         if Date().timeIntervalSince(lastMetricsEmission) >= 1 {
             lastMetricsEmission = Date()
+            updateBufferTargets(snapshot: snapshot)
             for payload in nativePeriodicMetricsPayloads(
                 snapshot: snapshot,
                 observation: lastObservationMetrics
@@ -3333,6 +3344,53 @@ public final class NativePlaybackRuntime: PlaybackRuntime {
     }
 
     var sessionSnapshotForDiagnostics: MediaSessionSnapshot? { session?.snapshot() }
+
+    /// Drains one telemetry window into the adaptive buffer policy and applies
+    /// any changed targets to the session.
+    private func updateBufferTargets(snapshot: MediaSessionSnapshot) {
+        guard let session else { return }
+        if memoryPressureSource == nil {
+            let source = DispatchSource.makeMemoryPressureSource(
+                eventMask: [.normal, .warning, .critical], queue: .main)
+            source.setEventHandler { [weak self, weak source] in
+                guard let event = source?.data else { return }
+                let pressured = event.contains(.warning) || event.contains(.critical)
+                MainActor.assumeIsolated { self?.isUnderMemoryPressure = pressured }
+            }
+            source.resume()
+            memoryPressureSource = source
+        }
+        let window = session.resourceTelemetry.drain()
+        if bufferPolicySessionID != activeSessionID {
+            // The session was constructed with the policy's initial targets.
+            bufferPolicy = AdaptiveBufferPolicy()
+            bufferPolicySessionID = activeSessionID
+            bufferPolicyStarvations = snapshot.rendererStarvations
+            bufferPolicySeekCount = snapshot.seekCount
+        }
+        let process = ProcessInfo.processInfo
+        let frameRate = session.activeVideoStream?.averageFrameRate
+        let input = AdaptiveBufferInputs(
+            playing: desiredPlaying && snapshot.rendererRate != 0,
+            seeked: snapshot.seekCount != bufferPolicySeekCount,
+            frameInterval: frameRate.flatMap { $0 > 0 ? 1 / $0 : nil },
+            videoDecodeP95: window.videoDecode.quantileUpperBound(0.95).map { $0 / 1_000 },
+            demuxReadMaximum: window.demuxRead.count > 0 ? window.demuxRead.maximumMilliseconds / 1_000 : nil,
+            demuxStalls: window.demuxRead.count(above: 50),
+            starvations: max(0, snapshot.rendererStarvations - bufferPolicyStarvations),
+            videoFrameQueueLow: window.videoFrameQueueLow,
+            videoPacketAheadLow: window.videoPacketAheadLowSeconds,
+            audioPacketAheadLow: window.audioPacketAheadLowSeconds,
+            rendererVideoAheadLow: window.rendererVideoAheadLowSeconds,
+            constrained: isUnderMemoryPressure || process.isLowPowerModeEnabled
+                || process.thermalState == .serious || process.thermalState == .critical)
+        bufferPolicyStarvations = snapshot.rendererStarvations
+        bufferPolicySeekCount = snapshot.seekCount
+        let previous = bufferPolicy.targets
+        let targets = bufferPolicy.update(input)
+        if targets != previous { session.applyBufferTargets(targets) }
+    }
+
     public var diagnosticSnapshot: NativePlaybackDiagnosticSnapshot? {
         let lifecycle = replacementLifecycle.snapshot
         let snapshot = session?.snapshot()
