@@ -18,6 +18,7 @@ struct ThumbnailDecodeObservation: Codable, Sendable {
     var prefetchMilliseconds: Double = 0
     var packets = 0
     var frames = 0
+    var hardwareDecodedFrames = 0
     var discardedBeforeOutput = 0
     var skippedNonReferencePackets = 0
     var usedEOFFallback = false

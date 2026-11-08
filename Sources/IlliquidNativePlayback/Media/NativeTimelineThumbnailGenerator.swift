@@ -69,14 +69,18 @@ public actor NativeTimelineThumbnailGenerator {
         let simulatedRefillDelay: Double
         let softwareThreads: Int
         let planarOutput: Bool
+        /// nil selects by source size (see `DecodeContext.usesHardware`).
+        let prefersHardware: Bool?
         let usesKeyframeIndex: Bool
         let skipsNonReferencePreroll: Bool
         let reducedFidelity: ReducedFidelity
         init(optimized: Bool = true, maximumPackets: Int = 1_500,
-             softwareThreads: Int = 2, planarOutput: Bool = false, usesKeyframeIndex: Bool = true,
+             softwareThreads: Int = 2, planarOutput: Bool = false, prefersHardware: Bool? = nil,
+             usesKeyframeIndex: Bool = true,
              skipsNonReferencePreroll: Bool = true, reducedFidelity: ReducedFidelity = .all,
              packetWindowBytes: Int = 0, packetReadAheadSeconds: Double = 0, simulatedRefillDelay: Double = 0,
              observe: (@Sendable (ThumbnailDecodeObservation) -> Void)?) {
+            self.prefersHardware = prefersHardware
             self.packetWindowBytes = min(max(0, packetWindowBytes), 32 * 1024 * 1024)
             self.packetReadAheadSeconds = min(max(0, packetReadAheadSeconds), 1)
             self.simulatedRefillDelay = min(max(0, simulatedRefillDelay), 0.01)
@@ -113,7 +117,7 @@ public actor NativeTimelineThumbnailGenerator {
                     cancellation: cancellation, context: &context,
                     token: FFmpegInputEffectToken(rawValue: nextToken), optimized: optimized,
                     maximumPackets: maximumPackets, softwareThreads: softwareThreads, planarOutput: planarOutput,
-                    usesKeyframeIndex: usesKeyframeIndex, skipsNonReferencePreroll: skipsNonReferencePreroll,
+                    prefersHardware: prefersHardware, usesKeyframeIndex: usesKeyframeIndex, skipsNonReferencePreroll: skipsNonReferencePreroll,
                     reducedFidelity: reducedFidelity,
                     packetWindowBytes: packetWindowBytes,
                     packetReadAheadSeconds: packetReadAheadSeconds, simulatedRefillDelay: simulatedRefillDelay,
@@ -138,6 +142,15 @@ public actor NativeTimelineThumbnailGenerator {
         }
     }
 
+    /// Above 1080p, VideoToolbox previews measured 56–67 MB less resident
+    /// memory and about 90% less CPU than two-thread software decoding, at
+    /// 25–40% more latency. At 1080p and below they saved no memory and were
+    /// 2–3x slower, so smaller sources keep the established software route.
+    /// `preference` pins the route for qualification.
+    nonisolated static func previewUsesHardware(width: Int32, height: Int32, preference: Bool?) -> Bool {
+        preference ?? (Int(width) * Int(height) > 1_920 * 1_088)
+    }
+
     private final class DecodeContext {
         let url: URL
         let interrupt: FFmpegInterruptState
@@ -148,7 +161,8 @@ public actor NativeTimelineThumbnailGenerator {
         var lastDecodedSeconds: Double?
         var reachedEOF = false
         var forwardContinuationIsSafe = true
-        init(url: URL, interrupt: FFmpegInterruptState, softwareThreads: Int, planarOutput: Bool, packetWindowBytes: Int) throws {
+        init(url: URL, interrupt: FFmpegInterruptState, softwareThreads: Int, planarOutput: Bool,
+             prefersHardware: Bool?, packetWindowBytes: Int) throws {
             packetWindow = packetWindowBytes > 0 ? ThumbnailPacketWindow(maximumBytes: packetWindowBytes) : nil
             self.url = url
             self.interrupt = interrupt
@@ -161,7 +175,9 @@ public actor NativeTimelineThumbnailGenerator {
             else { throw CocoaError(.fileReadCorruptFile) }
             self.stream = stream
             decoder = try VideoDecoder(
-                parameters: parameters, stream: stream, preferHardware: false,
+                parameters: parameters, stream: stream,
+                preferHardware: NativeTimelineThumbnailGenerator.previewUsesHardware(width: parameters.pointee.width,
+                    height: parameters.pointee.height, preference: prefersHardware),
                 timelineOriginSeconds: demuxer.mediaInfo.startTime,
                 softwareOutputMode: planarOutput ? .planarPreferred(rendererAttributes: [:]) : .bgra,
                 softwareDecoderThreadCount: softwareThreads,
@@ -193,13 +209,15 @@ public actor NativeTimelineThumbnailGenerator {
     // Internal qualification controls; the public initializer keeps the
     // two-thread BGRA route and the established worker scheduling priority.
     init(optimized: Bool = true, maximumPackets: Int = 1_500,
-         softwareThreads: Int = 2, planarOutput: Bool = false, prioritizesForeground: Bool = false, usesKeyframeIndex: Bool = true,
+         softwareThreads: Int = 2, planarOutput: Bool = false, prefersHardware: Bool? = nil,
+         prioritizesForeground: Bool = false, usesKeyframeIndex: Bool = true,
          skipsNonReferencePreroll: Bool = true, reducedFidelity: ReducedFidelity = .all,
          packetWindowBytes: Int = 0, packetReadAheadSeconds: Double = 0, simulatedRefillDelay: Double = 0,
          observe: @escaping @Sendable (ThumbnailDecodeObservation) -> Void) {
         cache = NativeThumbnailCache()
         let storage = DecoderStorage(optimized: optimized, maximumPackets: maximumPackets,
-            softwareThreads: softwareThreads, planarOutput: planarOutput, usesKeyframeIndex: usesKeyframeIndex,
+            softwareThreads: softwareThreads, planarOutput: planarOutput, prefersHardware: prefersHardware,
+            usesKeyframeIndex: usesKeyframeIndex,
             skipsNonReferencePreroll: skipsNonReferencePreroll, reducedFidelity: reducedFidelity,
             packetWindowBytes: packetWindowBytes, packetReadAheadSeconds: packetReadAheadSeconds,
             simulatedRefillDelay: simulatedRefillDelay, observe: observe)
@@ -340,7 +358,8 @@ public actor NativeTimelineThumbnailGenerator {
         token: FFmpegInputEffectToken,
         optimized: Bool,
         maximumPackets: Int,
-        softwareThreads: Int, planarOutput: Bool, usesKeyframeIndex: Bool, skipsNonReferencePreroll: Bool,
+        softwareThreads: Int, planarOutput: Bool, prefersHardware: Bool?, usesKeyframeIndex: Bool,
+        skipsNonReferencePreroll: Bool,
         reducedFidelity: ReducedFidelity,
         packetWindowBytes: Int, packetReadAheadSeconds: Double, simulatedRefillDelay: Double, measuresPacketReads: Bool,
         observation: inout ThumbnailDecodeObservation
@@ -359,7 +378,8 @@ public actor NativeTimelineThumbnailGenerator {
         do {
             defer { observation.openMilliseconds = (ProcessInfo.processInfo.systemUptime - openStarted) * 1_000 }
             if context?.url != url {
-                context = try DecodeContext(url: url, interrupt: interrupt, softwareThreads: softwareThreads, planarOutput: planarOutput, packetWindowBytes: packetWindowBytes)
+                context = try DecodeContext(url: url, interrupt: interrupt, softwareThreads: softwareThreads,
+                    planarOutput: planarOutput, prefersHardware: prefersHardware, packetWindowBytes: packetWindowBytes)
             }
         }
         try cancellation.checkCancellation()
@@ -455,6 +475,7 @@ public actor NativeTimelineThumbnailGenerator {
         var reachedTarget = false
         func receive(_ frame: NativeDecodedVideoFrame) {
             observation.frames += 1
+            if frame.isHardwareDecoded { observation.hardwareDecodedFrames += 1 }
             current.lastDecodedSeconds = frame.presentationTime.seconds
             if frame.usesDeinterlacingFilter || frame.beginsTimelineDiscontinuity {
                 // Filter history after random access need not match a fresh
@@ -556,6 +577,14 @@ public actor NativeTimelineThumbnailGenerator {
         isHorizontallyMirrored: Bool,
         maximumPixelSize: CGSize
     ) -> CGImage? {
+        if frame.isHardwareDecoded,
+           CVBufferCopyAttachment(frame.pixelBuffer, kCVImageBufferYCbCrMatrixKey, nil) == nil {
+            // Software previews convert untagged YCbCr with swscale's default
+            // BT.601 coefficients. Tag untagged VideoToolbox output the same way
+            // so a preview does not change color with the decode route.
+            CVBufferSetAttachment(frame.pixelBuffer, kCVImageBufferYCbCrMatrixKey,
+                                  kCVImageBufferYCbCrMatrix_ITU_R_601_4, .shouldPropagate)
+        }
         var image = CIImage(cvPixelBuffer: frame.pixelBuffer)
 
         // Scaled conversion produces a buffer smaller than the coded frame;

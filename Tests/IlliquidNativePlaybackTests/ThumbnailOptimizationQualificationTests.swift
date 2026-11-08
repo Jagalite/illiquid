@@ -167,6 +167,48 @@ struct ThumbnailOptimizationQualificationTests {
         await exact.releaseIdleResources(); await reduced.releaseIdleResources()
     }
 
+    @Test func previewDecodeRouteFollowsSourceSize() {
+        #expect(!NativeTimelineThumbnailGenerator.previewUsesHardware(width: 1_920, height: 1_080, preference: nil))
+        #expect(!NativeTimelineThumbnailGenerator.previewUsesHardware(width: 1_920, height: 1_088, preference: nil))
+        #expect(NativeTimelineThumbnailGenerator.previewUsesHardware(width: 2_560, height: 1_440, preference: nil))
+        #expect(NativeTimelineThumbnailGenerator.previewUsesHardware(width: 3_840, height: 2_160, preference: nil))
+        #expect(NativeTimelineThumbnailGenerator.previewUsesHardware(width: 640, height: 360, preference: true))
+        #expect(!NativeTimelineThumbnailGenerator.previewUsesHardware(width: 3_840, height: 2_160, preference: false))
+    }
+
+    /// Hardware and software previews take different decode and scaling routes;
+    /// require them to stay visually equivalent at preview size.
+    @Test func hardwarePreviewStaysCloseToSoftwarePreview() async throws {
+        guard let path = ProcessInfo.processInfo.environment["ILLIQUID_PREVIEW_HARDWARE_FIXTURE"] else { return }
+        let url = URL(fileURLWithPath: path)
+        let codec = try #require(FFmpegDemuxer(url: url).mediaInfo.videoStreams.first).codecName
+        guard VideoDecoder.platformSupportsHardwareDecode(codecName: codec) else {
+            print("[preview-hardware] unqualified: host has no hardware decoder for \(codec)")
+            return
+        }
+        let hardwareRecords = Observations()
+        let software = NativeTimelineThumbnailGenerator(prefersHardware: false) { _ in }
+        let hardware = NativeTimelineThumbnailGenerator(prefersHardware: true) { hardwareRecords.append($0) }
+        let size = CGSize(width: 368, height: 208)
+        for target in [0.5, 1.5, 2.25] {
+            let expected = try #require(await software.thumbnail(for: url, at: target, maximumPixelSize: size, background: false))
+            let actual = try #require(await hardware.thumbnail(for: url, at: target, maximumPixelSize: size, background: false))
+            #expect(actual.width == expected.width && actual.height == expected.height)
+            let delta = try #require(difference(actual, expected))
+            print("[preview-hardware] target=\(target) psnr=\(delta.psnr) mean-absolute=\(delta.meanAbsolute)")
+            // swscale and Core Image resample differently, so synthetic noise and
+            // hairlines keep PSNR near 26 dB while flat colors agree within two
+            // levels and no geometric offset exists. A decode-route color mismatch
+            // (untagged BT.601 vs Core Image's default) measured 10.7 here.
+            #expect(delta.meanAbsolute <= 4)
+        }
+        // prefersHardware permits software fallback; a fallback would compare
+        // software with software and prove nothing about the hardware route.
+        let records = hardwareRecords.snapshot()
+        #expect(records.contains { $0.hardwareDecodedFrames > 0 })
+        #expect(records.allSatisfy { $0.hardwareDecodedFrames == $0.frames })
+    }
+
     @Test func packetExperimentFallsBackUnderTinyBudgetAndReleasesOnPressureOrInvalidation() async throws {
         guard let path = ProcessInfo.processInfo.environment["ILLIQUID_PACKET_REGRESSION_FIXTURE"] else { return }
         let url = URL(fileURLWithPath: path), size = CGSize(width: 368, height: 208)
