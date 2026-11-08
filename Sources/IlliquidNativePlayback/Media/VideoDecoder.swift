@@ -880,8 +880,26 @@ final class VideoDecoder {
         context.pointee.skip_frame = skipsNonReference ? AVDISCARD_NONREF : AVDISCARD_DEFAULT
         context.pointee.skip_loop_filter = skipsLoopFilter ? AVDISCARD_ALL : AVDISCARD_DEFAULT
         if skipsNonReference { seekPrerollNonReferencePackets += 1 }
-        defer { context.pointee.skip_frame = AVDISCARD_DEFAULT }
+        // The VideoToolbox-rejection path below frees this context; never write
+        // through it after replacement. The replacement exists before the old
+        // context is freed, so the addresses cannot coincide.
+        defer { if self.context == context { context.pointee.skip_frame = AVDISCARD_DEFAULT } }
         var sendResult = avcodec_send_packet(context, packetPointer)
+        if hardwareWasConfigured, illiquid_decoder_rejected_videotoolbox(context) != 0 {
+            // The hardware context was opened single-threaded but negotiated a
+            // software format. Restart as a threaded software decoder and
+            // resubmit this packet; format negotiation precedes frame output.
+            guard try switchToSoftware() else {
+                throw FFmpegError(
+                    operation: "Restart \(stream.codecName) decoder in software",
+                    code: illiquid_averror_nomem()
+                )
+            }
+            hardwareFallbackReason = "VideoToolbox does not support this stream's format"
+            try decodeOutput(packet, while: shouldContinue,
+                             reserveSoftwareOutput: reserveSoftwareOutput, mode: mode, emit: emit)
+            return
+        }
         if sendResult == illiquid_averror_eagain() {
             try receiveFrames(
                 generation: packet.generation,

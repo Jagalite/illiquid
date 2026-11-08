@@ -40,6 +40,13 @@ common_video=(
     -c:v libx265 -preset ultrafast -x265-params log-level=error \
     -pix_fmt yuv420p10le -c:a aac "${fixture_dir}/hevc-10bit-aac.mkv"
 
+# FFmpeg offers VideoToolbox for MPEG-2, but hwaccel initialization fails on
+# Apple Silicon. The hardware-preferring decoder must fall back to threaded
+# software decoding for this stream.
+"${ffmpeg_bin}" -hide_banner -loglevel error -y "${common_video[@]}" \
+    -c:v mpeg2video -pix_fmt yuv420p -an \
+    "${fixture_dir}/mpeg2-video-only.mkv"
+
 "${ffmpeg_bin}" -hide_banner -loglevel error -y "${common_video[@]}" \
     -c:v libvpx-vp9 -deadline realtime -cpu-used 8 -pix_fmt yuv420p \
     -c:a libopus "${fixture_dir}/vp9-opus.mkv"

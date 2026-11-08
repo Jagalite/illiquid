@@ -608,6 +608,39 @@ struct NativePlaybackFixtureIntegrationTests {
         #expect(recoveryPackets.takeReplayPackets(generation: 7).isEmpty)
     }
 
+    @Test func fallsBackToThreadedSoftwareWhenVideoToolboxRejectsFormat() throws {
+        guard let fixtureDirectory else { return }
+        let url = fixtureDirectory.appendingPathComponent("mpeg2-video-only.mkv")
+        guard FileManager.default.fileExists(atPath: url.path) else {
+            print("[hardware-fallback] unqualified: regenerate fixtures for mpeg2-video-only.mkv")
+            return
+        }
+        let demuxer = try FFmpegDemuxer(url: url)
+        let stream = try #require(demuxer.mediaInfo.videoStreams.first)
+        let parameters = try #require(demuxer.codecParameters(streamIndex: stream.index))
+        let decoder = try VideoDecoder(
+            parameters: parameters,
+            stream: stream,
+            preferHardware: true,
+            softwareDecoderThreadCount: 0
+        )
+        guard decoder.hardwareWasConfigured else {
+            print("[hardware-fallback] unqualified: VideoToolbox device unavailable")
+            return
+        }
+        var frames: [NativeDecodedVideoFrame] = []
+        for _ in 0..<300 where frames.count < 5 {
+            guard let packet = try demuxer.readPacket(generation: 1) else { break }
+            guard packet.streamIndex == stream.index else { continue }
+            frames += try decoder.decode(packet)
+        }
+        #expect(frames.count >= 5)
+        #expect(frames.allSatisfy { !$0.isHardwareDecoded })
+        #expect(decoder.softwareFallbackActivated)
+        #expect(!decoder.hardwareWasConfigured)
+        #expect(decoder.hardwareFallbackReason == "VideoToolbox does not support this stream's format")
+    }
+
     @Test func recreatesSoftwareDecoderAfterHardwarePathFailure() throws {
         guard let fixtureDirectory else { return }
         let demuxer = try FFmpegDemuxer(

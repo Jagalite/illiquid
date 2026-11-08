@@ -226,6 +226,15 @@ static inline CVPixelBufferRef illiquid_videotoolbox_pixel_buffer(const AVFrame 
         : NULL;
 }
 
+// Marker stored in AVCodecContext.opaque when a VideoToolbox-configured
+// context had to negotiate a software pixel format (for example an H.264
+// 10-bit or 4:2:2 profile that VideoToolbox does not decode). Such contexts
+// were opened single-threaded for hardware decoding, so callers recreate them
+// as threaded software decoders.
+// A macro, not a static variable: Swift's importer does not emit header
+// variable definitions. AVCodecContext.opaque is otherwise unused here.
+#define ILLIQUID_VIDEOTOOLBOX_REJECTED ((void *)(uintptr_t)0x1)
+
 static enum AVPixelFormat illiquid_videotoolbox_get_format(
     AVCodecContext *context,
     const enum AVPixelFormat *formats
@@ -236,6 +245,8 @@ static enum AVPixelFormat illiquid_videotoolbox_get_format(
             return *format;
         format++;
     }
+    if (context && context->hw_device_ctx)
+        context->opaque = ILLIQUID_VIDEOTOOLBOX_REJECTED;
     format = formats;
     while (*format != AV_PIX_FMT_NONE) {
         const AVPixFmtDescriptor *descriptor = av_pix_fmt_desc_get(*format);
@@ -244,6 +255,10 @@ static enum AVPixelFormat illiquid_videotoolbox_get_format(
         format++;
     }
     return AV_PIX_FMT_NONE;
+}
+
+static inline int illiquid_decoder_rejected_videotoolbox(const AVCodecContext *context) {
+    return context && context->opaque == ILLIQUID_VIDEOTOOLBOX_REJECTED;
 }
 
 static inline int illiquid_decoder_supports_videotoolbox(
@@ -319,6 +334,10 @@ static inline int illiquid_create_decoder_with_thread_count(
         if (result >= 0) {
             context->hw_device_ctx = device;
             context->get_format = illiquid_videotoolbox_get_format;
+            // VideoToolbox does the decoding. FFmpeg frame threading would
+            // only add per-thread parser/DPB state: measured 4K60 HEVC at the
+            // same 60 fps used ~350 MiB with 9 threads and ~170 MiB with one.
+            context->thread_count = 1;
             using_hardware = 1;
         }
     }
