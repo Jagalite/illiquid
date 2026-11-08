@@ -84,6 +84,12 @@ struct PlayerRootView: View {
         .onChange(of: model.isInspectorPresented) { _, isPresented in
             model.setTransientPresentation(isPresented, owner: "inspector")
         }
+        .sheet(isPresented: $model.isPictureAdjustmentsPresented) {
+            PictureAdjustmentsView(model: model).scaledPlayerInterface()
+        }
+        .onChange(of: model.isPictureAdjustmentsPresented) { _, isPresented in
+            model.setTransientPresentation(isPresented, owner: "picture-adjustments")
+        }
         .sheet(isPresented: $model.isShortcutSettingsPresented) { ShortcutSettingsView(model: model).scaledPlayerInterface() }
         .onChange(of: model.isShortcutSettingsPresented) { _, shown in
             model.setTransientPresentation(shown, owner: "shortcut-settings")

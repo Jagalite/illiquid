@@ -176,6 +176,33 @@ struct PlayerCommands: Commands {
                 Button("Reset Video Sizing", action: model.player.resetVideoGeometry)
                     .disabled(model.state.pictureInPicture.isActive)
             }
+            if model.player.supports(.changeVideoAdjustments) {
+                Divider()
+                Picker("Rotation", selection: Binding(
+                    get: { model.state.videoAdjustments.rotation },
+                    set: { model.player.setVideoRotation($0) }
+                )) {
+                    Text("None").tag(0)
+                    Text("90° Clockwise").tag(90)
+                    Text("180°").tag(180)
+                    Text("90° Counterclockwise").tag(270)
+                }
+                .disabled(model.state.currentSource == nil || model.state.pictureInPicture.isActive)
+                Button("Picture Adjustments…") { model.isPictureAdjustmentsPresented = true }
+                    .disabled(model.state.currentSource == nil)
+            }
+            if model.player.supports(.changeVideoFilters) {
+                Menu("Filters") {
+                    ForEach(VideoFilterPreset.allCases) { filter in
+                        Toggle(filter.displayName, isOn: Binding(
+                            get: { model.state.activeVideoFilters.contains(filter) },
+                            set: { model.player.setVideoFilter(filter, enabled: $0) }
+                        ))
+                        .help(filter.helpText)
+                    }
+                }
+                .disabled(model.state.currentSource == nil)
+            }
         }
 
         CommandGroup(after: .windowArrangement) {

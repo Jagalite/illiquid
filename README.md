@@ -14,6 +14,12 @@ around your video, and find your place with a visual timeline.
   sources in the sidebar, with tabs for quick switching.
 - **A player that remembers.** Track progress and resume videos where you
   left off.
+- **Subtitles that look right.** Styled ASS/SSA with embedded fonts, SRT,
+  WebVTT, and image-based PGS, VobSub, and DVB subtitles, from the file or an
+  external file, with timing adjustment and subtitles in Picture in Picture.
+- **Picture controls.** Adjust brightness, contrast, saturation, gamma, and
+  hue, rotate the video, and turn on deband, denoise, and sharpen filters,
+  with changes shown immediately, even while paused.
 - **Made for macOS.** Enjoy Picture in Picture, HDR, media keys, and a resizable
   interface, with audio and subtitle controls close at hand.
 
@@ -21,7 +27,9 @@ around your video, and find your place with a visual timeline.
 
 Illiquid uses FFmpeg and Apple's VideoToolbox for video decoding, with native
 macOS rendering and hardware acceleration when available. Its playback pipeline
-uses bounded queues to manage buffered media during playback.
+uses bounded queues to manage buffered media during playback. Picture
+adjustments and filters run on the GPU with Metal, so hardware decoding stays
+on while they are in use.
 
 ## Download
 

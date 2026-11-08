@@ -301,6 +301,7 @@ final class AppModel {
     var benchmarkTimelineHover: BenchmarkTimelineHover?
     var benchmarkSourceQuery: String?
     var isInspectorPresented = false
+    var isPictureAdjustmentsPresented = false
     let shortcutBindings = PlayerShortcutBindings()
     var isShortcutSettingsPresented = false
     var isShortcutHelpPresented = false
@@ -1951,6 +1952,7 @@ final class AppModel {
         }
         activeContextMenuTarget = nil
         isInspectorPresented = false
+        isPictureAdjustmentsPresented = false
         isShortcutHelpPresented = false
         isMessageHistoryPresented = false
         for task in sourceItemPreparationTasks.values { task.cancel() }
@@ -2370,6 +2372,8 @@ final class AppModel {
                 isMessageHistoryPresented = false
             } else if isInspectorPresented {
                 isInspectorPresented = false
+            } else if isPictureAdjustmentsPresented {
+                isPictureAdjustmentsPresented = false
             } else if isShortcutHelpPresented {
                 isShortcutHelpPresented = false
             } else if isSidebarPresented {

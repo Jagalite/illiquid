@@ -565,6 +565,17 @@ class Runner:
         if not executable.is_relative_to(app) or not os.access(executable, os.X_OK):
             raise Failure("error", "bundle executable must be executable and contained in the bundle")
         timeout = bounded(args.get("timeout", 30))
+        # Optional video frame-processing switches. They are explicit launch
+        # inputs recorded in launch_overrides, never inherited from the shell.
+        processing = {}
+        for key, variable in (("video_transform", "ILLIQUID_VIDEO_TRANSFORM"),
+                              ("video_interpolate", "ILLIQUID_VIDEO_INTERPOLATE")):
+            value = args.get(key)
+            if value is None:
+                continue
+            if not isinstance(value, str) or not re.fullmatch(r"[A-Za-z0-9.,:=x-]{1,128}", value):
+                raise Failure("error", f"invalid {key.replace('_', '-')} value")
+            processing[variable] = value
         seed_bytes, seed_source, seed_values = None, None, {}
         if args.get("preferences_seed_file") is not None:
             try:
@@ -607,6 +618,7 @@ class Runner:
         }
         if seed_path:
             isolated["ILLIQUID_BENCHMARK_PREFERENCES_SEED_FILE"] = str(seed_path)
+        isolated.update(processing)
         environment = {k: v for k, v in os.environ.items() if not k.startswith("ILLIQUID_")}
         environment.update(isolated)
         self.manifest["environment"]["launch_overrides"] = isolated
@@ -1456,6 +1468,8 @@ def parser():
     launch.add_argument("--run-dir", help="new directory; defaults to QualificationArtifacts/AgentUI/<id>")
     launch.add_argument("--context", help="JSON string/file with fixture, instrumentation, display, cache context")
     launch.add_argument("--preferences-seed-file", help="JSON preference seed copied byte-for-byte into the new run")
+    launch.add_argument("--video-transform", help="ILLIQUID_VIDEO_TRANSFORM value, e.g. scale=0.5,flip=h")
+    launch.add_argument("--video-interpolate", help="ILLIQUID_VIDEO_INTERPOLATE value, e.g. 60 or 60:high")
     launch.add_argument("--timeout", type=float, default=30)
     attach = commands.add_parser("attach", help="attach exact PID and executable; does not acquire process ownership")
     attach.add_argument("--pid", required=True, type=int)
