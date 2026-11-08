@@ -13,6 +13,12 @@ public struct PlaybackAuthorityProjection: Equatable, Sendable {
     public let selectedSubtitleID: Int64?
     public let subtitleDelay: TimeInterval
     public let failureCode: String?
+    /// Core-owned controls projected beside the snapshot. `nil` speed keeps
+    /// the current value (projections that do not carry a rate).
+    public let audioDelay: TimeInterval
+    public let playbackSpeed: Double?
+    public let loopStart: TimeInterval?
+    public let loopEnd: TimeInterval?
 
     public init(
         phase: PlaybackPhase,
@@ -23,7 +29,11 @@ public struct PlaybackAuthorityProjection: Equatable, Sendable {
         selectedSubtitleID: Int64?,
         subtitleDelay: TimeInterval,
         failureCode: String?,
-        isPauseDesired: Bool = true
+        isPauseDesired: Bool = true,
+        audioDelay: TimeInterval = 0,
+        playbackSpeed: Double? = nil,
+        loopStart: TimeInterval? = nil,
+        loopEnd: TimeInterval? = nil
     ) {
         self.phase = phase
         self.isPauseDesired = isPauseDesired
@@ -34,6 +44,10 @@ public struct PlaybackAuthorityProjection: Equatable, Sendable {
         self.selectedSubtitleID = selectedSubtitleID
         self.subtitleDelay = subtitleDelay
         self.failureCode = failureCode
+        self.audioDelay = audioDelay
+        self.playbackSpeed = playbackSpeed
+        self.loopStart = loopStart
+        self.loopEnd = loopEnd
     }
 }
 
@@ -72,6 +86,9 @@ public final class PlaybackState {
     public internal(set) var currentChapterID: Int64? { didSet { notifyMutation() } }
     public internal(set) var audioDelay: TimeInterval = 0 { didSet { notifyMutation() } }
     public internal(set) var subtitleDelay: TimeInterval = 0 { didSet { notifyMutation() } }
+    /// The active session's A-B loop, as accepted by the playback core.
+    public internal(set) var loopStart: TimeInterval? { didSet { notifyMutation() } }
+    public internal(set) var loopEnd: TimeInterval? { didSet { notifyMutation() } }
     public internal(set) var bufferStatus: BufferStatus = .empty { didSet { notifyMutation() } }
     public internal(set) var videoOutputStatus: VideoOutputStatus = .empty { didSet { notifyMutation() } }
     public internal(set) var displayOutputStatus: DisplayOutputStatus = .empty { didSet { notifyMutation() } }
@@ -232,8 +249,9 @@ public final class PlaybackState {
         }
     }
 
-    /// The only mutation entry point for core-owned playback fields.
-    public func applyAuthorityProjection(_ projection: PlaybackAuthorityProjection) {
+    /// The only mutation entry point for core-owned playback fields. Package
+    /// access keeps the app shell from fabricating authority.
+    package func applyAuthorityProjection(_ projection: PlaybackAuthorityProjection) {
         performMutationBatch {
             if phase != projection.phase { phase = projection.phase }
             if isPauseDesired != projection.isPauseDesired {
@@ -276,6 +294,19 @@ public final class PlaybackState {
             }
             let delay = projection.subtitleDelay.isFinite ? projection.subtitleDelay : 0
             if subtitleDelay != delay { subtitleDelay = delay }
+            let audioOffset = projection.audioDelay.isFinite ? projection.audioDelay : 0
+            if audioDelay != audioOffset { audioDelay = audioOffset }
+            if let speed = projection.playbackSpeed, speed.isFinite, speed > 0,
+               playbackSpeed != speed
+            {
+                playbackSpeed = speed
+            }
+            let loop: (TimeInterval?, TimeInterval?) =
+                if let start = projection.loopStart, let end = projection.loopEnd,
+                   start.isFinite, end.isFinite, start < end
+                { (start, end) } else { (nil, nil) }
+            if loopStart != loop.0 { loopStart = loop.0 }
+            if loopEnd != loop.1 { loopEnd = loop.1 }
             if coreFailureCode != projection.failureCode {
                 coreFailureCode = projection.failureCode
                 if let code = projection.failureCode, recoveryIssue == nil {
@@ -400,7 +431,7 @@ public final class PlaybackState {
         }
     }
 
-    public func setAudioDelay(_ delay: TimeInterval) {
+    package func setAudioDelay(_ delay: TimeInterval) {
         let normalized = delay.isFinite ? delay : 0
         guard audioDelay != normalized else { return }
         audioDelay = normalized

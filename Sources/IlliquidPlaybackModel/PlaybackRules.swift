@@ -15,7 +15,7 @@ extension PlaybackDomainState {
       case .load, .stop, .shutdown, .setPlaybackSpeed:
         break
       case .play, .pause, .seek, .selectAudio, .selectSubtitle, .setLoop,
-           .setSubtitleDelay, .checkpoint:
+           .setSubtitleDelay, .setAudioDelay, .checkpoint:
         return (.invalid(reason: "sourceReplacementPending"), [])
       }
     }
@@ -63,6 +63,8 @@ extension PlaybackDomainState {
       return beginSubtitleSelection(intent)
     case .setSubtitleDelay(let microseconds):
       return beginSubtitleDelay(microseconds)
+    case .setAudioDelay(let microseconds):
+      return beginAudioDelay(microseconds)
     case .checkpoint:
       return beginCheckpoint()
     case .stop:
@@ -344,6 +346,134 @@ extension PlaybackDomainState {
       exclusiveKey: "subtitle.delay.\(session.id.rawValue)"
     ) else { return allocationFailure() }
     return (.accepted, [effect])
+  }
+
+  mutating func beginAudioDelay(
+    _ microseconds: Int64
+  ) -> (EventDisposition, [PlaybackEffect]) {
+    guard var session = self.activeSession else {
+      return (.invalid(reason: "audioDelayRequiresSession"), [])
+    }
+    let requested = ControlMachineState.clampedAudioDelay(microseconds: microseconds)
+    switch audioDelayAdmission(for: session) {
+    case .refused:
+      return (.invalid(reason: "audioDelayNotAccepted"), [])
+    case .deferred:
+      // A replacement, seek or preroll is in flight. Keep only the latest
+      // intent and issue it when that work settles, so repeated adjustments
+      // are not lost and the in-flight transaction is never superseded.
+      session.controls.queuedAudioDelayMicroseconds = requested
+      self.activeSession = session
+      return (.accepted, [])
+    case .ready:
+      break
+    }
+    session.controls.queuedAudioDelayMicroseconds = nil
+    self.activeSession = session
+    guard requested != session.controls.appliedAudioDelayMicroseconds else {
+      return (.accepted, [])
+    }
+    return startAudioDelayReplacement(requested)
+  }
+
+  /// Starts the replacement for `requested` on the active session, whose
+  /// track transaction must be idle.
+  mutating func startAudioDelayReplacement(
+    _ requested: Int64
+  ) -> (EventDisposition, [PlaybackEffect]) {
+    guard var session = self.activeSession,
+      let revision = session.tracks.requestReplacement(),
+      let operationID = self.allocator.allocateOperation(),
+      session.generation.rawValue < UInt64.max
+    else { return (.invalid(reason: "audioDelayNotAccepted"), []) }
+    session.controls.requestAudioDelay(microseconds: requested)
+    session.generation = PlaybackGenerationID(rawValue: session.generation.rawValue + 1)
+    session.drain = PlaybackDrainState()
+    session.synchronization.beginStartupObligation()
+    session.revisions.track = revision
+    session.phase = .prerolling
+    session.actualTransport = .paused
+    session.activeOperationID = operationID
+    self.activeSession = session
+    guard let effect = makeEffect(
+      authority: session.authority,
+      operationID: operationID,
+      executor: .resource,
+      kind: .applyAudioDelay(microseconds: requested, revision: revision),
+      exclusiveKey: "track.audio.\(session.id.rawValue)"
+    ) else { return allocationFailure() }
+    return (.accepted, [effect])
+  }
+
+  enum AudioDelayAdmission { case ready, deferred, refused }
+
+  /// An audio-delay replacement bumps the generation, so it may start only
+  /// from a settled session: no track transaction, seek or source replacement
+  /// in flight. Busy sessions defer; teardown and failure refuse.
+  func audioDelayAdmission(for session: ActivePlaybackSession) -> AudioDelayAdmission {
+    switch session.phase {
+    case .stopping, .stopped, .failed, .idle:
+      return .refused
+    case .opening, .probing, .configuring, .prerolling, .seeking, .draining:
+      return .deferred
+    case .ready, .buffering, .playing, .paused, .ended:
+      break
+    }
+    guard session.tracks.phase == .idle, session.seek == nil, self.pendingSession == nil
+    else { return .deferred }
+    return .ready
+  }
+
+  /// Issues a queued audio delay once the session admits it. Returns the
+  /// replacement effect, if one starts. A refusing session drops the queue.
+  mutating func startQueuedAudioDelay() -> [PlaybackEffect]? {
+    guard var session = self.activeSession,
+      let queued = session.controls.queuedAudioDelayMicroseconds
+    else { return nil }
+    switch audioDelayAdmission(for: session) {
+    case .deferred:
+      return nil
+    case .refused:
+      session.controls.queuedAudioDelayMicroseconds = nil
+      self.activeSession = session
+      return nil
+    case .ready:
+      break
+    }
+    session.controls.queuedAudioDelayMicroseconds = nil
+    self.activeSession = session
+    guard queued != session.controls.appliedAudioDelayMicroseconds else { return nil }
+    let (disposition, effects) = startAudioDelayReplacement(queued)
+    guard disposition == .accepted, !effects.isEmpty else { return nil }
+    return effects
+  }
+
+  /// A seek (or other generation change) can supersede an in-flight audio
+  /// delay replacement. Native still completes it, so its late result must
+  /// settle the track transaction; otherwise every later track or delay
+  /// change would be refused until the source changes. Rate and preroll
+  /// belong to the superseding operation, so no effects are emitted here.
+  mutating func settleSupersededAudioDelay(
+    _ effect: PlaybackEffect,
+    revision: TrackRevisionID,
+    succeeded: Bool
+  ) -> Bool {
+    guard var session = self.activeSession,
+      case let .playback(sessionID, _, _) = effect.context.authority,
+      sessionID == session.id,
+      session.tracks.revision == revision,
+      session.tracks.phase == .preparing
+    else { return false }
+    session.controls.settleAudioDelay(succeeded: succeeded)
+    if succeeded {
+      _ = session.tracks.prepared(revision: revision)
+      _ = session.tracks.committed(revision: revision)
+    } else {
+      _ = session.tracks.failed(revision: revision)
+      _ = session.tracks.rolledBack(revision: revision)
+    }
+    self.activeSession = session
+    return true
   }
 
   mutating func acceptDuration(
@@ -732,6 +862,10 @@ extension PlaybackDomainState {
         self.activeSession = pending.value
       }
     }
+    if self.activeSession?.controls.queuedAudioDelayMicroseconds != nil {
+      // Stop ends the session's replacement work; a queued delay is dropped.
+      self.activeSession?.controls.queuedAudioDelayMicroseconds = nil
+    }
     guard var session = self.activeSession else {
       if forShutdown {
         guard
@@ -891,6 +1025,12 @@ extension PlaybackDomainState {
     if !record.effect.isCleanup,
       !authorityIsCurrent(record.effect.context.authority)
     {
+      if case .applyAudioDelay(_, let revision) = record.effect.kind,
+        settleSupersededAudioDelay(
+          record.effect, revision: revision, succeeded: result.token.kind == .succeeded)
+      {
+        return (.accepted, startQueuedAudioDelay() ?? [])
+      }
       return (.stale(reason: staleAuthorityReason(record.effect.context.authority)), [])
     }
 
@@ -942,6 +1082,10 @@ extension PlaybackDomainState {
 
     case .applySubtitleSelection(_, let revision):
       return settleTrackSelection(revision: revision, succeeded: succeeded, result: result)
+
+    case .applyAudioDelay(_, let revision):
+      return settleTrackSelection(
+        revision: revision, succeeded: succeeded, result: result, settlesAudioDelay: true)
 
     case .applySubtitleDelay(let microseconds):
       return settleApplySubtitleDelayResult(result: result, effect: effect, microseconds: microseconds)
@@ -1194,6 +1338,8 @@ extension PlaybackDomainState {
       session.lastFailure = result.failure ?? genericFailure(for: effect)
     }
     self.activeSession = session
+    // An audio delay requested while a seek was settling waits for it.
+    if succeeded, let followUp = startQueuedAudioDelay() { return (.accepted, followUp) }
     return (.accepted, [])
   }
 
@@ -1438,18 +1584,22 @@ extension PlaybackDomainState {
   mutating func settleTrackSelection(
     revision: TrackRevisionID,
     succeeded: Bool,
-    result: PlaybackEffectResult
+    result: PlaybackEffectResult,
+    settlesAudioDelay: Bool = false
   ) -> (EventDisposition, [PlaybackEffect]) {
     guard var session = self.activeSession,
       revision == session.tracks.revision,
       session.tracks.phase == .preparing
     else { return (.stale(reason: .operationMismatch), []) }
+    if settlesAudioDelay { session.controls.settleAudioDelay(succeeded: succeeded) }
     if succeeded {
       _ = session.synchronization.satisfyStartupObligation()
       _ = session.tracks.prepared(revision: revision)
       _ = session.tracks.committed(revision: revision)
       let rate = session.desiredTransport == .playing ? self.playbackMilliRate : Int32(0)
       self.activeSession = session
+      // A queued audio delay starts once this rate is acknowledged
+      // (`settleApplyRateResult`), when the session is settled again.
       guard let rateEffect = makeEffect(
         authority: session.authority,
         operationID: session.activeOperationID,
@@ -1467,6 +1617,7 @@ extension PlaybackDomainState {
       session.actualTransport = session.desiredTransport == .playing ? .playing : .paused
     }
     self.activeSession = session
+    if let followUp = startQueuedAudioDelay() { return (.accepted, followUp) }
     return (.accepted, [])
   }
 

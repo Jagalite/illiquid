@@ -343,7 +343,6 @@ public final class PlaybackCoordinator {
             backend.setHardwareDecodingPolicy(preferences.hardwareDecodingPolicy)
             if capabilityModel.supports(.changePlaybackSpeed) {
                 _ = runtimeDriver?.setPlaybackSpeed(effectivePlaybackSpeed)
-                backend.setPlaybackSpeed(effectivePlaybackSpeed)
             }
         } catch {
             state.setShellError(error.localizedDescription)
@@ -1122,10 +1121,15 @@ public final class PlaybackCoordinator {
         guard supports(.changePlaybackSpeed, operation: "playback speed") else { return }
         guard speed.isFinite else { return }
         let sanitized = (min(max(speed, 0.25), 4) * 1_000).rounded() / 1_000
-        state.setPlaybackSpeed(sanitized)
+        // The core owns the effective rate; the projection publishes it. Only
+        // an accepted speed becomes the saved preference.
+        guard let runtimeDriver else {
+            state.setPlaybackSpeed(sanitized)
+            persistence.setPlaybackSpeed(sanitized)
+            return
+        }
+        guard runtimeDriver.setPlaybackSpeed(sanitized) else { return }
         persistence.setPlaybackSpeed(sanitized)
-        _ = runtimeDriver?.setPlaybackSpeed(sanitized)
-        backend?.setPlaybackSpeed(sanitized)
     }
 
     public func setSoftwareDecoderThreadLimit(_ value: Int) {
@@ -1173,7 +1177,8 @@ public final class PlaybackCoordinator {
 
     public func setAudioDelay(_ delay: TimeInterval) {
         guard supports(.changeAudioDelay, operation: "audio delay") else { return }
-        backend?.setAudioDelay(min(max(delay, -10), 10))
+        guard delay.isFinite else { return }
+        _ = runtimeDriver?.setAudioDelay(min(max(delay, -10), 10))
     }
 
     public func setSubtitleDelay(_ delay: TimeInterval) {
@@ -1557,8 +1562,16 @@ public final class PlaybackCoordinator {
             restoreTarget: restoreTarget,
             traversalStep: traversalStep
         )
+        // Decide the initial transport before opening, so a paused restore
+        // never starts the clock and is then paused after `loaded`.
+        let restoreForSource = pendingPlaybackRestore.flatMap {
+            $0.source.representsSameResource(as: source) ? $0 : nil
+        }
+        let startsPaused = restoreForSource?.wasPaused == true
+            || (restoresSessionPaused && origin == .restoredSession)
         let accepted = runtimeDriver?.load(
-            PlaybackRuntimeLoadRequest(media: request, identity: identity)
+            PlaybackRuntimeLoadRequest(media: request, identity: identity),
+            autoplay: !startsPaused
         ) == true
         if !accepted {
             pendingSourceTransaction = nil
@@ -2065,8 +2078,9 @@ public final class PlaybackCoordinator {
             state.setVolume(value)
         case let .muteChanged(value):
             state.setMuted(value)
-        case let .speedChanged(value):
-            state.setPlaybackSpeed(value)
+        case .speedChanged:
+            // Telemetry only: the effective rate is projected from the core.
+            break
         case let .audioOutputSelectionFailed(message):
             state.setShellError(message)
         case let .audioDevicesChanged(devices):
@@ -2093,8 +2107,9 @@ public final class PlaybackCoordinator {
             }
         case let .chaptersChanged(chapters, currentID):
             state.updateChapters(chapters, currentID: currentID)
-        case let .audioDelayChanged(value):
-            state.setAudioDelay(value)
+        case .audioDelayChanged:
+            // Telemetry only: audio delay is projected from the core.
+            break
         case .subtitleDelayChanged:
             break
         case let .videoAdjustmentsChanged(adjustments):
@@ -2210,6 +2225,7 @@ public final class PlaybackCoordinator {
     }
 
     private func applyCoreSnapshot(_ snapshot: PlaybackUISnapshot) {
+        let controls = runtimeDriver?.currentControls
         let phase: PlaybackPhase
         switch snapshot.lifecycle {
         case .shuttingDown, .terminated:
@@ -2240,7 +2256,13 @@ public final class PlaybackCoordinator {
             selectedSubtitleID: snapshot.selectedSubtitleTrackID?.mediaTrackID,
             subtitleDelay: Double(snapshot.subtitleDelayMicroseconds) / 1_000_000,
             failureCode: snapshot.failureCode,
-            isPauseDesired: snapshot.desiredTransport != .playing
+            isPauseDesired: snapshot.desiredTransport != .playing,
+            audioDelay: controls.map {
+                Double($0.requestedAudioDelayMicroseconds) / 1_000_000
+            } ?? 0,
+            playbackSpeed: controls.map { Double($0.playbackMilliRate) / 1_000 },
+            loopStart: controls?.loopStart.flatMap(seconds),
+            loopEnd: controls?.loopEnd.flatMap(seconds)
         ))
         surfaceHost?.setPlaybackPhase(phase)
     }
@@ -2302,9 +2324,9 @@ public final class PlaybackCoordinator {
             state.currentURL.flatMap { persistence.playbackPosition(for: $0) }
         }
         pendingPlaybackRestore = nil
-        if matchingRestore?.wasPaused == true || (restoresSessionPaused && state.currentSourceOrigin == .restoredSession) {
-            pause()
-        }
+        // A paused restore was already loaded with `autoplay: false` (see
+        // beginSourceTransaction), from the same restore and origin. Pausing
+        // again here would override a play the user issued since loading.
         if let savedPosition, savedPosition > 1 {
             seek(to: savedPosition)
         }

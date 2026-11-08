@@ -19,6 +19,7 @@ enum NativeOperationRequestedState: Equatable, Sendable {
     case awaitPreroll
     case seek(target: MediaTimestamp, mode: IlliquidPlaybackModel.SeekMode)
     case audioTrack(Int64?)
+    case audioDelay(microseconds: Int64)
     case subtitle(SubtitleSelectionIntent)
     case externalSubtitle(URL)
     case recovery(String)

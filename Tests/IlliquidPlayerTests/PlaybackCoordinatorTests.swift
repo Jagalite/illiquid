@@ -2391,6 +2391,53 @@ struct PlaybackCoordinatorTests {
         #expect(fixture.coordinator.state.subtitleDelay == 0.25)
     }
 
+    @Test func nativeConfiguredTracksAreTheProjectedSelection() async throws {
+        let fixture = try CoordinatorFixture()
+        let file = try fixture.createFile("configured.mkv")
+        fixture.coordinator.open(url: file)
+        try await waitForPreparation(fixture.coordinator)
+        let load = try #require(fixture.runtime.loads.last)
+        fixture.runtime.emit(.loaded, identity: load.identity)
+        fixture.runtime.emit(.prerollReady, identity: load.identity)
+        fixture.runtime.emit(.pauseChanged(false), identity: load.identity)
+        // Native ranked the non-default audio stream first and left the default
+        // subtitle off, as a language preference with "subtitles: off" would.
+        fixture.runtime.emit(.tracksChanged(.init(
+            hasVideo: true,
+            tracks: [
+                MediaTrack(id: 1, kind: .audio, title: "English", isDefault: true),
+                MediaTrack(id: 2, kind: .audio, title: "Japanese"),
+                MediaTrack(id: 3, kind: .subtitle, title: "English", isDefault: true),
+            ],
+            selectedAudioID: 2,
+            selectedSubtitleID: nil
+        )), identity: load.identity)
+
+        #expect(fixture.coordinator.state.selectedAudioTrack?.id == 2)
+        #expect(fixture.coordinator.state.selectedSubtitleTrack == nil)
+    }
+
+    @Test func audioDelayAndSpeedAreProjectedFromTheCore() async throws {
+        let fixture = try CoordinatorFixture()
+        let file = try fixture.createFile("controls.mkv")
+        fixture.coordinator.open(url: file)
+        try await waitForPreparation(fixture.coordinator)
+        let load = try #require(fixture.runtime.loads.last)
+        fixture.runtime.emit(.loaded, identity: load.identity)
+        fixture.runtime.emit(.prerollReady, identity: load.identity)
+        fixture.runtime.emit(.pauseChanged(false), identity: load.identity)
+
+        fixture.coordinator.setAudioDelay(0.3)
+        #expect(fixture.runtime.executedEffects.contains {
+            $0.kind == .applyAudioDelay(microseconds: 300_000, revision: TrackRevisionID(rawValue: 1))
+        })
+        #expect(fixture.coordinator.state.audioDelay == 0.3)
+
+        fixture.coordinator.setPlaybackSpeed(1.5)
+        #expect(fixture.coordinator.state.playbackSpeed == 1.5)
+        #expect(fixture.persistence.loadPreferences().playbackSpeed == 1.5)
+    }
+
     @Test func externalLanguageRestoreWaitsForTheInstalledSidecarCatalog() async throws {
         let fixture = try CoordinatorFixture()
         let video = try fixture.createFile("external-languages.mkv")
@@ -2653,6 +2700,7 @@ private final class CoordinatorFakeBackend: PlaybackRuntime {
              .cancelInputRead, .flushDecoder, .installPresentationFence,
              .clearSubtitleOverlay, .invalidateSubtitleSource, .releaseLease,
              .applyAudioSelection, .applySubtitleSelection, .applySubtitleDelay,
+             .applyAudioDelay,
              .resumeVideoDecoderAfterTransientFailure,
              .recreateVideoDecoderInSoftware, .flushPresentationForRecovery,
              .rebuildPresentationGraph, .disableAudioTrack,
@@ -2671,12 +2719,10 @@ private final class CoordinatorFakeBackend: PlaybackRuntime {
     }
     func setVolume(_ value: Double) {}
     func setMuted(_ value: Bool) {}
-    func setPlaybackSpeed(_ value: Double) {}
     func selectAudioTrack(_ id: Int64?) {}
     func selectSubtitleTrack(_ id: Int64?) {}
     func selectAudioOutputDevice(_ id: String?) { audioOutputRequests.append(id) }
     func loadExternalSubtitle(_ url: URL, select: Bool) {}
-    func setAudioDelay(_ value: TimeInterval) {}
     func setSubtitleDelay(_ value: TimeInterval) {}
     func setHardwareDecodingPolicy(_ policy: HardwareDecodingPolicy) {}
     func setVideoAspect(_ aspect: String?) {}

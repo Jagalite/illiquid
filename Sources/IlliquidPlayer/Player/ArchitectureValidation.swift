@@ -300,6 +300,8 @@ public enum ArchitectureValidation {
             "backend?.play(", "backend?.pause(", "backend?.stop(", "backend?.seek(",
             "backend?.selectAudioTrack(", "backend?.selectSubtitleTrack(",
             "backend?.loadExternalSubtitle(", "backend?.setSubtitleDelay(",
+            "backend?.setAudioDelay(", "backend?.setPlaybackSpeed(",
+            "backend.setPlaybackSpeed(",
             "state.markLoaded(", "state.markBuffering(", "state.setPaused(",
             "state.updatePosition(", "state.updateDuration(",
         ]
@@ -311,6 +313,7 @@ public enum ArchitectureValidation {
         for forbidden in [
             "func play()", "func pause()", "func stop()", "func seek(to",
             "func selectAudioTrack", "func selectSubtitleTrack", "func setSubtitleDelay",
+            "func setAudioDelay", "func setPlaybackSpeed",
         ] where runtimeContract.contains(forbidden) {
             failures.append("runtime exposes core-owned direct command: \(forbidden)")
         }

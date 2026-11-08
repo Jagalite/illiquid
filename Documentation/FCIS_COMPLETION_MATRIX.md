@@ -29,6 +29,9 @@ development evidence; it is not the current contract.
 | Select audio track | Core | Real | Prepare/commit outcome updates effective selection |
 | Select subtitle track | Core | Real | Prepare/commit outcome updates effective selection |
 | Set subtitle delay | Core | Real | Applied delay fact must match requested value |
+| Set audio delay | Core | Real | Identified `applyAudioDelay` replacement shares the track transaction; failure rolls the request back |
+| Set playback speed | Core (effective rate) / player shell (saved preference) | Real | Rate reaches native only through `applyRate`; only an accepted speed is persisted |
+| Set or clear A-B loop | Core | Real | Loop is scoped to the active session and projected; the app keeps only the unfinished A marker |
 | Add external subtitle | Core policy / native executor | Real | Authorized URL is carried with an identified track-replacement effect |
 | Sleep / wake | Core | Real | Lifecycle fact produces an identified pause or wake-preroll transaction |
 | Recovery choice | Core | Real | Typed native failure or synchronization fact selects one bounded directive |
@@ -51,6 +54,7 @@ development evidence; it is not the current contract.
 | Decoder / presentation failure | Native executor -> core | Real | Typed failure is classified once by the core |
 | End of file | Native executor -> core | Real aggregate | Event proves decoder drain and presentation-horizon drain |
 | Track catalog metadata | Native executor / player projection | Real | Raw labels are telemetry; effective IDs come from core state |
+| Initial (automatic) track selection | Native ranking at open -> core | Real | Native ranks with the shared pure `TrackSelectionPreferences.select` inside the aggregate open; the catalog fact reports the configured streams and the core records them as the effective selection |
 | Display name and EDR capability | Native/App shell | Telemetry | Never changes core authority |
 | Raw queue, frame, and diagnostic counters | Native executor | Telemetry | Bounded diagnostics only; no reducer round trip per frame |
 
@@ -86,6 +90,7 @@ old replay fixtures, but the production reducer does not emit them.
 | Selected tracks | Core | Effective selection is core-owned; labels come from catalog telemetry |
 | Seek, recovery, EOF/drain, failures | Core | Never independently mutated in `PlaybackState`; `coreFailureCode` is projected separately from `shellError` |
 | Subtitle selection and delay | Core | Requested/effective values are reducer state |
+| Audio delay, effective rate, A-B loop | Core | `PlaybackControlProjection`, beside the snapshot so its hashed encoding is unchanged |
 | Playlist, source origin, resume persistence | Player shell | Explicitly composed with the core projection |
 | Video/display/audio-device diagnostics | Runtime telemetry | Explicitly composed and never interpreted as authority |
 | Fullscreen, sidebar, pointer/chrome state | App shell | Explicitly composed and never sent to the reducer |

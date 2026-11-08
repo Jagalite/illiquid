@@ -368,3 +368,34 @@ public struct PlaybackLoopRange: Codable, Equatable, Sendable {
   public let start: MediaTimestamp
   public let end: MediaTimestamp
 }
+
+/// Committed core values the shell projects in addition to `PlaybackUISnapshot`.
+/// They are kept out of the snapshot so its canonical encoding, which the
+/// frozen oracle and verification digests hash, does not change.
+public struct PlaybackControlProjection: Equatable, Sendable {
+  /// The A-B loop of the active session, if one is set for it.
+  public let loopStart: MediaTimestamp?
+  public let loopEnd: MediaTimestamp?
+  /// Effective transport speed applied whenever playback runs.
+  public let playbackMilliRate: Int32
+  /// Latest requested (including one queued behind an in-flight
+  /// replacement) and native-acknowledged audio offsets of the active session.
+  public let requestedAudioDelayMicroseconds: Int64
+  public let appliedAudioDelayMicroseconds: Int64
+
+  public init(state: PlaybackDomainState) {
+    let session = state.activeSession
+    if let loop = state.loopRange, loop.sessionID == session?.id {
+      loopStart = loop.start
+      loopEnd = loop.end
+    } else {
+      loopStart = nil
+      loopEnd = nil
+    }
+    playbackMilliRate = state.playbackMilliRate
+    requestedAudioDelayMicroseconds = session.map {
+      $0.controls.queuedAudioDelayMicroseconds ?? $0.controls.requestedAudioDelayMicroseconds
+    } ?? 0
+    appliedAudioDelayMicroseconds = session?.controls.appliedAudioDelayMicroseconds ?? 0
+  }
+}

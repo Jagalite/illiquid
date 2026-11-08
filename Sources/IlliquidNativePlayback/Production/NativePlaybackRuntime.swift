@@ -1131,6 +1131,34 @@ public final class NativePlaybackRuntime: PlaybackRuntime {
             emit(.subtitleDelayChanged(subtitles.delay))
             finish(effect)
 
+        case let .applyAudioDelay(microseconds, _):
+            let delay = AudioDelayTimeline.bounded(Double(microseconds) / 1_000_000)
+            guard let session, session.activeAudioStream != nil else {
+                finish(effect, succeeded: false, code: "audioDelayRequiresAudio")
+                return
+            }
+            if delay == session.audioDelay, replacementTasks.isEmpty,
+               deferredReplacementRequest == nil, pendingCommittedReplacement == nil
+            {
+                emit(.audioDelayChanged(delay))
+                finish(effect)
+                return
+            }
+            let transaction = beginOperation(
+                effect,
+                kind: .trackReplacement,
+                requestedState: .audioDelay(microseconds: microseconds),
+                supersessionCode: "trackSelectionSuperseded"
+            )
+            guard replaceSessionForAudioDelay(delay) else {
+                finishOperation(
+                    effectID: transaction.effectID,
+                    succeeded: false,
+                    code: "audioDelayRequiresActiveMedia"
+                )
+                return
+            }
+
         case .cancelSession:
             let transaction = beginOperation(
                 effect,
@@ -1190,7 +1218,8 @@ public final class NativePlaybackRuntime: PlaybackRuntime {
             )
             let generation = resumeAfterWake(
                 position: seconds,
-                playing: milliRate != 0
+                playing: milliRate != 0,
+                milliRate: milliRate
             )
             if let generation {
                 correlateOperation(
@@ -1383,14 +1412,6 @@ public final class NativePlaybackRuntime: PlaybackRuntime {
         isMuted = value
         presentation.setVolume(Float(volume / 100), muted: value)
         emit(.muteChanged(value))
-    }
-
-    public func setPlaybackSpeed(_ value: Double) {
-        guard value.isFinite, (0.25...4).contains(value) else { return }
-        playbackSpeed = Float(value)
-        // The deterministic core applies the transport rate. This preference
-        // also survives native replacement/rollback and direct wake recovery.
-        emit(.speedChanged(value))
     }
 
     public func selectAudioTrack(_ id: Int64?) {
@@ -1592,16 +1613,25 @@ public final class NativePlaybackRuntime: PlaybackRuntime {
         }
     }
 
-    public func setAudioDelay(_ value: TimeInterval) {
-        guard let session, session.activeAudioStream != nil,
-              let identity = activeIdentity, let url = currentURL,
-              let request = MediaLoadRequest(source: .localFile(url), origin: .userSelected) else { return }
+    /// Native mechanism behind the core's `applyAudioDelay` effect. Product
+    /// code must change audio delay through the core; this entry point stays
+    /// internal for mechanism tests.
+    func setAudioDelay(_ value: TimeInterval) {
+        guard let session, session.activeAudioStream != nil else { return }
         let delay = AudioDelayTimeline.bounded(value)
         guard delay != session.audioDelay || !replacementTasks.isEmpty
             || deferredReplacementRequest != nil || pendingCommittedReplacement != nil else { return }
+        _ = replaceSessionForAudioDelay(delay)
+    }
+
+    private func replaceSessionForAudioDelay(_ delay: TimeInterval) -> Bool {
+        guard let identity = activeIdentity, let url = currentURL,
+              let request = MediaLoadRequest(source: .localFile(url), origin: .userSelected)
+        else { return false }
         beginReplaceSession(for: PlaybackRuntimeLoadRequest(media: request, identity: identity),
                             seekTo: currentTime, emitLoaded: false, preserveOldUntilPrepared: true,
                             audioDelay: delay)
+        return true
     }
     public func setSubtitleDelay(_ value: TimeInterval) {
         setSubtitlePipelineDelay(min(max(value, -10), 10))
@@ -1927,9 +1957,16 @@ public final class NativePlaybackRuntime: PlaybackRuntime {
     }
 
     @discardableResult
-    public func resumeAfterWake(position: TimeInterval, playing: Bool) -> Int? {
+    public func resumeAfterWake(
+        position: TimeInterval,
+        playing: Bool,
+        milliRate: Int32? = nil
+    ) -> Int? {
         guard let session else { return nil }
         currentTime = max(position, 0)
+        // The core's wake effect carries the rate to resume at; the cached
+        // speed is only the fallback for direct (test) callers.
+        if playing, let milliRate, milliRate > 0 { playbackSpeed = Float(milliRate) / 1_000 }
         let nativeGeneration = session.seek(
             to: currentTime,
             exact: true,
@@ -1949,6 +1986,9 @@ public final class NativePlaybackRuntime: PlaybackRuntime {
         isShutdown = true
         audioDeviceMonitor?.stop()
         audioDeviceMonitor = nil
+        // The adaptive buffer policy's pressure observer follows the runtime.
+        memoryPressureSource?.cancel()
+        memoryPressureSource = nil
         let task = Task { @MainActor [weak self] in
             guard let self else { return false }
             return await self.performPhysicalShutdown()
@@ -3348,7 +3388,7 @@ public final class NativePlaybackRuntime: PlaybackRuntime {
     /// Drains one telemetry window into the adaptive buffer policy and applies
     /// any changed targets to the session.
     private func updateBufferTargets(snapshot: MediaSessionSnapshot) {
-        guard let session else { return }
+        guard let session, !isShutdown else { return }
         if memoryPressureSource == nil {
             let source = DispatchSource.makeMemoryPressureSource(
                 eventMask: [.normal, .warning, .critical], queue: .main)

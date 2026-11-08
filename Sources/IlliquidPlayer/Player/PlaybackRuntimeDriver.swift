@@ -35,6 +35,7 @@ final class PlaybackRuntimeDriver {
     private let relativeSeekNow: () -> ContinuousClock.Instant
 
     var currentSnapshot: PlaybackUISnapshot { PlaybackUISnapshot(state: host.state) }
+    var currentControls: PlaybackControlProjection { PlaybackControlProjection(state: host.state) }
 
     init(
         runtime: any PlaybackRuntime,
@@ -48,12 +49,12 @@ final class PlaybackRuntimeDriver {
     }
 
     @discardableResult
-    func load(_ request: PlaybackRuntimeLoadRequest) -> Bool {
+    func load(_ request: PlaybackRuntimeLoadRequest, autoplay: Bool = true) -> Bool {
         pendingLoad = request
         sessionBeforePendingLoad = host.state.activeSession?.id
         return send(.load(
             source: sourceIdentity(request.media.source),
-            autoplay: true
+            autoplay: autoplay
         ))
     }
 
@@ -122,6 +123,14 @@ final class PlaybackRuntimeDriver {
         let scaled = seconds * 1_000_000
         guard let microseconds = Int64(exactly: scaled.rounded()) else { return false }
         return send(.setSubtitleDelay(microseconds: microseconds))
+    }
+
+    @discardableResult
+    func setAudioDelay(_ seconds: TimeInterval) -> Bool {
+        guard seconds.isFinite else { return false }
+        let scaled = seconds * 1_000_000
+        guard let microseconds = Int64(exactly: scaled.rounded()) else { return false }
+        return send(.setAudioDelay(microseconds: microseconds))
     }
 
     func shutdown() async {
@@ -287,6 +296,7 @@ final class PlaybackRuntimeDriver {
         case .probeSource, .configureSession, .awaitPreroll, .applyRate,
              .seek, .cancelSession, .cancelInputRead, .flushDecoder,
              .applyAudioSelection, .applySubtitleSelection, .applySubtitleDelay,
+             .applyAudioDelay,
              .installPresentationFence, .clearSubtitleOverlay,
              .invalidateSubtitleSource, .releaseLease, .finalizeShutdown,
              .resumeVideoDecoderAfterTransientFailure,
@@ -412,6 +422,8 @@ final class PlaybackRuntimeDriver {
     }
 
     private func catalog(_ snapshot: PlayerTrackSnapshot) -> PlaybackCatalog {
+        // Native resolves automatic selection while opening; report the streams
+        // it configured so the core's effective selection is what is playing.
         PlaybackCatalog(
             hasVideo: snapshot.hasVideo,
             audio: snapshot.tracks.filter { $0.kind == .audio }.map {
@@ -427,7 +439,15 @@ final class PlaybackRuntimeDriver {
                     isDefault: $0.isDefault,
                     isForced: $0.isForced
                 )
-            }
+            },
+            configuredSelection: InitialTrackSelectionState(
+                audio: snapshot.selectedAudioID.map {
+                    PlaybackTrackID(kind: .audio, mediaTrackID: $0)
+                },
+                subtitle: snapshot.selectedSubtitleID.map {
+                    PlaybackTrackID(kind: .subtitle, mediaTrackID: $0)
+                }
+            )
         )
     }
 }

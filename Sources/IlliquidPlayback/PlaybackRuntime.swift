@@ -18,9 +18,7 @@ public protocol PlaybackRuntime: AnyObject {
     func frameStepTarget(direction: Int) async throws -> TimeInterval?
     func setVolume(_ value: Double)
     func setMuted(_ value: Bool)
-    func setPlaybackSpeed(_ value: Double)
     func selectAudioOutputDevice(_ id: String?)
-    func setAudioDelay(_ value: TimeInterval)
     func setTrackSelectionPreferences(_ preferences: TrackSelectionPreferences)
     func setSubtitleFallbackEncoding(_ encoding: SubtitleFallbackEncoding)
     func setSoftwareDecoderThreadLimit(_ value: Int)

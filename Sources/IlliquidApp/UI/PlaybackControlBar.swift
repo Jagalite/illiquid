@@ -593,6 +593,9 @@ private final class PlaybackTimelineNativeView: NSView {
         theme: PlayerTheme
     ) {
         let sourceChanged = self.source != source
+        // A scrub or scroll gesture that spans an item change must not commit
+        // the old file's position into the new one.
+        if sourceChanged, self.source != nil { cancelScrubbing() }
         let chaptersChanged = self.chapters != chapters
         let bufferChanged = self.bufferStatus != bufferStatus
         let themeChanged = self.theme != theme

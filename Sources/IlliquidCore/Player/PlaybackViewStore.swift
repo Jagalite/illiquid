@@ -25,6 +25,8 @@ public struct PlaybackViewSnapshot: Equatable, Sendable {
     public let currentChapterID: Int64?
     public let audioDelay: TimeInterval
     public let subtitleDelay: TimeInterval
+    public let loopStart: TimeInterval?
+    public let loopEnd: TimeInterval?
     public let bufferStatus: BufferStatus
     public let videoOutputStatus: VideoOutputStatus
     public let displayOutputStatus: DisplayOutputStatus
@@ -70,6 +72,8 @@ public struct PlaybackViewSnapshot: Equatable, Sendable {
         currentChapterID = state.currentChapterID
         audioDelay = state.audioDelay
         subtitleDelay = state.subtitleDelay
+        loopStart = state.loopStart
+        loopEnd = state.loopEnd
         bufferStatus = state.bufferStatus
         videoOutputStatus = state.videoOutputStatus
         displayOutputStatus = state.displayOutputStatus
@@ -124,6 +128,8 @@ public final class PlaybackViewStore {
     public private(set) var currentChapterID: Int64?
     public private(set) var audioDelay: TimeInterval
     public private(set) var subtitleDelay: TimeInterval
+    public private(set) var loopStart: TimeInterval?
+    public private(set) var loopEnd: TimeInterval?
     public private(set) var bufferStatus: BufferStatus
     public private(set) var videoOutputStatus: VideoOutputStatus
     public private(set) var displayOutputStatus: DisplayOutputStatus
@@ -171,6 +177,8 @@ public final class PlaybackViewStore {
         currentChapterID = snapshot.currentChapterID
         audioDelay = snapshot.audioDelay
         subtitleDelay = snapshot.subtitleDelay
+        loopStart = snapshot.loopStart
+        loopEnd = snapshot.loopEnd
         bufferStatus = snapshot.bufferStatus
         videoOutputStatus = snapshot.videoOutputStatus
         displayOutputStatus = snapshot.displayOutputStatus
@@ -230,6 +238,8 @@ public final class PlaybackViewStore {
         }
         if audioDelay != snapshot.audioDelay { audioDelay = snapshot.audioDelay }
         if subtitleDelay != snapshot.subtitleDelay { subtitleDelay = snapshot.subtitleDelay }
+        if loopStart != snapshot.loopStart { loopStart = snapshot.loopStart }
+        if loopEnd != snapshot.loopEnd { loopEnd = snapshot.loopEnd }
         if bufferStatus != snapshot.bufferStatus { bufferStatus = snapshot.bufferStatus }
         if videoOutputStatus != snapshot.videoOutputStatus {
             videoOutputStatus = snapshot.videoOutputStatus

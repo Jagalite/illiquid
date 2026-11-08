@@ -486,9 +486,7 @@ private final class RelativeSeekLifetimeRuntime: PlaybackRuntime {
 
     func setVolume(_ value: Double) {}
     func setMuted(_ value: Bool) {}
-    func setPlaybackSpeed(_ value: Double) {}
     func selectAudioOutputDevice(_ id: String?) {}
-    func setAudioDelay(_ value: TimeInterval) {}
     func setHardwareDecodingPolicy(_ policy: HardwareDecodingPolicy) {}
     func setVideoAspect(_ aspect: String?) {}
     func setVideoCrop(_ crop: String?) {}

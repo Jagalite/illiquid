@@ -347,6 +347,7 @@ public enum PlaybackSearchCanonicalizer {
     case .applySubtitleSelection(let intent, _):
       return "subtitle-selection:\(subtitleIntentClass(intent))"
     case .applySubtitleDelay(let delay): return "subtitle-delay:\(delayClass(delay))"
+    case .applyAudioDelay(let delay, _): return "audio-delay:\(delayClass(delay))"
     case .cancelSession: return "cancel-session"
     case .persistCheckpoint: return "persist-checkpoint"
     case .cancelInputRead: return "cancel-input"

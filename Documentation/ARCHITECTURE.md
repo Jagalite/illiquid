@@ -1,6 +1,6 @@
-# Superplayr architecture
+# Illiquid architecture
 
-Superplayr uses a deterministic functional playback core with an imperative,
+Illiquid uses a deterministic functional playback core with an imperative,
 reactive application shell.
 There is one production engine: the native FFmpeg/VideoToolbox/sample-buffer
 runtime.
@@ -9,11 +9,11 @@ runtime.
 
 | Layer | Owns | Must not own |
 | --- | --- | --- |
-| `SuperplayrPlaybackCore` | deterministic state, command/result reduction, effect identity, generation and seek barriers, drain/EOF, recovery budgets, sync/buffering/lifecycle, track intent, subtitle revision and delay state | framework objects, queues, clocks, UI observation |
-| `SuperplayrNativePlayback` | exact native-operation ledger, active/candidate media sessions, FFmpeg input and decoding, VideoToolbox, bounded queues, renderer demand, AVSampleBuffer presentation, isolated subtitle pipelines, resource leases, PiP transitions and platform callbacks | product preferences, playlist policy, UI state |
-| `SuperplayrPlayer` | product command routing, session identity gate, persistence checkpoints, native runtime lifetime, owned folder-discovery tasks, immutable view-snapshot publication | decoder or renderer policy, backend selection |
-| `SuperplayrApp` | the single player-window scene, controls, Now Playing, power notifications, display attachment, PiP window restoration, user interaction | playback authority or writable engine state |
-| `SuperplayrPlaybackStateSpace` | bounded environment ledgers, structural search keys, deterministic exploration, replay artifacts, progress analysis | duplicated playback policy, media objects, framework execution, physical-correctness claims |
+| `IlliquidPlaybackModel` | deterministic state, command/result reduction, effect identity, generation and seek barriers, drain/EOF, recovery budgets, sync/buffering/lifecycle, track intent and effective selection, subtitle and audio delay, effective rate, A-B loop | framework objects, queues, clocks, UI observation |
+| `IlliquidNativePlayback` | exact native-operation ledger, active/candidate media sessions, FFmpeg input and decoding, VideoToolbox, bounded queues, renderer demand, AVSampleBuffer presentation, isolated subtitle pipelines, resource leases, PiP transitions and platform callbacks | product preferences, playlist policy, UI state |
+| `IlliquidPlayer` | product command routing, session identity gate, persistence checkpoints, native runtime lifetime, owned folder-discovery tasks, immutable view-snapshot publication | decoder or renderer policy, backend selection |
+| `IlliquidApp` | the single player-window scene, controls, Now Playing, power notifications, display attachment, PiP window restoration, user interaction | playback authority or writable engine state |
+| `IlliquidPlaybackStateSpace` | bounded environment ledgers, structural search keys, deterministic exploration, replay artifacts, progress analysis | duplicated playback policy, media objects, framework execution, physical-correctness claims |
 
 ## Command and result flow
 
@@ -61,7 +61,7 @@ selection; the runtime protocol has no separate chapter operation. The product
 coordinator keeps its mutable projection internal and exposes `PlaybackViewStore`
 to the app and external consumers.
 
-`SuperplayrPlaybackStateSpace` drives this same production transition function;
+`IlliquidPlaybackStateSpace` drives this same production transition function;
 it does not contain a second reducer. Its executor prerequisite bits describe
 when an aggregate native acknowledgement may be scheduled, not proof that a
 decoder or renderer physically performed that work. Recovery prerequisites are
@@ -71,7 +71,7 @@ explorer applies per-case wall-clock limits, emits layer progress, records
 source revision/dirty identity in every result, and can resume completed jobs.
 
 Filesystem preparation uses the shared `SourcePreparationExecutor` utility in
-`SuperplayrCore` (separate from the deterministic `SuperplayrPlaybackCore`).
+`IlliquidCore` (separate from the deterministic `IlliquidPlaybackModel`).
 Product open/restore/folder preparation and native external-subtitle reads share
 two physical worker slots and twelve-second logical deadlines. Cancellation or
 timeout retires the waiter while stalled OS work retains its slot. Source and
@@ -318,16 +318,25 @@ it.
 
 ## Dependency boundary
 
-`SuperplayrPlaybackCore` imports no Foundation runtime, AppKit, SwiftUI,
-AVFoundation, VideoToolbox, CFFmpeg, CLibass, dispatch queues, locks, timers, or
-wall clocks. `SuperplayrNativePlayback` is the sole FFmpeg/libass and Apple media
+`IlliquidPlaybackModel` is a native Statelessness model. Its rules import no
+AppKit, SwiftUI, AVFoundation, VideoToolbox, CFFmpeg, CLibass, dispatch queues,
+locks, timers, or wall clocks; Foundation is used only by its canonical JSON
+codec. `IlliquidNativePlayback` is the sole FFmpeg/libass and Apple media
 framework boundary. Package and bundle verification reject removed engine and
 OpenGL dependencies.
 
 Signed audio delay is an immutable MediaSession configuration. Nonzero offsets
 use an independent FFmpeg input inside the existing audio decode worker and a
-bounded sample mapping; no additional worker or clock is introduced. Replacement
-uses the existing candidate commit/rollback path. Seek generation fences reset
+bounded sample mapping; no additional worker or clock is introduced. The
+playback core owns the requested and applied offset: `setAudioDelay` issues an
+identified `applyAudioDelay` replacement effect that shares the track
+transaction (revision, generation and preroll obligation), so it cannot
+interleave with a track change. Native executes it on the existing candidate
+commit/rollback path, and failure rolls the request back. A request made
+while a replacement, seek or preroll is in flight is kept as the latest
+queued intent and starts once the session is settled; stop drops it. A seek
+that supersedes an in-flight delay replacement still settles it from the late
+result. Seek generation fences reset
 mapped timestamps, trimming and bounded silence. Track changes retain the offset;
 new media resets it to zero.
 

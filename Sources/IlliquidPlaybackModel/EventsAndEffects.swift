@@ -169,6 +169,9 @@ public enum PlaybackCommand: Codable, Equatable, Sendable {
   case selectAudio(AudioSelectionIntent)
   case selectSubtitle(SubtitleSelectionIntent)
   case setSubtitleDelay(microseconds: Int64)
+  /// Audio delay rebuilds the audio input at an offset, so it is a session
+  /// replacement transaction like an audio-track change.
+  case setAudioDelay(microseconds: Int64)
   case checkpoint
   case stop
   case shutdown
@@ -226,6 +229,9 @@ public enum PlaybackEffectKind: Codable, Equatable, Sendable {
   case applyAudioSelection(AudioSelectionIntent, revision: TrackRevisionID)
   case applySubtitleSelection(SubtitleSelectionIntent, revision: TrackRevisionID)
   case applySubtitleDelay(microseconds: Int64)
+  /// Aggregate replacement with the requested audio offset. Success has the
+  /// same proof obligations as `applyAudioSelection`.
+  case applyAudioDelay(microseconds: Int64, revision: TrackRevisionID)
   case cancelSession
   case persistCheckpoint
   case cancelInputRead

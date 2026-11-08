@@ -1951,6 +1951,14 @@ final class MediaSession: @unchecked Sendable {
                             metrics.deinterlacingFailure = frame.deinterlacingFailure
                             metrics.pixelBufferFormat = Self.pixelFormatName(frame.pixelBuffer)
                             metrics.isHardwareDecoded = frame.isHardwareDecoded
+                            if !frame.isHardwareDecoded,
+                               metrics.hardwareDecoder == "FFmpeg VideoToolbox configured"
+                            {
+                                // VideoToolbox negotiated a software format at the
+                                // first packet; the construction-time label is stale.
+                                metrics.hardwareDecoder =
+                                    "Software decoder — VideoToolbox does not support this stream's format"
+                            }
                             metrics.isCopiedHardwarePath = frame.isCopiedHardwarePath
                             metrics.isNearZeroCopy = frame.isNearZeroCopy
                             metrics.colorPrimaries = frame.colorPrimaries

@@ -22,13 +22,12 @@ any resulting dependency or runtime path that escapes the bundle.
 
 ## Development gates
 
-The Swift package and executable product retain the internal `Superplayr`
-name. These commands exercise the internal development build:
+These commands exercise the internal development build:
 
 ```sh
-swift run SuperplayrArchitectureCheck
+swift run IlliquidArchitectureCheck
 swift test --no-parallel
-swift build --product Superplayr
+swift build --product Illiquid
 ```
 
 The architecture check enforces the framework-free deterministic-core boundary,
@@ -38,8 +37,8 @@ Fixture-backed qualification can be run with:
 
 ```sh
 ./Scripts/generate-native-fixtures.sh
-SUPERPLAYR_NATIVE_FIXTURE_DIR="$PWD/TestFixtures/Generated" \
-SUPERPLAYR_NATIVE_REQUIRE_FIXTURES=1 swift test --no-parallel
+ILLIQUID_NATIVE_FIXTURE_DIR="$PWD/TestFixtures/Generated" \
+ILLIQUID_NATIVE_REQUIRE_FIXTURES=1 swift test --no-parallel
 ```
 
 ## Native dependency lock
@@ -105,7 +104,7 @@ Use a disposable output directory; generated files at these names are replaced.
 
 ```sh
 python3 Scripts/generate-bitmap-subtitle-fixtures.py /tmp/platinum-bitmap-fixtures
-SUPERPLAYR_BITMAP_FIXTURE_DIR=/tmp/platinum-bitmap-fixtures \
+ILLIQUID_BITMAP_FIXTURE_DIR=/tmp/platinum-bitmap-fixtures \
   swift test --filter 'BitmapSubtitleTests|PiPSubtitlePipelineTests'
 ```
 
@@ -121,13 +120,13 @@ checks plus the existing decoder, buffer, seek and replacement suite:
 
 ```sh
 python3 Scripts/generate-planar-fixtures.py /tmp/platinum-planar-fixtures
-SUPERPLAYR_PLANAR_EXPERIMENT_FIXTURE_DIR=/tmp/platinum-planar-fixtures \
+ILLIQUID_PLANAR_EXPERIMENT_FIXTURE_DIR=/tmp/platinum-planar-fixtures \
   swift test --no-parallel --filter 'PlanarPrecisionReferenceTests|PlanarSoftwareOutputExperimentTests'
 ```
 
 The suite also uses `TestFixtures/Generated` from `generate-native-fixtures.sh`.
 The generators overwrite their named outputs. For a separate warm conversion
-probe, set `SUPERPLAYR_MEASURE_PLANAR_CONVERSION=1` and run only
+probe, set `ILLIQUID_MEASURE_PLANAR_CONVERSION=1` and run only
 `PlanarPrecisionReferenceTests` with `--no-parallel`. The reported wall/thread
 CPU times exclude allocation, decoding and presentation; they are not playback
 or energy measurements. Native renderer tests may create temporary test windows;

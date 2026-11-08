@@ -305,24 +305,27 @@ final class AppModel {
     var isShortcutSettingsPresented = false
     var isShortcutHelpPresented = false
     var isGoToTimePresented = false
-    var loopStart: TimeInterval?
-    var loopEnd: TimeInterval?
+    /// The A marker between "Set Start" and "Set End". It is interaction
+    /// state only; the loop itself is owned by the playback core and arrives
+    /// through `state.loopStart`/`state.loopEnd`. Cleared on source change.
+    private var pendingLoopStart: TimeInterval?
+    var loopStart: TimeInterval? { state.loopStart ?? pendingLoopStart }
+    var loopEnd: TimeInterval? { state.loopEnd }
 
     func setLoopStart() {
         guard state.currentSource != nil else { return }
-        loopStart = state.position
-        loopEnd = nil
         _ = player.setLoop(start: nil, end: nil)
+        pendingLoopStart = state.position
     }
 
     func setLoopEnd() {
         guard let start = loopStart, state.position > start,
               player.setLoop(start: start, end: state.position) else { return }
-        loopEnd = state.position
+        pendingLoopStart = nil
     }
 
     func clearLoop() {
-        loopStart = nil; loopEnd = nil
+        pendingLoopStart = nil
         _ = player.setLoop(start: nil, end: nil)
     }
     var isMessageHistoryPresented = false
@@ -1529,6 +1532,10 @@ final class AppModel {
         }
         if state.currentSource != lastObservedSource {
             cancelActiveInteraction()
+            // Seek undo history and an unfinished A-B marker belong to the
+            // previous source; never apply them to the new one.
+            seekInteractionAccumulator.reset()
+            pendingLoopStart = nil
             osdPresenter.invalidate()
             surfaceScrollAccumulator.cancel()
             if let source = state.currentSource {

@@ -82,6 +82,18 @@ public struct TrackSelectionMachineState: Codable, Equatable, Sendable {
     return .prepareSubtitle(intent, revision: revision)
   }
 
+  /// Starts a replacement that keeps the current track intent, such as an
+  /// audio-delay change. It shares the revision and phase so it cannot
+  /// interleave with a track selection.
+  public mutating func requestReplacement() -> TrackRevisionID? {
+    guard phase == .idle, revision.rawValue < UInt64.max else { return nil }
+    revision = TrackRevisionID(rawValue: revision.rawValue + 1)
+    priorAudio = effectiveAudio
+    priorSubtitle = effectiveSubtitle
+    phase = .preparing
+    return revision
+  }
+
   public mutating func prepared(revision candidate: TrackRevisionID) -> TrackSelectionDirective? {
     guard candidate == revision, phase == .preparing else { return nil }
     phase = .committing
@@ -136,5 +148,42 @@ public struct ControlMachineState: Codable, Equatable, Sendable {
     guard microseconds == requestedSubtitleDelayMicroseconds else { return false }
     appliedSubtitleDelayMicroseconds = microseconds
     return true
+  }
+
+  // Audio delay is stored sparsely: `nil` means zero, so state recorded before
+  // audio delay entered the model keeps its canonical encoding.
+  var requestedAudioDelayStorage: Int64?
+  var appliedAudioDelayStorage: Int64?
+
+  /// The latest audio delay requested while a replacement was in flight;
+  /// issued when that transaction settles. `nil` when nothing is waiting.
+  public internal(set) var queuedAudioDelayMicroseconds: Int64?
+
+  public var requestedAudioDelayMicroseconds: Int64 { requestedAudioDelayStorage ?? 0 }
+  public var appliedAudioDelayMicroseconds: Int64 { appliedAudioDelayStorage ?? 0 }
+
+  public static func clampedAudioDelay(microseconds: Int64) -> Int64 {
+    min(max(microseconds, -10_000_000), 10_000_000)
+  }
+
+  mutating func requestAudioDelay(microseconds: Int64) {
+    let clamped = Self.clampedAudioDelay(microseconds: microseconds)
+    requestedAudioDelayStorage = clamped == 0 ? nil : clamped
+  }
+
+  mutating func settleAudioDelay(succeeded: Bool) {
+    if succeeded {
+      appliedAudioDelayStorage = requestedAudioDelayStorage
+    } else {
+      requestedAudioDelayStorage = appliedAudioDelayStorage
+    }
+  }
+
+  private enum CodingKeys: String, CodingKey {
+    case requestedSubtitleDelayMicroseconds
+    case appliedSubtitleDelayMicroseconds
+    case requestedAudioDelayStorage = "requestedAudioDelayMicroseconds"
+    case appliedAudioDelayStorage = "appliedAudioDelayMicroseconds"
+    case queuedAudioDelayMicroseconds
   }
 }

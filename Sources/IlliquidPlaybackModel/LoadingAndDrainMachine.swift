@@ -14,15 +14,23 @@ public struct PlaybackCatalog: Codable, Equatable, Sendable {
   public let hasVideo: Bool
   public let audio: [PlaybackTrackCandidate]
   public let subtitles: [PlaybackTrackCandidate]
+  /// The streams native preparation actually configured. Automatic selection
+  /// is resolved while opening (the open/probe/configure work is one native
+  /// aggregate), using the shared pure `TrackSelectionPreferences` ranking.
+  /// When present, this fact is the effective initial selection; `nil` keeps
+  /// the catalog-only rule for inputs that do not report a configuration.
+  public let configuredSelection: InitialTrackSelectionState?
 
   public init(
     hasVideo: Bool = false,
     audio: [PlaybackTrackCandidate] = [],
-    subtitles: [PlaybackTrackCandidate] = []
+    subtitles: [PlaybackTrackCandidate] = [],
+    configuredSelection: InitialTrackSelectionState? = nil
   ) {
     self.hasVideo = hasVideo
     self.audio = audio
     self.subtitles = subtitles
+    self.configuredSelection = configuredSelection
   }
 }
 
@@ -94,6 +102,17 @@ public struct PlaybackDrainState: Codable, Equatable, Sendable {
 }
 
 func selectInitialTracks(from catalog: PlaybackCatalog) -> InitialTrackSelectionState {
+  if let configured = catalog.configuredSelection {
+    // Accept only streams the catalog advertises; an unknown or unplayable
+    // stream is reported as no selection rather than invented.
+    let audio = configured.audio.flatMap { id in
+      catalog.audio.contains(where: { $0.id == id }) ? id : nil
+    }
+    let subtitle = configured.subtitle.flatMap { id in
+      catalog.subtitles.contains(where: { $0.id == id }) ? id : nil
+    }
+    return InitialTrackSelectionState(audio: audio, subtitle: subtitle)
+  }
   let audio = catalog.audio.first(where: \.isDefault)?.id ?? catalog.audio.first?.id
   let subtitle = catalog.subtitles.first(where: { $0.isForced })?.id
     ?? catalog.subtitles.first(where: \.isDefault)?.id
