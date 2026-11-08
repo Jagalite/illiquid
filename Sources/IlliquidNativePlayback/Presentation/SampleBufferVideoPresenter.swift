@@ -120,7 +120,8 @@ final class SampleBufferVideoPresenter: @unchecked Sendable {
         let identity = FrameIdentity(
             surfaceID: CVPixelBufferGetIOSurface(frame.pixelBuffer).map { IOSurfaceGetID($0.takeUnretainedValue()) },
             bufferID: UInt(bitPattern: Unmanaged.passUnretained(frame.pixelBuffer).toOpaque()),
-            time: frame.presentationTime.seconds, generation: frame.generation)
+            time: frame.presentationTime.seconds, generation: frame.generation,
+            isSynthesized: frame.origin.isSynthesized)
         identityLock.withLock {
             frameIdentities.append(identity)
         }

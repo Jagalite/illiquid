@@ -341,6 +341,24 @@ class RunnerTests(unittest.TestCase):
             self.assertNotEqual(result["status"], "ok", result)
             self.assertEqual(self.drag_calls(), [])
 
+    def test_launch_records_explicit_video_processing_and_strips_inherited(self):
+        with patch.dict(os.environ, {"ILLIQUID_VIDEO_INTERPOLATE": "120"}):
+            result = self.run.execute("launch", {"app": str(self.app), "timeout": .2,
+                                                 "video_transform": "scale=0.5,flip=h",
+                                                 "video_interpolate": "60"})
+        self.assertEqual(result["status"], "ok", result)
+        env = self.adapter.environments[0]
+        self.assertEqual(env["ILLIQUID_VIDEO_TRANSFORM"], "scale=0.5,flip=h")
+        self.assertEqual(env["ILLIQUID_VIDEO_INTERPOLATE"], "60")
+        overrides = self.run.manifest["environment"]["launch_overrides"]
+        self.assertEqual(overrides["ILLIQUID_VIDEO_INTERPOLATE"], "60")
+
+    def test_launch_rejects_malformed_video_processing_before_spawn(self):
+        result = self.run.execute("launch", {"app": str(self.app), "timeout": .2,
+                                             "video_transform": "scale=1;rm -rf /"})
+        self.assertEqual(result["status"], "error", result)
+        self.assertEqual(self.adapter.environments, [])
+
     def test_launch_exact_bundle_isolated_environment_and_manifest(self):
         with patch.dict(os.environ, {"HOME": "/do-not-repurpose", "ILLIQUID_BENCHMARK_FAKE": "stale",
                                     "ILLIQUID_BENCHMARK_PREFERENCES_SUITE": "shared",

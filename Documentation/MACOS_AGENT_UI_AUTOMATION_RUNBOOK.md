@@ -145,6 +145,8 @@ python3 Scripts/agent-ui/agent_ui.py launch \
   --preferences-seed-file "$preference_seed"
 ```
 
+To exercise the optional video frame-processing path, pass its switches explicitly: `--video-transform` sets `ILLIQUID_VIDEO_TRANSFORM` (for example `scale=0.5,flip=h`) and `--video-interpolate` sets `ILLIQUID_VIDEO_INTERPOLATE` (for example `60`). The launcher records them in `launch_overrides`; inherited shell values are still stripped. Confirm what ran from the app log's `[native-video-processing]` line (stages, generated frames, `warming-up`, `stage-unavailable`, `bypass`), not from the launch flags alone.
+
 This is an alternative launch into a new run directory, not a second launch into the earlier run. The runner copies the seed byte-for-byte to `state/preferences-seed.json` and retains its path/hash and values. Seeds are at most 1 MiB, use contract-approved app keys and property-list values, and cannot set the suite reservation key. Retain `artifacts/preferences.json` and the manifest's validated preference record. The receipt snapshots initial persisted values, not every unpersisted code default, live Settings behavior, or crash durability. Never reset/reuse a suite or overwrite its receipt to repair a failed attempt.
 
 Launch activates the exact owned process as semantic setup, then waits for an on-screen owned window. The activation helper pumps its run loop until frontmost ownership is observed, then checks AX focus; this is semantic setup rather than an input-routing assertion. The windows-only probe does not require AX discovery and returns `elements: []`, `truncated: true`, and `inspection_scope: "windows-only"`. Neither endpoint proves layout/presentation readiness.

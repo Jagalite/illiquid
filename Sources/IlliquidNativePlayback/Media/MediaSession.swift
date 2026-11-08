@@ -41,6 +41,8 @@ struct MediaSessionSnapshot: Equatable, Sendable {
     // Number of video enqueue calls that returned without an immediate
     // renderer failure. This is submission evidence, not presentation.
     var framesSubmitted = 0
+    /// Present only when a processing stage is configured for the session.
+    var videoProcessing: VideoFrameProcessingSnapshot?
     var videoSubmissionAttempts = 0
     var videoEnqueueReturnedWithoutImmediateFailure = 0
     var audioSubmissionAttempts = 0
@@ -320,6 +322,15 @@ final class MediaSession: @unchecked Sendable {
     private let videoFrames: BoundedQueue<VideoFrameQueueItem>
     private let audioFrames = BoundedQueue<AudioFrameQueueItem>(capacity: 48)
     private let videoPipelineCapacityGate: VideoFrameCapacityGate?
+    /// GPU and ML stages between the decoder and the renderer. Nil keeps the
+    /// unprocessed path.
+    private var videoProcessingPipeline: VideoFrameProcessingPipeline?
+    private var videoProcessingUnavailableReason: String?
+    /// The pipeline, created on first use. Guarded by `stateLock` so the
+    /// presentation thread and live updates agree on it.
+    private var videoProcessing: VideoFrameProcessingPipeline? {
+        stateLock.withLock { videoProcessingPipeline }
+    }
     private let usesFairDemuxDispatch: Bool
     private let videoRecoveryPackets = VideoRecoveryPacketBuffer()
 
@@ -355,6 +366,12 @@ final class MediaSession: @unchecked Sendable {
     private var audioFormatRevision: UInt64?
     private var pendingVideoRecoveryReplay: [FFmpegPacket] = []
     private var videoGeometry: NativeVideoGeometry?
+    /// Geometry of a video format change waiting for the main thread's
+    /// flush. Published when that reconfiguration completes, so the surface
+    /// reads the new size instead of racing the presentation thread.
+    private var pendingVideoGeometry: (
+        revision: MediaFormatRevisionID, geometry: NativeVideoGeometry, effectiveSeconds: Double
+    )?
     private var audioDisabled = false
     private var subtitleDisabled = false
 
@@ -381,6 +398,7 @@ final class MediaSession: @unchecked Sendable {
         softwarePlanarOutputMaximumBufferCount: Int =
             SoftwareBGRAOutputPool.qualifiedMaximumBufferCount,
         initialBufferTargets: AdaptiveBufferTargets? = nil,
+        videoFrameProcessing: VideoFrameProcessingConfiguration = .disabled,
         constructionCancellation: FFmpegInputCancellationSignal? = nil,
         sessionID: PlaybackSessionID = PlaybackSessionID(rawValue: 0),
         onLifecycleTrace: (@Sendable (String) -> Void)? = nil,
@@ -421,6 +439,21 @@ final class MediaSession: @unchecked Sendable {
             ? VideoFrameCapacityGate(capacity: selectedPipelineCapacity)
             : nil
         self.usesFairDemuxDispatch = usesFairDemuxDispatch
+        if videoFrameProcessing.isEnabled {
+            do {
+                videoProcessingPipeline = try VideoFrameProcessingPipeline(
+                    configuration: videoFrameProcessing
+                )
+                videoProcessingUnavailableReason = nil
+            } catch {
+                // Processing is optional; playback continues unprocessed.
+                videoProcessingPipeline = nil
+                videoProcessingUnavailableReason = String(describing: error)
+            }
+        } else {
+            videoProcessingPipeline = nil
+            videoProcessingUnavailableReason = nil
+        }
         try constructionCancellation?.checkCancellation()
         onLifecycleTrace?("input-opening")
         let versionBeforeOpen = NativeFileContentVersion.read(url)
@@ -733,6 +766,7 @@ final class MediaSession: @unchecked Sendable {
         guard shouldStart else { return }
         armRendererDemand()
         if videoDecoder != nil {
+            videoProcessing?.setContinuationCheck { [weak self] in self?.isRunning ?? false }
             launch("video-present", body: videoPresentationLoop)
         }
         if audioDecoder != nil {
@@ -1024,6 +1058,20 @@ final class MediaSession: @unchecked Sendable {
         }
         synchronization.observeSupply(starved: result.2, cacheSeconds: result.3)
         var snapshot = result.0
+        let (processingPipeline, processingFailure) = stateLock.withLock {
+            (videoProcessingPipeline, videoProcessingUnavailableReason)
+        }
+        // Read the published counters only: the processing lock can be held
+        // across a GPU or VideoToolbox wait, and snapshots run on the main
+        // thread.
+        let processingSnapshot = processingPipeline?.snapshot
+        if let processingSnapshot, !processingSnapshot.stageNames.isEmpty {
+            snapshot.videoProcessing = processingSnapshot
+        } else if let videoProcessingUnavailableReason = processingFailure {
+            snapshot.videoProcessing = VideoFrameProcessingSnapshot(
+                bypassReason: videoProcessingUnavailableReason
+            )
+        }
         if let pipelineCapacity = videoPipelineCapacityGate?.snapshot {
             snapshot.videoPipelineCapacity = pipelineCapacity.capacity
             snapshot.videoPipelineCapacityInUse = pipelineCapacity.inUse
@@ -1881,6 +1929,32 @@ final class MediaSession: @unchecked Sendable {
         onFailureObserved?(failure)
     }
 
+    /// Changes processing while playing; frames processed from now on use
+    /// the new settings. Creates the pipeline the first time something is
+    /// switched on.
+    func updateVideoProcessing(_ configuration: VideoFrameProcessingConfiguration) {
+        if let existing = videoProcessing {
+            do {
+                try existing.update(configuration: configuration)
+                stateLock.withLock { videoProcessingUnavailableReason = nil }
+            } catch {
+                stateLock.withLock { videoProcessingUnavailableReason = String(describing: error) }
+            }
+            return
+        }
+        guard configuration.isEnabled else { return }
+        do {
+            let pipeline = try VideoFrameProcessingPipeline(configuration: configuration)
+            pipeline.setContinuationCheck { [weak self] in self?.isRunning ?? false }
+            stateLock.withLock {
+                if videoProcessingPipeline == nil { videoProcessingPipeline = pipeline }
+                videoProcessingUnavailableReason = nil
+            }
+        } catch {
+            stateLock.withLock { videoProcessingUnavailableReason = String(describing: error) }
+        }
+    }
+
     private func videoPresentationLoop() {
         while isRunning {
             switch videoFrames.pop() {
@@ -1905,84 +1979,103 @@ final class MediaSession: @unchecked Sendable {
                         onFailureObserved?(failure)
                         return
                     }
-                    guard adoptVideoFormatIfNeeded(frame) else { return }
-                    let backpressureStart = ProcessInfo.processInfo.systemUptime
-                    guard videoDemand.consume(while: { self.isRunning }) else { return }
-                    let backpressureDuration = ProcessInfo.processInfo.systemUptime
-                        - backpressureStart
-                    if backpressureDuration >= 0.001 {
-                        stateLock.withLock {
-                            metrics.rendererBackpressureEvents += 1
-                            metrics.rendererBackpressureSeconds += backpressureDuration
-                        }
+                    guard let processing = videoProcessing else {
+                        guard presentVideoFrame(frame) else { return }
+                        continue
                     }
-                    guard isRunning, accepts(frame) else { continue }
-                    do {
-                        guard let fence = stateLock.withLock({
-                            metrics.generation == frame.generation ? presentationFence : nil
-                        }) else { incrementStaleFrame(); continue }
-                        guard try presentation.enqueueVideo(
-                            frame,
-                            fence: fence,
-                            // Preview remains a paused, timestamped transaction
-                            // on the synchronizer. DisplayImmediately is not
-                            // qualified under AVSampleBufferRenderSynchronizer.
-                            displayImmediately: false
-                        ) else {
-                            incrementStaleFrame()
-                            continue
-                        }
-                        stateLock.withLock {
-                            // A seek can reset metrics after enqueue returns but
-                            // before this lock is acquired. Never journal the old
-                            // frame as the new generation's first output.
-                            guard metrics.recordEnqueuedVideo(
-                                startPTS: frame.presentationTime.seconds,
-                                endPTS: frame.presentationTime.seconds + frame.duration.seconds,
-                                generation: frame.generation
-                            ) else { return }
-                            metrics.framesSubmitted += 1
-                            if metrics.seekTimings?.milliseconds[.videoEnqueued] == nil {
-                                metrics.seekTimings?.record(.videoEnqueued, generation: frame.generation,
-                                                           at: ProcessInfo.processInfo.systemUptime)
-                            }
-                            metrics.ffmpegPixelFormat = frame.ffmpegPixelFormat
-                            metrics.usesDeinterlacingFilter = frame.usesDeinterlacingFilter
-                            metrics.deinterlacingFailure = frame.deinterlacingFailure
-                            metrics.pixelBufferFormat = Self.pixelFormatName(frame.pixelBuffer)
-                            metrics.isHardwareDecoded = frame.isHardwareDecoded
-                            if !frame.isHardwareDecoded,
-                               metrics.hardwareDecoder == "FFmpeg VideoToolbox configured"
-                            {
-                                // VideoToolbox negotiated a software format at the
-                                // first packet; the construction-time label is stale.
-                                metrics.hardwareDecoder =
-                                    "Software decoder — VideoToolbox does not support this stream's format"
-                            }
-                            metrics.isCopiedHardwarePath = frame.isCopiedHardwarePath
-                            metrics.isNearZeroCopy = frame.isNearZeroCopy
-                            metrics.colorPrimaries = frame.colorPrimaries
-                            metrics.transferCharacteristic = frame.transferCharacteristic
-                            metrics.matrixCoefficients = frame.matrixCoefficients
-                            metrics.isFullRange = frame.isFullRange
-                            metrics.hasMasteringDisplayMetadata = frame.hasMasteringDisplayMetadata
-                            metrics.hasContentLightMetadata = frame.hasContentLightMetadata
-                        }
-                        onObservationRequested?(RuntimeObservationRequest(
-                            source: .videoEnqueue,
-                            urgency: .routine
-                        ))
-                        startIfPrerolled(.video, generation: frame.generation)
-                    } catch {
-                        let failure = recovery.presentationFailure(error: error)
-                        stateLock.withLock { metrics.lastRecoveryFailure = failure }
-                        onFailureObserved?(failure)
-                        return
+                    let outputs = processing.process(frame)
+                    for output in outputs {
+                        guard presentVideoFrame(output) else { return }
                     }
-                case let .endOfStream(active): markEnded(kind: .video, generation: active)
-                case .flush: break
+                case let .endOfStream(active):
+                    for output in videoProcessing?.finish() ?? [] {
+                        guard presentVideoFrame(output) else { return }
+                    }
+                    markEnded(kind: .video, generation: active)
+                case .flush:
+                    videoProcessing?.reset()
                 }
             }
+        }
+    }
+
+    /// Adopts, paces and enqueues one frame. Returns false when the
+    /// presentation loop must stop.
+    private func presentVideoFrame(_ frame: NativeDecodedVideoFrame) -> Bool {
+        guard adoptVideoFormatIfNeeded(frame) else { return false }
+        let backpressureStart = ProcessInfo.processInfo.systemUptime
+        guard videoDemand.consume(while: { self.isRunning }) else { return false }
+        let backpressureDuration = ProcessInfo.processInfo.systemUptime
+            - backpressureStart
+        if backpressureDuration >= 0.001 {
+            stateLock.withLock {
+                metrics.rendererBackpressureEvents += 1
+                metrics.rendererBackpressureSeconds += backpressureDuration
+            }
+        }
+        guard isRunning, accepts(frame) else { return true }
+        do {
+            guard let fence = stateLock.withLock({
+                metrics.generation == frame.generation ? presentationFence : nil
+            }) else { incrementStaleFrame(); return true }
+            guard try presentation.enqueueVideo(
+                frame,
+                fence: fence,
+                // Preview remains a paused, timestamped transaction
+                // on the synchronizer. DisplayImmediately is not
+                // qualified under AVSampleBufferRenderSynchronizer.
+                displayImmediately: false
+            ) else {
+                incrementStaleFrame()
+                return true
+            }
+            stateLock.withLock {
+                // A seek can reset metrics after enqueue returns but
+                // before this lock is acquired. Never journal the old
+                // frame as the new generation's first output.
+                guard metrics.recordEnqueuedVideo(
+                    startPTS: frame.presentationTime.seconds,
+                    endPTS: frame.presentationTime.seconds + frame.duration.seconds,
+                    generation: frame.generation
+                ) else { return }
+                metrics.framesSubmitted += 1
+                if metrics.seekTimings?.milliseconds[.videoEnqueued] == nil {
+                    metrics.seekTimings?.record(.videoEnqueued, generation: frame.generation,
+                                               at: ProcessInfo.processInfo.systemUptime)
+                }
+                metrics.ffmpegPixelFormat = frame.ffmpegPixelFormat
+                metrics.usesDeinterlacingFilter = frame.usesDeinterlacingFilter
+                metrics.deinterlacingFailure = frame.deinterlacingFailure
+                metrics.pixelBufferFormat = Self.pixelFormatName(frame.pixelBuffer)
+                metrics.isHardwareDecoded = frame.isHardwareDecoded
+                if !frame.isHardwareDecoded,
+                   metrics.hardwareDecoder == "FFmpeg VideoToolbox configured"
+                {
+                    // VideoToolbox negotiated a software format at the
+                    // first packet; the construction-time label is stale.
+                    metrics.hardwareDecoder =
+                        "Software decoder — VideoToolbox does not support this stream's format"
+                }
+                metrics.isCopiedHardwarePath = frame.isCopiedHardwarePath
+                metrics.isNearZeroCopy = frame.isNearZeroCopy
+                metrics.colorPrimaries = frame.colorPrimaries
+                metrics.transferCharacteristic = frame.transferCharacteristic
+                metrics.matrixCoefficients = frame.matrixCoefficients
+                metrics.isFullRange = frame.isFullRange
+                metrics.hasMasteringDisplayMetadata = frame.hasMasteringDisplayMetadata
+                metrics.hasContentLightMetadata = frame.hasContentLightMetadata
+            }
+            onObservationRequested?(RuntimeObservationRequest(
+                source: .videoEnqueue,
+                urgency: .routine
+            ))
+            startIfPrerolled(.video, generation: frame.generation)
+            return true
+        } catch {
+            let failure = recovery.presentationFailure(error: error)
+            stateLock.withLock { metrics.lastRecoveryFailure = failure }
+            onFailureObserved?(failure)
+            return false
         }
     }
 
@@ -2095,26 +2188,22 @@ final class MediaSession: @unchecked Sendable {
             }
             videoFormatRevision += 1
             let revision = MediaFormatRevisionID(rawValue: videoFormatRevision)
-            let ticket = formatReconfiguration.begin(
-                .video,
-                revision: revision
+            let geometry = NativeVideoGeometry(
+                displaySize: frame.displaySize,
+                rotationDegrees: frame.rotationDegrees
             )
-            onSynchronizationObserved?(.formatChanged(stream: .video, revision: revision))
-            guard ticket.wait(timeout: .now() + 3) == .success else {
-                return PlaybackFailure(
-                    domain: .presentation,
-                    stage: .configure,
-                    stableCode: "videoFormatReconfigurationTimedOut",
-                    recoverability: .retryable
-                )
-            }
+            // The display layer takes samples whose format changes mid-stream,
+            // so presentation does not wait for anyone. (It used to block on a
+            // main-thread round trip through the playback core; anything on
+            // the main thread waiting on this pipeline then stalled both for
+            // the 3 s timeout.) The core still learns the new revision, and
+            // the runtime switches the surface when this frame is due.
             stateLock.withLock {
                 videoFormatSignature = signature
-                videoGeometry = NativeVideoGeometry(
-                    displaySize: frame.displaySize,
-                    rotationDegrees: frame.rotationDegrees
-                )
+                videoGeometry = geometry
+                pendingVideoGeometry = (revision, geometry, frame.presentationTime.seconds)
             }
+            onSynchronizationObserved?(.formatChanged(stream: .video, revision: revision))
             return nil
         }
         guard let failure else { return true }
@@ -2156,11 +2245,25 @@ final class MediaSession: @unchecked Sendable {
         return false
     }
 
+    /// Acknowledges a format change. Audio presentation waits for this;
+    /// video does not. For video, returns any geometry change not yet taken.
+    @discardableResult
     func completeFormatReconfiguration(
         _ stream: SynchronizedStream,
         revision: MediaFormatRevisionID
-    ) {
+    ) -> (geometry: NativeVideoGeometry, effectiveSeconds: Double)? {
+        let change = stream == .video ? takePendingVideoGeometry() : nil
         formatReconfiguration.complete(stream, revision: revision)
+        return change
+    }
+
+    /// The newest mid-stream geometry change and the presentation time of
+    /// its first frame, once. The runtime switches the surface at that time.
+    func takePendingVideoGeometry() -> (geometry: NativeVideoGeometry, effectiveSeconds: Double)? {
+        stateLock.withLock {
+            defer { pendingVideoGeometry = nil }
+            return pendingVideoGeometry.map { ($0.geometry, $0.effectiveSeconds) }
+        }
     }
 
     private func acceptedAudioFrame(

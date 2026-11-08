@@ -463,7 +463,17 @@ public final class NativePlaybackRuntime: PlaybackRuntime {
     private let replacementLifecycle = NativeReplacementLifecycleLedger()
 
     private var surfaceHost: NativePlaybackSurfaceHost?
-    private var session: MediaSession?
+    private var session: MediaSession? {
+        didSet {
+            // A session built before the latest picture change catches up
+            // when it becomes active.
+            if session !== oldValue {
+                pendingSurfaceGeometry = nil
+                clearPictureRefreshState()
+                session?.updateVideoProcessing(effectiveVideoProcessing)
+            }
+        }
+    }
     private var pendingLoad: PlaybackRuntimeLoadRequest?
     private var operations = NativeOperationLedger()
     private var operationDeadlineTasks: [PlaybackEffectID: Task<Void, Never>] = [:]
@@ -503,6 +513,25 @@ public final class NativePlaybackRuntime: PlaybackRuntime {
     private let reservesVideoPipelineCapacity: Bool
     private let videoPipelineCapacityOverride: Int?
     private let usesFairDemuxDispatch: Bool
+    /// Development switches (environment); the base for user settings.
+    private let videoFrameProcessing: VideoFrameProcessingConfiguration
+    /// User picture settings from the app's Video menu.
+    private var pictureAdjustments = VideoPictureAdjustments()
+    private var userRotation = 0
+    private var videoFilters: Set<VideoFilterPreset> = []
+    /// Coalesces repaints of the paused picture while a control is dragged.
+    private var pictureRefreshGeneration: (session: PlaybackSessionID, generation: Int)?
+    private var pictureRefreshPending = false
+    /// The paused frame's time, kept across repeated repaints so they cannot
+    /// drift. Cleared when playback resumes, the app seeks, or the session
+    /// changes.
+    private var pictureRefreshAnchor: Double?
+
+    private func clearPictureRefreshState() {
+        pictureRefreshGeneration = nil
+        pictureRefreshPending = false
+        pictureRefreshAnchor = nil
+    }
     private let softwarePlanarOutputMaximumBufferCount: Int
     private var volume = 100.0
     private var isMuted = false
@@ -624,7 +653,8 @@ public final class NativePlaybackRuntime: PlaybackRuntime {
         usesFairDemuxDispatch: Bool = false,
         softwarePlanarOutputMaximumBufferCount: Int = 16,
         seekPrerollFrameSkippingEnabled: Bool = true,
-        softwareSeekAccelerationEnabled: Bool = true
+        softwareSeekAccelerationEnabled: Bool = true,
+        videoFrameProcessing: VideoFrameProcessingConfiguration = .fromEnvironment()
     ) throws {
         var capabilities: PlaybackCapabilities = [
             .localFiles,
@@ -648,6 +678,10 @@ public final class NativePlaybackRuntime: PlaybackRuntime {
         if NativePictureInPictureController.isSupported {
             capabilities.insert(.pictureInPicture)
         }
+        if VideoFrameProcessingContext.isAvailable {
+            capabilities.insert(.videoAdjustments)
+            capabilities.insert(.videoFilters)
+        }
         self.capabilities = capabilities
         self.softwareVideoOutputPolicy = softwareVideoOutputPolicy
         self.seekPrerollFrameSkippingEnabled = seekPrerollFrameSkippingEnabled
@@ -656,6 +690,7 @@ public final class NativePlaybackRuntime: PlaybackRuntime {
         self.reservesVideoPipelineCapacity = reservesVideoPipelineCapacity
         self.videoPipelineCapacityOverride = videoPipelineCapacityOverride
         self.usesFairDemuxDispatch = usesFairDemuxDispatch
+        self.videoFrameProcessing = videoFrameProcessing
         self.softwarePlanarOutputMaximumBufferCount = max(
             1,
             softwarePlanarOutputMaximumBufferCount
@@ -889,6 +924,7 @@ public final class NativePlaybackRuntime: PlaybackRuntime {
         if let surfaceHost { return surfaceHost }
         let host = NativePlaybackSurfaceHost(backend: self)
         surfaceHost = host
+        applySurfaceGeometry()
         if surfaceLease == nil {
             let context = runtimeMetadata.makeApplicationContext()
             let lease = runtimeMetadata.leases.acquire(provenance: RuntimeResourceProvenance(
@@ -1306,6 +1342,7 @@ public final class NativePlaybackRuntime: PlaybackRuntime {
     }
 
     public func play() {
+        pictureRefreshAnchor = nil
         desiredPlaying = true
         session?.requestTransport(playing: true, speed: playbackSpeed)
         pictureInPictureController?.updatePlayback(
@@ -1341,6 +1378,7 @@ public final class NativePlaybackRuntime: PlaybackRuntime {
     }
 
     public func seek(to value: TimeInterval, mode: IlliquidPlayback.SeekMode) {
+        pictureRefreshAnchor = nil
         seek(to: value, mode: mode, effectID: nil)
     }
 
@@ -1350,6 +1388,7 @@ public final class NativePlaybackRuntime: PlaybackRuntime {
         effectID: PlaybackEffectID?
     ) {
         guard let session else { return }
+        pictureRefreshAnchor = nil
         let target: TimeInterval
         switch mode {
         case .relative:
@@ -1678,10 +1717,145 @@ public final class NativePlaybackRuntime: PlaybackRuntime {
         videoAdjustments.crop = crop
         updateVideoPresentationGeometry()
     }
-    public func setVideoRotation(_ rotation: Int) { unsupported("video rotation override") }
-    public func setDeinterlace(_ enabled: Bool) { unsupported("manual deinterlacing override") }
+    /// Rotates clockwise in addition to the file's own rotation (as in
+    /// mpv), quarter turns only. Applied by the view's layer transform like
+    /// the file's rotation: no format change, no GPU pass, immediate even
+    /// while paused.
+    public func setVideoRotation(_ rotation: Int) {
+        let normalized = ((rotation % 360) + 360) % 360
+        guard VideoFrameTransform.Rotation(rawValue: normalized) != nil else {
+            unsupported("video rotation other than quarter turns")
+            return
+        }
+        guard normalized != userRotation else { return }
+        userRotation = normalized
+        applySurfaceGeometry()
+    }
+
+    /// The file's own rotation and display size, before the user's rotation.
+    private var sourceSurfaceGeometry = NativeVideoGeometry(displaySize: .zero, rotationDegrees: 0)
+    /// A mid-stream geometry change waiting for its first frame to be due.
+    private var pendingSurfaceGeometry: (geometry: NativeVideoGeometry, seconds: Double)?
+
+    private func scheduleSurfaceGeometry(_ geometry: NativeVideoGeometry, at seconds: Double) {
+        pendingSurfaceGeometry = (geometry, seconds)
+        applyPendingSurfaceGeometryIfDue()
+    }
+
+    /// Called from presentation observations, which run as frames are
+    /// enqueued and the clock advances.
+    private func applyPendingSurfaceGeometryIfDue() {
+        guard let pending = pendingSurfaceGeometry else { return }
+        let now = presentation.currentTime.seconds
+        // A small lead covers observation latency; never switch early by
+        // more than a frame at 60 fps.
+        guard now.isFinite, now + 0.016 >= pending.seconds else { return }
+        pendingSurfaceGeometry = nil
+        setSourceSurfaceGeometry(
+            displaySize: pending.geometry.displaySize,
+            rotationDegrees: pending.geometry.rotationDegrees
+        )
+    }
+
+    /// After a seek the session's geometry describes the frames that follow,
+    /// whichever side of a format change the target is on.
+    private func adoptSessionSurfaceGeometry(_ session: MediaSession) {
+        pendingSurfaceGeometry = nil
+        guard let geometry = session.currentVideoGeometry else { return }
+        setSourceSurfaceGeometry(displaySize: geometry.displaySize, rotationDegrees: geometry.rotationDegrees)
+    }
+
+    private func setSourceSurfaceGeometry(displaySize: CGSize, rotationDegrees: Double) {
+        sourceSurfaceGeometry = NativeVideoGeometry(displaySize: displaySize, rotationDegrees: rotationDegrees)
+        applySurfaceGeometry()
+    }
+
+    private var userRotationSwapsAxes: Bool { userRotation % 180 == 90 }
+
+    /// Composes the file's geometry with the user's rotation for the view.
+    private func applySurfaceGeometry() {
+        let size = sourceSurfaceGeometry.displaySize
+        surfaceHost?.rotationDegrees = (sourceSurfaceGeometry.rotationDegrees + Double(userRotation))
+            .truncatingRemainder(dividingBy: 360)
+        surfaceHost?.sourceDisplaySize = userRotationSwapsAxes
+            ? CGSize(width: size.height, height: size.width)
+            : size
+    }
+
+    // Interlaced streams are always deinterlaced (bwdif); there is no
+    // manual override. Turning it "off" (as Reset does) is accepted quietly.
+    public func setDeinterlace(_ enabled: Bool) {
+        guard enabled else { return }
+        unsupported("manual deinterlacing override")
+    }
+
     public func setVideoEqualizer(_ adjustments: VideoAdjustmentState) {
-        unsupported("video equalizer")
+        let next = VideoPictureAdjustments(adjustments)
+        guard next != pictureAdjustments else { return }
+        pictureAdjustments = next
+        applyVideoProcessingChange()
+    }
+
+    private func setVideoFilter(_ filter: VideoFilterPreset, enabled: Bool) {
+        let before = videoFilters
+        if enabled { videoFilters.insert(filter) } else { videoFilters.remove(filter) }
+        guard videoFilters != before else { return }
+        applyVideoProcessingChange()
+    }
+
+    /// Development switches combined with the user's picture settings.
+    var effectiveVideoProcessing: VideoFrameProcessingConfiguration {
+        var configuration = videoFrameProcessing
+        configuration.pictureAdjustments = pictureAdjustments.isNeutral ? nil : pictureAdjustments
+        configuration.filters.formUnion(videoFilters)
+        return configuration
+    }
+
+    private func applyVideoProcessingChange() {
+        session?.updateVideoProcessing(effectiveVideoProcessing)
+        refreshPausedPicture()
+    }
+
+    /// Shows a picture change while paused by presenting the displayed frame
+    /// again through the new settings: an exact seek just before it, at rate
+    /// zero. Requests during a refresh collapse into one more.
+    private func refreshPausedPicture() {
+        guard let session, presentation.rate == 0, !desiredPlaying else { return }
+        // Another seek is running (ours or the app's): its frame may already
+        // have been processed with the old settings, so repaint once it
+        // completes.
+        guard pictureRefreshGeneration == nil, !session.seekInProgress else {
+            pictureRefreshPending = true
+            return
+        }
+        let displayed = presentation.video.renderer.displayedPixelBuffer()
+            .flatMap { presentation.video.identity(for: $0) }
+            .flatMap { $0.generation == session.currentGeneration ? $0 : nil }
+        let target = pictureRefreshAnchor ?? displayed?.time ?? currentTime
+        pictureRefreshAnchor = target
+        // An exact seek shows the first frame at or after the target; aim a
+        // millisecond early so rounding cannot skip the displayed frame.
+        let generation = session.seek(
+            to: max(target - 0.001, 0),
+            exact: true,
+            resumeRate: 0
+        )
+        pictureRefreshGeneration = (activeSessionID, generation)
+    }
+
+    /// Called for every seek outcome. A superseded refresh never reports its
+    /// own generation, so any later generation (or another session) ends it;
+    /// a refresh waiting on any seek then runs.
+    private func pictureRefreshDidFinish(generation: Int, sessionID: PlaybackSessionID) {
+        if let refresh = pictureRefreshGeneration,
+           refresh.session != sessionID || generation >= refresh.generation {
+            pictureRefreshGeneration = nil
+        }
+        guard pictureRefreshPending, pictureRefreshGeneration == nil,
+              sessionID == activeSessionID
+        else { return }
+        pictureRefreshPending = false
+        refreshPausedPicture()
     }
 
     public func setPictureInPictureActive(_ active: Bool) {
@@ -1926,6 +2100,16 @@ public final class NativePlaybackRuntime: PlaybackRuntime {
     }
 
     public func execute(_ command: IlliquidCore.PlaybackCommand) async throws {
+        switch command {
+        case let .addVideoFilter(filter) where capabilities.contains(.videoFilters):
+            setVideoFilter(filter, enabled: true)
+            return
+        case let .removeVideoFilter(filter) where capabilities.contains(.videoFilters):
+            setVideoFilter(filter, enabled: false)
+            return
+        default:
+            break
+        }
         guard case let .screenshot(url, includeSubtitles) = command else {
             throw UnsupportedPlaybackCapabilityError(String(describing: command))
         }
@@ -1943,13 +2127,18 @@ public final class NativePlaybackRuntime: PlaybackRuntime {
             8192 / max(viewSize.width, viewSize.height, 1),
             sqrt(33_554_432 / max(viewSize.width * viewSize.height, 1)))
         let size = CGSize(width: floor(viewSize.width * scale), height: floor(viewSize.height * scale))
-        let viewport = VideoPresentationGeometry(sourceSize: geometry.displaySize,
+        // Capture what the view shows, including the user's rotation.
+        let displaySize = userRotationSwapsAxes
+            ? CGSize(width: geometry.displaySize.height, height: geometry.displaySize.width)
+            : geometry.displaySize
+        let rotation = (geometry.rotationDegrees + Double(userRotation)).truncatingRemainder(dividingBy: 360)
+        let viewport = VideoPresentationGeometry(sourceSize: displaySize,
             bounds: CGRect(origin: .zero, size: size), adjustments: videoAdjustments).imageRect
         let regions = includeSubtitles ? subtitles.renderedRegions(
             at: CMTime(seconds: frameIdentity.time, preferredTimescale: 60_000),
-            viewport: viewport, videoSize: geometry.displaySize) : []
-        let capture = NativeScreenshot(buffer: buffer, displaySize: geometry.displaySize,
-            rotation: geometry.rotationDegrees, mirrored: surfaceHost.isHorizontallyMirrored,
+            viewport: viewport, videoSize: displaySize) : []
+        let capture = NativeScreenshot(buffer: buffer, displaySize: displaySize,
+            rotation: rotation, mirrored: surfaceHost.isHorizontallyMirrored,
             size: size, adjustments: videoAdjustments, regions: regions)
         let data = try await Task.detached(priority: .userInitiated) { try capture.png() }.value
         guard identity == activeSessionID, session.currentGeneration == frameIdentity.generation else { throw CancellationError() }
@@ -1963,6 +2152,7 @@ public final class NativePlaybackRuntime: PlaybackRuntime {
         milliRate: Int32? = nil
     ) -> Int? {
         guard let session else { return nil }
+        pictureRefreshAnchor = nil
         currentTime = max(position, 0)
         // The core's wake effect carries the rate to resume at; the cached
         // speed is only the fallback for direct (test) callers.
@@ -2329,6 +2519,7 @@ public final class NativePlaybackRuntime: PlaybackRuntime {
         let reservesVideoPipelineCapacity = reservesVideoPipelineCapacity
         let videoPipelineCapacityOverride = videoPipelineCapacityOverride
         let usesFairDemuxDispatch = usesFairDemuxDispatch
+        let videoFrameProcessing = effectiveVideoProcessing
         let softwarePlanarOutputMaximumBufferCount =
             softwarePlanarOutputMaximumBufferCount
         let presentation = presentation
@@ -2383,6 +2574,7 @@ public final class NativePlaybackRuntime: PlaybackRuntime {
                         softwarePlanarOutputMaximumBufferCount:
                             softwarePlanarOutputMaximumBufferCount,
                         initialBufferTargets: AdaptiveBufferPolicy.initial,
+                        videoFrameProcessing: videoFrameProcessing,
                         constructionCancellation: constructionCancellation,
                         sessionID: replacementSessionID,
                         onLifecycleTrace: { stage in
@@ -2732,15 +2924,14 @@ public final class NativePlaybackRuntime: PlaybackRuntime {
         currentURL = request.media.source.url
         setSubtitleDiagnosticMediaIdentity(currentURL?.lastPathComponent)
         selectedAudioIndex = replacement.activeAudioStream?.index
-        surfaceHost?.rotationDegrees = replacement.mediaInfo.videoStreams.first {
+        let selectedVideoStream = replacement.mediaInfo.videoStreams.first {
             $0.index == replacement.mediaInfo.selectedVideoIndex
-        }?.rotationDegrees ?? 0
-        surfaceHost?.isHorizontallyMirrored = replacement.mediaInfo.videoStreams.first {
-            $0.index == replacement.mediaInfo.selectedVideoIndex
-        }?.isMirrored ?? false
-        surfaceHost?.sourceDisplaySize = replacement.mediaInfo.videoStreams.first {
-            $0.index == replacement.mediaInfo.selectedVideoIndex
-        }?.displaySize ?? .zero
+        }
+        surfaceHost?.isHorizontallyMirrored = selectedVideoStream?.isMirrored ?? false
+        setSourceSurfaceGeometry(
+            displaySize: selectedVideoStream?.displaySize ?? .zero,
+            rotationDegrees: selectedVideoStream?.rotationDegrees ?? 0
+        )
         replacement.videoAdjustments = videoAdjustments
         surfaceHost?.videoAdjustments = videoAdjustments
         currentTime = committedSeekTarget ?? 0
@@ -3130,6 +3321,11 @@ public final class NativePlaybackRuntime: PlaybackRuntime {
     private func consumeRuntimeObservation() {
         guard let session else { return }
         defer { refreshPresentationObservationCadence() }
+        if let change = session.takePendingVideoGeometry() {
+            scheduleSurfaceGeometry(change.geometry, at: change.effectiveSeconds)
+        } else {
+            applyPendingSurfaceGeometryIfDue()
+        }
         if previewSeekInFlight, !session.seekInProgress {
             previewSeekInFlight = false
         }
@@ -3293,6 +3489,7 @@ public final class NativePlaybackRuntime: PlaybackRuntime {
     }
 
     private func dispatchPendingPreviewSeekIfReady(session: MediaSession) {
+        pictureRefreshAnchor = nil
         guard !previewSeekInFlight, let pending = pendingPreviewSeek else { return }
         pendingPreviewSeek = nil
         if let effectID = pending.effectID,
@@ -3325,10 +3522,12 @@ public final class NativePlaybackRuntime: PlaybackRuntime {
             nativeSessionID: sessionID,
             nativeGeneration: generation
         )
+        pictureRefreshDidFinish(generation: generation, sessionID: sessionID)
         guard sessionID == activeSessionID,
               let session,
               session.currentGeneration == generation
         else { return }
+        adoptSessionSurfaceGeometry(session)
         emit(.seekCompleted)
         if let transaction {
             if transaction.kind == .wake,
@@ -3365,6 +3564,7 @@ public final class NativePlaybackRuntime: PlaybackRuntime {
         failure: PlaybackFailure,
         sessionID: PlaybackSessionID
     ) {
+        pictureRefreshDidFinish(generation: generation, sessionID: sessionID)
         let transaction = takeOperation(
             nativeSessionID: sessionID,
             nativeGeneration: generation
@@ -3791,6 +3991,19 @@ public final class NativePlaybackRuntime: PlaybackRuntime {
                 supersessionCode: "recoverySuperseded"
             )
             guard operations.transaction(effectID: transaction.effectID) != nil else { return }
+            if stream == .video {
+                // Presentation already continued (it no longer waits for
+                // this), and nothing is flushed: flushing stopped the clock
+                // with nothing to restart it and dropped every queued sample.
+                // Take any geometry change the observations have not yet; the
+                // surface switches when its first frame is due.
+                if let change = formatSession.completeFormatReconfiguration(stream, revision: revision) {
+                    scheduleSurfaceGeometry(change.geometry, at: change.effectiveSeconds)
+                }
+                finishOperation(effectID: transaction.effectID)
+                return
+            }
+            let resumeAfterFlush = desiredPlaying
             let fence = presentation.installFenceAndRequestFlush(
                 at: presentation.currentTime,
                 removeDisplayedImage: false
@@ -3804,11 +4017,10 @@ public final class NativePlaybackRuntime: PlaybackRuntime {
                     stream,
                     revision: revision
                 )
-                if stream == .video,
-                   let geometry = formatSession.currentVideoGeometry
-                {
-                    self.surfaceHost?.rotationDegrees = geometry.rotationDegrees
-                    self.surfaceHost?.sourceDisplaySize = geometry.displaySize
+                // The flush stopped the clock; playback continues from the
+                // flush point with the new format.
+                if resumeAfterFlush, self.desiredPlaying, self.session === formatSession {
+                    _ = formatSession.requestTransport(playing: true, speed: self.playbackSpeed)
                 }
             }
         case let .correctAudioVideoDrift(microseconds):
@@ -4531,6 +4743,28 @@ func nativePeriodicMetricsPayloads(
                 + "max-delay-ms=\(String(format: "%.3f", maximumDelayMilliseconds)) "
                 + "max-urgent-delay-ms=\(String(format: "%.3f", maximumUrgentDelayMilliseconds)) "
                 + "sources=\(sourceCounts)"
+        ),
+    ] + nativeVideoProcessingPayloads(snapshot.videoProcessing)
+}
+
+/// Emitted only when a processing stage is configured, so sessions without
+/// processing keep their existing diagnostics.
+func nativeVideoProcessingPayloads(
+    _ processing: VideoFrameProcessingSnapshot?
+) -> [PlaybackRuntimeEventPayload] {
+    guard let processing else { return [] }
+    return [
+        .diagnostic(
+            "[native-video-processing] stages=\(processing.stageNames.joined(separator: "+")) "
+                + "in=\(processing.inputFrames) out=\(processing.outputFrames) "
+                + "synthesized=\(processing.synthesizedFrames) "
+                + "overruns=\(processing.overruns) "
+                + "synthesis-suspended=\(processing.synthesisSuspended) "
+                + "last-ms=\(String(format: "%.3f", processing.lastProcessingMilliseconds)) "
+                + "configure-ms=\(String(format: "%.1f", processing.configurationMilliseconds)) "
+                + "warming-up=\(processing.warmingUp) "
+                + "stage-unavailable=\(processing.stageUnavailableReason ?? "none") "
+                + "bypass=\(processing.bypassReason ?? "none")"
         ),
     ]
 }

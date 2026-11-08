@@ -246,3 +246,310 @@ fragment float2 pip_hdr_chroma_fragment(PiPVideoVertexOut input [[stage_in]],
     float2 code = c * ((encoding & 1) != 0 ? 1023.0 : 896.0) + 512.0;
     return round(clamp(code, 0.0, 1023.0)) * (64.0 / 65535.0);
 }
+
+// Video frame processing. Matches VideoTransformUniforms in
+// MetalTransformStage.swift.
+struct VideoTransformUniforms {
+    float4 mapX;
+    float4 mapY;
+    float2 sourceMin;
+    float2 sourceMax;
+    float2 stepU;
+    float2 stepV;
+};
+
+// Resamples one plane. Output pixel centers map to normalized source
+// coordinates through an affine transform; sampling stays inside the crop so
+// pixels outside it never bleed in. Chroma planes use the same normalized
+// mapping as luma, so 4:2:0 siting follows the source buffer's layout.
+kernel void video_transform_plane(
+    texture2d<float, access::sample> source [[texture(0)]],
+    texture2d<float, access::write> destination [[texture(1)]],
+    constant VideoTransformUniforms &uniforms [[buffer(0)]],
+    uint2 gid [[thread_position_in_grid]])
+{
+    uint width = destination.get_width();
+    uint height = destination.get_height();
+    if (gid.x >= width || gid.y >= height) {
+        return;
+    }
+    constexpr sampler bilinear(coord::normalized, address::clamp_to_edge, filter::linear);
+    float2 uv = (float2(gid) + 0.5) / float2(width, height);
+    float3 point = float3(uv, 1.0);
+    float2 coordinate = float2(dot(uniforms.mapX.xyz, point), dot(uniforms.mapY.xyz, point));
+    float2 halfTexel = 0.5 / float2(source.get_width(), source.get_height());
+    float2 lower = uniforms.sourceMin + halfTexel;
+    float2 upper = max(lower, uniforms.sourceMax - halfTexel);
+    float4 value;
+    if (any(uniforms.stepU != 0.0) || any(uniforms.stepV != 0.0)) {
+        value = source.sample(bilinear, clamp(coordinate - uniforms.stepU - uniforms.stepV, lower, upper))
+            + source.sample(bilinear, clamp(coordinate + uniforms.stepU - uniforms.stepV, lower, upper))
+            + source.sample(bilinear, clamp(coordinate - uniforms.stepU + uniforms.stepV, lower, upper))
+            + source.sample(bilinear, clamp(coordinate + uniforms.stepU + uniforms.stepV, lower, upper));
+        value *= 0.25;
+    } else {
+        value = source.sample(bilinear, clamp(coordinate, lower, upper));
+    }
+    destination.write(value, gid);
+}
+
+// Matches VideoColorConversionUniforms in MetalRGBAConverter.swift.
+struct VideoColorConversionUniforms {
+    float4 coefficients;
+    float lumaOffset;
+    float lumaScale;
+    float chromaOffset;
+    float chromaScale;
+};
+
+// Bi-planar 4:2:0 Y'CbCr to RGBA. Removes the matrix and range only; the
+// output keeps the source's transfer function and primaries.
+kernel void video_ycbcr_to_rgba(
+    texture2d<float, access::sample> luma [[texture(0)]],
+    texture2d<float, access::sample> chroma [[texture(1)]],
+    texture2d<float, access::write> destination [[texture(2)]],
+    constant VideoColorConversionUniforms &uniforms [[buffer(0)]],
+    uint2 gid [[thread_position_in_grid]])
+{
+    uint width = destination.get_width();
+    uint height = destination.get_height();
+    if (gid.x >= width || gid.y >= height) {
+        return;
+    }
+    constexpr sampler bilinear(coord::normalized, address::clamp_to_edge, filter::linear);
+    float2 uv = (float2(gid) + 0.5) / float2(width, height);
+    float y = (luma.sample(bilinear, uv).r - uniforms.lumaOffset) * uniforms.lumaScale;
+    float2 c = (chroma.sample(bilinear, uv).rg - uniforms.chromaOffset) * uniforms.chromaScale;
+    float3 rgb = float3(
+        y + uniforms.coefficients.x * c.y,
+        y - uniforms.coefficients.y * c.x - uniforms.coefficients.z * c.y,
+        y + uniforms.coefficients.w * c.x);
+    destination.write(float4(saturate(rgb), 1.0), gid);
+}
+
+kernel void video_bgra_to_rgba(
+    texture2d<float, access::read> source [[texture(0)]],
+    texture2d<float, access::write> destination [[texture(1)]],
+    uint2 gid [[thread_position_in_grid]])
+{
+    if (gid.x >= destination.get_width() || gid.y >= destination.get_height()) {
+        return;
+    }
+    destination.write(source.read(gid), gid);
+}
+
+// ---------------------------------------------------------------------------
+// Picture filters. Each kernel processes one plane of a bi-planar 4:2:0
+// buffer, or the single plane of a BGRA buffer, reading `source` and writing
+// `destination` at the same size.
+
+// Matches PictureAdjustmentUniforms in PictureAdjustmentStage.swift.
+struct PictureAdjustmentUniforms {
+    float brightness;
+    float contrast;
+    float saturation;
+    float gammaExponent;
+    float hueCos;
+    float hueSin;
+    float lumaOffset;
+    float lumaScale;
+    float chromaOffset;
+    float chromaScale;
+    float padding0;
+    float padding1;
+};
+
+static float adjust_luma(float y, constant PictureAdjustmentUniforms &u) {
+    y = (y - 0.5) * u.contrast + 0.5 + u.brightness;
+    // Sign-preserving gamma: video-range codes below black stay below black
+    // instead of clipping as soon as any adjustment is active.
+    return sign(y) * pow(abs(y), u.gammaExponent);
+}
+
+static float2 adjust_chroma(float2 c, constant PictureAdjustmentUniforms &u) {
+    float2 rotated = float2(c.x * u.hueCos - c.y * u.hueSin, c.x * u.hueSin + c.y * u.hueCos);
+    return rotated * u.saturation * u.contrast;
+}
+
+kernel void picture_adjust_luma(
+    texture2d<float, access::read> source [[texture(0)]],
+    texture2d<float, access::write> destination [[texture(1)]],
+    constant PictureAdjustmentUniforms &u [[buffer(0)]],
+    uint2 gid [[thread_position_in_grid]])
+{
+    if (gid.x >= destination.get_width() || gid.y >= destination.get_height()) { return; }
+    float y = (source.read(gid).r - u.lumaOffset) * u.lumaScale;
+    y = adjust_luma(y, u);
+    destination.write(float4(saturate(y / u.lumaScale + u.lumaOffset)), gid);
+}
+
+kernel void picture_adjust_chroma(
+    texture2d<float, access::read> source [[texture(0)]],
+    texture2d<float, access::write> destination [[texture(1)]],
+    constant PictureAdjustmentUniforms &u [[buffer(0)]],
+    uint2 gid [[thread_position_in_grid]])
+{
+    if (gid.x >= destination.get_width() || gid.y >= destination.get_height()) { return; }
+    float2 c = (source.read(gid).rg - u.chromaOffset) * u.chromaScale;
+    c = adjust_chroma(c, u);
+    float2 coded = saturate(c / u.chromaScale + u.chromaOffset);
+    destination.write(float4(coded, 0.0, 1.0), gid);
+}
+
+// BGRA: adjust in BT.601 Y'CbCr, then return to RGB.
+kernel void picture_adjust_rgb(
+    texture2d<float, access::read> source [[texture(0)]],
+    texture2d<float, access::write> destination [[texture(1)]],
+    constant PictureAdjustmentUniforms &u [[buffer(0)]],
+    uint2 gid [[thread_position_in_grid]])
+{
+    if (gid.x >= destination.get_width() || gid.y >= destination.get_height()) { return; }
+    float4 color = source.read(gid);
+    const float kr = 0.299, kb = 0.114, kg = 1.0 - kr - kb;
+    float y = kr * color.r + kg * color.g + kb * color.b;
+    float2 c = float2((color.b - y) / (2.0 * (1.0 - kb)), (color.r - y) / (2.0 * (1.0 - kr)));
+    y = adjust_luma(y, u);
+    c = adjust_chroma(c, u);
+    float r = y + 2.0 * (1.0 - kr) * c.y;
+    float b = y + 2.0 * (1.0 - kb) * c.x;
+    float g = (y - kr * r - kb * b) / kg;
+    destination.write(float4(saturate(float3(r, g, b)), color.a), gid);
+}
+
+// Contrast-adaptive sharpening (after AMD FidelityFX CAS): the weight falls as
+// local contrast rises, so edges sharpen without ringing and flat areas are
+// left alone. `strength` is 0...1.
+struct SharpenUniforms {
+    float strength;
+    float padding0;
+    float padding1;
+    float padding2;
+};
+
+static float4 cas(texture2d<float, access::read> t, int2 p, float strength) {
+    int2 limit = int2(t.get_width() - 1, t.get_height() - 1);
+    float4 e = t.read(uint2(clamp(p, int2(0), limit)));
+    float4 b = t.read(uint2(clamp(p + int2(0, -1), int2(0), limit)));
+    float4 d = t.read(uint2(clamp(p + int2(-1, 0), int2(0), limit)));
+    float4 f = t.read(uint2(clamp(p + int2(1, 0), int2(0), limit)));
+    float4 h = t.read(uint2(clamp(p + int2(0, 1), int2(0), limit)));
+    float4 mn = min(e, min(min(b, d), min(f, h)));
+    float4 mx = max(e, max(max(b, d), max(f, h)));
+    float4 amp = sqrt(saturate(min(mn, 1.0 - mx) / max(mx, 1e-5)));
+    float4 w = amp * (-1.0 / mix(8.0, 5.0, strength));
+    return saturate((b * w + d * w + f * w + h * w + e) / (1.0 + 4.0 * w));
+}
+
+kernel void sharpen_plane(
+    texture2d<float, access::read> source [[texture(0)]],
+    texture2d<float, access::write> destination [[texture(1)]],
+    constant SharpenUniforms &u [[buffer(0)]],
+    uint2 gid [[thread_position_in_grid]])
+{
+    if (gid.x >= destination.get_width() || gid.y >= destination.get_height()) { return; }
+    float4 value = cas(source, int2(gid), u.strength);
+    value.a = source.read(gid).a;
+    destination.write(value, gid);
+}
+
+// Hash-based noise; stable per pixel and seed.
+static float noise(uint2 p, uint seed) {
+    uint h = p.x * 1973u + p.y * 9277u + seed * 26699u;
+    h = (h ^ 61u) ^ (h >> 16);
+    h *= 9u;
+    h ^= h >> 4;
+    h *= 0x27d4eb2du;
+    h ^= h >> 15;
+    return float(h & 0x00ffffffu) / float(0x01000000u);
+}
+
+// Deband (after libplacebo): replace each pixel by the mean of four random
+// samples at growing radii when every sample is within the threshold, i.e.
+// the area is a smooth gradient rather than detail; then add fine grain to
+// hide residual steps.
+struct DebandUniforms {
+    float threshold;
+    float radius;
+    float grain;
+    uint iterations;
+    uint seed;
+    uint padding0;
+    uint padding1;
+    uint padding2;
+};
+
+kernel void deband_plane(
+    texture2d<float, access::sample> source [[texture(0)]],
+    texture2d<float, access::write> destination [[texture(1)]],
+    constant DebandUniforms &u [[buffer(0)]],
+    uint2 gid [[thread_position_in_grid]])
+{
+    uint width = destination.get_width();
+    uint height = destination.get_height();
+    if (gid.x >= width || gid.y >= height) { return; }
+    constexpr sampler bilinear(coord::pixel, address::clamp_to_edge, filter::linear);
+    float2 center = float2(gid) + 0.5;
+    float4 original = source.sample(bilinear, center);
+    float4 value = original;
+    for (uint i = 1; i <= u.iterations; i++) {
+        float distance = noise(gid, u.seed + i * 2u) * u.radius * float(i) / float(u.iterations);
+        float angle = noise(gid, u.seed + i * 2u + 1u) * 6.2831853;
+        float2 o = float2(cos(angle), sin(angle)) * distance;
+        float4 mean = (source.sample(bilinear, center + o) + source.sample(bilinear, center - o)
+            + source.sample(bilinear, center + float2(-o.y, o.x))
+            + source.sample(bilinear, center + float2(o.y, -o.x))) * 0.25;
+        float4 difference = abs(original - mean);
+        float limit = u.threshold / float(i);
+        value = select(value, mean, difference < limit);
+    }
+    float grain = (noise(gid, u.seed + 97u) - 0.5) * u.grain;
+    value.rgb = saturate(value.rgb + grain);
+    value.a = original.a;
+    destination.write(value, gid);
+}
+
+// Denoise: an edge-preserving 3x3 spatial smooth, then motion-adaptive
+// temporal blending with the previous output. Pixels that changed a lot keep
+// the current frame, so motion does not ghost.
+struct DenoiseUniforms {
+    float rangeSigma;
+    float temporalSigma;
+    float temporalStrength;
+    uint hasHistory;
+};
+
+kernel void denoise_plane(
+    texture2d<float, access::read> source [[texture(0)]],
+    texture2d<float, access::write> destination [[texture(1)]],
+    texture2d<float, access::read> history [[texture(2)]],
+    constant DenoiseUniforms &u [[buffer(0)]],
+    uint2 gid [[thread_position_in_grid]])
+{
+    uint width = destination.get_width();
+    uint height = destination.get_height();
+    if (gid.x >= width || gid.y >= height) { return; }
+    int2 limit = int2(width - 1, height - 1);
+    float4 center = source.read(gid);
+    float4 sum = 0.0;
+    float4 weights = 0.0;
+    float rangeScale = -0.5 / (u.rangeSigma * u.rangeSigma);
+    for (int dy = -1; dy <= 1; dy++) {
+        for (int dx = -1; dx <= 1; dx++) {
+            float4 v = source.read(uint2(clamp(int2(gid) + int2(dx, dy), int2(0), limit)));
+            float spatial = (dx == 0 && dy == 0) ? 1.0 : ((dx == 0 || dy == 0) ? 0.6 : 0.36);
+            float4 diff = v - center;
+            float4 w = spatial * exp(diff * diff * rangeScale);
+            sum += v * w;
+            weights += w;
+        }
+    }
+    float4 smoothed = sum / max(weights, 1e-5);
+    if (u.hasHistory != 0) {
+        float4 previous = history.read(gid);
+        float4 change = smoothed - previous;
+        float4 k = u.temporalStrength * exp(change * change * (-0.5 / (u.temporalSigma * u.temporalSigma)));
+        smoothed = mix(smoothed, previous, k);
+    }
+    smoothed.a = center.a;
+    destination.write(smoothed, gid);
+}
