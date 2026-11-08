@@ -721,7 +721,13 @@ struct PlanarSoftwareOutputExperimentTests {
         #expect(decoder.planarExperimentDiagnostics?.uniqueBuffers == 1)
     }
 
-    @Test func planarEOFDrainAndTeardownAreBounded() throws {
+    /// The fixture carries one displayed frame per packet. A single-threaded
+    /// decoder emits at most one frame per packet. Frame-threaded dav1d delays
+    /// output and can release two frames from one call, so threaded decoding is
+    /// bounded by input instead: output never runs ahead of packets submitted,
+    /// and drain delivers every remaining frame.
+    @Test(arguments: [1, 0])
+    func planarEOFDrainAndTeardownAreBounded(threads: Int) throws {
         guard let fixtures else { return }
         let url = fixtures.appendingPathComponent("av1-video-only.mkv")
         guard FileManager.default.fileExists(atPath: url.path) else { return }
@@ -735,20 +741,25 @@ struct PlanarSoftwareOutputExperimentTests {
             preferHardware: false,
             softwareOutputMode: .planarExperiment(
                 rendererAttributes: rendererAttributes(presenter)
-            )
+            ),
+            softwareDecoderThreadCount: threads
         )
         var frames = 0
+        var packets = 0
         while let packet = try demuxer.readPacket(generation: 9) {
             guard packet.streamIndex == stream.index else { continue }
+            packets += 1
             let decoded = try decoder.decode(packet)
-            #expect(decoded.count <= 1)
+            if threads == 1 { #expect(decoded.count <= 1) }
             #expect(decoded.allSatisfy { $0.generation == 9 })
             frames += decoded.count
+            #expect(frames <= packets)
         }
         let drained = try decoder.drain(generation: 9)
         #expect(drained.allSatisfy { $0.generation == 9 })
         frames += drained.count
-        #expect(frames > 0)
+        #expect(packets > 0)
+        #expect(frames == packets)
         #expect(decoder.planarExperimentDiagnostics?.timeouts == 0)
         #expect(decoder.planarExperimentDiagnostics?.uniqueBuffers ?? 0
             <= SoftwareBGRAOutputPool.qualifiedMaximumBufferCount)

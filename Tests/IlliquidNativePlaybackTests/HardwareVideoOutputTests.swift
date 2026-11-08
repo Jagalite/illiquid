@@ -61,9 +61,7 @@ struct HardwareVideoOutputTests {
             decoder.seekOutputFloor = (1, target)
         }
         var frames: [Output] = []
-        while frames.count < 12, let packet = try demuxer.readPacket(generation: 1) {
-            guard packet.streamIndex == stream.index else { continue }
-            try decoder.decode(packet, while: { true }) { frame in
+        func collect(_ frame: NativeDecodedVideoFrame) throws {
                 #expect(frame.isHardwareDecoded == hardware)
                 let buffer = frame.pixelBuffer
                 let format = CVPixelBufferGetPixelFormatType(buffer)
@@ -95,7 +93,16 @@ struct HardwareVideoOutputTests {
                     fullRange: frame.isFullRange, primaries: frame.colorPrimaries,
                     transfer: frame.transferCharacteristic, matrix: frame.matrixCoefficients,
                     pixelFormat: format, planes: planes))
-            }
+        }
+        while frames.count < 12, let packet = try demuxer.readPacket(generation: 1) {
+            guard packet.streamIndex == stream.index else { continue }
+            try decoder.decode(packet, while: { true }, emit: collect)
+        }
+        // Decoders may hold the final frames until end of stream (the
+        // supplemental VP9 decoder holds more than libvpx); playback drains at
+        // EOF, so compare the same complete output.
+        if frames.count < 12 {
+            try decoder.drain(generation: 1, while: { true }, emit: collect)
         }
         try #require(frames.count >= 12)
         return Array(frames.prefix(12))

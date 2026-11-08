@@ -113,8 +113,10 @@ struct AudioDelayTests {
         await backend.shutdown()
     }
 
+    /// Real sessions preroll here; a loaded machine running the parallel suite
+    /// measured over 5 s. The deadline only bounds a genuine hang.
     @MainActor private func waitUntil(_ predicate: () -> Bool) async -> Bool {
-        let deadline = Date().addingTimeInterval(5)
+        let deadline = Date().addingTimeInterval(15)
         while Date() < deadline {
             if predicate() { return true }
             try? await Task.sleep(for: .milliseconds(10))

@@ -6,7 +6,6 @@ import Testing
 @Suite("Input read failure bounds", .serialized)
 struct InputReadFailureTests {
     private final class Probe: @unchecked Sendable {
-        let started = DispatchSemaphore(value: 0)
         let release = DispatchSemaphore(value: 0)
         let blocksFirst: Bool
         let code: Int32
@@ -18,14 +17,12 @@ struct InputReadFailureTests {
         }
         func read(_ generation: Int) throws -> FFmpegPacket? {
             let first = lock.withLock { reads.append(generation); return reads.count == 1 }
-            if first {
-                started.signal()
-                if blocksFirst { _ = release.wait(timeout: .now() + 5) }
-            }
+            // The timeout only prevents a hung test. It must not race the test's
+            // own seek-then-release ordering on a heavily loaded machine.
+            if first, blocksFirst { _ = release.wait(timeout: .now() + 30) }
             if blocksFirst && !first { return nil }
             throw FFmpegError(operation: "Injected input read", code: code)
         }
-        func awaitStart() -> Bool { started.wait(timeout: .now() + 3) == .success }
         func failed() { lock.withLock { failures += 1 } }
         var snapshot: (reads: [Int], failures: Int) { lock.withLock { (reads, failures) } }
     }
@@ -64,11 +61,11 @@ struct InputReadFailureTests {
         let session = try makeSession(url, loop: loop, probe: probe, presentation: presentation, pipeline: pipeline)
         defer { probe.release.signal(); session.stop(); _ = session.waitForShutdown(); pipeline.terminate(); presentation.terminate() }
         session.start(rate: 0)
-        let started = await Task.detached { probe.awaitStart() }.value
+        let started = await waitForFirstRead(probe)
         try #require(started)
         let next = session.seek(to: 0.25, exact: true, resumeRate: 0)
         probe.release.signal()
-        let deadline = ContinuousClock.now + .seconds(2)
+        let deadline = ContinuousClock.now + .seconds(10)
         while probe.snapshot.reads.count < 2, probe.snapshot.failures == 0, ContinuousClock.now < deadline {
             try await Task.sleep(for: .milliseconds(5))
         }
@@ -88,13 +85,24 @@ struct InputReadFailureTests {
         let session = try makeSession(url, loop: loop, probe: probe, presentation: presentation, pipeline: pipeline)
         defer { probe.release.signal(); session.stop(); _ = session.waitForShutdown(); pipeline.terminate(); presentation.terminate() }
         session.start(rate: 0)
-        let started = await Task.detached { probe.awaitStart() }.value
+        let started = await waitForFirstRead(probe)
         try #require(started)
         session.stop()
         probe.release.signal()
         #expect(session.waitForShutdown())
         #expect(probe.snapshot.reads == [0])
         #expect(probe.snapshot.failures == 0)
+    }
+
+    /// Polls instead of blocking a cooperative thread on a semaphore. Under a
+    /// parallel suite, blocked detached tasks could exhaust the pool long enough
+    /// for the probe's 5 s release timeout to fail the read before the seek.
+    @MainActor private func waitForFirstRead(_ probe: Probe) async -> Bool {
+        let deadline = ContinuousClock.now + .seconds(3)
+        while probe.snapshot.reads.isEmpty, ContinuousClock.now < deadline {
+            try? await Task.sleep(for: .milliseconds(2))
+        }
+        return !probe.snapshot.reads.isEmpty
     }
 
     @MainActor private func makeSession(_ url: URL, loop: String, probe: Probe,
