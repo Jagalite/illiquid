@@ -1337,6 +1337,48 @@ private enum ElasticPlaybackGestureMode: Equatable {
 
 /// A custom playback surface whose centerline deforms continuously as its
 /// pointer-tracked center approaches either side of the player.
+/// Memoizes sidebar-avoiding geometry across body evaluations. Hover and
+/// thumbnail state live on the root view, so every pointer move re-runs its
+/// body; rebuilding a bent bar integrates the surface with trigonometry for
+/// each sampled point. The inputs change only on resize, drag or relayout.
+/// Holds the full-utility layout and the fitted fallback layout.
+@MainActor
+final class ElasticPlaybackControlBarGeometryCache {
+    struct Key: Equatable {
+        let containerSize: CGSize
+        let center: CGPoint
+        let utilityCount: Int
+        let bendDirection: ElasticPlaybackControlBarBendDirection
+        let orientation: ElasticPlaybackControlBarOrientation
+        let sidebarOccupiedWidth: CGFloat
+        let attachmentStrength: CGFloat?
+        let renderOffset: CGSize?
+    }
+
+    private var entries: [(key: Key, geometry: ElasticPlaybackControlBarGeometry)] = []
+    private(set) var misses = 0
+
+    func geometry(for key: Key) -> ElasticPlaybackControlBarGeometry {
+        if let index = entries.firstIndex(where: { $0.key == key }) {
+            return entries[index].geometry
+        }
+        misses += 1
+        let geometry = ElasticPlaybackControlBarGeometry.avoidingSidebar(
+            containerSize: key.containerSize,
+            center: key.center,
+            utilityCount: key.utilityCount,
+            bendDirection: key.bendDirection,
+            orientation: key.orientation,
+            sidebarOccupiedWidth: key.sidebarOccupiedWidth,
+            attachmentStrength: key.attachmentStrength,
+            renderOffset: key.renderOffset
+        )
+        entries.append((key, geometry))
+        if entries.count > 2 { entries.removeFirst(entries.count - 2) }
+        return geometry
+    }
+}
+
 struct ElasticPlaybackControlBar: View {
     @Bindable var model: AppModel
 
@@ -1358,6 +1400,7 @@ struct ElasticPlaybackControlBar: View {
     @State private var timelineThumbnailTask: Task<Void, Never>?
     @State private var timelineHoverLastMovement = ContinuousClock.now
     @State private var timelineThumbnailRequestID = 0
+    @State private var geometryCache = ElasticPlaybackControlBarGeometryCache()
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @Environment(\.playerTheme) private var theme
 
@@ -1382,29 +1425,24 @@ struct ElasticPlaybackControlBar: View {
                     from: normalizedCenter,
                     in: size
                 )
-            let fullGeometry = ElasticPlaybackControlBarGeometry.avoidingSidebar(
-                containerSize: size,
-                center: center,
-                utilityCount: activeUtilities.count,
-                bendDirection: bendDirection,
-                orientation: orientation,
-                sidebarOccupiedWidth: sidebarOccupiedWidth,
-                attachmentStrength: placement.attachmentStrength.map { CGFloat($0) },
-                renderOffset: placement.normalizedRenderOffset.map {
-                    CGSize(width: $0.width * size.width, height: $0.height * size.height)
-                }
-            )
-            let utilities = ElasticPlaybackUtility.fitting(activeUtilities, length: fullGeometry.totalLength)
-            let geometry = utilities.count == activeUtilities.count ? fullGeometry
-                : ElasticPlaybackControlBarGeometry.avoidingSidebar(
-                    containerSize: size, center: center, utilityCount: utilities.count,
-                    bendDirection: bendDirection, orientation: orientation,
+            let geometryKey = { (utilityCount: Int) in
+                ElasticPlaybackControlBarGeometryCache.Key(
+                    containerSize: size,
+                    center: center,
+                    utilityCount: utilityCount,
+                    bendDirection: bendDirection,
+                    orientation: orientation,
                     sidebarOccupiedWidth: sidebarOccupiedWidth,
                     attachmentStrength: placement.attachmentStrength.map { CGFloat($0) },
                     renderOffset: placement.normalizedRenderOffset.map {
                         CGSize(width: $0.width * size.width, height: $0.height * size.height)
                     }
                 )
+            }
+            let fullGeometry = geometryCache.geometry(for: geometryKey(activeUtilities.count))
+            let utilities = ElasticPlaybackUtility.fitting(activeUtilities, length: fullGeometry.totalLength)
+            let geometry = utilities.count == activeUtilities.count ? fullGeometry
+                : geometryCache.geometry(for: geometryKey(utilities.count))
             let shape = ElasticPlaybackControlBarShape(points: geometry.surfacePoints)
 
             ZStack {

@@ -80,7 +80,9 @@ struct PlayerCommands: Commands {
             Menu("A–B Loop") {
                 Button(model.loopStart.map { "A: \($0.formatted(.number.precision(.fractionLength(2))) + " s") — Set Again" } ?? "Set Start (A)", action: model.setLoopStart)
                 Button(model.loopEnd.map { "B: \($0.formatted(.number.precision(.fractionLength(2))) + " s") — Set Again" } ?? "Set End (B)", action: model.setLoopEnd)
-                    .disabled(!(model.loopStart.map { model.state.position > $0 } ?? false))
+                    // `setLoopEnd` rejects a position at or before A. Reading
+                    // `state.position` here would rebuild the menu on every tick.
+                    .disabled(model.loopStart == nil)
                 Button("Clear Loop", action: model.clearLoop).disabled(model.loopStart == nil)
             }.disabled(model.state.currentSource == nil)
             if model.player.supports(.saveScreenshot) {
