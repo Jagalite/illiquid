@@ -226,6 +226,23 @@ struct VideoFrameIdentitySynthesisTests {
 // MARK: - GPU and pipeline
 
 enum VideoProcessingTestSupport {
+    /// VideoToolbox can report a processor as supported and then fail its
+    /// first request, as it does on GitHub's virtualized macOS runners. The
+    /// pipeline then passes source frames through, which the fallback tests
+    /// cover. Tests that check generated frames need a processor that
+    /// actually runs, so they probe one with the same input first.
+    static func interpolationRuns(
+        _ configuration: VideoFrameProcessingConfiguration,
+        width: Int, height: Int, pixelFormat: OSType
+    ) -> Bool {
+        guard MTLCreateSystemDefaultDevice() != nil,
+              let pipeline = try? VideoFrameProcessingPipeline(configuration: configuration),
+              let buffer = try? makeBuffer(width: width, height: height, pixelFormat: pixelFormat)
+        else { return false }
+        _ = pipeline.process(frame(buffer, seconds: 0, duration: 1.0 / 24))
+        return pipeline.waitUntilReady(timeout: 30)
+    }
+
     static func makeBuffer(width: Int, height: Int, pixelFormat: OSType) throws -> CVPixelBuffer {
         let attributes: [String: Any] = [
             kCVPixelBufferIOSurfacePropertiesKey as String: [String: Any](),
@@ -688,7 +705,11 @@ struct VideoFrameProcessingPipelineTests {
         }
     }
 
-    @Test(.enabled(if: hasMetal && VideoToolboxLowLatencyInterpolator.isSupported))
+    @Test(.enabled(if: hasMetal && VideoToolboxLowLatencyInterpolator.isSupported
+        && Support.interpolationRuns(
+            VideoFrameProcessingConfiguration(frameRateConversion: VideoFrameRateConversion(targetFrameRate: 48)),
+            width: 640, height: 360, pixelFormat: kCVPixelFormatType_420YpCbCr8BiPlanarVideoRange
+        )))
     func videoToolboxGeneratesBetweenFrames() throws {
         let pipeline = try VideoFrameProcessingPipeline(configuration: VideoFrameProcessingConfiguration(
             frameRateConversion: VideoFrameRateConversion(targetFrameRate: 48)
@@ -828,7 +849,11 @@ struct VideoFrameInterpolatorSelectionTests {
         #expect(pipeline.snapshot.bypassReason?.contains("No interpolator") == true)
     }
 
-    @Test(.enabled(if: hasMetal && VideoToolboxFrameInterpolator.isSupported))
+    @Test(.enabled(if: hasMetal && VideoToolboxFrameInterpolator.isSupported
+        && Support.interpolationRuns(
+            VideoFrameProcessingConfiguration(frameRateConversion: VideoFrameRateConversion(targetFrameRate: 60)),
+            width: 640, height: 360, pixelFormat: kCVPixelFormatType_32BGRA
+        )))
     func videoToolboxInterpolatesBGRAThroughRGBA() throws {
         let pipeline = try VideoFrameProcessingPipeline(configuration: VideoFrameProcessingConfiguration(
             frameRateConversion: VideoFrameRateConversion(targetFrameRate: 60)
@@ -856,7 +881,14 @@ struct VideoFrameTransformInterpolationTests {
     /// Transformed frames feed interpolation and also reach the renderer.
     /// VideoToolbox writes into padding its own pools add; given another
     /// stage's buffer directly, it corrupted memory and crashed on release.
-    @Test(.enabled(if: MTLCreateSystemDefaultDevice() != nil && VideoToolboxLowLatencyInterpolator.isSupported))
+    @Test(.enabled(if: MTLCreateSystemDefaultDevice() != nil && VideoToolboxLowLatencyInterpolator.isSupported
+        && Support.interpolationRuns(
+            VideoFrameProcessingConfiguration(
+                transform: VideoFrameTransform(outputSize: .scale(0.5), flipsHorizontally: true),
+                frameRateConversion: VideoFrameRateConversion(targetFrameRate: 60)
+            ),
+            width: 640, height: 360, pixelFormat: kCVPixelFormatType_420YpCbCr8BiPlanarVideoRange
+        )))
     func transformedFramesSurviveInterpolation() throws {
         let pipeline = try VideoFrameProcessingPipeline(configuration: VideoFrameProcessingConfiguration(
             transform: VideoFrameTransform(outputSize: .scale(0.5), flipsHorizontally: true),
@@ -890,7 +922,11 @@ struct VideoFrameProcessingHighDefinitionTests {
 
     /// Ten-bit 1080p goes through RGBA conversion and full frame-rate
     /// conversion; a live run hung on its first frame.
-    @Test(.enabled(if: VideoToolboxFrameInterpolator.isSupported))
+    @Test(.enabled(if: VideoToolboxFrameInterpolator.isSupported
+        && Support.interpolationRuns(
+            VideoFrameProcessingConfiguration(frameRateConversion: VideoFrameRateConversion(targetFrameRate: 60)),
+            width: 1920, height: 1080, pixelFormat: kCVPixelFormatType_420YpCbCr10BiPlanarVideoRange
+        )))
     func tenBitHighDefinitionInterpolatesWithoutStalling() throws {
         let pipeline = try VideoFrameProcessingPipeline(configuration: VideoFrameProcessingConfiguration(
             frameRateConversion: VideoFrameRateConversion(targetFrameRate: 60)
