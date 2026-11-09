@@ -52,6 +52,8 @@ struct SourcesSidebar: View {
     @State private var filesystemDebounceTask: Task<Void, Never>?
     @State private var browserFilter = SourceBrowserFilter()
     @State private var filterTask: Task<Void, Never>?
+    @State private var presenceRefreshTask: Task<Void, Never>?
+    @State private var lastPresenceRefresh: ContinuousClock.Instant?
     @State private var thumbnailFocusedFolder: URL?
     @State private var scrollRowID: String?
     @State private var pendingScrollRestoration: String?
@@ -228,7 +230,12 @@ struct SourcesSidebar: View {
     var body: some View {
         sidebarWithSourceUpdates
         .onChange(of: mediaPresenceScanner.results) {
-            refreshVisibleRows(rebuildProjection: true)
+            refreshForMediaPresenceChange()
+        }
+        .onChange(of: mediaPresenceScanner.isScanning) { _, isScanning in
+            // The final batch publishes before the scan ends. Show it now
+            // instead of waiting for the throttled refresh.
+            if !isScanning, presenceRefreshTask != nil { refreshForMediaPresenceChange() }
         }
         .onChange(of: previewRegexRuleID) {
             refreshVisibleRows()
@@ -266,6 +273,8 @@ struct SourcesSidebar: View {
         mediaPresenceScanner.stop()
         filterTask?.cancel()
         filterTask = nil
+        presenceRefreshTask?.cancel()
+        presenceRefreshTask = nil
         resizeState.clear()
         layout.clear()
         directories.cancelAllLoads()
@@ -778,6 +787,33 @@ struct SourcesSidebar: View {
                 .foregroundStyle(.secondary)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
+    }
+
+    /// A presence scan publishes every 100 ms, and presence is part of the
+    /// tree projection key, so each publication forces a full rebuild that
+    /// also cancels the previous one. At about 650 ms per 10k-file build, an
+    /// unthrottled scan never lets a projection finish. While scanning,
+    /// refresh at most once per second, always using the latest results.
+    private func refreshForMediaPresenceChange() {
+        guard mediaPresenceScanner.isScanning else {
+            presenceRefreshTask?.cancel()
+            presenceRefreshTask = nil
+            lastPresenceRefresh = .now
+            refreshVisibleRows(rebuildProjection: true)
+            return
+        }
+        guard presenceRefreshTask == nil else { return }
+        let interval = Duration.seconds(1)
+        let delay = lastPresenceRefresh.map { max(.zero, $0 + interval - .now) } ?? .zero
+        presenceRefreshTask = Task { @MainActor in
+            if delay > .zero {
+                try? await Task.sleep(for: delay)
+            }
+            guard !Task.isCancelled else { return }
+            presenceRefreshTask = nil
+            lastPresenceRefresh = .now
+            refreshVisibleRows(rebuildProjection: true)
+        }
     }
 
     private func refreshVisibleRows(rebuildProjection _: Bool = false) {

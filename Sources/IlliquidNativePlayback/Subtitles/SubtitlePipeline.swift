@@ -357,10 +357,19 @@ final class SubtitlePipeline: @unchecked Sendable {
             storedEventCount += 1
             // Demuxing and rendering run independently. A seek can render the
             // paused target before its subtitle packet arrives, caching an
-            // empty result for that timestamp. Invalidate both caches whenever
-            // libass receives a new event so the next tick recomputes even if
-            // the presentation clock has not advanced.
-            resetRenderCachesLocked()
+            // empty result for that timestamp. Invalidate both caches when the
+            // new event starts at or before a cached timestamp so the next tick
+            // recomputes even if the presentation clock has not advanced.
+            // Packets are usually demuxed seconds ahead; for those, a later
+            // timestamp misses the cache anyway and libass reports the change
+            // when the event becomes visible, so keeping the prior regions
+            // avoids a full mask copy, repack and upload per packet.
+            if Self.eventMayAffectCachedRender(
+                startSeconds: start,
+                cachedMilliseconds: [lastRenderedMilliseconds, lastOverlayMilliseconds]
+            ) {
+                resetRenderCachesLocked()
+            }
         }
     }
 
@@ -1006,6 +1015,21 @@ final class SubtitlePipeline: @unchecked Sendable {
         if resetCounters {
             renderCounters = RenderCounters()
         }
+    }
+
+    static func eventMayAffectCachedRender(
+        startSeconds: Double,
+        cachedMilliseconds: [Int64?]
+    ) -> Bool {
+        let cached = cachedMilliseconds.compactMap { $0 }
+        guard let latest = cached.max() else { return false }
+        guard startSeconds.isFinite,
+              abs(startSeconds) < Double(Int64.max) / 1_000 - 1
+        else { return true }
+        // Round down and allow one millisecond so rounding at the render
+        // clock can never hide an event that is already visible.
+        let startMilliseconds = Int64((startSeconds * 1_000).rounded(.down)) - 1
+        return startMilliseconds <= latest
     }
 
     private func resetRenderCachesLocked() {

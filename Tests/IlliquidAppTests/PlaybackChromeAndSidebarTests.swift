@@ -2148,6 +2148,38 @@ struct ElasticPlaybackControlBarGeometryTests {
         #expect(avoiding.surfaceBounds == natural.surfaceBounds)
     }
 
+    @Test @MainActor func geometryCacheReusesLayoutUntilAnInputChanges() {
+        let size = CGSize(width: 1_200, height: 720)
+        let center = ElasticPlaybackControlBarGeometry.defaultCenter(in: size)
+        let cache = ElasticPlaybackControlBarGeometryCache()
+        func key(utilities: Int = 7, sidebar: CGFloat = 380, strength: CGFloat? = 0.4)
+            -> ElasticPlaybackControlBarGeometryCache.Key {
+            .init(containerSize: size, center: center, utilityCount: utilities,
+                  bendDirection: .up, orientation: .right, sidebarOccupiedWidth: sidebar,
+                  attachmentStrength: strength, renderOffset: nil)
+        }
+        let direct = ElasticPlaybackControlBarGeometry.avoidingSidebar(
+            containerSize: size, center: center, utilityCount: 7, bendDirection: .up,
+            orientation: .right, sidebarOccupiedWidth: 380, attachmentStrength: 0.4
+        )
+        let cached = cache.geometry(for: key())
+        #expect(cached.surfacePoints == direct.surfacePoints)
+        #expect(cached.utilityPositions == direct.utilityPositions)
+        _ = cache.geometry(for: key())
+        #expect(cache.misses == 1)
+        // The fitted fallback layout coexists with the full one.
+        _ = cache.geometry(for: key(utilities: 3))
+        _ = cache.geometry(for: key())
+        _ = cache.geometry(for: key(utilities: 3))
+        #expect(cache.misses == 2)
+        let moved = cache.geometry(for: key(sidebar: 420))
+        #expect(cache.misses == 3)
+        #expect(moved.surfacePoints == ElasticPlaybackControlBarGeometry.avoidingSidebar(
+            containerSize: size, center: center, utilityCount: 7, bendDirection: .up,
+            orientation: .right, sidebarOccupiedWidth: 420, attachmentStrength: 0.4
+        ).surfacePoints)
+    }
+
     @Test func sidebarMovesTheBarOnlyWhenItsSurfaceWouldOverlap() {
         let size = CGSize(width: 1_200, height: 720)
         let center = ElasticPlaybackControlBarGeometry.defaultCenter(in: size)
